@@ -8,14 +8,14 @@ namespace PoEformance.Core.Tests;
 /// <summary>The reader-thread half of the monolith prices: from a snapshot to a priced, placed view.</summary>
 public class MonolithWatchTests
 {
-    private const ulong GameStates = 0x1400003000;
+    internal const ulong GameStates = 0x1400003000;
     private const ulong GameStateAddr = 0x20_0000;
     private const ulong InGameStateAddr = 0x30_0000;
 
     private static OffsetSchema Schema() => MonolithFixture.ShippedSchema();
 
     /// <summary>The chain from the GameStates static down to the fixture's area instance.</summary>
-    private static void Chain(FakeMemoryReader fake, OffsetSchema schema)
+    internal static void Chain(FakeMemoryReader fake, OffsetSchema schema)
     {
         fake.Place(GameStates, GameStateAddr);
 

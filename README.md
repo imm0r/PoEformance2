@@ -266,8 +266,21 @@ The row's own name stays the game's; a recipe names its reward by metadata path,
 own tables turn that into the English name poe.ninja prices under, so it works on a client in any
 language. The panel is found by a fingerprint walk the reference measured on 0.5.5 and this tool has
 not yet seen — the tab lists what it resolved, row by row, with the key each price came through, and
-the Status page names the elements, so the first opening is also the confirmation. The plugin's
-expedition route planner is not ported yet.
+the Status page names the elements, so the first opening is also the confirmation.
+
+The **Expedition** tab is the plugin's route planner. Run it at the detonator and it lays the
+explosive chain: from the detonator through every monolith worth the walk (by reward plus rune,
+or by size, since the big one is where the chain cashes out), every relic whose mods net positive
+and the Kalguur Sentinel first, bridging the gaps along walkable ground, setting each charge past
+its anchor so the blast reaches toward the next, grabbing reward flags in passing, and spending
+the spare charges on the flag clusters that pay most per charge. The order it settles on is the
+detonation order the rune chain values the monoliths by, so the two agree. The charges are
+numbered on the map with their blast rings, the next one to lay is ringed in the world, the
+counts come off the game's own expedition controller with the HUD counter and a manual total
+behind it, and a Grand expedition — a logbook, or ten charges and more — gets its longer
+placement and wider blast, stretched by the map's own modifiers. Every offset here is the
+plugin's and unseen by this tool, so the tab says which count source answered, and the
+planner's decision trace can be written to a file when a plan looks wrong.
 
 The config window has a **Map** tab showing the same layout at a readable size, with the
 player and nearby markers on it. It stays open while the overlay runs and its settings apply

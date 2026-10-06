@@ -583,8 +583,28 @@
         "TerrainMetadata": {
           "offset": "0x8D0", "type": "ptr",
           "comment": "TerrainStruct (was 0x8A0, then 0x8B8, then 0x8C0 - 2026-08 +0x08 wave - now 0x8D0, 0.5.5 late region +0x10). Source: GameHelper2 AreaInstanceOffsets.cs. NOTE: unlike most ptr fields this is an inline struct base in some builds - treat as base address, not pointer, when reading TerrainMetadata fields. INLINE IS THE CASE HERE, and the recordings say so outright: the eight bytes at 0x8C0 hold a MODULE address, which is a vtable and not a heap pointer, and the very next slot holds this AreaInstance's own address - a back-pointer to the owner, where GameHelper2's TerrainStruct has an unnamed field at +0x08."
+        },
+        "MapMods": {
+          "offset": "0x150", "type": "stdVector",
+          "comment": "std::vector of { i32 statKey; i32 value } - the area's active map modifiers, locale-free, the value a signed percent. yokkenUA's RunecraftHelper's 0.5.5 measurement (0x158 -> 0x150 with the early region's -8) and live-verified there in Stagnant Basin: 34 pairs spanning 0x110, among them 13471 = 35 on a zone advertising +35% explosive radius. THE KEY IS THE Stats.dat ROW PLUS ONE, uniformly: decoded by the plugin against a fresh dump on all 33 mods of a live area, every one resolves to a map_* stat at +1 and only 25 at +0 - so a key is derived from a dumped row by adding one and never read off the dump as it stands (13686 at face value is 'number of monster markers'; at +1 it is the placement-distance mod, confirmed live in a Tundra logbook holding 13686 = 30). A drift here fails SILENTLY, which is how it survived a patch in the plugin: at the old offset the read lands on the vector's end and capacity, begin equals end, and the percentages simply stay stale - so ExpeditionReader leaves the values untouched when the vector does not read and zeroes them only for a genuinely empty one. NOT SEEN BY THIS TOOL; the Expedition tab prints what it read."
         }
       }
+    },
+
+    "ExpeditionStats": {
+      "comment": "The two map-modifier stat keys the route planner applies, as AreaInstance.MapMods carries them - Stats.dat row + 1, see that field. Ghidra (RunecraftHelper, 0.5.4 BHF3): effective placement distance = base x (1 + pct / 100) in ExpeditionExplosive_BuildPlacementPath, effective blast radius the same way in ExpeditionExplosive_ComputeBlastRadius.",
+      "fields": {
+        "Key": { "offset": "0x00", "type": "i32", "comment": "One pair's stat key; the value follows at +0x04." }
+      },
+      "consts": { "PairSize": "8", "MostPairs": "4096", "MapExplosionRadiusPct": "13471", "MapPlacementDistancePct": "13686" }
+    },
+
+    "ExpeditionPhysics": {
+      "comment": "What a charge can do, in grid cells, with no map modifier - EXACT from Ghidra (RunecraftHelper, 0.5.4 BHF3): placement reach 0x6C / 0x5A in ExpeditionExplosive_BuildPlacementPath, blast radius 0x25 / 0x1E in ExpeditionExplosive_ComputeBlastRadius, Grand against normal by the same area-type test in both. Live measurement had the radii at 35/28, two cells under the code's floor, and the engine adds +8 x (nearby uncovered) on top of it, so the floor is the conservative coverage value. The area-type test itself is not decoded: a Logbook is known by its WorldArea id (ExpeditionLogBook_*, ExpeditionSubArea_*), and a Grand Expedition rolled onto an ordinary map only by its charge total reaching GrandChargeThreshold.",
+      "fields": {
+        "Unused": { "offset": "0x00", "type": "i32", "comment": "No memory behind this struct; it carries constants." }
+      },
+      "consts": { "GrandPlacement": "108", "NormalPlacement": "90", "GrandRadius": "37", "NormalRadius": "30", "GrandChargeThreshold": "10" }
     },
 
     "LocalPlayerStruct": {
@@ -599,13 +619,46 @@
     },
 
     "ServerData": {
-      "comment": "Behind LocalPlayerStruct.ServerDataPtr - i.e. the VALUE at AreaInstance+PlayerInfo, not a second dereference. The blob the server sends about this character: page-aligned, four vtables at its head. Only the one field below is decoded here; the inventories and the league name live in it too and are read elsewhere.",
+      "comment": "Behind LocalPlayerStruct.ServerDataPtr - i.e. the VALUE at AreaInstance+PlayerInfo, not a second dereference. The blob the server sends about this character: page-aligned, four vtables at its head. Two fields are decoded here; the inventories and the league name live in it too and are read elsewhere.",
       "fields": {
         "QuestFlagOwnerPtr": {
           "offset": "0x60", "type": "ptr", "invariant": { "kind": "plausiblePtr" },
           "comment": "First hop of the quest-flag chain. WHAT THIS OBJECT IS is not known - it carries five vtables at its head, so a class with multiple bases, and nothing here has identified it. Named for where it leads rather than for what it is, which is honest about the state of it."
+        },
+        "ExpeditionControllerPtr": {
+          "offset": "0x2598", "type": "ptr",
+          "comment": "The ExpeditionExplosiveController - where the charge counts live while explosives are being placed, null outside an expedition. A ServerData field, NOT a UI object, which is what makes it range-independent and survives walking away from the detonator (yokkenUA's RunecraftHelper, Ghidra ExpeditionExplosiveController_ctor 0.5.4 HF3). DRIFT: 0x2618 on 0.5.4, 0x2598 on 0.5.5, and it has moved twice, so ExpeditionReader tries this slot, then the old one (ExpeditionControllerPtrWas), then scans ControllerScanStart..ControllerScanEnd eight bytes at a time for anything that passes ExpeditionController's fingerprint - which needs no earlier success, unlike a vtable match. NOT SEEN BY THIS TOOL."
         }
-      }
+      },
+      "consts": { "ExpeditionControllerPtrWas": "0x2618", "ControllerScanStart": "0x2400", "ControllerScanEnd": "0x2700" }
+    },
+
+    "ExpeditionController": {
+      "comment": "ServerController_ctorBase(this, manager, 0x33): the type id at +0x30 and the manager - the very ServerData it hangs off - at +0x48, which is the SELF-VERIFYING fingerprint: only the real controller of this ServerData points back at it. Both held across 0.5.4 HF3 and 0.5.5 while the class body shrank around them (0x2B8 -> 0x278). The counts used to be read off the controller itself (total at +0x2B0, placed vector at +0x220) and on 0.5.5 both fell OUTSIDE the object, +0x220 reading a stale pointer that faulted - a count is data and the wrong thing to prove identity with, which is why the fingerprint is structural. They live in the placement state now.",
+      "fields": {
+        "TypeId": { "offset": "0x30", "type": "i32", "comment": "0x33 - see consts." },
+        "ManagerPtr": { "offset": "0x48", "type": "ptr", "comment": "Back-pointer to the owning ServerData." },
+        "PlacementStatePtr": { "offset": "0x1E0", "type": "ptr", "struct": "ExpeditionPlacementState", "comment": "A one-element container {begin, end, cap} - the ctor's FUN_1417441c0(this + 0x3C, 1) reserves it - whose begin is the placement state." }
+      },
+      "consts": { "TypeId": "0x33" }
+    },
+
+    "ExpeditionPlacementState": {
+      "comment": "The 0x70-byte sub-object with its own vtable that carries both counts on 0.5.5. Verified live by the plugin: with two charges placed and the HUD showing 13, TotalCharges still read 15 - so it is the MAXIMUM for the map, what a budget is - and PlacedVec held exactly two entries, (1113,666) and (1098,711), in the monoliths' own grid space. +0x58 holds a constant (1023, 724) that looks like grid bounds and is not read.",
+      "fields": {
+        "PlacedVec": { "offset": "0x40", "type": "stdVector", "comment": "std::vector of { i32 x; i32 y } grid points, one per placed charge, in placement order. Genuinely { 0, 0 } before the first placement - an empty vector is zero placed, not a failed read; treating it as a failure made the controller 'disappear' until a charge went down." },
+        "LastPlaced": { "offset": "0x60", "type": "i32", "comment": "{ i32 x; i32 y } mirroring the vector's tail. Not read." },
+        "TotalCharges": { "offset": "0x68", "type": "u8", "invariant": { "kind": "range", "min": 0, "max": 64 }, "comment": "The map's charge total - the maximum, not the remainder. Reported as unknown outside 1..64 rather than as a fabricated budget." }
+      },
+      "consts": { "PlacedEntrySize": "8", "MostCharges": "64" }
+    },
+
+    "ExpeditionHud": {
+      "comment": "The ExplosiveCounter widget the game shows while explosives are being placed at the detonator, and the FALLBACK for the counts when the controller does not resolve: its leaf text is the number of charges REMAINING, language-independent, so total = remaining + the placed charges counted as entities. Child path from the UI root this tool resolves (InGameState.UiRootStructPtr, whose children the interface browser lists the HUD among): [97][9][17][1] is the widget (RunecraftHelper's 'GameUi -> [97][9][17][1]'), and three more [0] steps reach the text leaf. A CHILD PATH DRIFTS BETWEEN MAP LOADS - the plugin records it intermittently failing to resolve while the HUD was plainly on screen - which is why the detonator ENTITY, not this widget, decides whether the planner shows. The widget also carries the controller at ControllerOffset (0x378 on 0.5.4, the UiElementBase tail's -0x18 on 0.5.5), kept as the last resort.",
+      "fields": {
+        "ControllerPtr": { "offset": "0x360", "type": "ptr", "struct": "ExpeditionController", "comment": "On the widget element: the controller, while the widget exists. Validated by ExpeditionController's fingerprint before it is trusted." }
+      },
+      "consts": { "Child0": "97", "Child1": "9", "Child2": "17", "Child3": "1", "CounterDepth": "3", "MostRemaining": "999" }
     },
 
     "QuestFlagOwner": {

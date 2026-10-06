@@ -138,6 +138,21 @@ public sealed record MonolithView(
     /// <summary>Where it stands in the chain: what is already propagating over it.</summary>
     public ChainSite Site { get; init; }
 
+    /// <summary>
+    /// The strongest loot uplift this monolith could propagate, and which rune carries it -
+    /// ORDER-INDEPENDENT, for the route planner.
+    /// </summary>
+    /// <remarks>
+    /// Deliberately not the chain figure above: the planner compares candidate tour orders, and
+    /// a value already priced for the order in force is the circularity that let a strong rune
+    /// sit at the tail and value itself at zero. No duplicate suppression either, for the same
+    /// reason - whether a rune repeats depends on what precedes it in the candidate order. A
+    /// committed recipe pins the rune; an open monolith reports the best over its offers.
+    /// </remarks>
+    public double RouteUplift { get; init; }
+
+    public int RouteRune { get; init; } = -1;
+
     /// <summary>The runes it could still propagate that are worth it, best first, at most a few - for the map.</summary>
     public IReadOnlyList<string> Scout { get; init; } = [];
 
@@ -572,11 +587,15 @@ public sealed class MonolithWatch
                 Joint = view.Best,
                 Site = site,
                 Scout = [],
+                RouteUplift = 0,
+                RouteRune = -1,
             };
         }
 
         var candidates = new List<MonolithCandidate>(view.Candidates.Count);
         var scouted = new List<(int Rune, double Mult)>();
+        double routeUplift = 0;
+        int routeRune = -1;
         foreach (MonolithCandidate candidate in view.Candidates)
         {
             int rune = table.Propagated(site, station.GlowSockets, candidate.Recipe.Runes, station.Empowered);
@@ -592,7 +611,26 @@ public sealed class MonolithWatch
                 {
                     scouted.Add((rune, mult));
                 }
+
+                // For the planner: the best uplift over every framed socket of every offer,
+                // with no chain context - see RouteUplift.
+                foreach (int socket in station.GlowSockets)
+                {
+                    int at = candidate.Recipe.RuneAt(socket);
+                    double up = at >= 0 ? table.EffMult(at, station.Empowered) - 1 : 0;
+                    if (up > routeUplift)
+                    {
+                        routeUplift = up;
+                        routeRune = at;
+                    }
+                }
             }
+        }
+
+        if (view.LockedRune >= 0)
+        {
+            routeRune = view.LockedRune;
+            routeUplift = Math.Max(0, table.EffMult(view.LockedRune, station.Empowered) - 1);
         }
 
         // A committed monolith has one candidate, so its chain value is what it WILL propagate.
@@ -619,6 +657,8 @@ public sealed class MonolithWatch
             ExpectedWaves = best.Recipe.Size > 0 ? best.Recipe.Size : view.ExpectedWaves,
             Site = site,
             Scout = scout,
+            RouteUplift = routeUplift,
+            RouteRune = routeRune,
         };
     }
 

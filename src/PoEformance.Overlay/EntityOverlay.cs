@@ -1201,6 +1201,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private RunecraftWatch? _runecraftWatch;
     private readonly MonolithLayer _monoliths = new();
     private MonolithWatch? _monolithWatch;
+    private readonly ExpeditionLayer _expedition = new();
+    private ExpeditionWatch? _expeditionWatch;
 
     /// <summary>Called when a preload switch changed, so it can be written down.</summary>
     public Action<PreloadSettings>? PreloadRulesChanged { get; set; }
@@ -2573,6 +2575,21 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         }
     }
 
+    /// <summary>Attaches the expedition route planner: its tab, its map and world drawing, its hotkey.</summary>
+    public void AttachExpedition(ExpeditionWatch watch, Action<ExpeditionSettings> saved, bool visible = false)
+    {
+        ArgumentNullException.ThrowIfNull(watch);
+        ArgumentNullException.ThrowIfNull(saved);
+        _expeditionWatch = watch;
+
+        var window = new ExpeditionWindow(watch, saved);
+        _tools.Add(64, "expedition", "Expedition", window.DrawTab);
+        if (visible)
+        {
+            _tools.Show("expedition");
+        }
+    }
+
     /// <summary>
     /// Adds the raw-memory dissector.
     /// </summary>
@@ -3386,6 +3403,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         PollScreenshot(Environment.TickCount64);
 
+        // The planner's Run key, behind the foreground gate above so a press meant for another
+        // application never reaches it, and inert unless there is a chain to plan.
+        if (_expeditionWatch is { Settings.Enabled: true } planner)
+        {
+            _expedition.PollRunKey(planner, planner.Settings, planner.View);
+        }
+
         // Before the marker gate, and outside it: the watcher decides for itself where it is
         // quiet, and its own rule is towns rather than "wherever markers are drawn".
         if (_snapshot.InGame)
@@ -3470,6 +3494,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // marker has to be the one on top. It is the half you are meant to react to.
             _evasion.Draw(ImGui.GetBackgroundDrawList(), _snapshot, width, height);
             _statusIcons.Draw(ImGui.GetBackgroundDrawList(), _snapshot, width, height);
+
+            // The next charge of the expedition plan, ringed on the ground where it goes. On
+            // the ground like the hazard rings, and after the icons because it is the one mark
+            // the player is walking toward rather than reading.
+            if (_expeditionWatch is { Settings.Enabled: true } expedition)
+            {
+                _expedition.DrawWorld(ImGui.GetBackgroundDrawList(), _snapshot, width, height, expedition.View);
+            }
 
             if (ShowWorldDots)
             {
@@ -4539,6 +4571,18 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             }
         }
 
+        // The expedition planner: what the scan found and where the charge counts came from -
+        // the half that says whether the controller offsets, unseen by this tool, resolved.
+        if (_expeditionWatch is { Settings.Enabled: true } planner)
+        {
+            ExpeditionView expedition = planner.View;
+            Row(
+                "expedition",
+                expedition.Status + (expedition.HasDetonator ? $"   (charges {expedition.Placed}/{expedition.Total} by {expedition.CountsSource})" : string.Empty),
+                expedition.HasDetonator && !expedition.CountsKnown ? Warning : Measured,
+                figure: true);
+        }
+
         if (_snapshot.Player is not WorldEntity player)
         {
             return;
@@ -5044,6 +5088,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             && !recipes.View.Open)
         {
             _monoliths.Draw(draw, map, player, _monolithWatch.View, recipes.Settings);
+        }
+
+        // Over the labels: the chain is the map's answer to "where next" in an expedition, and
+        // a numbered charge wants to be read over the price it collects.
+        if (_expeditionWatch is { Settings.Enabled: true } planner)
+        {
+            _expedition.DrawOnMap(draw, map, player, _snapshot.Terrain, planner.View, planner.Settings);
         }
 
         if (ShowCalibration)

@@ -3880,8 +3880,41 @@ only the price is added. What the port kept, what it changed, and why:
   committed rune replaces the price on a monolith whose player gave up reward for it and
   joins it on one sealed by a reroll; scouting writes the best few runes a monolith could
   still propagate above its price.
-- **Not ported yet:** the plugin's expedition route planner, which rests on everything above
-  and supplies the detonation order the chain plan takes.
+- **The route planner** rests on everything above and supplies the detonation order the chain
+  plan takes. `ExpeditionReader` (Game) reads what the plan needs off the game, every offset the
+  plugin's and none yet seen here: the charge counts from the controller the ServerData holds
+  (its slot, then the slot it used to be in, then a window scan, each believed only when the
+  type id and the back-pointer to the ServerData both hold), the HUD counter's remaining text as
+  the fallback and the manual total as the last, the map's placement and radius modifiers as
+  stat-key pairs off `AreaInstance.MapMods`, the detonator's `activated` state, a blocker's shut
+  flag and a relic's mod ids. `ExpeditionWatch` (Features) owns the area on the reader thread:
+  a target cache that ACCUMULATES — the game stops listing a flag the player walks away from,
+  and a route recomputed on every such change would be a different route every few seconds —
+  and a fingerprint over the cache and the knobs that decides when the plan is stale; movement
+  alone never re-plans. A run only raises a flag; the next service snapshots the inputs and hands
+  them to a task, and a later service takes the result up, discarding one made for a previous
+  area. Monoliths join by entity id from the chain-valued view (joint value, holes, expected
+  waves, and an order-independent "strongest uplift it could propagate" for the reorder);
+  markers weigh by the reward icon on a Grand expedition and by POLE HEIGHT on a normal one — the
+  game fixes each tier's pole, so the modal height is the tiny swarm and taller is better.
+  Grand physics (108 cells placement, 37 blast) against normal (90, 30) is decided by the
+  logbook area id, else by a confirmed total of ten or more; unconfirmed reads as normal because
+  that never proposes a point the game refuses.
+  `ExpeditionPaths` is the planner's pathfinder over the terrain grid: a bounded A\* for "within
+  one hop", the full length with a component-label short-circuit for the unreachable, a memo
+  keyed on both endpoints that the tour matrix fills in parallel, and the doorways a shut gate
+  opens or a "Door" entity marks. `ExpeditionPlanner` is the plugin's spine planner in order: a
+  nearest-neighbour tour over walkable distances improved by 2-opt; the chain's re-scoring of it
+  (`J = baseEx × Σ waves × cumulative uplift + rewards − 8 ex per charge`, over the part the
+  budget affords — without that truncation a saturated plan scored every order the same and the
+  reorder switched itself off where it mattered); the Sentinel pinned first; the ordered anchors
+  rasterised into one dense polyline; the forward sweep that sets each charge past its anchor
+  toward the next, merges a bridge onto an adjacent reward when that costs nothing and lays
+  stepping stones where a hop will not reach; then the spares, each spent on the uncovered
+  cluster worth most per charge counting the bridges out and the reconnect back, rolled back
+  whole when it cannot complete. The result is drawn as numbered charges with blast rings on the
+  map, the next one ringed in the world, and the whole decision trace on the tab — and to a file
+  on request, which is how a wrong plan gets diagnosed without the game.
 
 ### The trade site — the uniques poe.ninja has nothing on
 

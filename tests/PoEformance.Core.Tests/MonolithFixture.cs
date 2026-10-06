@@ -18,12 +18,6 @@ internal sealed class MonolithFixture
 {
     public const ulong Device = 0x0000_0400_0000_0000;
     public const ulong OtherDevice = Device + 0x0800;
-    private const ulong Details = Device + 0x1000;
-    private const ulong Lookup = Device + 0x2000;
-    private const ulong Vector = Device + 0x3000;
-    private const ulong Bucket = Device + 0x4000;
-    private const ulong ComponentNames = Device + 0x5000;
-    private const ulong PathChars = Device + 0x6000;
 
     public const ulong Machine = Device + 0x10_000;
     private const ulong Definition = Device + 0x11_000;
@@ -73,7 +67,7 @@ internal sealed class MonolithFixture
         // A module the panel-open pointer can land in, so the module check is exercised.
         Reader.ModuleSize = 0x100_0000;
 
-        PlaceEntity(Device, DeviceId, DevicePath, [("StateMachine", Machine), ("Render", Device + 0x700)]);
+        PlaceEntity(Reader, schema, Device, DeviceId, DevicePath, [("StateMachine", Machine), ("Render", Device + 0x700)]);
 
         StructDef machine = schema.Structs["StateMachine"];
         int nameSize = (int)machine.Constants["StateNameSize"];
@@ -181,40 +175,85 @@ internal sealed class MonolithFixture
     public void MisalignAnchor()
         => Reader.Place<ulong>(Station + (ulong)_schema.Structs["RuneStation"].OffsetOf("AnchorRuneRowPtr"), RuneTable + 0x68 + 4);
 
-    /// <summary>Lays out an entity as the schema describes it: details, component vector, bucket, names.</summary>
-    private void PlaceEntity(ulong entity, uint id, string path, (string Name, ulong Component)[] components)
+    /// <summary>
+    /// Lays out an entity as the schema describes it: details, component vector, bucket, names.
+    /// </summary>
+    /// <remarks>
+    /// The scratch - details, lookup, vector, bucket, names, path characters - sits in the
+    /// 0x1000 pages above the entity, so an entity needs 0x7000 bytes of address space to itself
+    /// and two fixtures can lay entities side by side without a shared cursor.
+    /// </remarks>
+    internal static void PlaceEntity(
+        FakeMemoryReader reader, OffsetSchema schema, ulong entity, uint id, string path, (string Name, ulong Component)[] components)
     {
-        StructDef eDef = _schema.Structs["Entity"];
-        StructDef dDef = _schema.Structs["EntityDetails"];
-        StructDef lDef = _schema.Structs["ComponentLookup"];
-        StructDef bDef = _schema.Structs["StdBucket"];
-        StructDef entryDef = _schema.Structs["ComponentLookupEntry"];
+        ulong details = entity + 0x1000;
+        ulong lookup = entity + 0x2000;
+        ulong vector = entity + 0x3000;
+        ulong bucketAt = entity + 0x4000;
+        ulong componentNames = entity + 0x5000;
+        ulong pathChars = entity + 0x6000;
+
+        StructDef eDef = schema.Structs["Entity"];
+        StructDef dDef = schema.Structs["EntityDetails"];
+        StructDef lDef = schema.Structs["ComponentLookup"];
+        StructDef bDef = schema.Structs["StdBucket"];
+        StructDef entryDef = schema.Structs["ComponentLookupEntry"];
         int entrySize = (int)entryDef.Constants["Size"];
 
-        Reader.Place(entity, new byte[0x100]);
-        Reader.Place<ulong>(entity + (ulong)eDef.OffsetOf("EntityDetailsPtr"), Details);
-        Reader.Place<uint>(entity + (ulong)eDef.OffsetOf("Id"), id);
-        Reader.Place<ulong>(entity + (ulong)eDef.OffsetOf("ComponentsVec"), Vector);
-        Reader.Place<ulong>(entity + (ulong)eDef.OffsetOf("ComponentsVecLast"), Vector + (ulong)(components.Length * 8));
+        reader.Place(entity, new byte[0x100]);
+        reader.Place<ulong>(entity + (ulong)eDef.OffsetOf("EntityDetailsPtr"), details);
+        reader.Place<uint>(entity + (ulong)eDef.OffsetOf("Id"), id);
+        reader.Place<ulong>(entity + (ulong)eDef.OffsetOf("ComponentsVec"), vector);
+        reader.Place<ulong>(entity + (ulong)eDef.OffsetOf("ComponentsVecLast"), vector + (ulong)(components.Length * 8));
         for (int i = 0; i < components.Length; i++)
         {
-            Reader.Place<ulong>(Vector + (ulong)(i * 8), components[i].Component);
+            reader.Place<ulong>(vector + (ulong)(i * 8), components[i].Component);
         }
 
-        Reader.PlaceStdWString(Details + (ulong)dDef.OffsetOf("Path"), path, PathChars);
-        Reader.Place<ulong>(Details + (ulong)dDef.OffsetOf("ComponentLookupPtr"), Lookup);
+        reader.PlaceStdWString(details + (ulong)dDef.OffsetOf("Path"), path, pathChars);
+        reader.Place<ulong>(details + (ulong)dDef.OffsetOf("ComponentLookupPtr"), lookup);
 
-        ulong bucket = Lookup + (ulong)lDef.OffsetOf("Bucket");
-        Reader.Place<int>(bucket + (ulong)bDef.OffsetOf("Capacity"), components.Length * 2);
-        Reader.Place<ulong>(bucket + (ulong)bDef.OffsetOf("Data"), Bucket);
-        Reader.Place<ulong>(bucket + (ulong)bDef.OffsetOf("DataLast"), Bucket + (ulong)(components.Length * entrySize));
+        ulong bucket = lookup + (ulong)lDef.OffsetOf("Bucket");
+        reader.Place<int>(bucket + (ulong)bDef.OffsetOf("Capacity"), components.Length * 2);
+        reader.Place<ulong>(bucket + (ulong)bDef.OffsetOf("Data"), bucketAt);
+        reader.Place<ulong>(bucket + (ulong)bDef.OffsetOf("DataLast"), bucketAt + (ulong)(components.Length * entrySize));
         for (int i = 0; i < components.Length; i++)
         {
-            ulong entry = Bucket + (ulong)(i * entrySize);
-            ulong name = ComponentNames + (ulong)(i * 0x40);
-            Reader.Place<ulong>(entry + (ulong)entryDef.OffsetOf("NamePtr"), name);
-            Reader.Place<int>(entry + (ulong)entryDef.OffsetOf("Index"), i);
-            Reader.PlaceUtf8(name, components[i].Name);
+            ulong entry = bucketAt + (ulong)(i * entrySize);
+            ulong name = componentNames + (ulong)(i * 0x40);
+            reader.Place<ulong>(entry + (ulong)entryDef.OffsetOf("NamePtr"), name);
+            reader.Place<int>(entry + (ulong)entryDef.OffsetOf("Index"), i);
+            reader.PlaceUtf8(name, components[i].Name);
+        }
+    }
+
+    /// <summary>
+    /// Lays out a StateMachine component: its definition's names and its values, as the
+    /// decoder finds them - inline std::strings, StateNameSize apart, one value per name.
+    /// </summary>
+    internal static void PlaceStateMachine(
+        FakeMemoryReader reader, OffsetSchema schema, ulong machine, ulong definition, ulong names, ulong values,
+        string[] stateNames, long[] stateValues)
+    {
+        StructDef def = schema.Structs["StateMachine"];
+        int nameSize = (int)def.Constants["StateNameSize"];
+        reader.Place<ulong>(machine + (ulong)def.OffsetOf("StatesPtr"), definition);
+        reader.Place<ulong>(definition + (ulong)def.Constants["StateNamesBase"], names);
+        reader.Place(names, new byte[stateNames.Length * nameSize]);
+        for (int i = 0; i < stateNames.Length; i++)
+        {
+            var header = new byte[32];
+            System.Text.Encoding.ASCII.GetBytes(stateNames[i], header.AsSpan(0, 15));
+            System.Runtime.InteropServices.MemoryMarshal.Write(header.AsSpan(16), (long)stateNames[i].Length);
+            System.Runtime.InteropServices.MemoryMarshal.Write(header.AsSpan(24), 15L);
+            reader.Place(names + (ulong)(i * nameSize), header);
+        }
+
+        reader.Place<ulong>(machine + (ulong)def.OffsetOf("StatesValuesFirst"), values);
+        reader.Place<ulong>(machine + (ulong)def.OffsetOf("StatesValuesLast"), values + (ulong)(stateValues.Length * 8));
+        for (int i = 0; i < stateValues.Length; i++)
+        {
+            reader.Place(values + (ulong)(i * 8), stateValues[i]);
         }
     }
 

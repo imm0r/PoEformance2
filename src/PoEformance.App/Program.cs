@@ -2506,6 +2506,18 @@ internal static class Program
             Settings = runecraft.Settings,
         };
 
+        // AND THE ROUTE PLANNER over them: the explosive chain from the detonator through the
+        // monoliths, relics and markers worth it, planned on request and drawn on the map. It
+        // takes the monoliths' chain values and hands back the detonation order the chain
+        // values want - the two feed each other, a scan apart.
+        handle.Stage = "loading expedition settings";
+        var expedition = new PoEformance.Features.ExpeditionWatch(reader, schema, gameStatesStatic)
+        {
+            Settings = PoEformance.Features.ExpeditionStore.Load(),
+            ChainSettings = runecraft.Settings,
+            ModNames = PoEformance.Features.RelicModNames.Load(FindDataFile("expedition-relic-mods.json")),
+        };
+
         // What a map contains, drawn as the game's own pictures. Shares the stash's art store,
         // so one cache on disk serves both and a picture is unpacked once - and asks the install
         // itself where that art lives, rather than being told by a list somebody maintains.
@@ -2818,6 +2830,13 @@ internal static class Program
                 monoliths.Service(snapshot, Environment.TickCount64, prices.Book);
                 runecraft.Service(scale, Environment.TickCount64, prices.Book, monoliths.View);
 
+                // The planner after the monoliths, on their fresh view; its order goes back to
+                // them for the next scan. The same reference every tick costs the monoliths
+                // nothing - they re-value only when the order is a new one.
+                expedition.ChainSettings = runecraft.Settings;
+                expedition.Service(snapshot, Environment.TickCount64, monoliths.View);
+                monoliths.PlannedOrder = expedition.PlannedOrder;
+
                 // The same arrangement for the game's own exchange, and for the same reason:
                 // told the league every tick, it refreshes only when that is news or the hour
                 // has turned. Its digests are immutable, so a refresh is one request.
@@ -3084,6 +3103,7 @@ internal static class Program
                 PoEformance.Features.AtlasStore.Save(kept);
             });
         overlay.AttachRunecraft(runecraft, monoliths, changed => PoEformance.Features.RunecraftStore.Save(changed), prices);
+        overlay.AttachExpedition(expedition, changed => PoEformance.Features.ExpeditionStore.Save(changed));
         overlay.Noise = world.Noise;
         overlay.Memory = world.Memory;
 
