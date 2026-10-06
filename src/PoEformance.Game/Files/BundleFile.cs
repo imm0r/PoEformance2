@@ -34,6 +34,12 @@ public sealed class BundleFile
     private readonly long[] _starts;
     private readonly int _dataAt;
 
+    /// <summary>The chunk unpacked last, with its number - see <see cref="Read(int, int, Func{ReadOnlyMemory{byte}, int, byte[]})"/>.</summary>
+    private Recent? _recent;
+
+    /// <summary>One unpacked chunk and which it is.</summary>
+    private sealed record Recent(int Chunk, byte[] Plain);
+
     private BundleFile(Func<int, int, byte[]?> bytes, int uncompressed, int chunkSize, int[] sizes, int dataAt)
     {
         _bytes = bytes;
@@ -165,17 +171,28 @@ public sealed class BundleFile
                 return null;
             }
 
-            byte[]? packed = _bytes((int)_starts[chunk], _sizes[chunk]);
-            if (packed is null || packed.Length < _sizes[chunk])
-            {
-                return null;
-            }
-
+            // THE LAST CHUNK UNPACKED IS KEPT: files sit side by side in a bundle, so a run of small
+            // reads - the graph survey reads every material in the install - mostly lands in the
+            // chunk the read before it unpacked, and reading and unpacking 256 KB again for each is
+            // nearly the whole cost. Swapped whole, so a read on another thread sees a chunk and its
+            // number together or not at all; the array is never written after it is kept.
             int plainSize = SizeOfChunk(chunk);
-            byte[]? plain = decompress(packed, plainSize);
-            if (plain is null || plain.Length < plainSize)
+            byte[]? plain = Volatile.Read(ref _recent) is { } recent && recent.Chunk == chunk ? recent.Plain : null;
+            if (plain is null)
             {
-                return null;
+                byte[]? packed = _bytes((int)_starts[chunk], _sizes[chunk]);
+                if (packed is null || packed.Length < _sizes[chunk])
+                {
+                    return null;
+                }
+
+                plain = decompress(packed, plainSize);
+                if (plain is null || plain.Length < plainSize)
+                {
+                    return null;
+                }
+
+                Volatile.Write(ref _recent, new Recent(chunk, plain));
             }
 
             // Which part of this chunk was asked for: partly the ones at either end of the
