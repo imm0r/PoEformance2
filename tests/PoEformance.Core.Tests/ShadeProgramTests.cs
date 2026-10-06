@@ -292,7 +292,386 @@ public class ShadeProgramTests
             compiled.Program.Textures);
     }
 
+    /// <summary>
+    /// A Vastiri cliff from the install: its colour map with AGT_DesertDust's dust laid over it, the whole of it evaluated.
+    /// </summary>
+    /// <remarks>
+    /// THE CASE THE NODE BATCH WAS FOR, from the crimsonshores dump: VST_Cliff13c.mat and
+    /// AGT_DesertDust.fxgraph verbatim. The dust reads the occlusion DielectricSpecGlossBN put in the
+    /// indirect light's w, the surface normal through Transform by the TBN basis, the world position
+    /// through GroundScroll, and three textures triplanar or tiled - every texture that reaches the
+    /// colour, and none of the normal maps, which only feed channels nothing draws.
+    /// </remarks>
+    [Fact]
+    public void ANDTHEVASTIRICLIFFIsDustedByAGTDesertDust()
+    {
+        ShadeCompile compiled = Real("Art/Textures/Environment/desert/DesertCliffs/Vastiri/VST_Cliff13c.mat");
+
+        Assert.NotNull(compiled.Program);
+        Assert.Empty(compiled.Skipped);
+        Assert.Equal(-1, compiled.Program.Plain);
+        Assert.Equal(
+            ["Metadata/Materials/DielectricSpecGlossBN.fxgraph", "Metadata/Materials/Environment/Act2/Gates/AGT_DesertDust.fxgraph"],
+            compiled.Program.Graphs);
+        Assert.Equal(
+            [
+                new ShadeTexture("Art/Textures/Environment/desert/DesertCliffs/Vastiri/VST_Cliff13_colour_BC1.dds", true),
+                new ShadeTexture("Art/Textures/Environment/desert/DesertCliffs/Vastiri/VST_Cliff13_normal_BC7.dds", false),
+                new ShadeTexture("Art/Textures/Environment/desert/Shore/Ground/VST_RockSandStone_MCF_Height_BC4.dds", false),
+                new ShadeTexture("Art/Textures/Environment/desert/Shore/Ground/VST_RockSandStone_MCF_colour_BC1.dds", true),
+                new ShadeTexture("Art/Textures/General/Grunge/GrungeMap01_mask_BC4.dds", false),
+            ],
+            compiled.Program.Textures.OrderBy(one => one.Path, StringComparer.Ordinal));
+    }
+
+    /// <summary>SmoothStep is the node's own curve - 0.956 here, where HLSL's smoothstep would say otherwise.</summary>
+    [Fact]
+    public void SMOOTHSTEPIsTheNodesOwnCurve()
+        => AssertColour(
+            """
+            {"nodes":[
+              {"type":"ConstantFloat","index":0,"parameters":[{"value":0.25}]},
+              {"type":"ConstantFloat","index":1,"parameters":[{"value":0.75}]},
+              {"type":"ConstantFloat","index":2,"parameters":[{"value":0.5}]},
+              {"type":"SmoothStep","index":0},
+              {"type":"AlbedoColor","index":0,"stage":"Texturing_Init"}],
+             "links":[
+              {"src":{"type":"ConstantFloat","index":0,"variable":"output"},"dst":{"type":"SmoothStep","index":0,"variable":"center"}},
+              {"src":{"type":"ConstantFloat","index":1,"variable":"output"},"dst":{"type":"SmoothStep","index":0,"variable":"steepness"}},
+              {"src":{"type":"ConstantFloat","index":2,"variable":"output"},"dst":{"type":"SmoothStep","index":0,"variable":"in_value"}},
+              {"src":{"type":"SmoothStep","index":0,"variable":"out_value"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"xyz"}}]}
+            """,
+            0.9561f, 0.9561f, 0.9561f);
+
+    /// <summary>
+    /// Divide gives nought for a nought divisor and Power takes the base's size, as the fragments say - assembled by CoordsToFloat3.
+    /// </summary>
+    /// <remarks>The square root of -0.25 is not a number; of its size, a half.</remarks>
+    [Fact]
+    public void DIVIDEByNoughtIsNoughtAndPowerTakesTheBasesSize()
+        => AssertColour(
+            """
+            {"nodes":[
+              {"type":"ConstantFloat","index":0,"parameters":[{"value":0.3}]},
+              {"type":"ConstantFloat","index":1,"parameters":[{"value":0.6}]},
+              {"type":"ConstantFloat","index":2,"parameters":[{"value":0.5}]},
+              {"type":"Zero","index":0},
+              {"type":"ConstantFloat","index":4,"parameters":[{"value":-0.25}]},
+              {"type":"Half","index":0},
+              {"type":"Divide","index":0},
+              {"type":"Divide","index":1},
+              {"type":"Power","index":0},
+              {"type":"CoordsToFloat3","index":0},
+              {"type":"AlbedoColor","index":0,"stage":"Texturing_Init"}],
+             "links":[
+              {"src":{"type":"ConstantFloat","index":0,"variable":"output"},"dst":{"type":"Divide","index":0,"variable":"a"}},
+              {"src":{"type":"ConstantFloat","index":1,"variable":"output"},"dst":{"type":"Divide","index":0,"variable":"b"}},
+              {"src":{"type":"ConstantFloat","index":2,"variable":"output"},"dst":{"type":"Divide","index":1,"variable":"a"}},
+              {"src":{"type":"Zero","index":0,"variable":"output"},"dst":{"type":"Divide","index":1,"variable":"b"}},
+              {"src":{"type":"ConstantFloat","index":4,"variable":"output"},"dst":{"type":"Power","index":0,"variable":"base"}},
+              {"src":{"type":"Half","index":0,"variable":"output"},"dst":{"type":"Power","index":0,"variable":"exp"}},
+              {"src":{"type":"Divide","index":0,"variable":"output"},"dst":{"type":"CoordsToFloat3","index":0,"variable":"x"}},
+              {"src":{"type":"Divide","index":1,"variable":"output"},"dst":{"type":"CoordsToFloat3","index":0,"variable":"y"}},
+              {"src":{"type":"Power","index":0,"variable":"output"},"dst":{"type":"CoordsToFloat3","index":0,"variable":"z"}},
+              {"src":{"type":"CoordsToFloat3","index":0,"variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"xyz"}}]}
+            """,
+            0.5f, 0f, 0.5f);
+
+    /// <summary>FitRangeFromInput divides an empty input range by one, as the node does, rather than giving the bottom of the output.</summary>
+    [Fact]
+    public void FITRANGEDividesAnEmptyRangeByOne()
+        => AssertColour(
+            """
+            {"nodes":[
+              {"type":"ConstantFloat","index":0,"parameters":[{"value":0.75}]},
+              {"type":"ConstantFloat","index":1,"parameters":[{"value":0.5}]},
+              {"type":"ConstantFloat","index":2,"parameters":[{"value":0.25}]},
+              {"type":"FitRangeFromInput","index":0},
+              {"type":"AlbedoColor","index":0,"stage":"Texturing_Init"}],
+             "links":[
+              {"src":{"type":"ConstantFloat","index":0,"variable":"output"},"dst":{"type":"FitRangeFromInput","index":0,"variable":"value"}},
+              {"src":{"type":"ConstantFloat","index":1,"variable":"output"},"dst":{"type":"FitRangeFromInput","index":0,"variable":"in_min"}},
+              {"src":{"type":"ConstantFloat","index":1,"variable":"output"},"dst":{"type":"FitRangeFromInput","index":0,"variable":"in_max"}},
+              {"src":{"type":"ConstantFloat","index":2,"variable":"output"},"dst":{"type":"FitRangeFromInput","index":0,"variable":"out_min"}},
+              {"src":{"type":"ConstantFloat","index":1,"variable":"output"},"dst":{"type":"FitRangeFromInput","index":0,"variable":"out_max"}},
+              {"src":{"type":"FitRangeFromInput","index":0,"variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"xyz"}}]}
+            """,
+            0.3125f, 0.3125f, 0.3125f);
+
+    /// <summary>A link from Float3ToCoords' <c>z</c> carries the z alone - the port names the component.</summary>
+    [Fact]
+    public void ACOORDINATEOutputIsItsComponent()
+        => AssertColour(
+            """
+            {"nodes":[
+              {"type":"ConstantFloat3","index":0,"parameters":[{"value":[0.1,0.2,0.3]}]},
+              {"type":"Float3ToCoords","index":0},
+              {"type":"CoordsToFloat3","index":0},
+              {"type":"AlbedoColor","index":0,"stage":"Texturing_Init"}],
+             "links":[
+              {"src":{"type":"ConstantFloat3","index":0,"variable":"output"},"dst":{"type":"Float3ToCoords","index":0,"variable":"input"}},
+              {"src":{"type":"Float3ToCoords","index":0,"variable":"z"},"dst":{"type":"CoordsToFloat3","index":0,"variable":"x"}},
+              {"src":{"type":"Float3ToCoords","index":0,"variable":"x"},"dst":{"type":"CoordsToFloat3","index":0,"variable":"y"}},
+              {"src":{"type":"Float3ToCoords","index":0,"variable":"y"},"dst":{"type":"CoordsToFloat3","index":0,"variable":"z"}},
+              {"src":{"type":"CoordsToFloat3","index":0,"variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"xyz"}}]}
+            """,
+            0.3f, 0.1f, 0.2f);
+
+    /// <summary>SampleTexture's <c>g</c> is the read's green, spread like any float.</summary>
+    [Fact]
+    public void ANDATEXTURESGreenIsItsGreen()
+        => AssertColour(
+            """
+            {"nodes":[
+              {"type":"InputUV","index":0,"stage":"Texturing_Init"},
+              {"type":"SampleTexture","index":0,"parameters":[{"path":"Art/mask.dds","srgb":false}]},
+              {"type":"AlbedoColor","index":0,"stage":"Texturing_Init"}],
+             "links":[
+              {"src":{"type":"InputUV","index":0,"stage":"Texturing_Init","variable":"output"},"dst":{"type":"SampleTexture","index":0,"variable":"uv"}},
+              {"src":{"type":"SampleTexture","index":0,"variable":"g"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"xyz"}}]}
+            """,
+            200f / 255f, 200f / 255f, 200f / 255f,
+            new() { ["Art/mask.dds"] = Sheet(40, 200, 10) });
+
+    /// <summary>A vector handed to a float input keeps its x, as HLSL cuts it.</summary>
+    [Fact]
+    public void AFLOATInputKeepsAVectorsX()
+        => AssertColour(
+            """
+            {"nodes":[
+              {"type":"ConstantFloat3","index":0,"parameters":[{"value":[0.2,0.5,0.9]}]},
+              {"type":"Saturate","index":0},
+              {"type":"AlbedoColor","index":0,"stage":"Texturing_Init"}],
+             "links":[
+              {"src":{"type":"ConstantFloat3","index":0,"variable":"output"},"dst":{"type":"Saturate","index":0,"variable":"input"}},
+              {"src":{"type":"Saturate","index":0,"variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"xyz"}}]}
+            """,
+            0.2f, 0.2f, 0.2f);
+
+    /// <summary>Luminance and the legacy GrayScale weigh the channels as their fragments do.</summary>
+    [Fact]
+    public void LUMINANCEAndGrayScaleWeighTheChannelsTheirOwnWay()
+        => AssertColour(
+            """
+            {"nodes":[
+              {"type":"ConstantFloat3","index":0,"parameters":[{"value":[1.0,0.5,0.0]}]},
+              {"type":"Luminance","index":0},
+              {"type":"GrayScale","index":0},
+              {"type":"Zero","index":0},
+              {"type":"CoordsToFloat3","index":0},
+              {"type":"AlbedoColor","index":0,"stage":"Texturing_Init"}],
+             "links":[
+              {"src":{"type":"ConstantFloat3","index":0,"variable":"output"},"dst":{"type":"Luminance","index":0,"variable":"input"}},
+              {"src":{"type":"ConstantFloat3","index":0,"variable":"output"},"dst":{"type":"GrayScale","index":0,"variable":"in_color"}},
+              {"src":{"type":"Luminance","index":0,"variable":"lum"},"dst":{"type":"CoordsToFloat3","index":0,"variable":"x"}},
+              {"src":{"type":"GrayScale","index":0,"variable":"out_color","swizzle":"y"},"dst":{"type":"CoordsToFloat3","index":0,"variable":"y"}},
+              {"src":{"type":"Zero","index":0,"variable":"output"},"dst":{"type":"CoordsToFloat3","index":0,"variable":"z"}},
+              {"src":{"type":"CoordsToFloat3","index":0,"variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"xyz"}}]}
+            """,
+            0.5925f, 0.5755f, 0f);
+
+    /// <summary>RemapHue turns a colour by the shader's own helper, its 3.1425 for pi and all.</summary>
+    [Fact]
+    public void REMAPHUETurnsAColourAsTheShaderDoes()
+        => AssertColour(RemapHue("""[{"value":120.0},{"value":0.5},{"value":0.5}]"""), 0.0998f, 0.79996f, 0.2002f);
+
+    /// <summary>A value left out whose declared default is not nought is not taken as nought, nor as the default.</summary>
+    [Fact]
+    public void ANDAVALUELeftOutWhoseDefaultIsNotNoughtIsNotGuessed()
+    {
+        ShadeCompile compiled = ShadeProgram.Compile([(Instance(), Graph(RemapHue("""[{"value":120.0},{},{"value":0.5}]""")))]);
+
+        Assert.Null(compiled.Program);
+        Assert.Equal(["RemapHue leaving out a value whose default is not nought in Test"], compiled.Skipped);
+    }
+
+    /// <summary>
+    /// The indirect light's xyz start at nought in every lighting model and can be read; its w is the material's own and cannot.
+    /// </summary>
+    [Fact]
+    public void ACHANNELSPartsNobodySetAreNotRead()
+    {
+        ShadeCompile black = ShadeProgram.Compile([(Instance(), Graph(Reading("InputIndirectColor", "xyz")))]);
+        Assert.NotNull(black.Program);
+        Assert.Empty(black.Skipped);
+
+        ShadeCompile occlusion = ShadeProgram.Compile([(Instance(), Graph(Reading("InputIndirectColor", "w")))]);
+        Assert.Null(occlusion.Program);
+        Assert.Equal(["InputIndirectColor's w before any graph set it in Test"], occlusion.Skipped);
+    }
+
+    /// <summary>A channel whose write was left out is lost, and the graph reading it after is named for it, not handed the old value.</summary>
+    [Fact]
+    public void ALEFTOUTWriteLosesItsChannel()
+    {
+        ShadeCompile compiled = ShadeProgram.Compile(
+        [
+            (Instance("Metadata/Occluder.fxgraph"), Graph(
+                """
+                {"nodes":[
+                  {"type":"InputWorldPos","index":0,"stage":"Texturing_Init"},
+                  {"type":"Noise31","index":0},
+                  {"type":"IndirectColor","index":0,"stage":"Texturing_Init"}],
+                 "links":[
+                  {"src":{"type":"InputWorldPos","index":0,"stage":"Texturing_Init","variable":"output"},"dst":{"type":"Noise31","index":0,"variable":"pos"}},
+                  {"src":{"type":"Noise31","index":0,"variable":"output"},"dst":{"type":"IndirectColor","index":0,"stage":"Texturing_Init","variable":"input"}}]}
+                """)),
+            (Instance("Metadata/Reader.fxgraph"), Graph(Reading("InputIndirectColor", "xyz", "Texturing"))),
+        ]);
+
+        Assert.Null(compiled.Program);
+        Assert.Equal(["InputIndirectColor after Occluder's was left out in Reader"], compiled.Skipped);
+    }
+
+    /// <summary>
+    /// Texturing_Calc runs after Texturing_Init - the dust lays itself over the colour - but its order against plain Texturing is not known.
+    /// </summary>
+    [Fact]
+    public void CALCRunsAfterInitButItsOrderAgainstThePlainStageIsNotGuessed()
+    {
+        ShadeProgram darkened = Bound(ShadeProgram.Compile(
+        [
+            (Instance("Metadata/Red.fxgraph"), Graph(Constant(1f, 0f, 0f))),
+            (Instance("Metadata/Halved.fxgraph"), Graph(Halving("Texturing_Calc"))),
+        ]).Program, []);
+        Assert.Equal(["Metadata/Red.fxgraph", "Metadata/Halved.fxgraph"], darkened.Graphs);
+        AssertClose(MeshPicture.Of(Quad(), 64, skins: [Sheet(Srgb(0.5f), 0, 0)]), MeshPicture.Of(Quad(), 64, shades: [darkened]));
+
+        ShadeCompile unordered = ShadeProgram.Compile(
+        [
+            (Instance("Metadata/Red.fxgraph"), Graph(Constant(1f, 0f, 0f).Replace("Texturing_Init", "Texturing", StringComparison.Ordinal))),
+            (Instance("Metadata/Halved.fxgraph"), Graph(Halving("Texturing_Calc"))),
+        ]);
+        Assert.NotNull(unordered.Program);
+        Assert.Equal(["Metadata/Red.fxgraph"], unordered.Program.Graphs);
+        Assert.Equal(["Halved at Texturing_Calc, whose order against Texturing is not known"], unordered.Skipped);
+    }
+
+    /// <summary>
+    /// Two unordered stages both touching the normal hold back the normal's writes, not a colour that reads no normal.
+    /// </summary>
+    /// <remarks>AddDetailMap at Texturing beside AGT_DesertDust at Texturing_Calc, cut down to the part that matters.</remarks>
+    [Fact]
+    public void ANDWHATAColourDoesNotReadDoesNotHoldItBack()
+    {
+        ShadeProgram dusted = Bound(Checked(ShadeProgram.Compile(
+        [
+            (Instance("Metadata/Red.fxgraph"), Graph(Constant(1f, 0f, 0f))),
+            (Instance("Metadata/Detail.fxgraph"), Graph(Renormalising("Texturing", string.Empty))),
+            (Instance("Metadata/Dust.fxgraph"), Graph(Renormalising("Texturing_Calc", Halving("Texturing_Calc")))),
+        ])), []);
+
+        Assert.Equal(["Metadata/Red.fxgraph", "Metadata/Dust.fxgraph"], dusted.Graphs);
+        AssertClose(MeshPicture.Of(Quad(), 64, skins: [Sheet(Srgb(0.5f), 0, 0)]), MeshPicture.Of(Quad(), 64, shades: [dusted]));
+    }
+
+    /// <summary>
+    /// Transform of (0, 0, 1) by the TBN basis is the surface normal, and a triplanar read steered by it is the texture's colour.
+    /// </summary>
+    [Fact]
+    public void THETBNBasisNormalSteersATriplanarRead()
+        => AssertColour(Triplanar("[0.0,0.0,1.0]", "SampleInputTriplanar", "world_normal"), 0.8f, 0.4f, 0.2f, new() { ["Art/dust.dds"] = Sheet(Srgb(0.8f), Srgb(0.4f), Srgb(0.2f)) });
+
+    /// <summary>The mesh has no tangents, and the basis's normal has no known length: both are refused where they would matter.</summary>
+    [Fact]
+    public void ANDWHATTheBasisDoesNotSayIsRefused()
+    {
+        ShadeCompile tangent = ShadeProgram.Compile([(Instance(), Graph(Triplanar("[1.0,0.0,0.0]", "SampleInputTriplanar", "world_normal")))]);
+        Assert.Null(tangent.Program);
+        Assert.Equal(["Transform of a vector along the tangent or binormal, which the mesh does not have in Test"], tangent.Skipped);
+
+        ShadeCompile length = ShadeProgram.Compile([(Instance(), Graph(Triplanar("[0.0,0.0,1.0]", "Add3", "a")))]);
+        Assert.Null(length.Program);
+        Assert.Equal(["Add3 with the TBN basis's normal, whose length is not known in Test"], length.Skipped);
+    }
+
     // ---- the graphs ----
+
+    /// <summary>RemapHue of (0.8, 0.2, 0.1) with the given parameters, straight into the colour.</summary>
+    private static string RemapHue(string parameters) =>
+        $$$"""
+        {"nodes":[
+          {"type":"ConstantFloat3","index":0,"parameters":[{"value":[0.8,0.2,0.1]}]},
+          {"type":"RemapHue","index":0,"parameters":{{{parameters}}}},
+          {{{Albedo}}}],
+         "links":[
+          {"src":{"type":"ConstantFloat3","index":0,"variable":"output"},"dst":{"type":"RemapHue","index":0,"variable":"color_map"}},
+          {"src":{"type":"RemapHue","index":0,"variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"xyz"}}]}
+        """;
+
+    /// <summary>A reader's components straight into the colour.</summary>
+    private static string Reading(string reader, string swizzle, string stage = "Texturing_Init") =>
+        $$$"""
+        {"nodes":[
+          {"type":"{{{reader}}}","index":0,"stage":"{{{stage}}}"},
+          {"type":"AlbedoColor","index":0,"stage":"{{{stage}}}"}],
+         "links":[
+          {"src":{"type":"{{{reader}}}","index":0,"stage":"{{{stage}}}","variable":"output","swizzle":"{{{swizzle}}}"},"dst":{"type":"AlbedoColor","index":0,"stage":"{{{stage}}}","variable":"input","swizzle":"{{{swizzle}}}"}}]}
+        """;
+
+    /// <summary>The colour so far, halved, at a stage.</summary>
+    private static string Halving(string stage) =>
+        $$$"""
+        {"nodes":[
+          {"type":"InputAlbedoColor","index":0,"stage":"{{{stage}}}"},
+          {"type":"MultiplyConst3","index":0,"parameters":[{"value":0.5}]},
+          {"type":"AlbedoColor","index":0,"stage":"{{{stage}}}"}],
+         "links":[
+          {"src":{"type":"InputAlbedoColor","index":0,"stage":"{{{stage}}}","variable":"output","swizzle":"xyz"},"dst":{"type":"MultiplyConst3","index":0,"variable":"a"}},
+          {"src":{"type":"MultiplyConst3","index":0,"variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"{{{stage}}}","variable":"input","swizzle":"xyz"}}]}
+        """;
+
+    /// <summary>The normal renormalised at a stage, beside whatever other graph's nodes and links are handed in.</summary>
+    private static string Renormalising(string stage, string beside)
+    {
+        string normals =
+            $$$"""
+            {"type":"InputTbnNormal","index":0,"stage":"{{{stage}}}"},
+            {"type":"Normalize3","index":0},
+            {"type":"TbnNormal","index":0,"stage":"{{{stage}}}"}
+            """;
+        string links =
+            $$$"""
+            {"src":{"type":"InputTbnNormal","index":0,"stage":"{{{stage}}}","variable":"output"},"dst":{"type":"Normalize3","index":0,"variable":"input"}},
+            {"src":{"type":"Normalize3","index":0,"variable":"output"},"dst":{"type":"TbnNormal","index":0,"stage":"{{{stage}}}","variable":"input"}}
+            """;
+        if (beside.Length == 0)
+        {
+            return $$"""{"nodes":[{{normals}}],"links":[{{links}}]}""";
+        }
+
+        ShaderGraph other = Graph(beside);
+        Assert.NotEmpty(other.Nodes);
+        return beside
+            .Replace("\"nodes\":[", "\"nodes\":[" + normals + ",", StringComparison.Ordinal)
+            .Replace("\"links\":[", "\"links\":[" + links + ",", StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Transform of a constant by the TBN basis, handed to a port - AGT_DesertDust's triplanar read when that port is its world_normal.
+    /// </summary>
+    /// <remarks>The texture, the coordinates and an Add3's other input are linked whichever node it is; a node reads only its own ports.</remarks>
+    private static string Triplanar(string vector, string type, string port) =>
+        $$$"""
+        {"nodes":[
+          {"type":"InputWorldPos","index":0,"stage":"Texturing_Init"},
+          {"type":"InputTexture","index":0,"parameters":[{"path":"Art/dust.dds","srgb":true}]},
+          {"type":"ConstantFloat3","index":0,"parameters":[{"value":{{{vector}}}}]},
+          {"type":"InputTbnBasis","index":0,"stage":"Texturing_Init"},
+          {"type":"Transform","index":0},
+          {"type":"Dummy3","index":0},
+          {"type":"{{{type}}}","index":0},
+          {{{Albedo}}}],
+         "links":[
+          {"src":{"type":"ConstantFloat3","index":0,"variable":"output"},"dst":{"type":"Transform","index":0,"variable":"input"}},
+          {"src":{"type":"InputTbnBasis","index":0,"stage":"Texturing_Init","variable":"output"},"dst":{"type":"Transform","index":0,"variable":"inmatrix"}},
+          {"src":{"type":"Transform","index":0,"variable":"output"},"dst":{"type":"Dummy3","index":0,"variable":"in_value"}},
+          {"src":{"type":"InputTexture","index":0,"variable":"out_texture"},"dst":{"type":"{{{type}}}","index":0,"variable":"in_texture"}},
+          {"src":{"type":"InputWorldPos","index":0,"stage":"Texturing_Init","variable":"output"},"dst":{"type":"{{{type}}}","index":0,"variable":"uv"}},
+          {"src":{"type":"InputWorldPos","index":0,"stage":"Texturing_Init","variable":"output"},"dst":{"type":"{{{type}}}","index":0,"variable":"b"}},
+          {"src":{"type":"Dummy3","index":0,"variable":"out_value"},"dst":{"type":"{{{type}}}","index":0,"variable":"{{{port}}}"}},
+          {"src":{"type":"{{{type}}}","index":0,"variable":"{{{(type == "Add3" ? "output" : "color")}}}","swizzle":"xyz"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"xyz"}}]}
+        """;
 
     /// <summary>OffsetUVTiling, as the game ships it.</summary>
     private const string Tiling =
@@ -396,12 +775,29 @@ public class ShadeProgramTests
 
     private static ShaderValue Numbers(params float[] numbers) => new(string.Empty, numbers, null);
 
+    /// <summary>A compile's program, which must exist and have left nothing out.</summary>
+    private static ShadeProgram Checked(ShadeCompile compiled)
+    {
+        Assert.Empty(compiled.Skipped);
+        Assert.NotNull(compiled.Program);
+        return compiled.Program;
+    }
+
     private static ShadeProgram Compile(string graph)
     {
         ShadeCompile compiled = ShadeProgram.Compile([(Instance(), Graph(graph))]);
         Assert.NotNull(compiled.Program);
         Assert.Empty(compiled.Skipped);
         return compiled.Program;
+    }
+
+    /// <summary>A graph's colour, drawn, against the plain texture of the linear colour it should come to.</summary>
+    private static void AssertColour(string graph, float red, float green, float blue, Dictionary<string, Mipmaps>? sheets = null)
+    {
+        ShadeProgram program = Bound(Compile(graph), sheets ?? []);
+        AssertClose(
+            MeshPicture.Of(Quad(), 64, skins: [Sheet(Srgb(red), Srgb(green), Srgb(blue))]),
+            MeshPicture.Of(Quad(), 64, shades: [program]));
     }
 
     private static ShadeProgram Bound(ShadeProgram? program, Dictionary<string, Mipmaps> sheets)

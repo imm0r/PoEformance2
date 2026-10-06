@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Numerics;
 
 namespace PoEformance.Game.Files;
@@ -25,23 +26,34 @@ public sealed record ShadeCompile(ShadeProgram? Program, IReadOnlyList<string> S
 /// Drawn as colour, that texture is green and magenta. The graph is the only place the real colour
 /// is written down, so the graph is what is run.
 ///
-/// ONLY THE COLOUR. A graph writes many things - normals, gloss, the indirect light - and this
-/// renderer lights with one lamp and the mesh's own normals, so only what feeds <c>AlbedoColor</c>
-/// (and the coordinates and positions that feeds on) is compiled.
+/// THE COLOUR, AND WHAT THE COLOUR READS. A graph writes many things - normals, gloss, the
+/// indirect light - and this renderer lights with one lamp and the mesh's own normals, so only the
+/// colour is drawn. But a later graph may read what an earlier one wrote: AGT_DesertDust lays its
+/// dust by the ambient occlusion DielectricSpecGlossBN put in the indirect light's w. So every
+/// channel a graph can read is followed, and once the colour is compiled every step it does not
+/// depend on is dropped again (see <see cref="Finish"/>) - the indirect light costs nothing where
+/// no colour reads it.
 ///
 /// STAGES IN ORDER, GRAPHS IN ORDER WITHIN ONE. A material's graphs read and write named values -
 /// <c>InputUV</c> reads the coordinates, <c>UV</c> writes them - at named stages. Every graph
 /// writing at UVSetup is run before any reading at Texturing_Init, and within a stage the
 /// material's own order decides: TallDune1c writes its colour twice at Texturing_Init and the
 /// second, PBRGround's, is the one that stands. Within one graph at one stage every read sees the
-/// values as they were before that graph wrote any.
+/// values as they were before that graph wrote any. See <see cref="Stages"/> for what the order of
+/// the stages rests on, and where it rests on nothing.
 ///
-/// NOTHING IS GUESSED. No reference reads these graphs, so a node is evaluated only where its type
-/// and its ports leave no doubt about what it does - Add, Lerp3, Saturate, SampleTexture. A graph
-/// whose colour depends on anything else - MaskedContactFade, Noise31, a vertex colour this reader
-/// does not have - is left out whole and NAMED, and the colour stays what the graphs before it
-/// made it. A material none of whose graphs could be evaluated has no program, and is drawn
-/// exactly as it was before graphs were read.
+/// NOTHING IS GUESSED. Every node evaluated here is the fragment the game compiles it from, as
+/// <c>shaders/renderer/nodes/utilitynodes.ffx</c> writes it - <c>Power</c> is
+/// <c>pow(max(abs(base), 1e-7), exp)</c>, <c>Divide</c> gives nought for a nought divisor,
+/// <c>SmoothStep</c> is the node's own curve and not HLSL's. A graph whose colour depends on
+/// anything else - MaskedContactFade, Noise31, a vertex colour this reader does not have - is left
+/// out whole and NAMED, and the colour stays what the graphs before it made it. A material none of
+/// whose graphs could be evaluated has no program, and is drawn exactly as it was before graphs
+/// were read.
+///
+/// A FLOAT IS ONE NUMBER IN ALL FOUR COMPONENTS, as HLSL widens one: a scalar node's result is
+/// its first component spread across the register, which is also what HLSL does to a vector handed
+/// to a float input - it keeps the x.
 ///
 /// LINEAR, as the game's shaders are. A texture flagged sRGB is linearised when it is read, the
 /// arithmetic runs on light rather than on display values, and the result is put back into sRGB
@@ -49,47 +61,6 @@ public sealed record ShadeCompile(ShadeProgram? Program, IReadOnlyList<string> S
 /// </remarks>
 public sealed class ShadeProgram
 {
-    /// <summary>
-    /// The node types the compiler evaluates.
-    /// </summary>
-    /// <remarks>
-    /// THE ONE LIST, checked before the compiler's switch: a type missing here is refused even if the
-    /// switch has a case for it, so a node added to one and not the other fails its own test rather
-    /// than leaving the graph survey (see <see cref="Knows"/>) reporting it missing after it works.
-    /// </remarks>
-    private static readonly System.Collections.Frozen.FrozenSet<string> Evaluated = System.Collections.Frozen.FrozenSet.ToFrozenSet(
-        [
-            "ConstantPixel", "ConstantPixel2", "ConstantPixel3", "ConstantPixel4",
-            "ConstantFloat", "ConstantFloat2", "ConstantFloat3", "ConstantFloat4",
-            "ConstantBool", "ConstantPixelBool", "Zero", "One",
-            "MultiplyConst", "MultiplyConst2", "MultiplyConst3", "MultiplyConst4",
-            "Add", "Add2", "Add3", "Add4",
-            "Subtract", "Subtract2", "Subtract3", "Subtract4",
-            "Multiply", "Multiply2", "Multiply3", "Multiply4",
-            "Power", "Negate", "OneMinus", "Saturate", "Normalize3", "Dummy4",
-            "Lerp", "Lerp2", "Lerp3", "Lerp4",
-            "FitRangeFromInput", "SampleTexture", "SampleInputTexture", "SampleInputTextureLod",
-        ],
-        StringComparer.Ordinal);
-
-    /// <summary>
-    /// Whether a graph node of this type is something the compiler can evaluate - for the graph survey.
-    /// </summary>
-    /// <remarks>
-    /// The readers of the values it tracks count, and so does <c>InputTexture</c>, which is never
-    /// compiled on its own but read through the <c>SampleInputTexture</c> it feeds.
-    /// </remarks>
-    public static bool Knows(string type)
-        => type is not null && (Evaluated.Contains(type) || ReadBy(type) is not null || type == "InputTexture");
-
-    /// <summary>The stages a colour is assembled across, in the order they run.</summary>
-    /// <remarks>
-    /// THE ORDER IS THE NAMES': coordinates are set up before textures are read with them, and the
-    /// texturing stage has an initial pass before it. Every stage the graphs read so far is here; a
-    /// colour written at any other is left out and named rather than placed by a guess.
-    /// </remarks>
-    public static readonly IReadOnlyList<string> Stages = ["VertexInit", "UVSetup", "Texturing_Init", "Texturing", "PreLighting"];
-
     /// <summary>Most registers one program may use - it lives on the stack while a triangle is drawn.</summary>
     public const int MostRegisters = 192;
 
@@ -100,8 +71,100 @@ public sealed class ShadeProgram
 
     internal const int Normal = 2;
 
+    /// <summary>The vertex normal as it is interpolated, not normalised - what <c>FromVertexNormal</c> reads.</summary>
+    internal const int VertexNormal = 3;
+
+    /// <summary>How many registers are the mesh's own, before any a program allocates.</summary>
+    private const int Fixed = 4;
+
+    /// <summary>
+    /// Stands in for the TBN basis, which is a matrix and so in no register - see <see cref="Basis"/>'s use in Transform.
+    /// </summary>
+    private const int Basis = -2;
+
+    /// <summary>Most registers a compile may allocate before the unused ones are dropped.</summary>
+    private const int MostBuilt = MostRegisters * 4;
+
     /// <summary>How finely the sRGB curve is tabled. A step is under a third of a display level.</summary>
     private const int Table = 4096;
+
+    /// <summary>The ways <see cref="Op.Compare"/> compares, in its step's Extra.</summary>
+    private const int Equal = 0;
+
+    private const int Greater = 1;
+
+    private const int Less = 2;
+
+    private const int Both = 3;
+
+    private const int Either = 4;
+
+    private const int Not = 5;
+
+    /// <summary>
+    /// The node types the compiler evaluates.
+    /// </summary>
+    /// <remarks>
+    /// THE ONE LIST, checked before the compiler's switch: a type missing here is refused even if the
+    /// switch has a case for it, so a node added to one and not the other fails its own test rather
+    /// than leaving the graph survey (see <see cref="Knows"/>) reporting it missing after it works.
+    /// Every family is listed only in the variants the game's sources define - there is no Round2.
+    /// </remarks>
+    private static readonly FrozenSet<string> Evaluated = FrozenSet.ToFrozenSet(
+        [
+            "ConstantPixel", "ConstantPixel2", "ConstantPixel3", "ConstantPixel4",
+            "ConstantFloat", "ConstantFloat2", "ConstantFloat3", "ConstantFloat4",
+            "ConstantBool", "ConstantPixelBool", "ConstantInt", "ConstantUInt",
+            "Zero", "One", "Half", "Two", "Pi", "Epsilon", "ZeroUInt", "OneUInt", "TwoUInt",
+            "Dummy", "Dummy2", "Dummy3", "Dummy4", "DummyBool", "DummyInt", "DummyUInt",
+            "Add", "Add2", "Add3", "Add4",
+            "Subtract", "Subtract2", "Subtract3", "Subtract4",
+            "Multiply", "Multiply2", "Multiply3", "Multiply4",
+            "Divide", "Divide2", "Divide3", "Divide4",
+            "MultiplyConst", "MultiplyConst2", "MultiplyConst3", "MultiplyConst4",
+            "AddConst", "AddConst2", "AddConst3", "AddConst4",
+            "SubtractConst", "SubtractConst2", "SubtractConst3", "SubtractConst4",
+            "MultiplyAdd", "MultiplyAdd2", "MultiplyAdd3", "MultiplyAdd4",
+            "Max", "Max2", "Max3", "Max4", "MaxUInt",
+            "Min", "Min2", "Min3", "Min4", "MinUInt",
+            "Clamp", "Clamp2", "Clamp3", "Clamp4",
+            "Fmod", "Fmod2", "Fmod3", "Fmod4",
+            "Power", "Step",
+            "Negate", "Negate2", "Negate3", "Negate4",
+            "OneMinus", "OneMinus2", "OneMinus3", "OneMinus4",
+            "Saturate", "Saturate2", "Saturate3", "Saturate4",
+            "Abs", "Abs2", "Abs3", "Abs4",
+            "Floor", "Floor2", "Floor3", "Floor4",
+            "Ceil", "Ceil2", "Ceil3", "Ceil4",
+            "Round",
+            "Truncate", "Truncate2", "Truncate3", "Truncate4",
+            "Frac", "Frac2", "Frac3", "Frac4",
+            "Sqrt", "Sqrt2", "Sqrt3", "Sqrt4",
+            "Sign", "Sign2", "Sign3", "Sign4",
+            "Normalize2", "Normalize3", "Normalize4",
+            "DotProduct2", "DotProduct3", "DotProduct4", "Length3", "Luminance", "GrayScale",
+            "Lerp", "Lerp2", "Lerp3", "Lerp4",
+            "SmoothStep", "FitRange", "FitRangeFromInput", "RemapHue", "RemapHueInput",
+            "SelectFloat", "SelectFloat2", "SelectFloat3", "SelectFloat4", "SelectBool", "SelectUInt", "SelectChannel",
+            "GreaterThan", "LessThan", "EqualsUInt", "GreaterThanUInt", "LessThanUInt", "And", "Or", "Not",
+            "Float2ToCoords", "Float3ToCoords", "Float4ToCoords", "CoordsToFloat2", "CoordsToFloat3", "CoordsToFloat4",
+            "SampleTexture", "SampleInputTexture", "SampleInputTextureLod", "SampleInputTriplanar",
+            "FromVertexNormal", "GroundScroll", "Transform",
+        ],
+        StringComparer.Ordinal);
+
+    /// <summary>The channels a graph reads and writes, in the order <see cref="Writer"/> numbers them.</summary>
+    /// <remarks>
+    /// FROM THE FIRST FOLLOWED ON, a channel whose write is left out is LOST rather than left as it
+    /// was: no later graph reads a stale indirect light without being named for it. The four before
+    /// keep their old value, as they always have - the colour is what is drawn and a left-out write of
+    /// it is said; a coordinate, position or normal a graph moves and this could not follow changes
+    /// neither.
+    /// </remarks>
+    private static readonly string[] Channels =
+        ["UV", "WorldPos", "WorldNormal", "Albedo", "IndirectColor", "SpecularColor", "EmissiveColor", "SubsurfaceColor", "Glossiness", "TbnNormal", "TbnBasis"];
+
+    private const int FirstFollowed = 4;
 
     private static readonly float[] ToLinear = Tabled(x => x <= 0.04045f ? x / 12.92f : MathF.Pow((x + 0.055f) / 1.055f, 2.4f));
 
@@ -128,7 +191,8 @@ public sealed class ShadeProgram
         Plain = plain;
         Graphs = graphs;
         _sheets = sheets;
-        UsesNormal = steps.Any(one => one.Reads(Normal));
+        UsesNormal = result == Normal || steps.Any(one => one.Reads(Normal));
+        UsesVertexNormal = result == VertexNormal || steps.Any(one => one.Reads(VertexNormal));
     }
 
     internal enum Op : byte
@@ -138,16 +202,65 @@ public sealed class ShadeProgram
         Add,
         Subtract,
         Multiply,
+        Divide,
+        Min,
+        Max,
+        Fmod,
+        MultiplyAdd,
+        Clamp,
+        Power,
+        Step,
         Negate,
         OneMinus,
         Saturate,
-        Power,
+        Abs,
+        Floor,
+        Ceil,
+        Round,
+        Truncate,
+        Frac,
+        Sqrt,
+        Sign,
         Normalize,
+        Dot,
+        Length,
         Lerp,
         Fit,
+        SmoothStep,
+        Select,
+        Compare,
+        Pick,
+        HueTurn,
+        RemapHue,
+        Triplanar,
         Sample,
         SampleLod,
     }
+
+    /// <summary>The stages a colour is assembled across, in the order they are run.</summary>
+    /// <remarks>
+    /// THE ORDER IS NOT IN THE GAME'S SHADER SOURCES - no file lists it - so it is only as good as
+    /// what each step of it rests on:
+    /// <list type="bullet">
+    /// <item>coordinates are set up before textures are read with them, and the texturing is done
+    /// before the lighting's own pass over the colour - the stage FAMILIES in order;</item>
+    /// <item>a family's <c>_Init</c> pass comes before the rest of it: AGT_DesertDust at
+    /// Texturing_Calc lays dust over the colour DielectricSpecGlossBN wrote at Texturing_Init, and
+    /// ParallaxUvSpaceContactFade at Texturing_Final fades the alpha that same graph wrote;</item>
+    /// <item>nothing says how the plain stage, <c>_Calc</c> and <c>_Final</c> of one family fall
+    /// against each other. They are run in that order, and where it would matter - a write reads
+    /// what one at another of them writes, or both write one channel - that write is left out and
+    /// named rather than placed by a guess (see <see cref="Unordered"/>).</item>
+    /// </list>
+    /// A colour written at any stage not here is left out and named.
+    /// </remarks>
+    public static readonly IReadOnlyList<string> Stages =
+    [
+        "VertexInit",
+        "UVSetup", "UVSetup_Calc", "UVSetup_Final",
+        "Texturing_Init", "Texturing", "Texturing_Calc", "Texturing_Final",
+        "PreLighting", "PreLighting_Calc", "PreLighting_Final",
+    ];
 
     /// <summary>How many registers a run needs.</summary>
     public int Registers { get; }
@@ -181,6 +294,19 @@ public sealed class ShadeProgram
     /// <summary>Whether a run reads the normal, which costs a normalisation per pixel.</summary>
     internal bool UsesNormal { get; }
 
+    /// <summary>Whether a run reads the vertex normal as it is interpolated.</summary>
+    internal bool UsesVertexNormal { get; }
+
+    /// <summary>
+    /// Whether a graph node of this type is something the compiler can evaluate - for the graph survey.
+    /// </summary>
+    /// <remarks>
+    /// The readers of the values it tracks count, and so does <c>InputTexture</c>, which is never
+    /// compiled on its own but read through the <c>SampleInputTexture</c> it feeds.
+    /// </remarks>
+    public static bool Knows(string type)
+        => type is not null && (Evaluated.Contains(type) || ReadBy(type) is not null || type == "InputTexture");
+
     /// <summary>
     /// Compiles the colour a material's graphs compute, or says why it cannot.
     /// </summary>
@@ -193,67 +319,113 @@ public sealed class ShadeProgram
         var skipped = new List<string>();
         var graphs = new List<string>();
 
-        // WHAT EACH NAMED VALUE HOLDS NOW, by register. The colour starts unwritten: a graph that
-        // reads it before any has written it has nothing to read.
-        var state = new Dictionary<string, int>(StringComparer.Ordinal)
+        // WHAT EACH NAMED VALUE HOLDS NOW, by register, and which of its components nobody has set.
+        // The colour starts unwritten: a graph that reads it before any has written it has nothing to
+        // read. The rest start as the engine's InitSurface and InitMaterial leave them, where every
+        // lighting model leaves them alike - the indirect light's w is the material's own ambient
+        // occlusion, a uniform this has not got, and the specular, emissive and gloss differ between
+        // the models (texturing.ffx), so those are unset. The TBN basis is the model's own, which
+        // ParallaxUvSpaceContactFade hands on as "model_tbn_basis".
+        var state = new Dictionary<string, Held>(StringComparer.Ordinal)
         {
-            ["UV"] = Coordinates,
-            ["WorldPos"] = Position,
-            ["WorldNormal"] = Normal,
+            ["UV"] = new(Coordinates, 0),
+            ["WorldPos"] = new(Position, 0),
+            ["WorldNormal"] = new(Normal, 0),
+            ["IndirectColor"] = new(build.Constant(Vector4.Zero), 0b1000),
+            ["SubsurfaceColor"] = new(build.Constant(Vector4.Zero), 0),
+            ["TbnNormal"] = new(build.Constant(new Vector4(0f, 0f, 1f, 0f)), 0),
+            ["TbnBasis"] = new(Basis, 0),
         };
 
+        // A FOLLOWED CHANNEL WHOSE WRITE WAS LEFT OUT, by the graph that wrote it - see Channels.
+        var lost = new Dictionary<string, string>(StringComparer.Ordinal);
+
         var lookups = new Lookup[chain.Count];
-        for (var one = 0; one < chain.Count; one++)
+        var writers = new List<Writer>[chain.Count, Stages.Count];
+        var every = new List<Writer>();
+        for (var link = 0; link < chain.Count; link++)
         {
-            lookups[one] = new Lookup(chain[one].Graph);
+            lookups[link] = new Lookup(chain[link].Graph);
+            foreach (ShaderNode node in chain[link].Graph.Nodes)
+            {
+                int at = IndexOf(node.Stage);
+                if (at < 0 || Written(node.Type) is not { } channel || !lookups[link].Fed(node))
+                {
+                    continue;
+                }
+
+                var writer = new Writer(node, at, Array.IndexOf(Channels, channel), Reads(lookups[link], node), Same(lookups[link], node, channel));
+                (writers[link, at] ??= []).Add(writer);
+                every.Add(writer);
+            }
         }
 
-        foreach (string stage in Stages)
+        for (var at = 0; at < Stages.Count; at++)
         {
+            string stage = Stages[at];
             for (var link = 0; link < chain.Count; link++)
             {
-                (ShaderInstance instance, ShaderGraph graph) = chain[link];
-                Lookup lookup = lookups[link];
-                Dictionary<string, int>? seen = null;
-                var wrote = new List<(string Channel, int Register)>();
-                foreach (ShaderNode node in graph.Nodes)
+                if (writers[link, at] is not { } mine)
                 {
-                    if (!string.Equals(node.Stage, stage, StringComparison.Ordinal)
-                        || Written(node.Type) is not { } channel
-                        || !lookup.Fed(node))
-                    {
-                        continue;
-                    }
+                    continue;
+                }
 
-                    // EVERY READ IN ONE GRAPH AT ONE STAGE SEES THE VALUES FROM BEFORE IT - see
-                    // the remarks - so the snapshot is taken once, at its first write.
-                    seen ??= new Dictionary<string, int>(state, StringComparer.Ordinal);
-                    Builder.Mark mark = build.Marked();
-                    var unit = new Unit(build, lookup, instance, seen);
-                    if (unit.Port(node, "input") is { } register && build.Fits)
+                // EVERY READ IN ONE GRAPH AT ONE STAGE SEES THE VALUES FROM BEFORE IT - see the remarks
+                // - so the snapshot is taken once, and one unit serves every write, sharing what they share.
+                (ShaderInstance instance, _) = chain[link];
+                string named = Named(instance.Parent);
+                var seen = new Dictionary<string, Held>(state, StringComparer.Ordinal);
+                var unit = new Unit(build, lookups[link], instance, seen, lost);
+                var wrote = new List<(string Channel, int Register)>();
+                foreach (Writer writer in mine)
+                {
+                    string channel = Channels[writer.Channel];
+                    string what = channel == "UV" ? $"{named}'s coordinates" : named;
+                    string why;
+                    if (Unordered(every, writer) is { } against)
                     {
-                        wrote.Add((channel, register));
-                        continue;
+                        why = $"{what} at {stage}, whose order against {against} is not known";
+                    }
+                    else
+                    {
+                        Builder.Mark mark = build.Marked();
+                        unit.Start();
+                        if (unit.Port(writer.Node, "input") is { } register && build.Fits && (channel == "TbnBasis") == (register == Basis))
+                        {
+                            wrote.Add((channel, register));
+                            continue;
+                        }
+
+                        string stopped = !build.Fits ? "too many steps" : unit.Why.Length > 0 ? unit.Why : $"{writer.Node.Type} not from the basis it read";
+                        why = $"{stopped} in {what}";
+                        build.Back(mark);
+                        unit.Forget(mark.Next);
                     }
 
                     // THE COLOUR AND THE COORDINATES ARE SAID WHEN LEFT OUT: one is what is drawn, the
-                    // other is where every texture after it is read. A position or a normal a
-                    // graph moves and this could not follow changes neither.
-                    string why = build.Fits ? unit.Why : "too many steps";
-                    build.Back(mark);
-                    if (channel == "Albedo")
+                    // other is where every texture after it is read. A followed channel is lost.
+                    if (channel is "Albedo" or "UV")
                     {
-                        skipped.Add($"{why} in {Named(instance.Parent)}");
+                        skipped.Add(why);
                     }
-                    else if (channel == "UV")
+                    else if (writer.Channel >= FirstFollowed)
                     {
-                        skipped.Add($"{why} in {Named(instance.Parent)}'s coordinates");
+                        wrote.Add((channel, int.MinValue));
                     }
                 }
 
+                // IN THE GRAPH'S OWN ORDER, so a second write of one channel stands over the first.
                 foreach ((string channel, int register) in wrote)
                 {
-                    state[channel] = register;
+                    if (register == int.MinValue)
+                    {
+                        state.Remove(channel);
+                        lost[channel] = named;
+                        continue;
+                    }
+
+                    state[channel] = new Held(register, 0);
+                    lost.Remove(channel);
                     if (channel == "Albedo" && !graphs.Contains(instance.Parent, StringComparer.OrdinalIgnoreCase))
                     {
                         graphs.Add(instance.Parent);
@@ -268,23 +440,24 @@ public sealed class ShadeProgram
         {
             foreach (ShaderNode node in chain[link].Graph.Nodes)
             {
-                if (node.Type == "AlbedoColor" && !Stages.Contains(node.Stage) && lookups[link].Fed(node))
+                if (node.Type == "AlbedoColor" && IndexOf(node.Stage) < 0 && lookups[link].Fed(node))
                 {
                     skipped.Add($"AlbedoColor at {node.Stage} in {Named(chain[link].Instance.Parent)}");
                 }
             }
         }
 
-        if (!state.TryGetValue("Albedo", out int result))
+        if (!state.TryGetValue("Albedo", out Held albedo))
         {
             return new ShadeCompile(null, skipped);
         }
 
-        int plain = build.PlainOf(result);
-        ShadeTexture[] textures = [.. build.Textures];
-        var program = new ShadeProgram(
-            [.. build.Steps], [.. build.ConstantAt], [.. build.Constants], build.Next, result,
-            textures, [.. build.SampleTextures], plain, graphs, new Mipmaps?[textures.Length]);
+        ShadeProgram? program = Finish(build, albedo.Register, graphs);
+        if (program is null)
+        {
+            skipped.Add($"more than {MostRegisters} registers in the colour");
+        }
+
         return new ShadeCompile(program, skipped);
     }
 
@@ -320,7 +493,7 @@ public sealed class ShadeProgram
     /// <param name="registers">Scratch, <see cref="Registers"/> long, with <see cref="Preset"/> already run on it.</param>
     /// <param name="coordinates">The pixel's texture coordinates.</param>
     /// <param name="position">The pixel's position in the model's space.</param>
-    /// <param name="normal">The pixel's normal in the model's space, not yet normalised.</param>
+    /// <param name="normal">The pixel's normal in the model's space, interpolated and not yet normalised.</param>
     /// <param name="levels">The level each texture read takes, from <see cref="Levels"/>.</param>
     internal Vector3 Colour(
         Span<Vector4> registers, Vector2 coordinates, Vector3 position, Vector3 normal, ReadOnlySpan<float> levels)
@@ -330,6 +503,11 @@ public sealed class ShadeProgram
         if (UsesNormal)
         {
             registers[Normal] = new Vector4(normal.LengthSquared() > 1e-12f ? Vector3.Normalize(normal) : normal, 0f);
+        }
+
+        if (UsesVertexNormal)
+        {
+            registers[VertexNormal] = new Vector4(normal, 0f);
         }
 
         Run(registers, levels, default, -1);
@@ -362,6 +540,7 @@ public sealed class ShadeProgram
             registers[Coordinates] = new Vector4(coordinates[corner], 0f, 0f);
             registers[Position] = new Vector4(positions[corner], 0f);
             registers[Normal] = new Vector4(normals[corner], 0f);
+            registers[VertexNormal] = new Vector4(normals[corner], 0f);
             Run(registers, default, spots, corner);
         }
 
@@ -418,6 +597,46 @@ public sealed class ShadeProgram
                     r[step.To] = r[step.A] * r[step.B];
                     break;
 
+                case Op.Divide:
+                {
+                    Vector4 a = r[step.A];
+                    Vector4 b = r[step.B];
+                    r[step.To] = new Vector4(Divided(a.X, b.X), Divided(a.Y, b.Y), Divided(a.Z, b.Z), Divided(a.W, b.W));
+                    break;
+                }
+
+                case Op.Min:
+                    r[step.To] = Vector4.Min(r[step.A], r[step.B]);
+                    break;
+
+                case Op.Max:
+                    r[step.To] = Vector4.Max(r[step.A], r[step.B]);
+                    break;
+
+                case Op.Fmod:
+                {
+                    Vector4 a = r[step.A];
+                    Vector4 b = r[step.B];
+                    r[step.To] = new Vector4(a.X % b.X, a.Y % b.Y, a.Z % b.Z, a.W % b.W);
+                    break;
+                }
+
+                case Op.MultiplyAdd:
+                    r[step.To] = (r[step.A] * r[step.B]) + r[step.C];
+                    break;
+
+                case Op.Clamp:
+                    r[step.To] = Vector4.Min(Vector4.Max(r[step.A], r[step.B]), r[step.C]);
+                    break;
+
+                case Op.Power:
+                    r[step.To] = new Vector4(MathF.Pow(MathF.Max(MathF.Abs(r[step.A].X), 1e-7f), r[step.B].X));
+                    break;
+
+                case Op.Step:
+                    r[step.To] = new Vector4(r[step.B].X >= r[step.A].X ? 1f : 0f);
+                    break;
+
                 case Op.Negate:
                     r[step.To] = -r[step.A];
                     break;
@@ -430,28 +649,111 @@ public sealed class ShadeProgram
                     r[step.To] = Vector4.Clamp(r[step.A], Vector4.Zero, Vector4.One);
                     break;
 
-                case Op.Power:
+                case Op.Abs:
+                    r[step.To] = Vector4.Abs(r[step.A]);
+                    break;
+
+                case Op.Floor:
                 {
-                    Vector4 b = r[step.A];
-                    Vector4 e = r[step.B];
-                    r[step.To] = new Vector4(
-                        MathF.Pow(b.X, e.X), MathF.Pow(b.Y, e.Y), MathF.Pow(b.Z, e.Z), MathF.Pow(b.W, e.W));
+                    Vector4 v = r[step.A];
+                    r[step.To] = new Vector4(MathF.Floor(v.X), MathF.Floor(v.Y), MathF.Floor(v.Z), MathF.Floor(v.W));
+                    break;
+                }
+
+                case Op.Ceil:
+                {
+                    Vector4 v = r[step.A];
+                    r[step.To] = new Vector4(MathF.Ceiling(v.X), MathF.Ceiling(v.Y), MathF.Ceiling(v.Z), MathF.Ceiling(v.W));
+                    break;
+                }
+
+                case Op.Round:
+                {
+                    // TO EVEN AT A HALF, as the compiled round_ne does.
+                    Vector4 v = r[step.A];
+                    r[step.To] = new Vector4(MathF.Round(v.X), MathF.Round(v.Y), MathF.Round(v.Z), MathF.Round(v.W));
+                    break;
+                }
+
+                case Op.Truncate:
+                {
+                    Vector4 v = r[step.A];
+                    r[step.To] = new Vector4(MathF.Truncate(v.X), MathF.Truncate(v.Y), MathF.Truncate(v.Z), MathF.Truncate(v.W));
+                    break;
+                }
+
+                case Op.Frac:
+                {
+                    Vector4 v = r[step.A];
+                    r[step.To] = v - new Vector4(MathF.Floor(v.X), MathF.Floor(v.Y), MathF.Floor(v.Z), MathF.Floor(v.W));
+                    break;
+                }
+
+                case Op.Sqrt:
+                    r[step.To] = Vector4.SquareRoot(r[step.A]);
+                    break;
+
+                case Op.Sign:
+                {
+                    Vector4 v = r[step.A];
+                    r[step.To] = new Vector4(Signed(v.X), Signed(v.Y), Signed(v.Z), Signed(v.W));
                     break;
                 }
 
                 case Op.Normalize:
+                    r[step.To] = Normalized(r[step.A], step.Extra);
+                    break;
+
+                case Op.Dot:
+                    r[step.To] = new Vector4(Dotted(r[step.A], r[step.B], step.Extra));
+                    break;
+
+                case Op.Length:
                 {
-                    var v = new Vector3(r[step.A].X, r[step.A].Y, r[step.A].Z);
-                    r[step.To] = new Vector4(v.LengthSquared() > 1e-12f ? Vector3.Normalize(v) : v, 0f);
+                    Vector4 v = r[step.A];
+                    r[step.To] = new Vector4(MathF.Sqrt(Dotted(v, v, step.Extra)));
                     break;
                 }
 
                 case Op.Lerp:
-                    r[step.To] = r[step.A] + ((r[step.B] - r[step.A]) * r[step.C]);
+                    // THE ALPHA IS A FLOAT in every Lerp, the vector ones too, so its x is all of it.
+                    r[step.To] = r[step.A] + ((r[step.B] - r[step.A]) * r[step.C].X);
                     break;
 
                 case Op.Fit:
-                    r[step.To] = Fitted(r[step.A], r[step.B], r[step.C], r[step.D], r[step.E]);
+                    r[step.To] = new Vector4(Fitted(r[step.A].X, r[step.B].X, r[step.C].X, r[step.D].X, r[step.E].X));
+                    break;
+
+                case Op.SmoothStep:
+                    r[step.To] = new Vector4(Smoothed(r[step.A].X, r[step.B].X, r[step.C].X));
+                    break;
+
+                case Op.Select:
+                    r[step.To] = r[step.C].X != 0f ? r[step.B] : r[step.A];
+                    break;
+
+                case Op.Compare:
+                    r[step.To] = new Vector4(Compared(r[step.A].X, step.B >= 0 ? r[step.B].X : 0f, step.Extra) ? 1f : 0f);
+                    break;
+
+                case Op.Pick:
+                {
+                    Vector4 v = r[step.A];
+                    float index = r[step.B].X;
+                    r[step.To] = new Vector4(index == 0f ? v.X : index == 1f ? v.Y : index == 2f ? v.Z : index == 3f ? v.W : 0f);
+                    break;
+                }
+
+                case Op.HueTurn:
+                    r[step.To] = Turn(r[step.A].X, r[step.B].X, r[step.C].X);
+                    break;
+
+                case Op.RemapHue:
+                    r[step.To] = Remapped(r[step.A], r[step.B]);
+                    break;
+
+                case Op.Triplanar:
+                    r[step.To] = Triplanar(r[step.A], r[step.B], r[step.C], r[step.D]);
                     break;
 
                 case Op.Sample:
@@ -474,6 +776,11 @@ public sealed class ShadeProgram
                         : Read(step.Extra, new Vector2(r[step.A].X, r[step.A].Y), r[step.B].X);
                     break;
             }
+
+            if (step.Splat)
+            {
+                r[step.To] = new Vector4(r[step.To].X);
+            }
         }
     }
 
@@ -486,38 +793,366 @@ public sealed class ShadeProgram
             return Vector4.Zero;
         }
 
-        Vector4 texel = MeshPicture.Sample4(sheet, spot, Math.Clamp(level, 0f, sheet.Count - 1));
+        // A LEVEL THAT IS NOT A NUMBER READS THE TOP ONE rather than an index nowhere.
+        Vector4 texel = MeshPicture.Sample4(sheet, spot, level > 0f ? MathF.Min(level, sheet.Count - 1) : 0f);
         return Textures[texture].Srgb
             ? new Vector4(Linear(texel.X), Linear(texel.Y), Linear(texel.Z), texel.W)
             : texel;
     }
 
-    /// <summary>
-    /// A value moved from one range into another, each component on its own.
-    /// </summary>
+    /// <summary>The program with every step the colour does not depend on dropped, and its registers, reads and textures renumbered.</summary>
     /// <remarks>
-    /// NOT CLAMPED. Whether the game's node clamps is not written down anywhere this has; where its
-    /// input lies inside the input range - a texture channel in nought to one, mapped from nought to
-    /// one or one to nought, which is every use seen - the two agree. An empty input range gives the
-    /// bottom of the output one rather than a division by nothing.
+    /// WHY IT IS NEEDED. Every channel is compiled as it is written, before anything knows whether a
+    /// colour will read it: DielectricSpecGlossBN's indirect light reads its NormalGlossAO texture,
+    /// and a material with nothing after it would decode that texture and read it on every pixel for
+    /// nothing. Walking back from the colour keeps exactly what it reads, and the textures only the
+    /// dropped steps read are never named, so never loaded.
     /// </remarks>
-    private static Vector4 Fitted(Vector4 value, Vector4 inMin, Vector4 inMax, Vector4 outMin, Vector4 outMax)
+    private static ShadeProgram? Finish(Builder build, int result, List<string> graphs)
     {
-        var said = default(Vector4);
-        for (var part = 0; part < 4; part++)
+        List<Step> steps = build.Steps;
+        var live = new bool[build.Next];
+        live[result] = true;
+        var keep = new bool[steps.Count];
+        for (int at = steps.Count - 1; at >= 0; at--)
         {
-            float span = inMax[part] - inMin[part];
-            said[part] = span == 0f
-                ? outMin[part]
-                : outMin[part] + ((value[part] - inMin[part]) / span * (outMax[part] - outMin[part]));
+            Step step = steps[at];
+            if (!live[step.To])
+            {
+                continue;
+            }
+
+            // A SWIZZLE WRITES PART OF ITS REGISTER, so the register stays live for the steps before
+            // that wrote the rest; nothing else writes a register twice.
+            keep[at] = true;
+            Live(live, step.A);
+            if (step.Op != Op.Sample)
+            {
+                Live(live, step.B);
+            }
+
+            Live(live, step.C);
+            Live(live, step.D);
+            Live(live, step.E);
         }
 
-        return said;
+        var map = new int[build.Next];
+        Array.Fill(map, -1);
+        for (var one = 0; one < Fixed; one++)
+        {
+            map[one] = one;
+        }
+
+        int next = Fixed;
+        var constantAt = new List<int>();
+        var constants = new List<Vector4>();
+        for (var one = 0; one < build.ConstantAt.Count; one++)
+        {
+            int at = build.ConstantAt[one];
+            if (live[at])
+            {
+                map[at] = next++;
+                constantAt.Add(map[at]);
+                constants.Add(build.Constants[one]);
+            }
+        }
+
+        var textureMap = new int[build.Textures.Count];
+        Array.Fill(textureMap, -1);
+        var textures = new List<ShadeTexture>();
+        var sampleTextures = new List<int>();
+        var kept = new List<Step>();
+        for (var at = 0; at < steps.Count; at++)
+        {
+            if (!keep[at])
+            {
+                continue;
+            }
+
+            Step step = steps[at];
+            if (map[step.To] < 0)
+            {
+                map[step.To] = next++;
+            }
+
+            int b = step.B;
+            int extra = step.Extra;
+            if (step.Op is Op.Sample or Op.SampleLod)
+            {
+                if (textureMap[extra] < 0)
+                {
+                    textureMap[extra] = textures.Count;
+                    textures.Add(build.Textures[extra]);
+                }
+
+                extra = textureMap[extra];
+                if (step.Op == Op.Sample)
+                {
+                    b = sampleTextures.Count;
+                    sampleTextures.Add(extra);
+                }
+                else
+                {
+                    b = Mapped(map, b);
+                }
+            }
+            else
+            {
+                b = Mapped(map, b);
+            }
+
+            kept.Add(new Step(
+                step.Op, map[step.To], Mapped(map, step.A), b, Mapped(map, step.C), Mapped(map, step.D), Mapped(map, step.E), extra, step.Splat));
+        }
+
+        if (next > MostRegisters)
+        {
+            return null;
+        }
+
+        int plain = build.PlainOf(result);
+        ShadeTexture[] named = [.. textures];
+        return new ShadeProgram(
+            [.. kept], [.. constantAt], [.. constants], next, map[result],
+            named, [.. sampleTextures], plain >= 0 ? textureMap[plain] : -1, graphs, new Mipmaps?[named.Length]);
     }
 
-    private static float Linear(float value) => ToLinear[(int)((Math.Clamp(value, 0f, 1f) * (Table - 1)) + 0.5f)];
+    private static void Live(bool[] live, int register)
+    {
+        if (register >= 0)
+        {
+            live[register] = true;
+        }
+    }
 
-    private static float Srgb(float value) => ToSrgb[(int)((Math.Clamp(value, 0f, 1f) * (Table - 1)) + 0.5f)];
+    private static int Mapped(int[] map, int register) => register >= 0 ? map[register] : register;
+
+    /// <summary>
+    /// The stage of a write this one's outcome hangs on though nothing says which runs first; else null.
+    /// </summary>
+    /// <remarks>
+    /// TWO STAGES ARE UNORDERED when they are of one family and neither is its <c>_Init</c> - see
+    /// <see cref="Stages"/>. Between two writes at such stages the order matters where one READS
+    /// what the other writes - a graph at Texturing_Calc laying something over a colour a graph at
+    /// Texturing writes comes out differently the other way round - and where both write one channel,
+    /// since whichever is last stands. Then the reading write, or the later of the two, is left out
+    /// and named rather than placed by a guess. Nothing else is held back: AddDetailMap at Texturing
+    /// adds to the normal, AGT_DesertDust at Texturing_Calc reads and writes the normal too, and the
+    /// dust's colour, which reads no normal, is not the normal's business.
+    ///
+    /// A WRITE OF WHAT WAS READ, unchanged - <c>UV</c> fed straight from <c>InputUV</c>, as half
+    /// the graphs do to keep a channel they do not touch - comes to the same in either order, and
+    /// counts for neither side.
+    /// </remarks>
+    private static string? Unordered(List<Writer> every, Writer writer)
+    {
+        string stage = Stages[writer.Stage];
+        if (writer.Same || Initial(stage))
+        {
+            return null;
+        }
+
+        string family = Family(stage);
+        foreach (Writer other in every)
+        {
+            string theirs = Stages[other.Stage];
+            if (other.Stage == writer.Stage || other.Same || Initial(theirs)
+                || !string.Equals(Family(theirs), family, StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            if ((writer.Reads & (1 << other.Channel)) != 0 || (other.Channel == writer.Channel && other.Stage < writer.Stage))
+            {
+                return theirs;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>The channels a write's value is worked out from, as bits of <see cref="Channels"/>: every reader behind it.</summary>
+    private static int Reads(Lookup lookup, ShaderNode writer)
+    {
+        var reads = 0;
+        var seen = new HashSet<ShaderNode>(ReferenceEqualityComparer.Instance);
+        var pending = new Stack<ShaderNode>();
+        pending.Push(writer);
+        while (pending.Count > 0)
+        {
+            foreach (ShaderLink link in lookup.Into(pending.Pop()))
+            {
+                if (lookup.Node(link.Source) is not { } source || !seen.Add(source))
+                {
+                    continue;
+                }
+
+                if (ReadBy(source.Type) is { } channel)
+                {
+                    reads |= 1 << Array.IndexOf(Channels, channel);
+                }
+
+                pending.Push(source);
+            }
+        }
+
+        return reads;
+    }
+
+    /// <summary>Whether a write is of its own channel's reader, whole and unchanged.</summary>
+    private static bool Same(Lookup lookup, ShaderNode writer, string channel)
+    {
+        IReadOnlyList<ShaderLink> into = lookup.Into(writer);
+        return into.Count == 1
+            && into[0].Source.Swizzle.Length == 0
+            && into[0].Target.Swizzle.Length == 0
+            && lookup.Node(into[0].Source) is { } source
+            && ReadBy(source.Type) == channel;
+    }
+
+    private static bool Initial(string stage) => stage.EndsWith("_Init", StringComparison.Ordinal);
+
+    private static string Family(string stage)
+    {
+        int cut = stage.IndexOf('_', StringComparison.Ordinal);
+        return cut > 0 ? stage[..cut] : stage;
+    }
+
+    private static int IndexOf(string stage)
+    {
+        for (var at = 0; at < Stages.Count; at++)
+        {
+            if (string.Equals(Stages[at], stage, StringComparison.Ordinal))
+            {
+                return at;
+            }
+        }
+
+        return -1;
+    }
+
+    private static float Divided(float a, float b) => MathF.Abs(b) > 0f ? a / b : 0f;
+
+    private static float Signed(float value) => value > 0f ? 1f : value < 0f ? -1f : 0f;
+
+    private static float Dotted(Vector4 a, Vector4 b, int width) => width switch
+    {
+        2 => (a.X * b.X) + (a.Y * b.Y),
+        3 => (a.X * b.X) + (a.Y * b.Y) + (a.Z * b.Z),
+        _ => Vector4.Dot(a, b),
+    };
+
+    /// <summary>The Normalize nodes': <c>input / (length(input) + 1e-7)</c>, over as many components as the node has.</summary>
+    private static Vector4 Normalized(Vector4 value, int width)
+    {
+        Vector4 part = width switch
+        {
+            2 => new Vector4(value.X, value.Y, 0f, 0f),
+            3 => new Vector4(value.X, value.Y, value.Z, 0f),
+            _ => value,
+        };
+        return part / (MathF.Sqrt(Vector4.Dot(part, part)) + 1e-7f);
+    }
+
+    /// <summary>
+    /// FitRange's and FitRangeFromInput's: a value moved from one range into another, not clamped.
+    /// </summary>
+    /// <remarks>An empty input range divides by one, as the node does, rather than by nothing.</remarks>
+    private static float Fitted(float value, float inMin, float inMax, float outMin, float outMax)
+    {
+        float divisor = inMax - inMin;
+        return ((value - inMin) * (outMax - outMin) / (MathF.Abs(divisor) > 0f ? divisor : 1f)) + outMin;
+    }
+
+    /// <summary>The SmoothStep node's own curve, not HLSL's smoothstep - see utilitynodes.ffx.</summary>
+    private static float Smoothed(float center, float steepness, float value)
+    {
+        float power = Math.Clamp((2f / MathF.Max(1e-3f, 1f - steepness)) - 1f, -1e5f, 1e5f);
+        float said = 1f - center
+            + ((-Pow(Saturated((1f - MathF.Max(center, value)) / (1f - center)), power) * (1f - center))
+               + (Pow(Saturated(MathF.Min(center, value) / center), power) * center));
+
+        // THE NODE'S OWN GUARD: "handling edge case of pow(0, 0) returning NaN".
+        return float.IsNaN(said) ? center : said;
+    }
+
+    /// <summary>
+    /// pow as a graphics card works it out - exp2(y * log2(x)) - which is where SmoothStep's guard comes from.
+    /// </summary>
+    /// <remarks>
+    /// NOUGHT TO THE NOUGHT IS NOT A NUMBER THERE, where .NET says one; the node relies on that to
+    /// fall back to its centre, so it is kept. A negative base has no logarithm and is not a number either.
+    /// </remarks>
+    private static float Pow(float x, float y)
+    {
+        if (x > 0f)
+        {
+            return MathF.Pow(x, y);
+        }
+
+        if (x < 0f)
+        {
+            return float.NaN;
+        }
+
+        return y > 0f ? 0f : y < 0f ? float.PositiveInfinity : float.NaN;
+    }
+
+    /// <summary>saturate as HLSL has it: nought for what is not a number.</summary>
+    private static float Saturated(float value) => value > 0f ? (value < 1f ? value : 1f) : 0f;
+
+    private static bool Compared(float a, float b, int how) => how switch
+    {
+        Equal => a == b,
+        Greater => a > b,
+        Less => a < b,
+        Both => a != 0f && b != 0f,
+        Either => a != 0f || b != 0f,
+        Not => a == 0f,
+        _ => false,
+    };
+
+    /// <summary>
+    /// RemapHueHelper's per-pixel constants: the angle's cosine and sine, the saturation doubled and the brightness made -1..1.
+    /// </summary>
+    /// <remarks>THE GAME'S OWN PI, 3.1425, is kept: the hue turns by what the shader turns it by.</remarks>
+    private static Vector4 Turn(float hue, float saturation, float brightness)
+    {
+        float angle = hue / 180f * 3.1425f;
+        return new Vector4(MathF.Cos(angle), MathF.Sin(angle), saturation * 2f, (brightness * 2f) - 1f);
+    }
+
+    /// <summary>RemapHueHelper, from utilitynodes.ffx, over the constants <see cref="Turn"/> works out.</summary>
+    private static Vector4 Remapped(Vector4 colour, Vector4 turn)
+    {
+        const float k = 0.57735f;
+        var c = new Vector3(colour.X, colour.Y, colour.Z);
+        float cos = turn.X;
+
+        // cross(k, c) with every component of k alike.
+        var cross = new Vector3(k * (c.Z - c.Y), k * (c.X - c.Z), k * (c.Y - c.X));
+        Vector3 hue = (c * cos) + (cross * turn.Y) + (new Vector3(k) * (k * (c.X + c.Y + c.Z)) * (1f - cos));
+        Vector3 bright = hue + new Vector3(turn.W);
+        float intensity = Vector3.Dot(bright, new Vector3(0.299f, 0.587f, 0.114f));
+        Vector3 said = new Vector3(intensity) + ((bright - new Vector3(intensity)) * turn.Z);
+        return new Vector4(said, 0f);
+    }
+
+    /// <summary>SampleInputTriplanar's blend of its three reads, weighted by the normal's squared components.</summary>
+    private static Vector4 Triplanar(Vector4 alongX, Vector4 alongY, Vector4 alongZ, Vector4 normal)
+    {
+        var n = new Vector3(normal.X, normal.Y, normal.Z);
+        n /= MathF.Max(1e-5f, n.Length());
+        Vector3 weights = n * n;
+        weights /= MathF.Max(1e-5f, weights.X + weights.Y + weights.Z);
+        return (alongX * weights.X) + (alongY * weights.Y) + (alongZ * weights.Z);
+    }
+
+    // NOT A NUMBER COMES OUT AS NOUGHT rather than as an index nowhere: a graph's square root of a
+    // negative, or fmod by nought, is not a number on a graphics card too.
+    private static float Linear(float value) => ToLinear[(int)((Saturated(value) * (Table - 1)) + 0.5f)];
+
+    private static float Srgb(float value) => ToSrgb[(int)((Saturated(value) * (Table - 1)) + 0.5f)];
 
     private static float[] Tabled(Func<float, float> curve)
     {
@@ -537,6 +1172,13 @@ public sealed class ShadeProgram
         "WorldPos" => "WorldPos",
         "WorldNormal" => "WorldNormal",
         "AlbedoColor" => "Albedo",
+        "IndirectColor" => "IndirectColor",
+        "SpecularColor" => "SpecularColor",
+        "EmissiveColor" => "EmissiveColor",
+        "SubsurfaceColor" => "SubsurfaceColor",
+        "Glossiness" => "Glossiness",
+        "TbnNormal" => "TbnNormal",
+        "TbnBasis" => "TbnBasis",
         _ => null,
     };
 
@@ -547,7 +1189,43 @@ public sealed class ShadeProgram
         "InputWorldPos" => "WorldPos",
         "InputWorldNormal" => "WorldNormal",
         "InputAlbedoColor" => "Albedo",
+        "InputIndirectColor" => "IndirectColor",
+        "InputSpecularColor" => "SpecularColor",
+        "InputEmissiveColor" => "EmissiveColor",
+        "InputSubsurfaceColor" => "SubsurfaceColor",
+        "InputGlossiness" => "Glossiness",
+        "InputTbnNormal" => "TbnNormal",
+        "InputTbnBasis" => "TbnBasis",
         _ => null,
+    };
+
+    /// <summary>
+    /// The component a node's named scalar output is, for the nodes that have several; else -1.
+    /// </summary>
+    /// <remarks>
+    /// A LINK NAMES ITS PORT, and for these the port is the component: <c>Float3ToCoords</c>'s
+    /// <c>y</c> is its input's y, <c>SampleTexture</c>'s <c>g</c> its read's green. Read as the whole
+    /// register, a link from <c>.y</c> would hand on x, y and z.
+    /// </remarks>
+    private static int Implied(string type, string variable) => type switch
+    {
+        "Float2ToCoords" or "Float3ToCoords" or "Float4ToCoords" => variable switch
+        {
+            "x" => 0,
+            "y" => 1,
+            "z" => 2,
+            "w" => 3,
+            _ => -1,
+        },
+        "SampleTexture" => variable switch
+        {
+            "r" => 0,
+            "g" => 1,
+            "b" => 2,
+            "a" => 3,
+            _ => -1,
+        },
+        _ => -1,
     };
 
     /// <summary>A graph's file name without its folder or extension, for the line under the picture.</summary>
@@ -559,9 +1237,16 @@ public sealed class ShadeProgram
         return dot > 0 ? said[..dot] : said;
     }
 
+    /// <summary>What a channel holds: its register, and which of its components nothing has set.</summary>
+    private readonly record struct Held(int Register, int Unset);
+
+    /// <summary>One fed writer of a channel: its node, the stage it writes at, the channel, what it reads, and whether it only hands on what it read.</summary>
+    private readonly record struct Writer(ShaderNode Node, int Stage, int Channel, int Reads, bool Same);
+
     /// <summary>One step: what to do, where to put it, and from which registers.</summary>
-    /// <param name="Extra">A texture's index for a read, the packed swizzle for a swizzle.</param>
-    internal readonly record struct Step(Op Op, int To, int A, int B, int C, int D, int E, int Extra)
+    /// <param name="Extra">A texture's index for a read, the packed swizzle for a swizzle, the width for a dot, length or normalisation, how for a comparison.</param>
+    /// <param name="Splat">Whether the result is a float, its x spread across all four components.</param>
+    internal readonly record struct Step(Op Op, int To, int A, int B, int C, int D, int E, int Extra, bool Splat = false)
     {
         public bool Reads(int register) => Op switch
         {
@@ -623,6 +1308,20 @@ public sealed class ShadeProgram
     /// <summary>The steps, constants and textures being collected, with a way back to an earlier point.</summary>
     private sealed class Builder
     {
+        /// <summary>Which registers hold, in x, y and z, exactly one plain read - see <see cref="ShadeProgram.Plain"/>.</summary>
+        private readonly Dictionary<int, int> _plain = [];
+
+        /// <summary>The constants by value, so one value takes one register however many nodes say it.</summary>
+        private readonly Dictionary<Vector4, int> _byValue = [];
+
+        /// <summary>The constants by register - what Transform needs to know of its input.</summary>
+        private readonly Dictionary<int, Vector4> _value = [];
+
+        /// <summary>
+        /// The registers that hold only a direction: the TBN basis's normal, whose length the engine does not say.
+        /// </summary>
+        private readonly HashSet<int> _direction = [];
+
         public List<Step> Steps { get; } = [];
 
         public List<int> ConstantAt { get; } = [];
@@ -633,12 +1332,9 @@ public sealed class ShadeProgram
 
         public List<int> SampleTextures { get; } = [];
 
-        /// <summary>Which registers hold, in x, y and z, exactly one plain read - see <see cref="ShadeProgram.Plain"/>.</summary>
-        private readonly Dictionary<int, int> _plain = [];
+        public int Next { get; private set; } = Fixed;
 
-        public int Next { get; private set; } = 3;
-
-        public bool Fits => Next <= MostRegisters;
+        public bool Fits => Next <= MostBuilt;
 
         public readonly record struct Mark(int Steps, int Constants, int Textures, int Samples, int Next);
 
@@ -656,6 +1352,13 @@ public sealed class ShadeProgram
                 _plain.Remove(gone);
             }
 
+            foreach (KeyValuePair<Vector4, int> gone in _byValue.Where(one => one.Value >= mark.Next).ToList())
+            {
+                _byValue.Remove(gone.Key);
+                _value.Remove(gone.Value);
+            }
+
+            _direction.RemoveWhere(one => one >= mark.Next);
             Next = mark.Next;
         }
 
@@ -663,18 +1366,34 @@ public sealed class ShadeProgram
 
         public int Constant(Vector4 value)
         {
+            if (_byValue.TryGetValue(value, out int known))
+            {
+                return known;
+            }
+
             int at = Register();
             ConstantAt.Add(at);
             Constants.Add(value);
+            _byValue[value] = at;
+            _value[at] = value;
             return at;
         }
 
-        public int Emit(Op op, int a, int b = -1, int c = -1, int d = -1, int e = -1, int extra = 0)
+        public bool ConstantOf(int register, out Vector4 value) => _value.TryGetValue(register, out value);
+
+        public int Emit(Op op, int a, int b = -1, int c = -1, int d = -1, int e = -1, int extra = 0, bool splat = false)
         {
             int to = Register();
-            Steps.Add(new Step(op, to, a, b, c, d, e, extra));
+            Steps.Add(new Step(op, to, a, b, c, d, e, extra, splat));
             return to;
         }
+
+        /// <summary>A step writing part of a register already allocated.</summary>
+        public void Into(int into, int from, int packed) => Steps.Add(new Step(Op.Swizzle, into, from, -1, -1, -1, -1, packed));
+
+        public void Directional(int register) => _direction.Add(register);
+
+        public bool Direction(int register) => _direction.Contains(register);
 
         public int Texture(ShadeTexture texture)
         {
@@ -719,14 +1438,31 @@ public sealed class ShadeProgram
         public int PlainOf(int register) => _plain.TryGetValue(register, out int texture) ? texture : -1;
     }
 
-    /// <summary>One writer's expression being compiled: its graph, its instance and the values it reads.</summary>
-    private sealed class Unit(Builder build, Lookup lookup, ShaderInstance instance, IReadOnlyDictionary<string, int> seen)
+    /// <summary>One graph's writes at one stage being compiled: its graph, its instance and the values it reads.</summary>
+    private sealed class Unit(
+        Builder build, Lookup lookup, ShaderInstance instance,
+        IReadOnlyDictionary<string, Held> seen, IReadOnlyDictionary<string, string> lost)
     {
+        /// <summary>Every component taken from x - a float spread across a register.</summary>
+        private const int Spread = 0b1111 << 8;
+
         private readonly Dictionary<ShaderNode, int> _done = new(ReferenceEqualityComparer.Instance);
         private readonly HashSet<ShaderNode> _open = new(ReferenceEqualityComparer.Instance);
 
         /// <summary>Why the expression could not be compiled - the node type it stopped at.</summary>
         public string Why { get; private set; } = string.Empty;
+
+        /// <summary>Begins one write.</summary>
+        public void Start() => Why = string.Empty;
+
+        /// <summary>Forgets what a write that was backed out compiled, from the register it was backed out to.</summary>
+        public void Forget(int from)
+        {
+            foreach (ShaderNode gone in _done.Where(one => one.Value >= from).Select(one => one.Key).ToList())
+            {
+                _done.Remove(gone);
+            }
+        }
 
         /// <summary>The register holding what arrives on one port, or null.</summary>
         public int? Port(ShaderNode node, string port)
@@ -746,21 +1482,32 @@ public sealed class ShadeProgram
             }
 
             // ONE WHOLE VALUE STRAIGHT ACROSS needs no step of its own.
-            if (links.Count == 1 && links[0].Source.Swizzle.Length == 0 && links[0].Target.Swizzle.Length == 0)
+            if (links.Count == 1 && links[0].Target.Swizzle.Length == 0 && Swizzled(links[0].Source) is { Length: 0 })
             {
-                return Output(links[0].Source);
+                return Brought(node, port, links[0].Source, string.Empty);
             }
 
             var parts = new (int From, int Packed)[links.Count];
             int covered = 0;
             for (var one = 0; one < links.Count; one++)
             {
-                if (Output(links[one].Source) is not { } from)
+                if (Swizzled(links[one].Source) is not { } swizzle)
+                {
+                    return Fail($"{node.Type} with a swizzle this does not read");
+                }
+
+                if (Brought(node, port, links[one].Source, swizzle) is not { } from)
                 {
                     return null;
                 }
 
-                if (Packed(links[one].Source.Swizzle, links[one].Target.Swizzle) is not { } packed)
+                // A MATRIX OR A DIRECTION CUT INTO PARTS is neither any more.
+                if (from == Basis || build.Direction(from))
+                {
+                    return Fail($"{node.Type} with part of the TBN basis");
+                }
+
+                if (Packed(swizzle, links[one].Target.Swizzle) is not { } packed)
                 {
                     return Fail($"{node.Type} with a swizzle this does not read");
                 }
@@ -777,11 +1524,65 @@ public sealed class ShadeProgram
 
             foreach ((int from, int packed) in parts)
             {
-                build.Steps.Add(new Step(Op.Swizzle, into, from, -1, -1, -1, -1, packed));
+                build.Into(into, from, packed);
                 build.Carried(into, from, packed);
             }
 
             return into;
+        }
+
+        /// <summary>
+        /// The register a link brings, with what it may be used for checked.
+        /// </summary>
+        /// <remarks>
+        /// THREE THINGS ARE REFUSED HERE. A component of a channel nobody has set - the indirect
+        /// light's w before any graph wrote it. The TBN basis anywhere but where a matrix goes. And
+        /// the basis's normal anywhere its length would matter: the engine builds the basis from the
+        /// interpolated normal, and whether it normalises it on the way is not written down.
+        /// </remarks>
+        private int? Brought(ShaderNode node, string port, ShaderEnd source, string swizzle)
+        {
+            if (lookup.Node(source) is { } reader
+                && ReadBy(reader.Type) is { } channel
+                && seen.TryGetValue(channel, out Held held)
+                && (Mask(swizzle) & held.Unset) != 0)
+            {
+                return Fail($"{reader.Type}'s {Letters(Mask(swizzle) & held.Unset)} before any graph set it");
+            }
+
+            if (Output(source) is not { } register)
+            {
+                return null;
+            }
+
+            if (register == Basis && (node.Type, port) is not (("Transform", "inmatrix") or ("TbnBasis", "input")))
+            {
+                return Fail($"{node.Type} reading the TBN basis");
+            }
+
+            if (build.Direction(register) && !Directional(node.Type, port))
+            {
+                return Fail($"{node.Type} with the TBN basis's normal, whose length is not known");
+            }
+
+            return register;
+        }
+
+        /// <summary>A link's source swizzle, with the component a scalar output names put in; null where it cannot be.</summary>
+        private string? Swizzled(ShaderEnd end)
+        {
+            int implied = lookup.Node(end) is { } source ? Implied(source.Type, end.Variable) : -1;
+            if (implied < 0)
+            {
+                return end.Swizzle;
+            }
+
+            if (end.Swizzle.Any(one => Component(one) != 0))
+            {
+                return null;
+            }
+
+            return new string("xyzw"[implied], Math.Max(1, end.Swizzle.Length));
         }
 
         /// <summary>The register holding a node's output.</summary>
@@ -816,8 +1617,13 @@ public sealed class ShadeProgram
         {
             if (ReadBy(node.Type) is { } channel)
             {
-                return seen.TryGetValue(channel, out int register)
-                    ? register
+                if (seen.TryGetValue(channel, out Held held))
+                {
+                    return held.Register;
+                }
+
+                return lost.TryGetValue(channel, out string? by)
+                    ? Fail($"{node.Type} after {by}'s was left out")
                     : Fail($"{node.Type} before any graph wrote it");
             }
 
@@ -826,6 +1632,9 @@ public sealed class ShadeProgram
                 return Fail(node.Type);
             }
 
+            // A FLOAT NODE'S RESULT IS ITS X, SPREAD - see the class's remarks. The families' float
+            // members are the ones without a width on the end: Max, not Max3.
+            bool splat = !char.IsAsciiDigit(node.Type[^1]);
             switch (node.Type)
             {
                 case "ConstantPixel":
@@ -838,66 +1647,231 @@ public sealed class ShadeProgram
                 case "ConstantFloat4":
                 case "ConstantBool":
                 case "ConstantPixelBool":
+                case "ConstantInt":
+                case "ConstantUInt":
                     return build.Constant(Vectored(Parameter(node, 0).Numbers));
 
                 case "Zero":
+                case "ZeroUInt":
                     return build.Constant(Vector4.Zero);
 
                 // PBRGroundBN's alpha - every ground material in the desert tilesets - and a scalar
                 // broadcast like every other constant here.
                 case "One":
+                case "OneUInt":
                     return build.Constant(Vector4.One);
 
-                case "MultiplyConst":
-                case "MultiplyConst2":
-                case "MultiplyConst3":
-                case "MultiplyConst4":
-                    return Port(node, "a") is { } scaled
-                        ? build.Emit(Op.Multiply, scaled, build.Constant(Vectored(Parameter(node, 0).Numbers)))
-                        : null;
+                case "Half":
+                    return build.Constant(new Vector4(0.5f));
+
+                case "Two":
+                case "TwoUInt":
+                    return build.Constant(new Vector4(2f));
+
+                case "Pi":
+                    return build.Constant(new Vector4(3.14159265359f));
+
+                case "Epsilon":
+                    return build.Constant(new Vector4(1e-4f));
+
+                // A FLOAT PASSED THROUGH IS STILL CUT TO ITS X; a vector one is the register itself.
+                case "Dummy":
+                case "DummyBool":
+                case "DummyInt":
+                case "DummyUInt":
+                    return Single(node) is { } passed ? build.Emit(Op.Swizzle, passed, extra: Spread) : null;
+
+                case "Dummy2":
+                case "Dummy3":
+                case "Dummy4":
+                    return Single(node);
 
                 case "Add":
                 case "Add2":
                 case "Add3":
                 case "Add4":
-                    return Binary(node, Op.Add, "a", "b");
+                    return Binary(node, Op.Add, "a", "b", splat);
 
                 case "Subtract":
                 case "Subtract2":
                 case "Subtract3":
                 case "Subtract4":
-                    return Binary(node, Op.Subtract, "a", "b");
+                    return Binary(node, Op.Subtract, "a", "b", splat);
 
                 case "Multiply":
                 case "Multiply2":
                 case "Multiply3":
                 case "Multiply4":
-                    return Binary(node, Op.Multiply, "a", "b");
+                    return Binary(node, Op.Multiply, "a", "b", splat);
+
+                case "Divide":
+                case "Divide2":
+                case "Divide3":
+                case "Divide4":
+                    return Binary(node, Op.Divide, "a", "b", splat);
+
+                case "Max":
+                case "Max2":
+                case "Max3":
+                case "Max4":
+                case "MaxUInt":
+                    return Binary(node, Op.Max, "a", "b", splat);
+
+                case "Min":
+                case "Min2":
+                case "Min3":
+                case "Min4":
+                case "MinUInt":
+                    return Binary(node, Op.Min, "a", "b", splat);
+
+                case "Fmod":
+                case "Fmod2":
+                case "Fmod3":
+                case "Fmod4":
+                    return Binary(node, Op.Fmod, "a", "b", splat);
+
+                // ONE NUMBER WHATEVER THE NODE'S WIDTH: "uniform float mult_const3", spread.
+                case "MultiplyConst":
+                case "MultiplyConst2":
+                case "MultiplyConst3":
+                case "MultiplyConst4":
+                    return Constanted(node, Op.Multiply, splat);
+
+                case "AddConst":
+                case "AddConst2":
+                case "AddConst3":
+                case "AddConst4":
+                    return Constanted(node, Op.Add, splat);
+
+                case "SubtractConst":
+                case "SubtractConst2":
+                case "SubtractConst3":
+                case "SubtractConst4":
+                    return Constanted(node, Op.Subtract, splat);
+
+                case "MultiplyAdd":
+                case "MultiplyAdd2":
+                case "MultiplyAdd3":
+                case "MultiplyAdd4":
+                    return Port(node, "a") is { } ma && Port(node, "b") is { } mb && Port(node, "c") is { } mc
+                        ? build.Emit(Op.MultiplyAdd, ma, mb, mc, splat: splat)
+                        : null;
+
+                case "Clamp":
+                case "Clamp2":
+                case "Clamp3":
+                case "Clamp4":
+                    return Port(node, "input") is { } clamped && Port(node, "iMin") is { } low && Port(node, "iMax") is { } high
+                        ? build.Emit(Op.Clamp, clamped, low, high, splat: splat)
+                        : null;
 
                 case "Power":
-                    return Binary(node, Op.Power, "base", "exp");
+                    return Binary(node, Op.Power, "base", "exp", false);
+
+                case "Step":
+                    return Binary(node, Op.Step, "val", "threshold", false);
 
                 case "Negate":
-                    return Unary(node, Op.Negate);
+                case "Negate2":
+                case "Negate3":
+                case "Negate4":
+                    return Unary(node, Op.Negate, splat);
 
                 case "OneMinus":
-                    return Unary(node, Op.OneMinus);
+                case "OneMinus2":
+                case "OneMinus3":
+                case "OneMinus4":
+                    return Unary(node, Op.OneMinus, splat);
 
                 case "Saturate":
-                    return Unary(node, Op.Saturate);
+                case "Saturate2":
+                case "Saturate3":
+                case "Saturate4":
+                    return Unary(node, Op.Saturate, splat);
 
+                case "Abs":
+                case "Abs2":
+                case "Abs3":
+                case "Abs4":
+                    return Unary(node, Op.Abs, splat);
+
+                case "Floor":
+                case "Floor2":
+                case "Floor3":
+                case "Floor4":
+                    return Unary(node, Op.Floor, splat);
+
+                case "Ceil":
+                case "Ceil2":
+                case "Ceil3":
+                case "Ceil4":
+                    return Unary(node, Op.Ceil, splat);
+
+                case "Round":
+                    return Unary(node, Op.Round, splat);
+
+                case "Truncate":
+                case "Truncate2":
+                case "Truncate3":
+                case "Truncate4":
+                    return Unary(node, Op.Truncate, splat);
+
+                case "Frac":
+                case "Frac2":
+                case "Frac3":
+                case "Frac4":
+                    return Unary(node, Op.Frac, splat);
+
+                case "Sqrt":
+                case "Sqrt2":
+                case "Sqrt3":
+                case "Sqrt4":
+                    return Unary(node, Op.Sqrt, splat);
+
+                case "Sign":
+                case "Sign2":
+                case "Sign3":
+                case "Sign4":
+                    return Unary(node, Op.Sign, splat);
+
+                case "Normalize2":
                 case "Normalize3":
-                    return Unary(node, Op.Normalize);
+                case "Normalize4":
+                    return Single(node) is { } normalised ? build.Emit(Op.Normalize, normalised, extra: Width(node.Type)) : null;
 
-                case "Dummy4":
-                    return Single(node);
+                case "DotProduct2":
+                case "DotProduct3":
+                case "DotProduct4":
+                    return Port(node, "a") is { } da && Port(node, "b") is { } db
+                        ? build.Emit(Op.Dot, da, db, extra: Width(node.Type))
+                        : null;
+
+                case "Length3":
+                    return Single(node) is { } measured ? build.Emit(Op.Length, measured, extra: 3) : null;
+
+                case "Luminance":
+                    return Single(node) is { } lit
+                        ? build.Emit(Op.Dot, lit, build.Constant(new Vector4(0.299f, 0.587f, 0.114f, 0f)), extra: 3)
+                        : null;
+
+                // legacy.ffx's, and a float3 for all it is one number: dot(float3(0.222, 0.707, 0.071), in_color).
+                case "GrayScale":
+                    return Single(node) is { } grey
+                        ? build.Emit(Op.Dot, grey, build.Constant(new Vector4(0.222f, 0.707f, 0.071f, 0f)), extra: 3)
+                        : null;
 
                 case "Lerp":
                 case "Lerp2":
                 case "Lerp3":
                 case "Lerp4":
                     return Port(node, "a") is { } a && Port(node, "b") is { } b && Port(node, "alpha") is { } alpha
-                        ? build.Emit(Op.Lerp, a, b, alpha)
+                        ? build.Emit(Op.Lerp, a, b, alpha, splat: splat)
+                        : null;
+
+                case "SmoothStep":
+                    return Port(node, "center") is { } center && Port(node, "steepness") is { } steepness
+                        && Port(node, "in_value") is { } smoothed
+                        ? build.Emit(Op.SmoothStep, center, steepness, smoothed)
                         : null;
 
                 case "FitRangeFromInput":
@@ -906,6 +1880,74 @@ public sealed class ShadeProgram
                         && Port(node, "out_min") is { } outMin && Port(node, "out_max") is { } outMax
                         ? build.Emit(Op.Fit, value, inMin, inMax, outMin, outMax)
                         : null;
+
+                // THE RANGE IS THE NODE'S OWN: inputMin, inputMax, outputMin, outputMax, in that order.
+                case "FitRange":
+                    return Port(node, "value") is { } fitted
+                        && Said(node, 0, 0f) is { } fromMin && Said(node, 1, 255f) is { } fromMax
+                        && Said(node, 2, 0f) is { } toMin && Said(node, 3, 255f) is { } toMax
+                        ? build.Emit(
+                            Op.Fit, fitted, build.Constant(new Vector4(fromMin)), build.Constant(new Vector4(fromMax)),
+                            build.Constant(new Vector4(toMin)), build.Constant(new Vector4(toMax)))
+                        : null;
+
+                case "RemapHue":
+                    return Port(node, "color_map") is { } mapped
+                        && Said(node, 0, 0f) is { } hue && Said(node, 1, 0.5f) is { } saturation && Said(node, 2, 0.5f) is { } brightness
+                        ? build.Emit(Op.RemapHue, mapped, build.Constant(Turn(hue, saturation, brightness)))
+                        : null;
+
+                case "RemapHueInput":
+                    return Port(node, "color_map") is { } remapped
+                        && Port(node, "hue") is { } turned && Port(node, "saturation") is { } sat && Port(node, "brightness") is { } bright
+                        ? build.Emit(Op.RemapHue, remapped, build.Emit(Op.HueTurn, turned, sat, bright))
+                        : null;
+
+                case "SelectFloat":
+                case "SelectFloat2":
+                case "SelectFloat3":
+                case "SelectFloat4":
+                case "SelectBool":
+                case "SelectUInt":
+                    return Port(node, "a") is { } no && Port(node, "b") is { } yes && Port(node, "condition") is { } condition
+                        ? build.Emit(Op.Select, no, yes, condition, splat: splat)
+                        : null;
+
+                case "SelectChannel":
+                    return Port(node, "input") is { } channels && Port(node, "index") is { } index
+                        ? build.Emit(Op.Pick, channels, index)
+                        : null;
+
+                case "GreaterThan":
+                case "GreaterThanUInt":
+                    return Compare(node, Greater);
+
+                case "LessThan":
+                case "LessThanUInt":
+                    return Compare(node, Less);
+
+                case "EqualsUInt":
+                    return Compare(node, Equal);
+
+                case "And":
+                    return Compare(node, Both);
+
+                case "Or":
+                    return Compare(node, Either);
+
+                case "Not":
+                    return Port(node, "a") is { } negated ? build.Emit(Op.Compare, negated, extra: Not) : null;
+
+                // THE INPUT ITSELF: each output is one of its components - see Implied.
+                case "Float2ToCoords":
+                case "Float3ToCoords":
+                case "Float4ToCoords":
+                    return Port(node, "input");
+
+                case "CoordsToFloat2":
+                case "CoordsToFloat3":
+                case "CoordsToFloat4":
+                    return Assembled(node, Width(node.Type));
 
                 case "SampleTexture":
                     return Texture(node, Parameter(node, 0)) is { } sheet && Port(node, "uv") is { } spot
@@ -922,15 +1964,118 @@ public sealed class ShadeProgram
                         ? build.Emit(Op.SampleLod, where, lod, extra: given)
                         : null;
 
+                case "SampleInputTriplanar":
+                    return Triplanar(node);
+
+                // semanticsData.normal: the vertex normal as interpolated, in the model's space - the
+                // world's, for a tile drawn where it stands.
+                case "FromVertexNormal":
+                    return VertexNormal;
+
+                // in_position.xy + ground_scalemove_uv.zw, where that shift is the engine's, set for the
+                // whole scene and in no file. It moves where a pattern lies, not what it looks like, so
+                // it is taken as nought: AGT_DesertDust's dust is the same dust, slid.
+                case "GroundScroll":
+                    return Port(node, "in_position");
+
+                case "Transform":
+                    return Transformed(node);
+
                 default:
                     return Fail(node.Type);
             }
         }
 
-        private int? Binary(ShaderNode node, Op op, string left, string right)
-            => Port(node, left) is { } a && Port(node, right) is { } b ? build.Emit(op, a, b) : null;
+        private int? Binary(ShaderNode node, Op op, string left, string right, bool splat)
+            => Port(node, left) is { } a && Port(node, right) is { } b ? build.Emit(op, a, b, splat: splat) : null;
 
-        private int? Unary(ShaderNode node, Op op) => Single(node) is { } input ? build.Emit(op, input) : null;
+        private int? Unary(ShaderNode node, Op op, bool splat)
+            => Single(node) is { } input ? build.Emit(op, input, splat: splat) : null;
+
+        /// <summary>A node's input and its one-number parameter: MultiplyConst, AddConst, SubtractConst.</summary>
+        private int? Constanted(ShaderNode node, Op op, bool splat)
+            => Port(node, "a") is { } a ? build.Emit(op, a, build.Constant(Vectored(Parameter(node, 0).Numbers)), splat: splat) : null;
+
+        private int? Compare(ShaderNode node, int how)
+            => Port(node, "a") is { } a && Port(node, "b") is { } b ? build.Emit(Op.Compare, a, b, extra: how) : null;
+
+        /// <summary>CoordsToFloat2, 3 and 4: each float input's x put in its own component.</summary>
+        private int? Assembled(ShaderNode node, int width)
+        {
+            var parts = new int[width];
+            for (var part = 0; part < width; part++)
+            {
+                if (Port(node, "xyzw"[part].ToString()) is not { } one)
+                {
+                    return null;
+                }
+
+                parts[part] = one;
+            }
+
+            // THE COMPONENTS PAST THE WIDTH ARE NEVER READ - a float3 has no w to hand on - so they
+            // are left as they lie.
+            int into = build.Register();
+            for (var part = 0; part < width; part++)
+            {
+                build.Into(into, parts[part], (1 << part) << 8);
+            }
+
+            return into;
+        }
+
+        /// <summary>
+        /// SampleInputTriplanar: the texture read three times, along each axis, and blended by the normal.
+        /// </summary>
+        /// <remarks>
+        /// THREE ORDINARY READS - at the position's yz, xz and xy - so each takes its own level from
+        /// the triangle, as a graphics card would give each its own derivatives.
+        /// </remarks>
+        private int? Triplanar(ShaderNode node)
+        {
+            if (Handed(node) is not { } texture || Port(node, "uv") is not { } uvw || Port(node, "world_normal") is not { } normal)
+            {
+                return null;
+            }
+
+            int yz = build.Emit(Op.Swizzle, uvw, extra: 1 | (2 << 2) | (0b0011 << 8));
+            int xz = build.Emit(Op.Swizzle, uvw, extra: 0 | (2 << 2) | (0b0011 << 8));
+            int alongX = build.Sample(texture, yz);
+            int alongY = build.Sample(texture, xz);
+            int alongZ = build.Sample(texture, uvw);
+            return build.Emit(Op.Triplanar, alongX, alongY, alongZ, normal);
+        }
+
+        /// <summary>
+        /// Transform by the TBN basis, where the vector lies along the basis's normal alone.
+        /// </summary>
+        /// <remarks>
+        /// <c>mul(input, inmatrix)</c> with the basis's rows tangent, binormal and normal, so
+        /// <c>Transform(float3(0, 0, 1), InputTbnBasis)</c> - AGT_DesertDust's and the parallax's
+        /// surface normal - is the normal row. The mesh has no tangents, so a vector with any part
+        /// along the other two rows is refused; and the result is a direction only - see Brought.
+        /// </remarks>
+        private int? Transformed(ShaderNode node)
+        {
+            if (Port(node, "inmatrix") is not { } matrix || Port(node, "input") is not { } vector)
+            {
+                return null;
+            }
+
+            if (matrix != Basis)
+            {
+                return Fail("Transform by a matrix other than the TBN basis");
+            }
+
+            if (!build.ConstantOf(vector, out Vector4 along) || along.X != 0f || along.Y != 0f)
+            {
+                return Fail("Transform of a vector along the tangent or binormal, which the mesh does not have");
+            }
+
+            int said = build.Emit(Op.Multiply, VertexNormal, build.Constant(new Vector4(along.Z)));
+            build.Directional(said);
+            return said;
+        }
 
         /// <summary>A one-input node's input, whatever its port is called - there is only the one.</summary>
         private int? Single(ShaderNode node)
@@ -976,6 +2121,26 @@ public sealed class ShadeProgram
                 : own;
         }
 
+        /// <summary>
+        /// A one-number parameter, where it is written or its declared default is nought; else null.
+        /// </summary>
+        /// <remarks>
+        /// NOUGHT FOR A VALUE LEFT OUT rests on parameters whose default is nought (see
+        /// <see cref="Parameter"/>), where nought and the default are one. FitRange's inputMax
+        /// defaults to 255 and RemapHue's saturation to a half, and whether a value left out of
+        /// those means the default or nought is something no file shows - so it is refused.
+        /// </remarks>
+        private float? Said(ShaderNode node, int at, float declared)
+        {
+            float[] numbers = Parameter(node, at).Numbers;
+            if (numbers.Length > 0)
+            {
+                return numbers[0];
+            }
+
+            return declared == 0f ? 0f : Fail($"{node.Type} leaving out a value whose default is not nought");
+        }
+
         private int? Fail(string why)
         {
             if (Why.Length == 0)
@@ -985,6 +2150,38 @@ public sealed class ShadeProgram
 
             return null;
         }
+
+        /// <summary>The ports a direction of unknown length may go to: where it is normalised before use, or passed through.</summary>
+        private static bool Directional(string type, string port)
+            => (type, port) is ("SampleInputTriplanar", "world_normal")
+                || type is "Normalize2" or "Normalize3" or "Normalize4" or "Dummy3" or "Dummy4";
+
+        /// <summary>The width on the end of a node's type: 3 for Normalize3.</summary>
+        private static int Width(string type) => type[^1] - '0';
+
+        /// <summary>Which components a swizzle reads, all four for none.</summary>
+        private static int Mask(string swizzle)
+        {
+            if (swizzle.Length == 0)
+            {
+                return 0b1111;
+            }
+
+            var mask = 0;
+            foreach (char letter in swizzle)
+            {
+                int part = Component(letter);
+                if (part >= 0)
+                {
+                    mask |= 1 << part;
+                }
+            }
+
+            return mask;
+        }
+
+        private static string Letters(int mask)
+            => string.Concat(Enumerable.Range(0, 4).Where(part => (mask & (1 << part)) != 0).Select(part => "xyzw"[part]));
 
         /// <summary>A value's numbers as four components: a scalar in all four, a vector in its own.</summary>
         private static Vector4 Vectored(float[] numbers)
