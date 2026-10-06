@@ -99,6 +99,46 @@ public class GameArtTests
     /// <summary>One pixel, in the blue-first order a DDS stores.</summary>
     private static byte[] Pixel(byte r, byte g, byte b, byte a) => [b, g, r, a];
 
+    /// <summary>A block-compressed DDS of 8 by 8 texels, every 4 by 4 block the one given, by a four-character code or a DX10 format.</summary>
+    private static byte[] Compressed(string code, int dx10, byte[] block)
+    {
+        using var stream = new MemoryStream();
+        using var write = new BinaryWriter(stream);
+
+        write.Write(Encoding.ASCII.GetBytes("DDS "));
+        write.Write(124);
+        write.Write(0x1007 | 0x80000);          // caps, height, width, pixel format, linear size
+        write.Write(8);
+        write.Write(8);
+        write.Write(block.Length * 4);
+        write.Write(0);
+        write.Write(1);
+        write.Write(new byte[44]);
+
+        write.Write(32);
+        write.Write(0x4);                       // a four-character code says the format
+        write.Write(Encoding.ASCII.GetBytes(code));
+        write.Write(new byte[20]);
+
+        write.Write(0x1000);
+        write.Write(new byte[16]);
+        if (code == "DX10")
+        {
+            write.Write(dx10);
+            write.Write(3);                     // a 2D texture
+            write.Write(0);
+            write.Write(1);
+            write.Write(0);
+        }
+
+        for (var one = 0; one < 4; one++)
+        {
+            write.Write(block);
+        }
+
+        return stream.ToArray();
+    }
+
     /// <summary>
     /// Packs a texture the way the game's compressed ones are: its size, then Brotli.
     /// </summary>
@@ -286,6 +326,37 @@ public class GameArtTests
         Assert.Null(GameArt.Read(null, "Art/Junk.dds"));
         Assert.Null(GameArt.Decode(null));
         Assert.Null(GameArt.Decode([]));
+    }
+
+    /// <summary>
+    /// A BC4 - AGT_DesertDust's grunge mask and height map are - reads as a graphics card reads it: its one channel red.
+    /// </summary>
+    /// <remarks>Both ways the game's headers can say it: the four-character code, and the DX10 header's format 80.</remarks>
+    [Fact]
+    public void ABC4IsItsOneChannelInRed()
+    {
+        byte[] block = [200, 50, 0, 0, 0, 0, 0, 0];   // both ends, every texel on the first: 200
+        foreach (byte[] dds in new[] { Compressed("ATI1", 0, block), Compressed("DX10", 80, block) })
+        {
+            GamePicture? picture = GameArt.Decode(dds);
+            Assert.NotNull(picture);
+            Assert.Equal<byte[]>([200, 0, 0, 255], picture.Value.Rgba[..4]);
+        }
+    }
+
+    /// <summary>A one-byte picture that is not a BC4 is not taken: a graphics card reads luminance and alpha otherwise.</summary>
+    [Fact]
+    public void ANDAnotherOneBytePictureIsNotGuessedAt()
+    {
+        byte[] dds = Dds(4, 4, new byte[16 * 4]);
+        BitConverter.GetBytes(0x20000).CopyTo(dds, 80);    // luminance
+        BitConverter.GetBytes(8).CopyTo(dds, 88);          // a byte a pixel
+        BitConverter.GetBytes(0xFF).CopyTo(dds, 92);       // all of it the one channel
+        BitConverter.GetBytes(0).CopyTo(dds, 96);
+        BitConverter.GetBytes(0).CopyTo(dds, 100);
+        BitConverter.GetBytes(0).CopyTo(dds, 104);
+
+        Assert.Null(GameArt.Decode(dds[..(128 + 16)]));
     }
 
     [Fact]
