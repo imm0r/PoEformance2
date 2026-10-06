@@ -17,9 +17,10 @@ namespace PoEformance.Features;
 /// <param name="Info">The reward icon, the relic's mods, the monolith's anchor - whatever names it.</param>
 /// <param name="Value">Its routing weight in Exalted, 0 when it has none.</param>
 /// <param name="Primary">Whether the tour goes to it.</param>
-/// <param name="Tier">A marker's height tier, or empty.</param>
+/// <param name="Tier">A marker's height tier, or empty; "avoid" on a shunned relic.</param>
+/// <param name="Shunned">A relic carrying a mod the settings avoid: no blast may reach it.</param>
 public sealed record ExpeditionTargetView(
-    uint Id, ExpeditionKind Kind, Vector2 Grid, float Z, string Info, double Value, bool Primary, string Tier);
+    uint Id, ExpeditionKind Kind, Vector2 Grid, float Z, string Info, double Value, bool Primary, string Tier, bool Shunned = false);
 
 /// <summary>A path-blocker: where it stands, whether it is shut, and the hole it punches in the grid.</summary>
 public sealed record ExpeditionGateView(Vector2 Grid, float Z, bool Blocked, IReadOnlyList<(int X, int Y)> Footprint);
@@ -741,13 +742,45 @@ public sealed class ExpeditionWatch
             ? 0
             : ExpeditionRelics.NetWeight(mods.Split(';', StringSplitOptions.RemoveEmptyEntries), weights);
 
+    /// <summary>The first of a relic's mods the settings avoid, or null. No allocation: the list is walked as spans.</summary>
+    private static string? AvoidedMod(string mods, ExpeditionSettings s)
+    {
+        if (s.AvoidMods.Count == 0 || mods.Length == 0)
+        {
+            return null;
+        }
+
+        ReadOnlySpan<char> all = mods;
+        foreach (Range part in all.Split(';'))
+        {
+            ReadOnlySpan<char> mod = all[part];
+            if (mod.IsEmpty)
+            {
+                continue;
+            }
+
+            foreach (string avoided in s.AvoidMods)
+            {
+                if (mod.SequenceEqual(avoided))
+                {
+                    return avoided;
+                }
+            }
+        }
+
+        return null;
+    }
+
     /// <summary>
     /// The cache as the planner's targets: the weight per kind, anchor or pickup, the Sentinel
-    /// pinned, then the two fallbacks that keep a map from going unplanned.
+    /// pinned, then the two fallbacks that keep a map from going unplanned. The shunned relics
+    /// come out separately: they are not targets worth nothing, they are ground no blast may reach.
     /// </summary>
-    private List<PlanTarget> Targets(ExpeditionSettings s, bool coverageMode, float baseline, bool sentinelWorthwhile, List<string>? trace)
+    private List<PlanTarget> Targets(
+        ExpeditionSettings s, bool coverageMode, float baseline, bool sentinelWorthwhile, List<string>? trace, out List<Vector2> shunned)
     {
         var targets = new List<PlanTarget>();
+        shunned = [];
         Dictionary<string, float> relics = RelicMap(s);
         var monolithIdx = new List<int>();
         var anyWorthTheWalk = false;
@@ -794,6 +827,13 @@ public sealed class ExpeditionWatch
                     break;
 
                 case ExpeditionKind.Remnant:
+                    if (AvoidedMod(t.Info, s) is { } avoided)
+                    {
+                        shunned.Add(t.Grid);
+                        trace?.Add($"[shun] relic {Fmt(t.Grid)} carries {ExpeditionRelics.ShortName(avoided)} - no blast may reach it");
+                        break;
+                    }
+
                     double net = RelicNet(t.Info, relics);
                     if (net > 0)
                     {
@@ -891,7 +931,7 @@ public sealed class ExpeditionWatch
         }
 
         var trace = new List<string>();
-        List<PlanTarget> targets = Targets(settings, coverageMode, baseline, sentinelWorthwhile, trace);
+        List<PlanTarget> targets = Targets(settings, coverageMode, baseline, sentinelWorthwhile, trace, out List<Vector2> shunned);
         RunecraftSettings? chain = ChainSettings;
         var inputs = new PlanInputs
         {
@@ -905,6 +945,7 @@ public sealed class ExpeditionWatch
             StepDist = Math.Max(1f, effDist - StepMargin),
             Targets = targets,
             Props = [.. _props],
+            Shunned = shunned,
             MarkerCoverageMode = coverageMode,
             MinMarkers = grand ? Math.Max(1, settings.MinMarkersPerSpare) : 1,
             ChainOrder = chain is { ChainEnabled: true },
@@ -1044,6 +1085,12 @@ public sealed class ExpeditionWatch
         }
 
         sb.Append('|');
+        foreach (string mod in s.AvoidMods)
+        {
+            sb.Append(mod).Append(',');
+        }
+
+        sb.Append('|');
         foreach ((string icon, int count) in markers)
         {
             sb.Append(icon).Append(':').Append(count).Append(',');
@@ -1068,6 +1115,7 @@ public sealed class ExpeditionWatch
         {
             double value = 0;
             var primary = false;
+            var shunnedHere = false;
             var tier = string.Empty;
             switch (t.Kind)
             {
@@ -1079,15 +1127,24 @@ public sealed class ExpeditionWatch
                     value = grand ? settings.RewardWeightOf(t.Info) : TierWeight(settings, PoleOffset(t), baseline, out tier);
                     break;
                 case ExpeditionKind.Remnant:
-                    value = RelicNet(t.Info, relics);
-                    primary = value > 0;
+                    if (AvoidedMod(t.Info, settings) is not null)
+                    {
+                        tier = "avoid";
+                        shunnedHere = true;
+                    }
+                    else
+                    {
+                        value = RelicNet(t.Info, relics);
+                        primary = value > 0;
+                    }
+
                     break;
                 case ExpeditionKind.Sentinel:
                     primary = !grand;
                     break;
             }
 
-            targets.Add(new ExpeditionTargetView(id, t.Kind, t.Grid, t.Z, t.Info, value, primary, tier));
+            targets.Add(new ExpeditionTargetView(id, t.Kind, t.Grid, t.Z, t.Info, value, primary, tier, shunnedHere));
         }
 
         targets.Sort((a, b) => b.Value.CompareTo(a.Value));

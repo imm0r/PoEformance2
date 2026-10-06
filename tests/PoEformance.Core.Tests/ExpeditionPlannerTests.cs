@@ -10,7 +10,7 @@ public class ExpeditionPlannerTests
     private static PlanInputs Inputs(
         TerrainGrid? grid, Vector2 detonator, int budget, IReadOnlyList<PlanTarget> targets,
         IReadOnlyList<PlanProp>? props = null, bool chain = false, float effDist = 108f, float effRadius = 37f,
-        bool coverage = false, int minMarkers = 1)
+        bool coverage = false, int minMarkers = 1, IReadOnlyList<Vector2>? shunned = null)
         => new()
         {
             Paths = new ExpeditionPaths(grid, null, effDist),
@@ -23,6 +23,7 @@ public class ExpeditionPlannerTests
             StepDist = effDist - 1f,
             Targets = targets,
             Props = props ?? [],
+            Shunned = shunned ?? [],
             MarkerCoverageMode = coverage,
             MinMarkers = minMarkers,
             ChainOrder = chain,
@@ -213,6 +214,75 @@ public class ExpeditionPlannerTests
         int sentinelAt = plan.Route.ToList().FindIndex(p => p.Sentinel);
         int flagAt = plan.Route.ToList().FindIndex(p => Vector2.Distance(p.Grid, new Vector2(250, 30)) <= 37f);
         Assert.True(sentinelAt >= 0 && flagAt >= 0 && sentinelAt < flagAt, $"sentinel at {sentinelAt}, flag at {flagAt}:\n{string.Join('\n', plan.Trace)}");
+    }
+
+    [Fact]
+    public void AShunnedRelicPushesTheChargeToTheAnchorsOtherSide()
+    {
+        // Edge placement would set the charge past the monolith, at about x=137 - inside the
+        // blast of a relic at 120. With the relic shunned the charge lands BEFORE the monolith,
+        // where it still covers it and stays a radius clear of the relic.
+        TerrainGrid field = ExpeditionPathsTests.Field(400, 60);
+        PlanInputs inputs = Inputs(field, new Vector2(20, 30), budget: 5, [Monolith(1, 100, 30, 40)], shunned: [new Vector2(120, 30)]);
+
+        PlanResult plan = ExpeditionPlanner.Plan(inputs);
+
+        Assert.Equal(1, plan.AnchorsCovered);
+        Assert.Equal(0, plan.ShunnedHit);
+        RoutePoint first = plan.Route[0];
+        Assert.True(first.Grid.X < 100f, $"placed at {first.Grid.X}, not before the anchor:\n{string.Join('\n', plan.Trace)}");
+        Assert.True(Vector2.Distance(first.Grid, new Vector2(100, 30)) <= 37f + 0.01f);
+        foreach (RoutePoint point in plan.Route)
+        {
+            Assert.True(Vector2.Distance(point.Grid, new Vector2(120, 30)) > 37f, $"a charge at {point.Grid} sets the relic off");
+        }
+    }
+
+    [Fact]
+    public void AnAnchorOnlyTakeableBySettingOffAShunnedRelicIsSkipped_WithoutABridgeWasted()
+    {
+        // The relic stands ON the monolith: no point covers one without the other.
+        TerrainGrid field = ExpeditionPathsTests.Field(400, 60);
+        PlanInputs inputs = Inputs(field, new Vector2(20, 30), budget: 5,
+        [
+            Monolith(1, 100, 30, 40),
+            Monolith(2, 250, 30, 10),
+        ], shunned: [new Vector2(100, 30)]);
+
+        PlanResult plan = ExpeditionPlanner.Plan(inputs);
+
+        Assert.Equal(1, plan.AnchorsCovered);
+        Assert.Equal(0, plan.ShunnedHit);
+        Assert.Contains(plan.Trace, line => line.Contains("every point covering it would set off a shunned relic", StringComparison.Ordinal));
+        Assert.Contains(plan.Trace, line => line.Contains("shunned=1", StringComparison.Ordinal));
+
+        // The second monolith is still reached, and no charge ever comes within a blast of the first.
+        Assert.Contains(plan.Route, p => Vector2.Distance(p.Grid, new Vector2(250, 30)) <= 37f);
+        foreach (RoutePoint point in plan.Route)
+        {
+            Assert.True(Vector2.Distance(point.Grid, new Vector2(100, 30)) > 37f, $"a charge at {point.Grid} sets the relic off");
+        }
+    }
+
+    [Fact]
+    public void ASpareIsNeverSpentBesideAShunnedRelic()
+    {
+        // The cluster from the spare test, with a shunned relic in its midst: the spare stays unspent.
+        TerrainGrid field = ExpeditionPathsTests.Field(400, 200);
+        PlanInputs inputs = Inputs(field, new Vector2(20, 60), budget: 4,
+        [
+            Monolith(1, 80, 60, 40),
+            Marker(10, 80, 150, 5),
+            Marker(11, 90, 152, 5),
+            Marker(12, 85, 158, 5),
+        ], coverage: true, minMarkers: 2, shunned: [new Vector2(86, 154)]);
+
+        PlanResult plan = ExpeditionPlanner.Plan(inputs);
+
+        Assert.Equal(1, plan.AnchorsCovered);
+        Assert.Single(plan.Route);
+        Assert.Equal(0, plan.ShunnedHit);
+        Assert.Contains(plan.Trace, line => line.Contains("no affordable cluster", StringComparison.Ordinal));
     }
 
     [Fact]

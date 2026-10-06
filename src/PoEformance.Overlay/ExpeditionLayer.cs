@@ -42,6 +42,7 @@ public sealed class ExpeditionLayer
     private const uint GateShut = 0xFF30_30FFu;
     private const uint GateOpen = 0xFF30_FF30u;
     private const uint GateHole = 0x5530_30FFu;
+    private const uint Shun = 0xFF40_40FFu;
     private const uint Black = 0xFF00_0000u;
     private const uint White = 0xFFFF_FFFFu;
     private const uint WorldRing = 0xFF00_D7FFu;
@@ -81,6 +82,7 @@ public sealed class ExpeditionLayer
                 }
 
                 Route(draw, map, player, terrain, view, settings);
+                Shunned(draw, map, player, terrain, view);
             }
             finally
             {
@@ -269,6 +271,29 @@ public sealed class ExpeditionLayer
             Vector2 centre = Project(map, player, terrain, gate.Grid, gate.Z);
             draw.AddCircle(centre, 5f, Black, 16, 3f);
             draw.AddCircle(centre, 5f, gate.Blocked ? GateShut : GateOpen, 16, 2f);
+        }
+    }
+
+    /// <summary>
+    /// The shunned relics: a red ring with a bar through it, the sign for "not this one" - drawn
+    /// whenever there is a plan to make, since the constraint shapes the route whether or not
+    /// the rings are on.
+    /// </summary>
+    private static void Shunned(ImDrawListPtr draw, MapView map, WorldEntity player, TerrainGrid? terrain, ExpeditionView view)
+    {
+        var bar = new Vector2(5f, -5f);
+        foreach (ExpeditionTargetView target in view.Targets)
+        {
+            if (!target.Shunned)
+            {
+                continue;
+            }
+
+            Vector2 at = Project(map, player, terrain, target.Grid, target.Z);
+            draw.AddCircle(at, 7f, Black, 16, 3.5f);
+            draw.AddCircle(at, 7f, Shun, 16, 2f);
+            draw.AddLine(at - bar, at + bar, Black, 3.5f);
+            draw.AddLine(at - bar, at + bar, Shun, 2f);
         }
     }
 

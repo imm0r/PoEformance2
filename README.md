@@ -273,7 +273,9 @@ explosive chain: from the detonator through every monolith worth the walk (by re
 or by size, since the big one is where the chain cashes out), every relic whose mods net positive
 and the Kalguur Sentinel first, bridging the gaps along walkable ground, setting each charge past
 its anchor so the blast reaches toward the next, grabbing reward flags in passing, and spending
-the spare charges on the flag clusters that pay most per charge. The order it settles on is the
+the spare charges on the flag clusters that pay most per charge. A relic mod ticked avoid is a
+hard rule rather than a weight: no blast may reach a relic carrying it, and an anchor only
+takeable by setting it off is skipped. The order it settles on is the
 detonation order the rune chain values the monoliths by, so the two agree. The charges are
 numbered on the map with their blast rings, the next one to lay is ringed in the world, the
 counts come off the game's own expedition controller with the HUD counter and a manual total

@@ -29,6 +29,27 @@ internal static class ImGuiText
     /// <summary>Doubles every percent sign, which is how printf spells a literal one.</summary>
     public static string Escape(string text) => text.Replace("%", "%%", StringComparison.Ordinal);
 
+    /// <summary>Coloured text that is not printf, for a line built from data.</summary>
+    /// <remarks>
+    /// TextColored is a format call, and the data this tool prints is full of percent signs -
+    /// "20% increased Rarity" is a relic mod's own name, and it came out as "20-225712300ncreased"
+    /// on the expedition tab. The colour is pushed round TextUnformatted, which is what
+    /// <see cref="Mono(Vector4, string)"/> already does in the mono face; this is the same shape
+    /// in the body face, for a table cell or a status line that is words rather than a figure.
+    /// </remarks>
+    public static void Colored(Vector4 colour, string text)
+    {
+        ImGui.PushStyleColor(ImGuiCol.Text, colour);
+        try
+        {
+            ImGui.TextUnformatted(text);
+        }
+        finally
+        {
+            ImGui.PopStyleColor();
+        }
+    }
+
     /// <summary>Coloured text that wraps at the window's edge, which TextColored never does.</summary>
     /// <remarks>
     /// The named helper exists because the composition kept being skipped: TextColored never

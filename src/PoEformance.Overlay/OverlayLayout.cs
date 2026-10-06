@@ -328,6 +328,15 @@ public static class OverlayLayout
         ImGui.Separator();
     }
 
+    /// <summary>A blank line between two blocks, where one ends and the next begins.</summary>
+    /// <remarks>
+    /// THE AIR BETWEEN GROUPS. <see cref="Group"/> opens with a title and a rule but closes with
+    /// nothing: its last control sits one item-space above the next title, and a page of six
+    /// groups reads as one long list with headings dropped into it. One text line of nothing
+    /// is enough to see six blocks instead - and it is one call, so every page breathes alike.
+    /// </remarks>
+    public static void Gap() => ImGui.Dummy(new Vector2(0f, ImGui.GetTextLineHeight()));
+
     /// <summary>
     /// An explanation, on its own line, under whatever it explains.
     /// </summary>

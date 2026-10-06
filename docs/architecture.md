@@ -3897,6 +3897,12 @@ only the price is added. What the port kept, what it changed, and why:
   waves, and an order-independent "strongest uplift it could propagate" for the reorder);
   markers weigh by the reward icon on a Grand expedition and by POLE HEIGHT on a normal one — the
   game fixes each tier's pole, so the modal height is the tiny swarm and taller is better.
+  A relic mod ticked AVOID makes its relics a constraint rather than a weight: they go to the
+  planner as points no blast may reach, every candidate charge that would set one off (by its
+  own blast or a prop's) is no candidate at all, and an anchor with no allowed covering point is
+  skipped before a bridge is wasted on it. The plugin's own rule was "net ≤ 0: never sought,
+  never avoided", which left a relic with "Monsters Immune to Lightning" to whatever blast
+  happened to cover it.
   Grand physics (108 cells placement, 37 blast) against normal (90, 30) is decided by the
   logbook area id, else by a confirmed total of ten or more; unconfirmed reads as normal because
   that never proposes a point the game refuses.

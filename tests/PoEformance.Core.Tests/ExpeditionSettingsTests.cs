@@ -20,6 +20,8 @@ public class ExpeditionSettingsTests
         Assert.Equal(112f, settings.PropRadiusFor("Metadata/Terrain/Gallows/Leagues/Expedition/Logbook_Basin/Objects/OilWell"));
         Assert.Equal(0f, settings.PropRadiusFor("Metadata/Terrain/Gallows/Leagues/Expedition/Objects/Rock"));
         Assert.Empty(settings.RelicWeights);
+        Assert.Empty(settings.AvoidMods);
+        Assert.False(settings.Avoids("ExpeditionRelicDownsideImmuneLightningDamage"));
     }
 
     [Fact]
@@ -30,6 +32,7 @@ public class ExpeditionSettingsTests
             MinMarkersPerSpare: 3, MarkerGold: 90,
             RewardWeights: [new("RewardChestCurrency", 30f)],
             RelicWeights: [new("ExpeditionRelicUpsideItemQuantityChest", 20f), new("ExpeditionRelicDownsideAlwaysCrit", 5f)],
+            AvoidMods: ["ExpeditionRelicDownsideImmuneLightningDamage", "ExpeditionRelicDownsideGrantNoFlaskCharges"],
             PropRules: [new("ExplodingFill", 55f), new("Objects/Tank", 40f, Enabled: false)],
             TraceFile: true);
         string path = Path.Combine(Path.GetTempPath(), $"expedition-{Guid.NewGuid():N}.json");
@@ -39,14 +42,17 @@ public class ExpeditionSettingsTests
             ExpeditionSettings read = ExpeditionStore.Load(path);
             Assert.Equal(written, read);
             Assert.Equal(written.GetHashCode(), read.GetHashCode());
+            Assert.True(read.Avoids("ExpeditionRelicDownsideGrantNoFlaskCharges"));
             string text = File.ReadAllText(path);
             Assert.Contains("\"relicWeights\"", text, StringComparison.Ordinal);
+            Assert.Contains("\"avoidMods\"", text, StringComparison.Ordinal);
             Assert.Contains("\"pathContains\"", text, StringComparison.Ordinal);
 
             File.WriteAllText(path, "{ \"enabled\": true }");
             ExpeditionSettings older = ExpeditionStore.Load(path);
             Assert.Equal(ExpeditionSettings.DefaultRewardWeights, older.RewardWeights);
             Assert.Equal(ExpeditionSettings.DefaultPropRules, older.PropRules);
+            Assert.Empty(older.AvoidMods);
         }
         finally
         {
@@ -63,6 +69,7 @@ public class ExpeditionSettingsTests
             ManualTotal: 0, MonolithMinEx: -5f, MonolithMinSockets: 99, MinMarkersPerSpare: 9, MarkerWhite: -1, RunKey: 999,
             RewardWeights: [new("RewardChestCurrency", float.NaN), new("", 3f), new("RewardChestCurrency", 7f)],
             RelicWeights: [new("ExpeditionRelicUpsidePackSize", 0f), new("ExpeditionRelicUpsidePackSize", 4f), new("", 2f)],
+            AvoidMods: ["", "ExpeditionRelicDownsideAlwaysCrit", "ExpeditionRelicDownsideAlwaysCrit"],
             PropRules: [new("X", float.NaN)]).Normalised();
 
         Assert.Equal(1, wild.ManualTotal);
@@ -73,12 +80,14 @@ public class ExpeditionSettingsTests
         Assert.Equal(0, wild.RunKey);
         Assert.Equal([new RewardWeight("RewardChestCurrency", 1f)], wild.RewardWeights);
         Assert.Equal([new RelicWeight("ExpeditionRelicUpsidePackSize", 4f)], wild.RelicWeights);
+        Assert.Equal(["ExpeditionRelicDownsideAlwaysCrit"], wild.AvoidMods);
         Assert.Equal([new PropRule("X", 0f)], wild.PropRules);
 
         // A clean record comes back with the same lists.
         ExpeditionSettings clean = ExpeditionSettings.Default;
         Assert.Same(clean.RewardWeights, clean.Normalised().RewardWeights);
         Assert.Same(clean.PropRules, clean.Normalised().PropRules);
+        Assert.Same(clean.AvoidMods, clean.Normalised().AvoidMods);
     }
 
     [Fact]

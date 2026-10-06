@@ -301,16 +301,17 @@ public class ExpeditionReaderTests
         Assert.Null(reader.IsBlocked(Relic));
     }
 
-    [Fact]
-    public void ARelicsModIdsComeOffItsMagicProperties()
+    /// <summary>
+    /// A relic entity with the given mod ids on its ObjectMagicProperties: the first two in the
+    /// first list, the rest in the third, the others empty - the shape a real relic reads in.
+    /// </summary>
+    internal static void PlaceRelic(FakeMemoryReader fake, OffsetSchema schema, ulong entity, uint id, string[] ids)
     {
-        OffsetSchema schema = Schema();
-        var fake = new FakeMemoryReader();
-        ulong magic = Relic + 0x10_000;
-        ulong entries = Relic + 0x11_000;
-        ulong rows = Relic + 0x12_000;
-        ulong strings = Relic + 0x13_000;
-        MonolithFixture.PlaceEntity(fake, schema, Relic, 80, ExpeditionReader.RelicPath, [("ObjectMagicProperties", magic)]);
+        ulong magic = entity + 0x10_000;
+        ulong entries = entity + 0x11_000;
+        ulong rows = entity + 0x12_000;
+        ulong strings = entity + 0x13_000;
+        MonolithFixture.PlaceEntity(fake, schema, entity, id, ExpeditionReader.RelicPath, [("ObjectMagicProperties", magic)]);
 
         int allMods = schema.Structs["ObjectMagicProperties"].OffsetOf("AllMods");
         int vectorSize = (int)schema.Structs["StdVector"].Constants["StructSize"];
@@ -318,9 +319,7 @@ public class ExpeditionReaderTests
         int entrySize = (int)mod.Constants["EntrySize"];
         fake.Place(magic, new byte[0x220]);
 
-        // Two mods in the first list, one in the third, the others empty.
-        string[] ids = ["ExpeditionRelicUpsideItemQuantityChest", "ExpeditionRelicDownsideAlwaysCrit", "ExpeditionRelicUpsidePackSize"];
-        fake.Place(entries, new byte[entrySize * 3]);
+        fake.Place(entries, new byte[entrySize * Math.Max(1, ids.Length)]);
         for (int i = 0; i < ids.Length; i++)
         {
             ulong row = rows + (ulong)(i * 0x100);
@@ -331,10 +330,22 @@ public class ExpeditionReaderTests
             fake.PlaceUtf16(text, ids[i]);
         }
 
+        int first = Math.Min(2, ids.Length);
         fake.Place<ulong>(magic + (ulong)allMods, entries);
-        fake.Place<ulong>(magic + (ulong)allMods + 8, entries + (ulong)(entrySize * 2));
-        fake.Place<ulong>(magic + (ulong)allMods + (ulong)(2 * vectorSize), entries + (ulong)(entrySize * 2));
-        fake.Place<ulong>(magic + (ulong)allMods + (ulong)(2 * vectorSize) + 8, entries + (ulong)(entrySize * 3));
+        fake.Place<ulong>(magic + (ulong)allMods + 8, entries + (ulong)(entrySize * first));
+        fake.Place<ulong>(magic + (ulong)allMods + (ulong)(2 * vectorSize), entries + (ulong)(entrySize * first));
+        fake.Place<ulong>(magic + (ulong)allMods + (ulong)(2 * vectorSize) + 8, entries + (ulong)(entrySize * ids.Length));
+    }
+
+    [Fact]
+    public void ARelicsModIdsComeOffItsMagicProperties()
+    {
+        OffsetSchema schema = Schema();
+        var fake = new FakeMemoryReader();
+
+        // Two mods in the first list, one in the third, the others empty.
+        string[] ids = ["ExpeditionRelicUpsideItemQuantityChest", "ExpeditionRelicDownsideAlwaysCrit", "ExpeditionRelicUpsidePackSize"];
+        PlaceRelic(fake, schema, Relic, 80, ids);
 
         Assert.Equal(ids, Make(fake, schema).ModIds(Relic));
         Assert.Empty(Make(fake, schema).ModIds(Relic + 0x8_0000));

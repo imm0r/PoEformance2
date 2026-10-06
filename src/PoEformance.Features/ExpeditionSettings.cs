@@ -64,6 +64,11 @@ public sealed record PropRule(
 /// <param name="MarkerLogbook">Of the tall two-triangle logbook flag.</param>
 /// <param name="RewardWeights">On a Grand expedition, the weight per reward type by icon. Types absent weigh 1.</param>
 /// <param name="RelicWeights">The weight per relic mod. A relic is a target when its net is positive.</param>
+/// <param name="AvoidMods">
+/// Mods no blast may reach: a relic carrying one is routed round, never harvested, and an
+/// anchor only takeable by setting it off is skipped. A hard rule, where the weights are a
+/// trade - "Monsters Immune to Lightning" is not worth any amount of quantity to a lightning build.
+/// </param>
 /// <param name="PropRules">The exploding props, as path fragment and radius.</param>
 /// <param name="TraceFile">Write the planner's decision trace to config/expedition-plan.txt on every run.</param>
 public sealed record ExpeditionSettings(
@@ -83,6 +88,7 @@ public sealed record ExpeditionSettings(
     [property: JsonPropertyName("markerLogbook")] int MarkerLogbook = 100,
     IReadOnlyList<RewardWeight>? RewardWeights = null,
     IReadOnlyList<RelicWeight>? RelicWeights = null,
+    IReadOnlyList<string>? AvoidMods = null,
     IReadOnlyList<PropRule>? PropRules = null,
     [property: JsonPropertyName("traceFile")] bool TraceFile = false)
 {
@@ -124,8 +130,25 @@ public sealed record ExpeditionSettings(
     [JsonPropertyName("relicWeights")]
     public IReadOnlyList<RelicWeight> RelicWeights { get; init; } = RelicWeights ?? [];
 
+    [JsonPropertyName("avoidMods")]
+    public IReadOnlyList<string> AvoidMods { get; init; } = AvoidMods ?? [];
+
     [JsonPropertyName("propRules")]
     public IReadOnlyList<PropRule> PropRules { get; init; } = PropRules ?? DefaultPropRules;
+
+    /// <summary>Whether a relic mod is one no blast may reach.</summary>
+    public bool Avoids(string mod)
+    {
+        foreach (string avoided in AvoidMods)
+        {
+            if (string.Equals(avoided, mod, StringComparison.Ordinal))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /// <summary>A reward type's weight: its row, else the catch-all 1.</summary>
     public float RewardWeightOf(string icon)
@@ -170,6 +193,7 @@ public sealed record ExpeditionSettings(
         RunKey = RunKey is >= 0 and <= 255 ? RunKey : 0,
         RewardWeights = CleanRewards(RewardWeights),
         RelicWeights = CleanRelics(RelicWeights),
+        AvoidMods = CleanAvoid(AvoidMods),
         PropRules = CleanProps(PropRules),
     };
 
@@ -192,6 +216,7 @@ public sealed record ExpeditionSettings(
                && MarkerWhite == other.MarkerWhite && MarkerMagic == other.MarkerMagic && MarkerGold == other.MarkerGold
                && MarkerLogbook == other.MarkerLogbook && TraceFile == other.TraceFile
                && RewardWeights.SequenceEqual(other.RewardWeights) && RelicWeights.SequenceEqual(other.RelicWeights)
+               && AvoidMods.SequenceEqual(other.AvoidMods, StringComparer.Ordinal)
                && PropRules.SequenceEqual(other.PropRules);
     }
 
@@ -221,6 +246,11 @@ public sealed record ExpeditionSettings(
         foreach (RelicWeight weight in RelicWeights)
         {
             hash.Add(weight);
+        }
+
+        foreach (string mod in AvoidMods)
+        {
+            hash.Add(mod, StringComparer.Ordinal);
         }
 
         foreach (PropRule rule in PropRules)
@@ -290,6 +320,35 @@ public sealed record ExpeditionSettings(
             }
 
             kept.Add(row);
+        }
+
+        return kept;
+    }
+
+    private static IReadOnlyList<string> CleanAvoid(IReadOnlyList<string> mods)
+    {
+        var clean = true;
+        for (int i = 0; i < mods.Count && clean; i++)
+        {
+            clean = mods[i] is { Length: > 0 };
+            for (int j = 0; j < i && clean; j++)
+            {
+                clean = !string.Equals(mods[j], mods[i], StringComparison.Ordinal);
+            }
+        }
+
+        if (clean)
+        {
+            return mods;
+        }
+
+        var kept = new List<string>(mods.Count);
+        foreach (string mod in mods)
+        {
+            if (mod is { Length: > 0 } && !kept.Contains(mod, StringComparer.Ordinal))
+            {
+                kept.Add(mod);
+            }
         }
 
         return kept;

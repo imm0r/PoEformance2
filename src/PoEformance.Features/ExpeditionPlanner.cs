@@ -73,6 +73,13 @@ public sealed class PlanInputs
 
     public IReadOnlyList<PlanProp> Props { get; init; } = [];
 
+    /// <summary>
+    /// Points no blast may reach - the relics carrying a mod the player will not have. A hard
+    /// rule rather than a negative weight: a charge that would set one off is not a worse
+    /// candidate, it is no candidate, so an anchor only takeable by hitting one is skipped.
+    /// </summary>
+    public IReadOnlyList<Vector2> Shunned { get; init; } = [];
+
     /// <summary>Normal expeditions: a spare charge needs a primary or a marker cluster. Off on Grand.</summary>
     public bool MarkerCoverageMode { get; init; }
 
@@ -134,6 +141,9 @@ public sealed class PlanResult
     public long Hits { get; init; }
 
     public string Phase { get; init; } = string.Empty;
+
+    /// <summary>Shunned relics the final route sets off anyway. Zero by construction; counted so a bug shows.</summary>
+    public int ShunnedHit { get; init; }
 
     /// <summary>Whether a plan was made at all.</summary>
     public bool Any => Route.Count > 0;
@@ -210,6 +220,7 @@ public static class ExpeditionPlanner
             Searches = inp.Paths.Searches,
             Hits = inp.Paths.Hits,
             Phase = result.Phase,
+            ShunnedHit = result.ShunnedHit,
         };
     }
 
@@ -277,6 +288,23 @@ public static class ExpeditionPlanner
 
     private static bool Covers(PlanInputs inp, List<int>? fired, Vector2 pos, Vector2 target, float r2)
         => DistSq(pos, target) <= r2 || PropCovers(inp, fired, target);
+
+    /// <summary>Whether a charge here would set off a shunned relic - by its own blast or a prop's.</summary>
+    private static bool Forbidden(PlanInputs inp, List<int>? fired, Vector2 pos, float r2)
+    {
+        foreach (Vector2 shunned in inp.Shunned)
+        {
+            if (Covers(inp, fired, pos, shunned, r2))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool Forbidden(PlanInputs inp, Vector2 pos, float r2)
+        => inp.Shunned.Count > 0 && Forbidden(inp, Triggered(inp, pos, r2), pos, r2);
 
     /// <summary>Uncaptured weight a charge here collects: its blast, plus the blasts of the props it sets off.</summary>
     private static double CoverGain(PlanInputs inp, bool[] captured, Vector2 p, float r2, out int count)
@@ -413,7 +441,7 @@ public static class ExpeditionPlanner
         foreach (Vector2 p in candidates)
         {
             double gain = CoverGain(inp, captured, p, r2, out _);
-            if (gain <= bestGain)
+            if (gain <= bestGain || Forbidden(inp, p, r2))
             {
                 continue;
             }
@@ -458,7 +486,7 @@ public static class ExpeditionPlanner
         }
 
         Log(inp, $"=== SPINE PLAN === budget={inp.Budget} effDist={F0(effDist)} effRadius={F0(effRadius)} "
-                 + $"anchors={anchors.Count} pickups={n - anchors.Count} det={At(det)}");
+                 + $"anchors={anchors.Count} pickups={n - anchors.Count} shunned={inp.Shunned.Count} det={At(det)}");
 
         if (anchors.Count == 0)
         {
@@ -569,7 +597,26 @@ public static class ExpeditionPlanner
         }
 
         int spare = inp.Budget - route.Count;
-        Log(inp, $"=== FINAL === {route.Count} charges, weight={F0(weight)}, covered={covered}/{n}, spare={spare} left unplaced");
+        var shunnedHit = 0;
+        if (inp.Shunned.Count > 0)
+        {
+            var hit = new bool[inp.Shunned.Count];
+            foreach (RoutePoint rp in route)
+            {
+                List<int>? fired = Triggered(inp, rp.Grid, r2);
+                for (int s = 0; s < hit.Length; s++)
+                {
+                    if (!hit[s] && Covers(inp, fired, rp.Grid, inp.Shunned[s], r2))
+                    {
+                        hit[s] = true;
+                        shunnedHit++;
+                    }
+                }
+            }
+        }
+
+        Log(inp, $"=== FINAL === {route.Count} charges, weight={F0(weight)}, covered={covered}/{n}, spare={spare} left unplaced"
+                 + (inp.Shunned.Count > 0 ? $", shunned relics hit={shunnedHit}/{inp.Shunned.Count}" : string.Empty));
         for (int i = 0; i < route.Count; i++)
         {
             Log(inp, $"  #{i + 1} {At(route[i].Grid)} {route[i].Note}");
@@ -587,7 +634,9 @@ public static class ExpeditionPlanner
             SpineHeights = spineZ,
             SpineAnchorIndex = anchorIdx,
             MonolithOrder = monolithOrder,
-            Phase = $"anchors {anchorsCovered}/{anchors.Count}, {route.Count} charges, {spare} spare",
+            Phase = $"anchors {anchorsCovered}/{anchors.Count}, {route.Count} charges, {spare} spare"
+                    + (shunnedHit > 0 ? $", {shunnedHit} shunned hit" : string.Empty),
+            ShunnedHit = shunnedHit,
         };
     }
 
@@ -691,12 +740,19 @@ public static class ExpeditionPlanner
             double bestScore = double.NegativeInfinity;
             Vector2 bestP = default;
             float bestZ = 0f;
+            var forbiddenCovers = 0;
             int hi = Math.Min(m - 1, anchorPosIdx + band);
             for (int j = hi; j > nodeIdx; j--)
             {
                 List<int>? fired = Triggered(inp, pts[j], r2);
                 if (!Covers(inp, fired, pts[j], anchorPos, r2))
                 {
+                    continue;
+                }
+
+                if (Forbidden(inp, fired, pts[j], r2))
+                {
+                    forbiddenCovers++;
                     continue;
                 }
 
@@ -743,6 +799,12 @@ public static class ExpeditionPlanner
                     continue;
                 }
 
+                if (Forbidden(inp, p, r2))
+                {
+                    forbiddenCovers++;
+                    continue;
+                }
+
                 double gain = CoverGain(inp, captured, p, r2, out _);
                 if (gain <= bestScore)
                 {
@@ -786,11 +848,26 @@ public static class ExpeditionPlanner
                 continue;
             }
 
-            // Bridge: the furthest reachable cell toward the anchor.
+            // No way to cover it from here. Before bridging toward it, make sure covering it is
+            // possible AT ALL: an anchor with a shunned relic at its side has no allowed covering
+            // point, and a bridge laid toward it would be a charge spent on nothing.
+            if (forbiddenCovers > 0 && !CoverableAtAll(inp, pts, anchorPosIdx, band, anchorPos, r2))
+            {
+                Log(inp, $"  MISSED anchor {F0(inp.Targets[at].Weight)} ex {At(anchorPos)} - every point covering it would set off a shunned relic");
+                ai++;
+                continue;
+            }
+
+            // Bridge: the furthest reachable cell toward the anchor that sets off no shunned relic.
             int bridgeJ = -1;
             float br = 0f;
             for (int j = anchorPosIdx; j > nodeIdx; j--)
             {
+                if (Forbidden(inp, pts[j], r2))
+                {
+                    continue;
+                }
+
                 float rr = paths.Reach(node, pts[j]);
                 if (rr >= 0f)
                 {
@@ -802,7 +879,8 @@ public static class ExpeditionPlanner
 
             if (bridgeJ < 0)
             {
-                Log(inp, $"  MISSED anchor {F0(inp.Targets[at].Weight)} ex {At(anchorPos)} - cannot advance");
+                Log(inp, $"  MISSED anchor {F0(inp.Targets[at].Weight)} ex {At(anchorPos)} - cannot advance"
+                         + (forbiddenCovers > 0 ? " without setting off a shunned relic" : string.Empty));
                 ai++;
                 continue;
             }
@@ -815,7 +893,7 @@ public static class ExpeditionPlanner
             for (int j = bridgeJ - 1; j >= Math.Max(nodeIdx + 1, bridgeJ - pickBand); j--)
             {
                 int count = CountUncovered(inp, captured, pts[j], r2);
-                if (count > chosenCount)
+                if (count > chosenCount && !Forbidden(inp, pts[j], r2))
                 {
                     chosenCount = count;
                     chosenJ = j;
@@ -831,6 +909,26 @@ public static class ExpeditionPlanner
         }
 
         return route;
+    }
+
+    /// <summary>
+    /// Whether any spine cell around an anchor covers it without setting off a shunned relic -
+    /// reach aside, since the question is geometry, not where the chain head is now.
+    /// </summary>
+    private static bool CoverableAtAll(PlanInputs inp, List<Vector2> pts, int anchorPosIdx, int band, Vector2 anchorPos, float r2)
+    {
+        int hi = Math.Min(pts.Count - 1, anchorPosIdx + band);
+        int lo = Math.Max(0, anchorPosIdx - band);
+        for (int j = hi; j >= lo; j--)
+        {
+            List<int>? fired = Triggered(inp, pts[j], r2);
+            if (Covers(inp, fired, pts[j], anchorPos, r2) && !Forbidden(inp, fired, pts[j], r2))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>The spare optimiser - see the class remarks.</summary>
@@ -888,6 +986,11 @@ public static class ExpeditionPlanner
                 var count = 0;
                 double gain = 0;
                 List<int>? fired = Triggered(inp, cand, r2);
+                if (Forbidden(inp, fired, cand, r2))
+                {
+                    continue;
+                }
+
                 for (int u = 0; u < n; u++)
                 {
                     if (!captured[u] && Covers(inp, fired, cand, targets[u].Grid, r2))
@@ -954,7 +1057,7 @@ public static class ExpeditionPlanner
                     break;
                 }
 
-                if (!paths.StepToward(node, bestC, stepDist, out Vector2 step))
+                if (!paths.StepToward(node, bestC, stepDist, out Vector2 step) || Forbidden(inp, step, r2))
                 {
                     aborted = true;
                     break;
@@ -984,7 +1087,7 @@ public static class ExpeditionPlanner
                     for (float a = 0f; a <= aMax + 1e-3f; a += 0.1f)
                     {
                         Vector2 cand = Vector2.Lerp(targets[u].Grid, node, a);
-                        if (!paths.IsWalkable(cand))
+                        if (!paths.IsWalkable(cand) || Forbidden(inp, cand, r2))
                         {
                             continue;
                         }
@@ -1046,7 +1149,7 @@ public static class ExpeditionPlanner
                 Vector2 rejoin = route[bestStart + 1].Grid;
                 while (paths.Reach(node, rejoin) < 0f && inp.Budget - (route.Count + branch.Count) > 0)
                 {
-                    if (!paths.StepToward(node, rejoin, stepDist, out Vector2 rstep))
+                    if (!paths.StepToward(node, rejoin, stepDist, out Vector2 rstep) || Forbidden(inp, rstep, r2))
                     {
                         aborted = true;
                         break;
