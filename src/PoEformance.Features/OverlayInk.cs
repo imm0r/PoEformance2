@@ -135,6 +135,17 @@ public static class OverlayInk
     /// <summary>The tab in front, and the title bar of the window being used.</summary>
     public static readonly Vector4 Chrome = Warm(0.30f);
 
+    /// <summary>The wash behind a group's title line - the chrome at a fifth of its strength.</summary>
+    /// <remarks>
+    /// THE SAME MATERIAL AS THE TAB IN FRONT, let through the panel rather than laid on it: a
+    /// title's band has to say "this line heads the block below" without competing with the
+    /// controls it heads, and a solid stop on the ray - even <see cref="Selected"/> - makes a
+    /// group title look like a row somebody picked. At a fifth of alpha over the panel it comes
+    /// to about (.11, .10, .09): a warmth, not a colour, and the accent ink the title is set in
+    /// still clears it by the same margin it clears the panel.
+    /// </remarks>
+    public static readonly Vector4 TitleBand = new(Chrome.X, Chrome.Y, Chrome.Z, 0.20f);
+
     /// <summary>Anything on the ray while the pointer is on it.</summary>
     public static readonly Vector4 Lit = Warm(0.44f);
 

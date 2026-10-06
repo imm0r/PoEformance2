@@ -233,49 +233,61 @@ public static class OverlayLayout
         ArgumentException.ThrowIfNullOrEmpty(id);
         ArgumentNullException.ThrowIfNull(tabs);
 
-        if (!ImGui.BeginTabBar(id, ImGuiTabBarFlags.FittingPolicyScroll))
-        {
-            return;
-        }
-
+        // The label face round the WHOLE bar, since a bar sizes itself from the face in force
+        // when it begins; each page's contents pop back to the body face.
+        OverlayFonts.PushLabel();
         try
         {
-            foreach ((string label, Action draw) in tabs)
+            if (!ImGui.BeginTabBar(id, ImGuiTabBarFlags.FittingPolicyScroll))
             {
-                // ImGui.NET only exposes the flags overload together with the ref-bool that
-                // puts a close button on every tab, and these tabs must not have one - a
-                // closed tab needs a list somewhere to reopen it from. BeginTabItem's plain
-                // overload is the one without it.
-                if (!ImGui.BeginTabItem(label))
-                {
-                    continue;
-                }
+                return;
+            }
 
-                try
+            try
+            {
+                foreach ((string label, Action draw) in tabs)
                 {
-                    // Its own id scope per tab, so two tabs holding a control of the same
-                    // name - and several hold a "filter" - do not share one ImGui id, which
-                    // would be one scroll position and one open state between them.
-                    ImGui.PushID(label);
+                    // ImGui.NET only exposes the flags overload together with the ref-bool that
+                    // puts a close button on every tab, and these tabs must not have one - a
+                    // closed tab needs a list somewhere to reopen it from. BeginTabItem's plain
+                    // overload is the one without it.
+                    if (!ImGui.BeginTabItem(label))
+                    {
+                        continue;
+                    }
+
                     try
                     {
-                        ImGui.Spacing();
-                        draw();
+                        // Its own id scope per tab, so two tabs holding a control of the same
+                        // name - and several hold a "filter" - do not share one ImGui id, which
+                        // would be one scroll position and one open state between them.
+                        ImGui.PushID(label);
+                        OverlayFonts.PopLabel();
+                        try
+                        {
+                            ImGui.Spacing();
+                            draw();
+                        }
+                        finally
+                        {
+                            OverlayFonts.PushLabel();
+                            ImGui.PopID();
+                        }
                     }
                     finally
                     {
-                        ImGui.PopID();
+                        ImGui.EndTabItem();
                     }
                 }
-                finally
-                {
-                    ImGui.EndTabItem();
-                }
+            }
+            finally
+            {
+                ImGui.EndTabBar();
             }
         }
         finally
         {
-            ImGui.EndTabBar();
+            OverlayFonts.PopLabel();
         }
     }
 
@@ -299,30 +311,59 @@ public static class OverlayLayout
     /// sentence on hover - see <see cref="Hint"/> for why an explanation read once belongs
     /// there rather than as a paragraph the block has to be read past every time.
     /// </param>
+    /// <remarks>
+    /// ON A BAND, in the label face. The title alone - accent ink at body size over a rule -
+    /// was the weakest heading in the tool: the one level that had neither a frame nor a size
+    /// of its own, so on a page of six groups it read as a coloured line in the list. A faint
+    /// wash of the warm ray behind the whole line, and one pixel of size, is enough to see the
+    /// title as a lid on the block under it; the rule stays, because the band's bottom edge is
+    /// soft and the rule is what the eye runs along.
+    /// </remarks>
     public static void Group(string title, string? hint = null)
     {
         ArgumentException.ThrowIfNullOrEmpty(title);
 
         ImGui.Spacing();
-        ImGui.PushStyleColor(ImGuiCol.Text, OverlayInk.Accent);
+        OverlayFonts.PushLabel();
         try
         {
-            ImGui.TextUnformatted(title);
+            // The band first, under where the title is about to go: the line's full width and
+            // its height plus a little air, measured in the label face so it fits that face.
+            float air = ImGui.GetStyle().FramePadding.Y;
+            float inset = ImGui.GetStyle().FramePadding.X;
+            Vector2 at = ImGui.GetCursorScreenPos();
+            float width = ImGui.GetContentRegionAvail().X;
+            float height = ImGui.GetTextLineHeight() + (2f * air);
+            ImGui.GetWindowDrawList().AddRectFilled(
+                at, at + new Vector2(width, height), ImGui.ColorConvertFloat4ToU32(OverlayInk.TitleBand));
+
+            ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(inset, air));
+            ImGui.PushStyleColor(ImGuiCol.Text, OverlayInk.Accent);
+            try
+            {
+                ImGui.TextUnformatted(title);
+            }
+            finally
+            {
+                ImGui.PopStyleColor();
+            }
+
+            if (hint is { Length: > 0 })
+            {
+                // The MARKER carries the hover, not the title. A heading that reacts to the mouse
+                // reads as something you can click, and there is nothing here to click; a small
+                // quiet mark beside it says "there is more about this" without making the same
+                // promise.
+                ImGui.SameLine();
+                ImGui.TextColored(OverlayInk.Quiet, "(?)");
+                Hint(hint);
+            }
+
+            ImGui.SetCursorPosY(ImGui.GetCursorPosY() + air);
         }
         finally
         {
-            ImGui.PopStyleColor();
-        }
-
-        if (hint is { Length: > 0 })
-        {
-            // The MARKER carries the hover, not the title. A heading that reacts to the mouse
-            // reads as something you can click, and there is nothing here to click; a small
-            // quiet mark beside it says "there is more about this" without making the same
-            // promise.
-            ImGui.SameLine();
-            ImGui.TextColored(OverlayInk.Quiet, "(?)");
-            Hint(hint);
+            OverlayFonts.PopLabel();
         }
 
         ImGui.Separator();

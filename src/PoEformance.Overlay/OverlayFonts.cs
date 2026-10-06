@@ -53,6 +53,8 @@ public static class OverlayFonts
 
     private static ImFontPtr _heading;
     private static bool _have;
+    private static ImFontPtr _label;
+    private static bool _haveLabel;
     private static ImFontPtr _mono;
     private static bool _haveMono;
     private static ImFontPtr _figures;
@@ -80,6 +82,21 @@ public static class OverlayFonts
     {
         _heading = heading;
         _have = true;
+    }
+
+    /// <summary>The same, for the label face - the body serif one pixel up.</summary>
+    /// <remarks>
+    /// A FIFTH SIZE, between the body and the heading, for the two things that name a block
+    /// without ranking as a section: a page's own tab bar (<see cref="OverlayLayout.Tabs"/>)
+    /// and a group's title (<see cref="OverlayLayout.Group"/>). Both were at body size and
+    /// read as one more line of the list they head; the heading face, a quarter up, made
+    /// them bars. One pixel is the smallest step the eye still ranks, and it was asked for by
+    /// the person reading the page.
+    /// </remarks>
+    public static void RebuiltLabel(ImFontPtr label)
+    {
+        _label = label;
+        _haveLabel = true;
     }
 
     /// <summary>The same, for the face figures are set in.</summary>
@@ -113,12 +130,16 @@ public static class OverlayFonts
     public static void None()
     {
         _have = false;
+        _haveLabel = false;
         _haveMono = false;
         _haveFigures = false;
     }
 
     /// <summary>Whether a heading face is available at all.</summary>
     public static bool HasHeading => _have;
+
+    /// <summary>Whether the label face is available at all.</summary>
+    public static bool HasLabel => _haveLabel;
 
     /// <summary>Whether a monospaced face is available at all.</summary>
     public static bool HasMono => _haveMono;
@@ -214,6 +235,29 @@ public static class OverlayFonts
     public static void PopHeading()
     {
         if (_have)
+        {
+            ImGui.PopFont();
+        }
+    }
+
+    /// <summary>Sets the label face, until <see cref="PopLabel"/>.</summary>
+    /// <remarks>
+    /// A pair like the heading's, and for the same reason: a tab bar takes its height from
+    /// the face in force when it BEGINS, so the push has to sit round the bar and the pop
+    /// inside each page, where the contents go back to the body face.
+    /// </remarks>
+    public static void PushLabel()
+    {
+        if (_haveLabel)
+        {
+            ImGui.PushFont(_label);
+        }
+    }
+
+    /// <summary>Undoes exactly one <see cref="PushLabel"/>.</summary>
+    public static void PopLabel()
+    {
+        if (_haveLabel)
         {
             ImGui.PopFont();
         }

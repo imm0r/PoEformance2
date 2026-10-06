@@ -56,6 +56,20 @@ public class InterfaceStyleTests
     }
 
     [Fact]
+    public void ALabelIsOnePixelUp_AndNeverOvertakesTheHeading()
+    {
+        // The fifth face sits between the body and the heading at every size the slider can
+        // reach: one pixel up, and where the heading is itself only one pixel up, level with it.
+        for (int body = InterfaceStyle.MinTextSize; body <= InterfaceStyle.MaxTextSize; body++)
+        {
+            int label = InterfaceStyle.LabelSizeFor(body);
+            Assert.True(label > body, $"a label over {body}px body text came out at {label}px");
+            Assert.True(label <= InterfaceStyle.HeadingSizeFor(body), $"a label over {body}px overtook the heading");
+            Assert.True(label <= body + 1, $"a label over {body}px is more than a pixel up");
+        }
+    }
+
+    [Fact]
     public void TheHeadingFollowsWhateverTheTextSizeSettledOn()
     {
         // Including the bounds: a style asking for something absurd draws its body clamped,

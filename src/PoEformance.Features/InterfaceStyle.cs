@@ -144,6 +144,15 @@ public sealed record InterfaceStyle(
     public static int HeadingSizeFor(int body)
         => Math.Max(body + 1, (int)((body * HeadingScale) + 0.5f));
 
+    /// <summary>The size a label is drawn at, for a given body size: one pixel up.</summary>
+    /// <remarks>
+    /// The fifth face - a page's own tab bar and its group titles. One pixel because it is the
+    /// smallest step the eye still ranks, and because the label must stay UNDER the heading at
+    /// every body size: at the small end the heading is itself only one pixel up, so the two
+    /// meet there, and a label that overtook it would invert the page's hierarchy.
+    /// </remarks>
+    public static int LabelSizeFor(int body) => Math.Min(body + 1, HeadingSizeFor(body));
+
     /// <summary>The size this style's headings are drawn at.</summary>
     public int HeadingSizeOr => HeadingSizeFor(TextSizeOr);
 

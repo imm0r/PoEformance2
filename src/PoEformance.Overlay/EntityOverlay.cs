@@ -3104,6 +3104,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
             OverlayFonts.Rebuilt(heading);
 
+            // The body face once more, one pixel up, for a page's own tab bar and its group
+            // titles - see OverlayFonts.RebuiltLabel for why a fifth size earns its glyphs.
+            OverlayFonts.RebuiltLabel(io.Fonts.AddFontFromFileTTF(
+                file, InterfaceStyle.LabelSizeFor(size), config, english));
+
             if (mono is not null)
             {
                 OverlayFonts.RebuiltMono(io.Fonts.AddFontFromFileTTF(mono, size, config, english));
