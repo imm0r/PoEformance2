@@ -306,6 +306,11 @@ public sealed record MonsterModel(
     /// with an address rather than a wrong colour nobody can explain.
     /// </remarks>
     public IReadOnlyList<string> Unshaded { get; init; } = [];
+
+    /// <summary>
+    /// The materials whose shader graphs read the game's clock, by file - drawn running, as an animation is. See ShadeProgram.UsesTime.
+    /// </summary>
+    public IReadOnlyList<string> Clocked { get; init; } = [];
 }
 
 /// <summary>
@@ -439,6 +444,7 @@ public static class MonsterModels
         var shades = new ShadeProgram?[count];
         Mipmaps?[]? skins = null;
         var drawn = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var clocked = new List<string>();
         var unshaded = new List<string>();
         for (var shape = 0; shape < count; shape++)
         {
@@ -461,6 +467,10 @@ public static class MonsterModels
             {
                 shades[shape] = program;
                 drawn.Add(MaterialFile.Bare(material));
+                if (program.UsesTime && !clocked.Contains(MaterialFile.Bare(material), StringComparer.OrdinalIgnoreCase))
+                {
+                    clocked.Add(MaterialFile.Bare(material));
+                }
                 continue;
             }
 
@@ -478,6 +488,7 @@ public static class MonsterModels
             Skins = skins ?? model.Skins,
             ShadedBy = drawn.Count,
             Unshaded = unshaded,
+            Clocked = clocked,
             Bytes = model.Bytes + bytes,
             Files = model.Files + files,
         };

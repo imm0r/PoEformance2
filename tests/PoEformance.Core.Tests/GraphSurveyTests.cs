@@ -29,11 +29,11 @@ public class GraphSurveyTests
     private const string Tinted =
         """
         {"nodes":[
-          {"type":"FromVertexColor","index":0,"stage":"VertexInit"},
+          {"type":"FromVertexLocalUV","index":0,"stage":"VertexInit"},
           {"type":"Saturate","index":0},
           {"type":"AlbedoColor","index":0,"stage":"Texturing"}],
          "links":[
-          {"src":{"type":"FromVertexColor","index":0,"stage":"VertexInit","variable":"output"},"dst":{"type":"Saturate","index":0,"variable":"input"}},
+          {"src":{"type":"FromVertexLocalUV","index":0,"stage":"VertexInit","variable":"output"},"dst":{"type":"Saturate","index":0,"variable":"input"}},
           {"src":{"type":"Saturate","index":0,"variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing","variable":"input"}}]}
         """;
 
@@ -94,21 +94,21 @@ public class GraphSurveyTests
         // THE VERTEX COLOUR ALONE holds back two materials, from two folders; the dust's two items
         // hold back one between them. The normal map is off every colour path and counts nowhere.
         Assert.Contains(
-            "  FromVertexColor · alone 2 · among 2 · graphs 1 · Art/Models/Monsters 1, Art/Textures/Environment 1",
+            "  FromVertexLocalUV · alone 2 · among 2 · graphs 1 · Art/Models/Monsters 1, Art/Textures/Environment 1",
             survey, StringComparison.Ordinal);
         Assert.Contains("  Muddle · alone 0 · among 1 · graphs 1 · Art/Textures/Environment 1", survey, StringComparison.Ordinal);
         Assert.Contains("  stage PixelOutput_Calc · alone 0 · among 1", survey, StringComparison.Ordinal);
         Assert.DoesNotContain("NormalTexToTbn ·", survey, StringComparison.Ordinal);
         Assert.True(
-            survey.IndexOf("  FromVertexColor · alone", StringComparison.Ordinal)
+            survey.IndexOf("  FromVertexLocalUV · alone", StringComparison.Ordinal)
                 < survey.IndexOf("  Muddle · alone", StringComparison.Ordinal),
             "what completes the most comes first");
 
-        Assert.Contains("  1. FromVertexColor · completes 2 · 75.0% of the coloured materials evaluate whole after it", survey, StringComparison.Ordinal);
+        Assert.Contains("  1. FromVertexLocalUV · completes 2 · 75.0% of the coloured materials evaluate whole after it", survey, StringComparison.Ordinal);
         Assert.Contains("  2. Muddle · completes 0 · 75.0%", survey, StringComparison.Ordinal);
         Assert.Contains("  3. stage PixelOutput_Calc · completes 1 · 100.0%", survey, StringComparison.Ordinal);
 
-        Assert.Contains("  Metadata/Tinted.fxgraph · 2 materials · missing FromVertexColor", survey, StringComparison.Ordinal);
+        Assert.Contains("  Metadata/Tinted.fxgraph · 2 materials · missing FromVertexLocalUV", survey, StringComparison.Ordinal);
         Assert.Contains("  PixelOutput_Calc · NOT run · graphs 1 · material uses 1", survey, StringComparison.Ordinal);
         Assert.Contains("  Texturing_Init · run · graphs 1 · material uses 2", survey, StringComparison.Ordinal);
         Assert.Equal("0 of 7 materials", told[0]);
@@ -157,10 +157,10 @@ public class GraphSurveyTests
         string Shifted(string mark) =>
             $$$"""
             {"nodes":[
-              {"type":"FromVertexColor","index":0,"stage":"VertexInit"},
+              {"type":"FromVertexLocalUV","index":0,"stage":"VertexInit"},
               {"type":"AlbedoColor","index":0,"stage":"Texturing","custom_parameter":"{{{mark}}}"}],
              "links":[
-              {"src":{"type":"FromVertexColor","index":0,"stage":"VertexInit","variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing","variable":"input"}}]}
+              {"src":{"type":"FromVertexLocalUV","index":0,"stage":"VertexInit","variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing","variable":"input"}}]}
             """;
         var files = new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase)
         {
@@ -176,7 +176,7 @@ public class GraphSurveyTests
         string said = examples.ToString();
 
         Assert.Contains(
-            "=== FromVertexColor · graph Metadata/Terrain/Shifted.fxgraph · named by 1 held-back terrain materials, 1 in all",
+            "=== FromVertexLocalUV · graph Metadata/Terrain/Shifted.fxgraph · named by 1 held-back terrain materials, 1 in all",
             said, StringComparison.Ordinal);
         Assert.Contains("--- material Art/Models/Terrain/Cliff/c.mat", said, StringComparison.Ordinal);
         Assert.Contains("\"custom_parameter\":\"terrain\"", said, StringComparison.Ordinal);
@@ -232,7 +232,8 @@ public class GraphSurveyTests
         Assert.True(ShadeProgram.Knows("FromVertexVariance"));
         Assert.True(ShadeProgram.Knows("RGBToTbn"));
         Assert.False(ShadeProgram.Knows("Muddle"));
-        Assert.False(ShadeProgram.Knows("FromVertexColor"));
+        Assert.True(ShadeProgram.Knows("FromVertexColor"));
+        Assert.False(ShadeProgram.Knows("FromVertexLocalUV"));
         Assert.False(ShadeProgram.Knows(string.Empty));
     }
 

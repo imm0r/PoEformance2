@@ -332,6 +332,20 @@ public sealed class MonsterPortrait
     private int _drawnAnimation = -1;
     private bool _drawnPosed;
 
+    /// <summary>
+    /// The game's clock as the picture runs it, in seconds - what a shade program's <c>Time</c> reads.
+    /// </summary>
+    /// <remarks>
+    /// MOVED ON LIKE AN ANIMATION'S FRAME, by the time the last frame took and only while playing, so
+    /// Pause stops a scrolling texture as it stops a walk. See <see cref="Ticking"/>.
+    /// </remarks>
+    private float _clock;
+    private float _drawnClock = float.NaN;
+
+    /// <summary>The model <see cref="_timed"/> was worked out for.</summary>
+    private MonsterModel? _timedOf;
+    private bool _timed;
+
     /// <summary>The greying the shown picture was drawn with - 0 for none. See <see cref="Greyed"/>.</summary>
     private float _drawnGrey = float.NaN;
 
@@ -1913,6 +1927,13 @@ public sealed class MonsterPortrait
                 + (_model.Unshaded.Count > 0
                     ? " · not evaluated: " + string.Join(", ", _model.Unshaded.Take(Named))
                         + (_model.Unshaded.Count > Named ? $" and {_model.Unshaded.Count - Named} more" : string.Empty)
+                    : string.Empty)
+
+                // AND WHICH OF THEM RUN WITH THE CLOCK, by name - the picture moves for these, and they
+                // are what to compare with the game. See ShadeProgram.UsesTime.
+                + (_model.Clocked.Count > 0
+                    ? $" · {_model.Clocked.Count} running with the clock: " + string.Join(", ", _model.Clocked.Take(Named).Select(Tail))
+                        + (_model.Clocked.Count > Named ? $" and {_model.Clocked.Count - Named} more" : string.Empty)
                     : string.Empty))
             : string.Empty;
 
@@ -2133,6 +2154,11 @@ public sealed class MonsterPortrait
 
         Landed();
         Advance();
+        bool ticking = Ticking;
+        if (ticking)
+        {
+            _clock += Math.Clamp(ImGui.GetIO().DeltaTime, 0f, 0.25f);
+        }
 
         // CAPPED WHILE IT IS BEING DRAGGED, ORBITED OR PLAYED, and the pane's own rung the moment
         // it stops. The work grows with the AREA, and it is while moving that a dropped frame is
@@ -2153,7 +2179,10 @@ public sealed class MonsterPortrait
             // and has to redraw one - without this the switch and the slider do nothing at all
             // until something else moves, which reads as neither working.
             || _drawnGrey != Greyed
-            || (posed && (_drawnFrame != _frame || _drawnAnimation != _chosen));
+            || (posed && (_drawnFrame != _frame || _drawnAnimation != _chosen))
+
+            // A PROGRAM THAT READS THE CLOCK changes the picture as the clock runs - see Ticking.
+            || (ticking && _drawnClock != _clock);
 
         if (!moved)
         {
@@ -2267,7 +2296,28 @@ public sealed class MonsterPortrait
 
     /// <summary>What the model is drawn at: the rung that covers the pane, capped while it moves.</summary>
     private int Wanted(float side)
-        => _held || _orbiting || (_playing && _tracks is { Ready: true }) ? _sizes.Moving(side) : _sizes.For(side);
+        => _held || _orbiting || (_playing && _tracks is { Ready: true }) || Ticking ? _sizes.Moving(side) : _sizes.For(side);
+
+    /// <summary>
+    /// Whether the picture runs with the clock: a shade program of the model reads <c>Time</c>, and it is playing.
+    /// </summary>
+    /// <remarks>
+    /// AN ANIMATION OF ITS OWN, and paid for like one - redrawn every frame at the capped rung while
+    /// it runs. Worked out once per model, since it is asked every frame.
+    /// </remarks>
+    private bool Ticking
+    {
+        get
+        {
+            if (!ReferenceEquals(_timedOf, _model))
+            {
+                _timedOf = _model;
+                _timed = _model.Shades.Any(one => one is { UsesTime: true });
+            }
+
+            return _playing && Shaded && _timed;
+        }
+    }
 
     /// <summary>The buffers for one size, kept until the size changes.</summary>
     /// <remarks>
@@ -2305,6 +2355,7 @@ public sealed class MonsterPortrait
         _drawnFrame = _frame;
         _drawnAnimation = _chosen;
         _drawnGrey = Greyed;
+        _drawnClock = _clock;
 
         try
         {
@@ -2318,14 +2369,14 @@ public sealed class MonsterPortrait
                 _pose.Move(_model.Mesh, _posed, _posedNormals);
                 lowest = Lowest(_posed);
                 drawn = MeshPicture.Of(
-                    _model.Mesh, Canvas(size), _posed, _posedNormals, _turn, _tilt, Ink,
+                    _model.Mesh, Clocked(Canvas(size)), _posed, _posedNormals, _turn, _tilt, Ink,
                     _model.Skin, _zoom, _pan, _model.Skins, Blends(), Shaded ? _model.Shades : null);
             }
             else
             {
                 lowest = _model.Mesh.Most.Z;
                 drawn = MeshPicture.Of(
-                    _model.Mesh, Canvas(size), _turn, _tilt, Ink, _model.Skin, _zoom, _pan, _model.Skins, Blends(), Shaded ? _model.Shades : null);
+                    _model.Mesh, Clocked(Canvas(size)), _turn, _tilt, Ink, _model.Skin, _zoom, _pan, _model.Skins, Blends(), Shaded ? _model.Shades : null);
             }
 
             _rate.Redrawn(ImGui.GetTime());
@@ -2834,11 +2885,18 @@ public sealed class MonsterPortrait
             _pose.Take(_tracks, _frame);
             _pose.Move(_model.Mesh, _posed, _posedNormals);
             return MeshPicture.Of(
-                _model.Mesh, canvas, _posed, _posedNormals, _turn, _tilt, Ink,
+                _model.Mesh, Clocked(canvas), _posed, _posedNormals, _turn, _tilt, Ink,
                 _model.Skin, _zoom, _pan, _model.Skins, Blends(), Shaded ? _model.Shades : null);
         }
 
-        return MeshPicture.Of(_model.Mesh, canvas, _turn, _tilt, Ink, _model.Skin, _zoom, _pan, _model.Skins, Blends(), Shaded ? _model.Shades : null);
+        return MeshPicture.Of(_model.Mesh, Clocked(canvas), _turn, _tilt, Ink, _model.Skin, _zoom, _pan, _model.Skins, Blends(), Shaded ? _model.Shades : null);
+    }
+
+    /// <summary>The canvas with the clock the picture is at - the export takes the instant on screen.</summary>
+    private MeshPicture.Canvas Clocked(MeshPicture.Canvas canvas)
+    {
+        canvas.Time = _clock;
+        return canvas;
     }
 
     /// <summary>

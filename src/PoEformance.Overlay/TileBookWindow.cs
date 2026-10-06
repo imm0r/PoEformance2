@@ -34,6 +34,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         ("Kind", "kind"),
         ("Sets", "set"),
         ("This area", "here"),
+        ("With the clock", "clock"),
     ];
 
     /// <summary>The query term the "only this area" checkbox writes.</summary>
@@ -128,7 +129,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     protected override string Caption => "Search for any terrain tile or room";
 
     /// <inheritdoc/>
-    protected override string Grammar => "arena  ·  kind:room  ·  set:woods  ·  here:yes  ·  needs:InputVertexColor  ·  folder:areatransitions";
+    protected override string Grammar => "arena  ·  kind:room  ·  set:woods  ·  here:yes  ·  clock:yes  ·  needs:InputVertexColor  ·  folder:areatransitions";
 
     /// <inheritdoc/>
     protected override string Noun => "tiles";
@@ -150,13 +151,14 @@ public sealed class TileBookWindow : BookWindow<TileBook>
 
         // THE NEEDS ARRIVE LATER THAN THE LISTS, read off the frame as the tileset is chosen, and the
         // book is built again when they do - a reference compare per frame until then.
-        IReadOnlyDictionary<string, string>? needs = Needs?.Ready(placings, _tileset);
+        AreaReading? reading = Needs?.Ready(placings, _tileset);
+        IReadOnlyDictionary<string, string>? needs = reading?.Needs;
         if (!ReferenceEquals(_installed, installed) || !ReferenceEquals(_placedOf, placings) || !ReferenceEquals(_needsOf, needs))
         {
             _installed = installed;
             _placedOf = placings;
             _needsOf = needs;
-            _page = TileBook.Of(installed, placings, needs);
+            _page = TileBook.Of(installed, placings, needs, reading?.Clocked);
         }
 
         return _page;

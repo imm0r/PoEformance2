@@ -143,14 +143,14 @@ public class ShadeProgramTests
         ShadeCompile compiled = ShadeProgram.Compile([(Instance("Metadata/Tint.fxgraph"), Graph(
             """
             {"nodes":[
-              {"type":"FromVertexColor","index":0},
+              {"type":"FromVertexLocalUV","index":0},
               {"type":"AlbedoColor","index":0,"stage":"Texturing_Init"}],
              "links":[
-              {"src":{"type":"FromVertexColor","index":0,"variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input"}}]}
+              {"src":{"type":"FromVertexLocalUV","index":0,"variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input"}}]}
             """))]);
 
         Assert.Null(compiled.Program);
-        Assert.Equal(["FromVertexColor in Tint"], compiled.Skipped);
+        Assert.Equal(["FromVertexLocalUV in Tint"], compiled.Skipped);
     }
 
     /// <summary>A constant colour, worked in linear light, comes out as the sRGB texture of that colour would.</summary>
@@ -1060,18 +1060,22 @@ public class ShadeProgramTests
     }
 
     [Fact]
-    public void ANDAMuddleThatScrollsWithTimeIsRefused()
+    public void ANDAMuddleThatScrollsRunsWithTheClock()
     {
-        ShadeCompile refused = ShadeProgram.Compile([(Instance(), Graph(Muddling(""",{"value":2.0},{"value":[0.1,0.0]},{"value":0.4}""")))]);
-        Assert.Null(refused.Program);
-        Assert.Contains(refused.Skipped, one => one.Contains("MuddleTex scrolling with time", StringComparison.Ordinal));
+        // time * scroll in the muddle's coordinates: the program reads the clock, and over a white
+        // texture the read - and so the picture - is the same at any instant.
+        ShadeProgram scrolling = Bound(Compile(Muddling(""",{"value":2.0},{"value":[0.1,0.0]},{"value":0.4}""")), new() { ["Art/muddle.dds"] = Sheet(255, 255, 255) });
+        Assert.True(scrolling.UsesTime);
+        AssertClose(
+            MeshPicture.Of(Quad(), 64, skins: [Sheet(Srgb(0.7f), Srgb(0.7f), 0)]),
+            MeshPicture.Of(Quad(), new MeshPicture.Canvas(64) { Time = 3f }, shades: [scrolling]));
 
-        ShadeCompile still = ShadeProgram.Compile([(Instance(), Graph(Muddling(""",{"value":2.0},{"value":[0.0,0.0]},{"value":0.4}""")))]);
-        Assert.NotNull(still.Program);
+        // Without a scroll the clock's term is left out, and nothing reads it.
+        Assert.False(Compile(Muddling(""",{"value":2.0},{"value":[0.0,0.0]},{"value":0.4}""")).UsesTime);
     }
 
     [Fact]
-    public void MUDDLETEXFROMINPUTTakesItsNumbersFromPortsAndRefusesAScrollThere()
+    public void MUDDLETEXFROMINPUTTakesItsNumbersFromPortsAndRunsAScrollThereWithTheClock()
     {
         static string Graph_(string scroll) => Colouring(
             $$$"""
@@ -1093,13 +1097,12 @@ public class ShadeProgramTests
 
         AssertColour(Graph_("[0.0,0.0]"), 0.7f, 0.7f, 0f, new() { ["Art/muddle.dds"] = Sheet(255, 255, 255) });
 
-        ShadeCompile refused = ShadeProgram.Compile([(Instance(), Graph(Graph_("[0.0,0.2]")))]);
-        Assert.Null(refused.Program);
-        Assert.Contains(refused.Skipped, one => one.Contains("MuddleTexFromInput scrolling with time", StringComparison.Ordinal));
+        Assert.True(Compile(Graph_("[0.0,0.2]")).UsesTime);
+        Assert.False(Compile(Graph_("[0.0,0.0]")).UsesTime);
     }
 
     [Fact]
-    public void MUDDLETEX2AddsTwoMuddlesAndRefusesAScrollInEither()
+    public void MUDDLETEX2AddsTwoMuddlesAndRunsAScrollInEitherWithTheClock()
     {
         static string Graph_(string parameters) => Owning("MuddleTex2", "out_uv", "xy", parameters: parameters)
             .Replace("\"variable\":\"uv\"}", "\"variable\":\"in_uv\"}", StringComparison.Ordinal);
@@ -1110,9 +1113,8 @@ public class ShadeProgramTests
         // Declared "1 0 0 0" twice: no intensity, so the coordinates as they were.
         AssertColour(Graph_(string.Empty), 0.5f, 0.5f, 0f, new() { ["Art/own.dds"] = Sheet(255, 255, 255) });
 
-        ShadeCompile refused = ShadeProgram.Compile([(Instance(), Graph(Graph_(""",{},{"value":[1.0,0.0,0.3,0.4]}""")))]);
-        Assert.Null(refused.Program);
-        Assert.Contains(refused.Skipped, one => one.Contains("MuddleTex2 scrolling with time", StringComparison.Ordinal));
+        Assert.True(Compile(Graph_(""",{},{"value":[1.0,0.0,0.3,0.4]}""")).UsesTime);
+        Assert.False(Compile(Graph_(string.Empty)).UsesTime);
     }
 
     [Fact]
@@ -1180,7 +1182,7 @@ public class ShadeProgramTests
             MathF.Sin(0.5f), MathF.Sin(0.5f), MathF.Sin(0.5f));
 
     [Fact]
-    public void ROTATEUVOLDTurnsAboutTheQuadrantsHalfPointAndRefusesATurnWithTime()
+    public void ROTATEUVOLDTurnsAboutTheQuadrantsHalfPointAndWithTheClock()
     {
         // (0.2, 0.6) less (0.5, 0.5), turned by half a radian the node's way, and put back.
         const float cos = 0.87758256f, sin = 0.47942554f;
@@ -1188,9 +1190,27 @@ public class ShadeProgramTests
             Turning("RotateUVOld", """{"value":[0.0,0.5]}"""),
             (-0.3f * cos) - (0.1f * sin) + 0.5f, (-0.3f * sin) + (0.1f * cos) + 0.5f, 0f);
 
-        ShadeCompile refused = ShadeProgram.Compile([(Instance(), Graph(Turning("RotateUVOld", """{"value":[1.0,0.5]}""")))]);
-        Assert.Null(refused.Program);
-        Assert.Contains(refused.Skipped, one => one.Contains("RotateUVOld turning with time", StringComparison.Ordinal));
+        // angle = time * AngleTime + AngleOffset: a radian a second from a quarter, a quarter of a second
+        // in, is the same half radian.
+        ShadeProgram turning = Compile(Turning("RotateUVOld", """{"value":[1.0,0.25]}"""));
+        Assert.True(turning.UsesTime);
+        AssertClose(
+            MeshPicture.Of(Quad(), 64, skins: [Sheet(Srgb((-0.3f * cos) - (0.1f * sin) + 0.5f), Srgb((-0.3f * sin) + (0.1f * cos) + 0.5f), 0)]),
+            MeshPicture.Of(Quad(), new MeshPicture.Canvas(64) { Time = 0.25f }, shades: [turning]));
+    }
+
+    [Fact]
+    public void TIMEIsTheClockTheDrawingIsAt()
+    {
+        string graph = Colouring("""{"type":"Time","index":0}""", string.Empty, "Time", "output");
+        ShadeProgram program = Compile(graph);
+        Assert.True(program.UsesTime);
+        AssertClose(
+            MeshPicture.Of(Quad(), 64, skins: [Sheet(Srgb(0.25f), Srgb(0.25f), Srgb(0.25f))]),
+            MeshPicture.Of(Quad(), new MeshPicture.Canvas(64) { Time = 0.25f }, shades: [program]));
+        AssertClose(
+            MeshPicture.Of(Quad(), 64, skins: [Sheet(Srgb(0.75f), Srgb(0.75f), Srgb(0.75f))]),
+            MeshPicture.Of(Quad(), new MeshPicture.Canvas(64) { Time = 0.75f }, shades: [program]));
     }
 
     private static string Occluding(string texture) =>
@@ -1597,6 +1617,59 @@ public class ShadeProgramTests
         AssertClose(
             MeshPicture.Of(Quad(), 64, skins: [Sheet(255, 255, 255)]),
             MeshPicture.Of(Quad(), 64, shades: [program]));
+    }
+
+    [Fact]
+    public void FROMVERTEXCOLORIsTheSameColourStreamWhiteWithoutOne()
+    {
+        // semanticsData.color0: white from InitSemanticsData, the mesh's stream through OutputVertexLocalColor.
+        string graph = Colouring("""{"type":"FromVertexColor","index":0,"stage":"VertexInit"}""", string.Empty, "FromVertexColor", "output", "xyz");
+        ShadeProgram program = Compile(graph);
+        Assert.True(program.UsesVertexColour);
+
+        var colours = new byte[4 * 4];
+        for (var one = 0; one < 4; one++)
+        {
+            colours[one * 4] = 128;
+            colours[(one * 4) + 1] = 64;
+            colours[(one * 4) + 2] = 255;
+            colours[(one * 4) + 3] = 255;
+        }
+
+        AssertClose(
+            MeshPicture.Of(Quad(), 64, skins: [Sheet(Srgb(128f / 255f), Srgb(64f / 255f), 255)]),
+            MeshPicture.Of(Quad(colours), 64, shades: [program]));
+        AssertClose(
+            MeshPicture.Of(Quad(), 64, skins: [Sheet(255, 255, 255)]),
+            MeshPicture.Of(Quad(), 64, shades: [program]));
+    }
+
+    [Fact]
+    public void ANDFROMVERTEXCOLORIsRefusedOnceAGraphWroteTheVertexColour()
+    {
+        // OutputVertexColor sets color0 at the vertex stage, which is not run - so what it wrote is not known.
+        ShadeCompile compiled = ShadeProgram.Compile(
+        [
+            (Instance("Metadata/Paint.fxgraph"), Graph(
+                """
+                {"nodes":[
+                  {"type":"ConstantFloat4","index":0,"parameters":[{"value":[1.0,0.0,0.0,1.0]}]},
+                  {"type":"OutputVertexColor","index":0,"stage":"WorldTransform"}],
+                 "links":[
+                  {"src":{"type":"ConstantFloat4","index":0,"variable":"output"},"dst":{"type":"OutputVertexColor","index":0,"stage":"WorldTransform","variable":"input"}}]}
+                """)),
+            (Instance("Metadata/Tint.fxgraph"), Graph(
+                """
+                {"nodes":[
+                  {"type":"FromVertexColor","index":0},
+                  {"type":"AlbedoColor","index":0,"stage":"Texturing_Init"}],
+                 "links":[
+                  {"src":{"type":"FromVertexColor","index":0,"variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input"}}]}
+                """)),
+        ]);
+
+        Assert.Null(compiled.Program);
+        Assert.Equal(["FromVertexColor after Paint wrote the vertex colour in Tint"], compiled.Skipped);
     }
 
     /// <summary>One quad facing the camera, its coordinates all on the middle of the texture - with a colour per vertex, where given.</summary>

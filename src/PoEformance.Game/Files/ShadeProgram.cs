@@ -86,13 +86,16 @@ public sealed record ShadeCompile(ShadeProgram? Program, IReadOnlyList<string> S
 /// rely on zero vertex color default value", and the pixel side's <c>InitSemanticsData</c> starts
 /// <c>color0</c> at white - so the game settled it: BasicColour on a rope and on book pages with no
 /// stream is drawn with their textures, where nought would have made both black (see
-/// SkinnedMesh.Colours).
+/// SkinnedMesh.Colours). <c>FromVertexColor</c> reads the same: it is <c>semanticsData.color0</c>,
+/// white from <c>InitSemanticsData</c> and replaced only through COLOR0 - the mesh's own stream by
+/// the engine's OutputVertexLocalColor, or what a graph's OutputVertexColor wrote, which is refused.
 ///
-/// A NODE THAT READS THE CLOCK IS DRAWN ONLY WHERE THE CLOCK CANNOT SHOW. MuddleTex, MuddleTex2 and
-/// RotateUVOld multiply <c>time</c> by a parameter - a scroll, an angle per second - and with that
-/// parameter at nought, which is each one's declared default, the picture is the same at every
-/// instant and is drawn; with it set the material is refused and named, not frozen at an instant of
-/// this reader's choosing. <c>FromVertexVariance</c> is a particle's: the fragment hands on
+/// A NODE THAT READS THE CLOCK RUNS WITH IT. <c>Time</c> is the game's clock, and MuddleTex, MuddleTex2
+/// and RotateUVOld multiply it by a parameter - a scroll, an angle per second. The clock is handed in
+/// per drawing (see Clock), and a picture whose program reads it is redrawn as the clock runs, as an
+/// animation is - not frozen at an instant of this reader's choosing, and not refused either. With
+/// the parameter at nought, each one's declared default, the term is left out and the program does
+/// not read the clock at all. <c>FromVertexVariance</c> is a particle's: the fragment hands on
 /// <c>uv2.x</c> under <c>PARTICLE_VARIANCE_ENABLED</c> and nought otherwise, and a mesh is not a
 /// particle, so it is nought.
 ///
@@ -119,11 +122,22 @@ public sealed class ShadeProgram
     /// <summary>The vertex normal as it is interpolated, not normalised - what <c>FromVertexNormal</c> reads.</summary>
     internal const int VertexNormal = 3;
 
-    /// <summary>The vertex colour as it is interpolated, nought to one - what <c>InputVertexColor</c> reads. See SkinnedMesh.Colours.</summary>
+    /// <summary>The vertex colour as it is interpolated, nought to one - what <c>InputVertexColor</c> and <c>FromVertexColor</c> read. See SkinnedMesh.Colours.</summary>
     internal const int VertexColour = 4;
 
+    /// <summary>
+    /// The game's clock, <c>time</c>, in all four components - what <c>Time</c> reads and the scrolls and turns multiply.
+    /// </summary>
+    /// <remarks>
+    /// SET PER DRAWING, from MeshPicture.Canvas.Time, the way an animation's frame is: the picture is
+    /// redrawn as the clock runs, as a monster is as it plays. In seconds - the sources do not say,
+    /// and the parameters do: RotateUVOld's offset runs to 6.28, a turn in radians, beside a turn
+    /// rate of up to eighteen, which is a spin a second and not one an hour.
+    /// </remarks>
+    internal const int Clock = 5;
+
     /// <summary>How many registers are the mesh's own, before any a program allocates.</summary>
-    private const int Fixed = 5;
+    private const int Fixed = 6;
 
     /// <summary>
     /// Stands in for the TBN basis, which is a matrix and so in no register - see <see cref="Basis"/>'s use in Transform.
@@ -201,6 +215,7 @@ public sealed class ShadeProgram
             "MuddleTex", "MuddleTexFromInput", "MuddleTex2", "FromVertexVariance",
             "RGBToTbn", "ScaleUVMaya", "HardLightBlend", "Sine", "RotateUVOld",
             "FromVertexNormal", "FromVertexWorldPos", "FromVertexLocalPosition", "InputVertexPosition", "InputVertexNormal", "InputVertexColor",
+            "FromVertexColor", "Time",
             "ModelOrigin", "GroundScroll", "Transform", "LookUpTexture",
             "Noise31", "PerlinNoise31", "Vibrance", "Rotate", "RotateUV", "RadiusToPolarNorm",
         ],
@@ -248,6 +263,7 @@ public sealed class ShadeProgram
         UsesNormal = result == Normal || steps.Any(one => one.Reads(Normal));
         UsesVertexNormal = result == VertexNormal || steps.Any(one => one.Reads(VertexNormal));
         UsesVertexColour = result == VertexColour || steps.Any(one => one.Reads(VertexColour));
+        UsesTime = result == Clock || steps.Any(one => one.Reads(Clock));
     }
 
     internal enum Op : byte
@@ -363,6 +379,9 @@ public sealed class ShadeProgram
     /// <summary>Whether a run reads the vertex colour - white where the mesh has no colour stream.</summary>
     public bool UsesVertexColour { get; }
 
+    /// <summary>Whether a run reads the game's clock - then the picture changes as it runs, and is redrawn as an animation is.</summary>
+    public bool UsesTime { get; }
+
     /// <summary>
     /// Whether the graphs set the colour's alpha, which a cut-out shape is then cut on instead of its texture's.
     /// </summary>
@@ -434,6 +453,13 @@ public sealed class ShadeProgram
                 {
                     string by = Named(chain[link].Instance.Parent);
                     moved = node.Type == "VertexPosition" ? moved with { Position = by } : moved with { Normal = by };
+                }
+
+                // AND ONE THAT WRITES COLOR0 HAS REPLACED WHAT FromVertexColor READS: the fragment
+                // OutputVertexColor sets semanticsData.color0 at the vertex stage, which is not run.
+                if (node.Type == "OutputVertexColor" && lookups[link].Fed(node))
+                {
+                    moved = moved with { Colour = Named(chain[link].Instance.Parent) };
                 }
 
                 int at = IndexOf(node.Stage);
@@ -578,8 +604,9 @@ public sealed class ShadeProgram
     /// <summary>
     /// Puts the constants in their registers - once per triangle, since nothing writes them.
     /// </summary>
-    internal void Preset(Span<Vector4> registers)
+    internal void Preset(Span<Vector4> registers, float time = 0f)
     {
+        registers[Clock] = new Vector4(time);
         for (var one = 0; one < _constantAt.Length; one++)
         {
             registers[_constantAt[one]] = _constants[one];
@@ -1595,8 +1622,8 @@ public sealed class ShadeProgram
     /// <summary>A channel's register, the components nothing set, and whether a link wrote its w - see HasAlpha.</summary>
     private readonly record struct Held(int Register, int Unset, bool Alpha = true);
 
-    /// <summary>The graphs, if any, that moved the vertices' positions and normals at a vertex stage.</summary>
-    private readonly record struct Displaced(string? Position, string? Normal);
+    /// <summary>The graphs, if any, that moved the vertices' positions and normals, or wrote their colour, at a vertex stage.</summary>
+    private readonly record struct Displaced(string? Position, string? Normal, string? Colour = null);
 
     /// <summary>One fed writer of a channel: its node, the stage it writes at, the channel, what it reads, and whether it only hands on what it read.</summary>
     private readonly record struct Writer(ShaderNode Node, int Stage, int Channel, int Reads, bool Same);
@@ -2575,6 +2602,17 @@ public sealed class ShadeProgram
                 case "InputVertexColor":
                     return VertexColour;
 
+                // semanticsData.color0, which InitSemanticsData sets to white and the vertex side replaces
+                // only through COLOR0: the engine's OutputVertexLocalColor hands the mesh's own colour stream
+                // across, a graph's OutputVertexColor whatever it wrote. So the same register as
+                // InputVertexColor - the stream, white without one - unless a graph wrote it.
+                case "FromVertexColor":
+                    return moved.Colour is { } painted ? Fail($"{node.Type} after {painted} wrote the vertex colour") : VertexColour;
+
+                // output = time - the game's clock, spread as a float is. See Clock.
+                case "Time":
+                    return Clock;
+
                 case "LookUpTexture":
                     return LookedUp(node);
 
@@ -2719,9 +2757,8 @@ public sealed class ShadeProgram
         /// </summary>
         /// <remarks>
         /// <c>MuddleTexHelper</c>: <c>muddle_uv = uv * freq + time * scroll + variance; uv + (tex(muddle_uv).rg - 0.5) * intensity</c>.
-        /// THE SCROLL RIDES ON THE CLOCK, so a material that scrolls is refused rather than frozen at
-        /// some instant; one that does not - the declared default, "0 0" - is the same picture at every
-        /// instant and is drawn. The texture is at parameter 0, the frequency (declared 1) at 2, the
+        /// THE SCROLL RIDES ON THE CLOCK - see Clock - and without one the term is left out, the same
+        /// picture at every instant. The texture is at parameter 0, the frequency (declared 1) at 2, the
         /// scroll at 3 and the intensity (declared 0) at 4.
         /// </remarks>
         private int? Muddled(ShaderNode node)
@@ -2732,16 +2769,15 @@ public sealed class ShadeProgram
             }
 
             Vector4 scroll = Numbers(node, 3, Vector4.Zero);
-            if (scroll.X != 0f || scroll.Y != 0f)
-            {
-                return Fail("MuddleTex scrolling with time");
-            }
+            int shifted = scroll.X != 0f || scroll.Y != 0f
+                ? build.Emit(Op.MultiplyAdd, Clock, build.Constant(new Vector4(scroll.X, scroll.Y, 0f, 0f)), variance)
+                : variance;
 
-            return Muddle(sheet, uv, build.Constant(new Vector4(Said(node, 2, 1f))), variance, build.Constant(new Vector4(Said(node, 4, 0f))));
+            return Muddle(sheet, uv, build.Constant(new Vector4(Said(node, 2, 1f))), shifted, build.Constant(new Vector4(Said(node, 4, 0f))));
         }
 
         /// <summary>MuddleTexFromInput: MuddleTex with its frequency, scroll and intensity on ports.</summary>
-        /// <remarks>A scroll on a port is refused unless it is a constant nought - the same rule as <see cref="Muddled"/>.</remarks>
+        /// <remarks>A scroll on a port rides on the clock as in <see cref="Muddled"/>; a constant nought leaves the term out.</remarks>
         private int? MuddledFromInput(ShaderNode node)
         {
             if (Texture(node, Parameter(node, 0)) is not { } sheet || Port(node, "in_uv") is not { } uv
@@ -2751,20 +2787,20 @@ public sealed class ShadeProgram
                 return null;
             }
 
-            if (!build.ConstantOf(scroll, out Vector4 fixed_) || fixed_.X != 0f || fixed_.Y != 0f)
-            {
-                return Fail("MuddleTexFromInput scrolling with time");
-            }
+            int shifted = build.ConstantOf(scroll, out Vector4 fixed_) && fixed_.X == 0f && fixed_.Y == 0f
+                ? variance
+                : build.Emit(Op.MultiplyAdd, Clock, Scroll(scroll), variance);
 
-            return Muddle(sheet, uv, frequency, variance, intensity);
+            return Muddle(sheet, uv, frequency, shifted, intensity);
         }
 
         /// <summary>
         /// MuddleTex2: two muddles of one texture added, each with its own frequency, scroll and intensity in one float4.
         /// </summary>
         /// <remarks>
-        /// <c>Freq ScrollX ScrollY Intensity</c>, declared "1 0 0 0", at parameters 2 and 3. A scroll in
-        /// either is refused, as in <see cref="Muddled"/>.
+        /// <c>Freq ScrollX ScrollY Intensity</c>, declared "1 0 0 0", at parameters 2 and 3:
+        /// <c>muddle_uv = in_uv * params.x + time * params.yz</c> for each, the scroll riding on the clock
+        /// as in <see cref="Muddled"/>, and no variance.
         /// </remarks>
         private int? MuddledTwice(ShaderNode node)
         {
@@ -2775,17 +2811,25 @@ public sealed class ShadeProgram
 
             Vector4 first = Numbers(node, 2, new Vector4(1f, 0f, 0f, 0f));
             Vector4 second = Numbers(node, 3, new Vector4(1f, 0f, 0f, 0f));
-            if (first.Y != 0f || first.Z != 0f || second.Y != 0f || second.Z != 0f)
-            {
-                return Fail("MuddleTex2 scrolling with time");
-            }
-
-            int once = Offset(sheet, build.Emit(Op.Multiply, uv, build.Constant(new Vector4(first.X))), build.Constant(new Vector4(first.W)));
-            int twice = Offset(sheet, build.Emit(Op.Multiply, uv, build.Constant(new Vector4(second.X))), build.Constant(new Vector4(second.W)));
+            int once = Offset(sheet, Spot(uv, first), build.Constant(new Vector4(first.W)));
+            int twice = Offset(sheet, Spot(uv, second), build.Constant(new Vector4(second.W)));
             return build.Emit(Op.Add, uv, once, twice);
         }
 
-        /// <summary>The helper's body once the scroll is nought: <c>uv + (tex(uv * frequency + variance).rg - 0.5) * intensity</c>.</summary>
+        /// <summary>One of MuddleTex2's spots: <c>uv * params.x + time * params.yz</c>, the clock's term left out where the scroll is nought.</summary>
+        private int Spot(int uv, Vector4 parameters)
+        {
+            int scaled = build.Emit(Op.Multiply, uv, build.Constant(new Vector4(parameters.X)));
+            return parameters.Y == 0f && parameters.Z == 0f
+                ? scaled
+                : build.Emit(Op.MultiplyAdd, Clock, build.Constant(new Vector4(parameters.Y, parameters.Z, 0f, 0f)), scaled);
+        }
+
+        /// <summary>A float2 scroll from a port, its z and w cleared so the clock times it moves only the coordinates.</summary>
+        private int Scroll(int scroll)
+            => build.Emit(Op.Multiply, scroll, build.Constant(new Vector4(1f, 1f, 0f, 0f)));
+
+        /// <summary>The helper's body, the clock's term already in the variance: <c>uv + (tex(uv * frequency + variance).rg - 0.5) * intensity</c>.</summary>
         private int Muddle(int sheet, int uv, int frequency, int variance, int intensity)
             => build.Emit(Op.Add, uv, Offset(sheet, build.Emit(Op.MultiplyAdd, uv, frequency, variance), intensity));
 
@@ -2813,8 +2857,8 @@ public sealed class ShadeProgram
         /// RotateUVOld: the coordinates turned about the half-point of their own quadrant.
         /// </summary>
         /// <remarks>
-        /// <c>angle = time * AngleTime + AngleOffset</c>, so a material with an AngleTime is refused as
-        /// turning with the clock; the declared default is "0 0". The offset is <c>sign(uv) * 0.5</c>,
+        /// <c>angle = time * AngleTime + AngleOffset</c>, the turn riding on the clock - see Clock - and
+        /// the declared default "0 0". The offset is <c>sign(uv) * 0.5</c>,
         /// and the turn is <c>(x cos - y sin, x sin + y cos)</c> - the other way round from Rotate's, so
         /// Rotate's step is given the angle negated.
         /// </remarks>
@@ -2826,13 +2870,12 @@ public sealed class ShadeProgram
             }
 
             Vector4 turn = Numbers(node, 0, Vector4.Zero);
-            if (turn.X != 0f)
-            {
-                return Fail("RotateUVOld turning with time");
-            }
+            int angle = turn.X == 0f
+                ? build.Constant(new Vector4(-turn.Y))
+                : build.Emit(Op.MultiplyAdd, Clock, build.Constant(new Vector4(-turn.X)), build.Constant(new Vector4(-turn.Y)));
 
             int centre = build.Emit(Op.Multiply, build.Emit(Op.Sign, uv), build.Constant(new Vector4(0.5f)));
-            return build.Emit(Op.Rotate, build.Constant(new Vector4(-turn.Y)), uv, centre);
+            return build.Emit(Op.Rotate, angle, uv, centre);
         }
 
         /// <summary>The vertex position as the vertex stage hands it on: the position, with a w of one.</summary>
