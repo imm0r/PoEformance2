@@ -173,6 +173,10 @@ public sealed record OverlaySettings(
     [property: JsonPropertyName("tilePanes")] IReadOnlyDictionary<string, double>? TilePanes = null,
     [property: JsonPropertyName("tileRail")] bool TileRail = true,
 
+    // How many doodads the tile book lets a room place. ZERO MEANS "NOT SET", so the usual count lives
+    // in the code (RoomModels.UsualDoodads) for everybody who never moved the slider.
+    [property: JsonPropertyName("roomDoodads")] int RoomDoodads = 0,
+
     // And the effect book's, kept apart for the same reason. See EffectBookWindow.
     [property: JsonPropertyName("effectColumns")] IReadOnlyList<string>? EffectColumns = null,
     [property: JsonPropertyName("effectColumnWidths")] IReadOnlyDictionary<string, int>? EffectColumnWidths = null,

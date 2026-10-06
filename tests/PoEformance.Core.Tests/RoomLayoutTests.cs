@@ -229,6 +229,53 @@ public class RoomLayoutTests
     }
 
     [Fact]
+    public void THEDOODADCapIsTheCallersAndSaysWhatItLeftOut()
+    {
+        Dictionary<string, byte[]> files = Install();
+        const string path = "Metadata/Terrain/Woods/Rooms/Clearing.arm";
+
+        MonsterModel one = RoomModels.Of(p => files.GetValueOrDefault(p), path, doodads: 1);
+        Assert.True(one.Ready, one.Why);
+        Assert.Equal(1, one.Parts);
+        Assert.Contains("1 more left out to keep it turnable - 1 doodads or 1000 triangles", one.Move, StringComparison.Ordinal);
+
+        // Zero is the usual, which places both.
+        Assert.Equal(2, RoomModels.Of(p => files.GetValueOrDefault(p), path, doodads: 0).Parts);
+    }
+
+    [Fact]
+    public void ARoomKeyCarriesItsCapAndTheUsualOneWritesTheBarePath()
+    {
+        const string path = "Metadata/Terrain/Maps/Port/Rooms/Unique/boss_01.arm";
+
+        Assert.Equal(path, new RoomKey(path).ToString());
+        Assert.Equal(path + "|doodads=800", new RoomKey(path, 800).ToString());
+        Assert.Equal(new RoomKey(path, 800), RoomKey.Read(path + "|doodads=800"));
+        Assert.Equal(new RoomKey(path), RoomKey.Read(path));
+
+        // Outside the slider's ends, or not a number: the usual.
+        Assert.Equal(RoomModels.UsualDoodads, RoomKey.Read(path + "|doodads=99999").Doodads);
+        Assert.Equal(RoomModels.UsualDoodads, RoomKey.Read(path + "|doodads=lots").Doodads);
+    }
+
+    [Fact]
+    public void ARoomThatDidNotLoadIsStillDumpedWithItsOwnFile()
+    {
+        // "the room places no doodads" is a claim about the file, so the dump of such a room is the
+        // file itself and the reason - Port's town rooms said it and could not be checked.
+        Dictionary<string, byte[]> files = Install();
+        const string path = "Metadata/Terrain/Woods/Rooms/Clearing.arm";
+        MonsterModel failed = MonsterModel.None with { Why = "the room places no doodads: " + path };
+
+        string dump = ModelDump.OfTile(one => files.GetValueOrDefault(one), path, failed);
+
+        Assert.StartsWith("room: " + path, dump, StringComparison.Ordinal);
+        Assert.Contains("=== .arm " + path, dump, StringComparison.Ordinal);
+        Assert.Contains("\"Metadata/Doodads/Rock.ao\"", dump, StringComparison.Ordinal);
+        Assert.Contains("did not load: the room places no doodads", dump, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void ANDAROOMCostsWhatItRead()
     {
         // COUNTED AT THE READER, so the number under the picture is what the install was asked for

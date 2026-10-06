@@ -3478,7 +3478,8 @@ internal static class Program
             readFile: installed is null ? null : installed.Read,
             modelSize: settings.MonsterModelSize,
             columnWidths: settings.TileColumnWidths,
-            panes: settings.TilePanes);
+            panes: settings.TilePanes,
+            roomDoodads: settings.RoomDoodads);
         overlay.AttachPointsOfInterest(route);
 
         // Before the editor, which is handed this exact instance - and before the layers read

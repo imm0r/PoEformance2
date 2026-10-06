@@ -25,11 +25,30 @@ namespace PoEformance.Features;
 /// </remarks>
 public static class RoomModels
 {
-    /// <summary>Most doodads placed. Beyond it the rest are counted and left out.</summary>
-    public const int MostDoodads = 400;
+    /// <summary>
+    /// Most doodads placed unless the tile book's slider says otherwise. Beyond it the rest are counted and left out.
+    /// </summary>
+    /// <remarks>
+    /// A CHOICE AND NOT A CONSTANT, because what the cap protects - turning the picture without a
+    /// stutter - depends on the machine, and what it costs depends on the room: the ship in Port's
+    /// boss room places 596 doodads and the old fixed 400 left a third of it out.
+    /// </remarks>
+    public const int UsualDoodads = 500;
 
-    /// <summary>Most triangles placed. The renderer is on the processor; past this, turning stutters.</summary>
-    public const int MostTriangles = 400_000;
+    /// <summary>The slider's ends.</summary>
+    public const int LeastDoodads = 100;
+
+    /// <summary>See <see cref="LeastDoodads"/>.</summary>
+    public const int MostDoodads = 5000;
+
+    /// <summary>
+    /// Triangles allowed per doodad allowed. The renderer is on the processor; past the product, turning stutters.
+    /// </summary>
+    /// <remarks>
+    /// The ratio the two fixed caps had - 400 doodads, 400,000 triangles - kept, so raising the
+    /// doodads raises the triangles with them; a cap on one alone would stop the slider short.
+    /// </remarks>
+    public const int TrianglesPerDoodad = 1000;
 
     /// <summary>Cells to a tile - the grid a room's doodad positions and a tile's walkability are written in.</summary>
     public const int CellsPerTile = 23;
@@ -73,7 +92,8 @@ public static class RoomModels
     /// <param name="read">How to get a file out of the install, by path.</param>
     /// <param name="path">The room's <c>.arm</c>.</param>
     /// <param name="shaded">Whether each material's shader graphs are read - see MonsterModels.Shaded.</param>
-    public static MonsterModel Of(Func<string, byte[]?>? read, string? path, bool shaded = false)
+    /// <param name="doodads">Most doodads placed - see <see cref="UsualDoodads"/>; zero or less is the usual.</param>
+    public static MonsterModel Of(Func<string, byte[]?>? read, string? path, bool shaded = false, int doodads = UsualDoodads)
     {
         if (read is null)
         {
@@ -125,6 +145,8 @@ public static class RoomModels
         float size = CellSize;
         var triangles = 0;
         int placed = 0, missing = 0, capped = 0;
+        int mostDoodads = doodads > 0 ? doodads : UsualDoodads;
+        long mostTriangles = (long)mostDoodads * TrianglesPerDoodad;
         string firstMissing = string.Empty;
 
         foreach (RoomDoodad one in room.Doodads)
@@ -151,7 +173,7 @@ public static class RoomModels
                 continue;
             }
 
-            if (placed >= MostDoodads || triangles + model.Mesh.Triangles > MostTriangles)
+            if (placed >= mostDoodads || triangles + model.Mesh.Triangles > mostTriangles)
             {
                 capped++;
                 continue;
@@ -198,7 +220,7 @@ public static class RoomModels
         if (capped > 0)
         {
             said.Add(string.Create(CultureInfo.InvariantCulture,
-                $"{capped} more left out to keep it turnable - {MostDoodads} doodads or {MostTriangles} triangles"));
+                $"{capped} more left out to keep it turnable - {mostDoodads} doodads or {mostTriangles} triangles; the doodads slider raises it"));
         }
 
         var laid = new MonsterModel(joined, skins.FirstOrDefault(one => one is not null), path, string.Empty, string.Empty)

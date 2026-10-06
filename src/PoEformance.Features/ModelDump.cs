@@ -158,11 +158,27 @@ public static class ModelDump
         IReadOnlyList<string>? shaders = null)
     {
         var said = new StringBuilder();
-        bool room = model?.Kind == ModelKind.Room;
+        bool room = model?.Kind == ModelKind.Room || TileBook.IsRoom(path);
         said.Append(room ? "room: " : "tile: ").AppendLine(path);
         if (read is null || model is null)
         {
             return said.AppendLine("nothing to read: no install, or no model").ToString();
+        }
+
+        // A ROOM'S OWN FILE FIRST, verbatim: it is text, small, and the one place a doodad that did not
+        // come out - or a room said to place none - can be checked against what the file really holds.
+        if (room)
+        {
+            byte[]? arm = read(path.Replace('\\', '/').Trim());
+            said.AppendLine().Append("=== .arm ").AppendLine(path);
+            said.AppendLine(arm is { Length: > 0 } ? StatDescriptionFiles.Decode(arm).TrimEnd() : "(not in the install)");
+        }
+
+        // A MODEL THAT DID NOT LOAD is dumped as far as its own file and its reason - which is what the
+        // question is about when nothing drew.
+        if (!model.Ready)
+        {
+            return said.AppendLine().Append("did not load: ").AppendLine(model.Why).ToString();
         }
 
         // DRAWN AS A TILESET, the materials below are the ones it swapped in - say so first, or the

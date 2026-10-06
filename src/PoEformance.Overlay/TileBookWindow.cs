@@ -68,6 +68,18 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     /// </remarks>
     private int _laid = -1;
 
+    /// <summary>Most doodads a room places - see RoomModels.UsualDoodads. Kept in the settings; see <see cref="Doodads"/>.</summary>
+    private int _doodads = RoomModels.UsualDoodads;
+
+    /// <summary>
+    /// The slider's value while it is being dragged, apart from <see cref="_doodads"/>.
+    /// </summary>
+    /// <remarks>
+    /// A ROOM IS RELOADED WHEN THE SLIDER IS LET GO, not at every step of the drag: the ship in Port's
+    /// boss room is 179 MB of files, and a reload per step would read it dozens of times over.
+    /// </remarks>
+    private int _dragging = RoomModels.UsualDoodads;
+
     /// <summary>The lists the book was built from, compared by reference to notice a new one.</summary>
     private IReadOnlyList<string>? _installed;
     private IReadOnlyDictionary<string, int>? _placedOf;
@@ -97,6 +109,20 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     /// The ways each tile was laid in the current area, by path, one bit per TileOrientation.Placement. Null leaves the choice out.
     /// </summary>
     public Func<IReadOnlyDictionary<string, byte>>? Laid { get; init; }
+
+    /// <summary>
+    /// Most doodads a room places, as the slider has it - what the settings keep.
+    /// </summary>
+    /// <remarks>Out-of-range values come back at the slider's nearest end; zero, "not set", is the usual.</remarks>
+    public int Doodads
+    {
+        get => _doodads;
+        set
+        {
+            _doodads = value <= 0 ? RoomModels.UsualDoodads : Math.Clamp(value, RoomModels.LeastDoodads, RoomModels.MostDoodads);
+            _dragging = _doodads;
+        }
+    }
 
     /// <inheritdoc/>
     protected override string Caption => "Search for any terrain tile or room";
@@ -167,12 +193,12 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     }
 
     /// <summary>
-    /// What the portrait loads for a key: a tile's geometry, or a room's doodads in the chosen unit.
+    /// What the portrait loads for a key: a tile's geometry, or a room's doodads up to the chosen cap.
     /// </summary>
     /// <remarks>
-    /// THE UNIT RIDES IN THE KEY, so switching it is a different key and the portrait reloads -
-    /// the same way the item book's drop or held choice does - without the portrait knowing about
-    /// rooms. A tile's choices ride the same way - see <see cref="TileKey"/> - and the load reads the
+    /// THE CAP RIDES IN THE KEY - see <see cref="RoomKey"/> - so changing it is a different key and the
+    /// portrait reloads, the same way the item book's drop or held choice does, without the portrait
+    /// knowing about rooms. A tile's choices ride the same way - see <see cref="TileKey"/> - and the load reads the
     /// named tileset's overrides itself, so the key is the whole of what is drawn and two tilesets
     /// are two keys.
     /// </remarks>
@@ -180,7 +206,9 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     {
         ArgumentNullException.ThrowIfNull(key);
 
-        if (!TileBook.IsRoom(key))
+        // THE PATH BEFORE THE MARK says which it is: a room's key carries words after it too.
+        int mark = key.IndexOf(TileKey.Mark, StringComparison.Ordinal);
+        if (!TileBook.IsRoom(mark >= 0 ? key[..mark] : key))
         {
             TileKey tile = TileKey.Read(key);
             return TileModels.Of(
@@ -194,7 +222,8 @@ public sealed class TileBookWindow : BookWindow<TileBook>
                 laid: TileOrientation.OfPlacement(tile.Laid));
         }
 
-        return RoomModels.Of(read, key, shaded: true);
+        RoomKey room = RoomKey.Read(key);
+        return RoomModels.Of(read, room.Path, shaded: true, doodads: room.Doodads);
     }
 
     /// <summary>What the tile or room is and where it is used, then its geometry under it.</summary>
@@ -244,6 +273,10 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             DrawnAs(chosen);
             LaidAs(chosen);
         }
+        else
+        {
+            DoodadCap();
+        }
 
         ImGui.Separator();
 
@@ -253,7 +286,9 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             return;
         }
 
-        string key = room ? chosen : new TileKey(chosen, _ground, _walls, Placing(chosen), Laying(chosen)).ToString();
+        string key = room
+            ? new RoomKey(chosen, _doodads).ToString()
+            : new TileKey(chosen, _ground, _walls, Placing(chosen), Laying(chosen)).ToString();
         if (!string.Equals(key, _subjectKey, StringComparison.Ordinal))
         {
             _subjectKey = key;
@@ -281,6 +316,30 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         }
 
         return string.Empty;
+    }
+
+    /// <summary>What the doodads slider is for.</summary>
+    private static readonly string DoodadsSaid = string.Create(CultureInfo.InvariantCulture,
+        $"How many doodads a room places before the rest are left out, and {RoomModels.TrianglesPerDoodad} triangles for each. The picture is drawn on the processor, so more turns more slowly. Usually {RoomModels.UsualDoodads}; the room reloads when the slider is let go. Ctrl+click types a number.");
+
+    /// <summary>
+    /// The slider for how many doodads a room places, applied when it is let go.
+    /// </summary>
+    private void DoodadCap()
+    {
+        ImGui.SetNextItemWidth(Math.Min(ImGui.GetContentRegionAvail().X, 260f));
+        ImGui.SliderInt("doodads at most##roomcap", ref _dragging, RoomModels.LeastDoodads, RoomModels.MostDoodads,
+            "%d", ImGuiSliderFlags.Logarithmic | ImGuiSliderFlags.AlwaysClamp);
+        if (ImGui.IsItemDeactivatedAfterEdit() && _dragging != _doodads)
+        {
+            _doodads = Math.Clamp(_dragging, RoomModels.LeastDoodads, RoomModels.MostDoodads);
+            Changed?.Invoke();
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(DoodadsSaid);
+        }
     }
 
     /// <summary>The ways the current area laid a tile, one bit per placement - zero where it did not, or the tables were not read.</summary>

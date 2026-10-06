@@ -176,10 +176,29 @@ public class EffectVisualsTests
     [InlineData("AlphaTest", MaterialBlend.Cutout)]
     [InlineData("Transparent", MaterialBlend.Alpha)]
     [InlineData("Opaque", MaterialBlend.Opaque)]
+    [InlineData("OpaqueNoShadow", MaterialBlend.Opaque)]
+    [InlineData("OpaqueShadowOnly", MaterialBlend.ShadowOnly)]
     [InlineData("", MaterialBlend.Opaque)]
     [InlineData(null, MaterialBlend.Opaque)]
     public void THEBLENDWordIsReadByTheChosenRuleWithAdditiveAskedFirst(string? mode, MaterialBlend expected)
         => Assert.Equal(expected, MaterialBlends.Of(mode));
+
+    [Fact]
+    public void AMaterialWithNoTextureStillNamesItsGraphs()
+    {
+        // black_shadowonlyc.mat, verbatim from the game: three graphs, not one texture. Read as
+        // "nothing", its graphs - which say the shape only casts a shadow - were lost with it.
+        MaterialFile paint = MaterialFile.Parse(
+            "{\"version\":4,\"graphinstances\":[{\"parent\":\"Metadata/Art/Textures/Misc/black_shadowonlyc.fxgraph\"},"
+            + "{\"parent\":\"Metadata/Effects/Graphs/General/ForceOpaqueShadowOnly.fxgraph\"},"
+            + "{\"parent\":\"Metadata/Effects/Graphs/General/Constant.fxgraph\"}],\"minimapcolourmultiplier\":0.0}");
+
+        Assert.NotSame(MaterialFile.None, paint);
+        Assert.Equal(
+            ["Metadata/Art/Textures/Misc/black_shadowonlyc.fxgraph", "Metadata/Effects/Graphs/General/ForceOpaqueShadowOnly.fxgraph", "Metadata/Effects/Graphs/General/Constant.fxgraph"],
+            paint.Parents);
+        Assert.Empty(paint.Textures);
+    }
 
     [Fact]
     public void AMATERIALSOwnBlendModeIsReadOffItsDefaultGraphAndAGraphFilesOffItsTop()
