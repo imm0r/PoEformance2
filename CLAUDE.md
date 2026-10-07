@@ -32,7 +32,20 @@ already cost real time on this project.
   that block and the shape names is a `cond(...)` in its `dolm` parser. Reading those gates
   as unconditional cost this project a day: four bytes taken that were not there put every
   shape name four bytes out, and the names came back NEARLY right, which reads as a wrongly
-  placed piece rather than a wrongly stepped file.
+  placed piece rather than a wrongly stepped file. It covers BOTH games — its CLI takes
+  `--patch 1`, `2` or a specific version — so a parser there is a PoE2 parser unless it
+  branches on the patch.
+- **Know which game a reference was written against.** The two games share most file formats,
+  which is exactly why a PoE1 tool can look like proof: it reads the PoE2 file and nearly
+  works. Check its paths before citing it.
+  - `annalithic/poeformats` is PoE2 now: `GameDirectory.cs` lists extracts 0.1.0 to 0.5.4f,
+    the PoE2 releases, and `Schema` defaults to `poe2 = true`. Its `Ggpk.cs` still points at
+    an old 0.8.8 extract, so a legacy corner of it is not.
+  - `annalithic/poeterrain` is **Path of Exile 1 only**: every path names 3.17 Siege to 3.21
+    Crucible, and its last commit is 2023-08-10. Its `.arm` importer helped (a slot as a fan of
+    four corner quarters, slots at their own `(x, y)`), but nothing taken from it is settled for
+    PoE2 until PoE2 files or the game agree. Its doodads prove nothing: the line that reads them
+    (`Arm.cs`) and the loop that places them (`ArmImportComponent.cs`) are both commented out.
 - Do not trust a summarised directory listing over the real thing. A tree summary once
   reported "no Radar plugin" for a repo that plainly has one, and that wrong answer was
   taken at face value.

@@ -26,8 +26,10 @@ namespace PoEformance.Features;
 /// the doodads with it.
 ///
 /// THE DOODADS GO WHERE THE ROOM'S CORNERS WERE FOUND - RoomFinder.Laying, the corners' own
-/// arithmetic - a doodad's x and y counting the room's columns and lines, as annalithic's importer
-/// lays a slot at (x, y) and a doodad at its own (x, y) in one frame.
+/// arithmetic - a doodad's x and y counting the room's columns and lines, the frame
+/// RoomModels.SpreadOf already draws a room's doodads in. That is this project's reading and still
+/// waits on the game: annalithic/poeterrain is a Path of Exile 1 importer, and both the line that
+/// reads its doodads and the loop that places them are commented out, so it settles nothing here.
 /// </remarks>
 public static class LaidRoomModels
 {

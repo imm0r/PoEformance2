@@ -8,9 +8,10 @@ namespace PoEformance.Game.Diagnostics;
 /// <remarks>
 /// WHY THIS EXISTS. <see cref="TerrainGroundTypes"/> holds one ground type per tile CORNER and
 /// hands the layer one per TILE, taking whichever type most of the four corners agree on. That
-/// reduction is this project's, not the game's: <c>annalithic/poeterrain</c>'s ArmImportComponent
-/// builds a tile as a fan of triangles from the four corners to a midpoint and paints each QUARTER
-/// with its own corner's type, so the game draws all four and never a majority.
+/// reduction is this project's: <c>annalithic/poeterrain</c>'s ArmImportComponent builds a tile as a
+/// fan of triangles from the four corners to a midpoint and paints each QUARTER with its own
+/// corner's type, all four and never a majority. That importer is Path of Exile 1's (its paths name
+/// 3.17 Siege to 3.21 Crucible), so for PoE2 the four quarters are a reading carried over, not seen.
 ///
 /// WHAT THAT COULD COST, and it is one thing rather than a general loss of detail. The layer draws
 /// a NAME AT A POINT per region - no fill, no outline - so a sharper boundary would move a label
