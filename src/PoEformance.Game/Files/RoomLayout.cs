@@ -12,6 +12,47 @@ namespace PoEformance.Game.Files;
 public readonly record struct RoomDoodad(int X, int Y, float Turn, float Scale, string Ao, string Stub);
 
 /// <summary>
+/// One slot of a room's grid: what kind it is and, for a <c>k</c> slot, the tile it asks for.
+/// </summary>
+/// <remarks>
+/// THE k SLOT'S NUMBERS, in poe_data_tools' order and annalithic's names, which agree:
+///
+///     w h   edge types down right up left   exit pairs down right up left (eight)
+///     corner ground types down-left down-right up-right up-left   corner heights (four)
+///     tag   [origin]
+///
+/// A type is an index into the room's string table counted from ONE, nought for none. WHICH WAY
+/// "DOWN" IS was settled by the files themselves, not by either reference: neighbouring slots share
+/// their corners and sides, and in the channel's 1open_01.arm - a nine by nine grid of one by one
+/// slots - only one reading makes them agree. Down is the side towards the grid's FIRST line, so a
+/// slot's down-left corner is the grid corner at its own column and line, its up-left one a line
+/// further on; read that way, 192 shared corners, 120 shared sides and their exit pairs agree with
+/// none against them, while the best of the seven other readings leaves 21 corners in conflict.
+/// </remarks>
+/// <param name="Kind">The slot's letter: k, f, s, o or n.</param>
+/// <param name="Numbers">A k slot's numbers as written, an f slot's one fill type; empty otherwise.</param>
+public readonly record struct RoomSlot(char Kind, int[] Numbers)
+{
+    /// <summary>Whether this asks for a tile - a k slot whose numbers are all there.</summary>
+    public bool IsTile => Kind == 'k' && Numbers.Length >= 23;
+
+    /// <summary>A k slot's width, from its first number.</summary>
+    public int Width => IsTile ? Numbers[0] : 0;
+
+    /// <summary>A k slot's height.</summary>
+    public int Height => IsTile ? Numbers[1] : 0;
+
+    /// <summary>A k slot's edge type on one side - 0 down, 1 right, 2 up, 3 left - as a string index from one, nought for none.</summary>
+    public int Edge(int side) => IsTile ? Numbers[2 + side] : 0;
+
+    /// <summary>A k slot's ground type at one corner - 0 down-left, 1 down-right, 2 up-right, 3 up-left - as a string index from one, nought for none.</summary>
+    public int Ground(int corner) => IsTile ? Numbers[14 + corner] : 0;
+
+    /// <summary>A k slot's tag, as a string index from one, nought for none.</summary>
+    public int Tag => IsTile ? Numbers[22] : 0;
+}
+
+/// <summary>
 /// A room file (<c>.arm</c>), read as far as its doodads.
 /// </summary>
 /// <remarks>
@@ -69,6 +110,26 @@ public sealed class RoomLayout
     /// <summary>The doodads, in the file's order.</summary>
     public IReadOnlyList<RoomDoodad> Doodads { get; private init; } = [];
 
+    /// <summary>The string table, unquoted, in the file's order - what a slot's types index from one.</summary>
+    public IReadOnlyList<string> Strings { get; private init; } = [];
+
+    /// <summary>
+    /// The slot grid, line by line as the file writes them, <see cref="Width"/> to a line - empty where it did not read; see <see cref="SlotsWhy"/>.
+    /// </summary>
+    public IReadOnlyList<RoomSlot> Slots { get; private init; } = [];
+
+    /// <summary>Why the slot grid did not read, or empty. A grid that will not read leaves the doodads standing.</summary>
+    public string SlotsWhy { get; private init; } = string.Empty;
+
+    /// <summary>The slot at a column and grid line, line 0 being the file's first and the room's down side.</summary>
+    public RoomSlot SlotAt(int column, int line)
+        => Slots.Count == Width * Height && (uint)column < (uint)Width && (uint)line < (uint)Height
+            ? Slots[(line * Width) + column]
+            : default;
+
+    /// <summary>A type a slot names, by its index from one: the string, or empty for nought or an index past the table.</summary>
+    public string Named(int index) => index > 0 && index <= Strings.Count ? Strings[index - 1] : string.Empty;
+
     /// <summary>Why nothing was read, or empty.</summary>
     public string Why { get; private init; } = string.Empty;
 
@@ -109,8 +170,18 @@ public sealed class RoomLayout
 
     private static RoomLayout Body(string[] lines, ref int at, int version)
     {
-        // The strings: a count, then that many quoted lines. Nothing here needs them by index.
-        Skip(lines, ref at, Whole(Line(lines, ref at), 0, "the string count"), "the string count");
+        // The strings: a count, then that many quoted lines - what a slot's types index from one.
+        int count = Whole(Line(lines, ref at), 0, "the string count");
+        if (count < 0 || count > lines.Length - at)
+        {
+            throw new FormatException($"the string count is {count.ToString(CultureInfo.InvariantCulture)}, and only {lines.Length - at} remain");
+        }
+
+        var strings = new string[count];
+        for (var one = 0; one < count; one++)
+        {
+            strings[one] = Line(lines, ref at).Trim().Trim('"').Replace('\\', '/');
+        }
 
         Line(lines, ref at);                                         // Dimensions.
         long thingies = 0;
@@ -156,7 +227,19 @@ public sealed class RoomLayout
             Line(lines, ref at);
         }
 
-        Skip(lines, ref at, height, "the slot grid");
+        // THE GRID, read where it can be and stepped over where it cannot: the doodads after it are
+        // the part of a room that is drawn, and a slot this does not know must not cost them.
+        var slots = new List<RoomSlot>(width * height);
+        string slotsWhy = string.Empty;
+        for (var line = 0; line < height; line++)
+        {
+            string text = Line(lines, ref at);
+            if (slotsWhy.Length == 0 && !Slotted(text, width, slots, out string why))
+            {
+                slotsWhy = $"grid line {line + 1}: {why}";
+                slots.Clear();
+            }
+        }
 
         var doodads = new List<RoomDoodad>();
         foreach (string line in Group(lines, ref at, version))
@@ -164,7 +247,78 @@ public sealed class RoomLayout
             doodads.Add(Doodad(line, version));
         }
 
-        return new RoomLayout { Version = version, Width = width, Height = height, Doodads = doodads };
+        return new RoomLayout
+        {
+            Version = version,
+            Width = width,
+            Height = height,
+            Doodads = doodads,
+            Strings = strings,
+            Slots = slotsWhy.Length == 0 ? slots : [],
+            SlotsWhy = slotsWhy,
+        };
+    }
+
+    /// <summary>
+    /// One grid line's slots, added to the list - or false and why, where it does not hold exactly <paramref name="width"/>.
+    /// </summary>
+    /// <remarks>
+    /// A k SLOT'S LAST NUMBER, ITS ORIGIN, IS NOT ALWAYS WRITTEN - poe_data_tools reads it as optional,
+    /// annalithic from version 19 - and every slot starts with a letter, so a number after the
+    /// twenty-third is the origin and a letter is the next slot.
+    /// </remarks>
+    private static bool Slotted(string text, int width, List<RoomSlot> slots, out string why)
+    {
+        string[] words = Words(text);
+        var at = 0;
+        var found = 0;
+        while (at < words.Length)
+        {
+            string word = words[at++];
+            switch (word)
+            {
+                case "n" or "s" or "o":
+                    slots.Add(new RoomSlot(word[0], []));
+                    break;
+
+                case "f":
+                    if (at >= words.Length || !int.TryParse(words[at++], NumberStyles.Integer, CultureInfo.InvariantCulture, out int fill))
+                    {
+                        why = "an f slot without its fill type";
+                        return false;
+                    }
+
+                    slots.Add(new RoomSlot('f', [fill]));
+                    break;
+
+                case "k":
+                    var numbers = new List<int>(24);
+                    while (at < words.Length && numbers.Count < 24
+                        && int.TryParse(words[at], NumberStyles.Integer, CultureInfo.InvariantCulture, out int number))
+                    {
+                        numbers.Add(number);
+                        at++;
+                    }
+
+                    if (numbers.Count < 23)
+                    {
+                        why = $"a k slot with {numbers.Count} numbers, where it takes 23 or 24";
+                        return false;
+                    }
+
+                    slots.Add(new RoomSlot('k', [.. numbers]));
+                    break;
+
+                default:
+                    why = $"a slot reading \"{word}\"";
+                    return false;
+            }
+
+            found++;
+        }
+
+        why = found == width ? string.Empty : $"{found} slots where the room is {width} wide";
+        return found == width;
     }
 
     /// <summary>One group's lines: counted below version 32, ended by a <c>-1</c> line from it.</summary>
