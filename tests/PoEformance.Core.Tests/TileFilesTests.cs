@@ -477,6 +477,32 @@ public class TileFilesTests
         Assert.Contains("tex Art/Textures/blacknofog.dds", dump, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// A tile whose sub-tiles hold nothing is dumped file by file: the definitions it inherits through, its template, and every sub-tile's mesh.
+    /// </summary>
+    [Fact]
+    public void ATILEThatDrewNothingIsDumpedFileByFile()
+    {
+        Dictionary<string, byte[]> files = Install();
+        files["Art/Models/Terrain/Test/Arena_c1r1.tgm"] = Tgm(props: 0, ground: 0);
+        files["Art/Models/Terrain/Test/Arena_c2r1.tgm"] = Tgm(props: 0, ground: 0);
+        Func<string, byte[]?> read = path => files.GetValueOrDefault(path);
+
+        MonsterModel model = TileModels.Of(read, "Metadata/Terrain/Test/Child.tdt");
+        Assert.False(model.Ready);
+        string dump = ModelDump.OfTile(read, "Metadata/Terrain/Test/Child.tdt", model);
+
+        Assert.Contains("did not load: the tile's sub-tiles hold no geometry", dump, StringComparison.Ordinal);
+        int child = dump.IndexOf("=== .tdt Metadata/Terrain/Test/Child.tdt", StringComparison.Ordinal);
+        int parent = dump.IndexOf("=== .tdt Metadata/Terrain/Test/Arena.tdt", StringComparison.Ordinal);
+        int template = dump.IndexOf("=== .tgt Art/Models/Terrain/Test/Arena.tgt", StringComparison.Ordinal);
+        Assert.True(child >= 0 && parent > child && template > parent, dump);
+        Assert.Contains("=== sub-tiles of Art/Models/Terrain/Test/Arena.tgt (2x1)", dump, StringComparison.Ordinal);
+        Assert.Contains("  c2r1 Art/Models/Terrain/Test/Arena_c2r1.tgm", dump, StringComparison.Ordinal);
+        Assert.Contains("    props: none", dump, StringComparison.Ordinal);
+        Assert.Contains("    ground: no ground", dump, StringComparison.Ordinal);
+    }
+
     /// <summary>The dump prints the graphs a tile's materials name, once each, after the materials.</summary>
     [Fact]
     public void ANDTheDumpPrintsTheGraphsTheMaterialsName()
