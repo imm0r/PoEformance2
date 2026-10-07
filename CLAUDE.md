@@ -105,6 +105,13 @@ exactly like a bug in the other one:
 Markers from (1) will never line up with the markers the game draws in (2), because the map
 is zoomable. Comparing them is what makes a correct projection look broken.
 
+**The game's frame is LEFT-HANDED** — world and model files alike, with up as minus z. The map
+draws grid x up-right and y up-left (x to y anticlockwise from above, so x × y = −z), and every
+rig puts its `L_` bones at +x while facing −y. A renderer built from proper rotations draws that
+frame as its mirror image, which looks entirely right until it is held against the game and
+cannot be turned to match: a room drawn from the area's own tiles came out exactly that way.
+`MeshPicture.Camera` turns x over once for every picture the tool draws.
+
 ## Verify against the game, not against yourself
 
 A check that a wrong value passes is worse than no check. Prefer tests the game itself can
