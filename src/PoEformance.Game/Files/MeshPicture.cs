@@ -24,7 +24,7 @@ namespace PoEformance.Game.Files;
 /// with is a fresh pair of buffers each time; see <see cref="Canvas"/>.
 ///
 /// AND IT IS DRAWN IN BANDS OF ROWS ON EVERY CORE, since the pane grew to 1200 px and an animation
-/// plays at thirty frames a second. Each band walks every triangle in the mesh's order and draws
+/// plays at thirty frames a second. Each band walks the triangles that reach it (see Binned), in the mesh's order, and draws
 /// the rows that are its own, so no pixel is ever touched by two threads and the picture is the
 /// one-threaded one to the byte - the depth test needs no lock because it never has a race. What
 /// it buys is most of the core count: on the four threads of the machine this was written on, a
@@ -229,16 +229,44 @@ public static class MeshPicture
         /// <summary>The triangles whose program reads the clock, in the mesh's order - the first <see cref="Drawn.Clocked"/> of them.</summary>
         internal int[] Clocked { get; private set; } = [];
 
-        /// <summary>The translucent triangles, in the mesh's order - the first <see cref="Drawn.Glowing"/> of them.</summary>
-        internal int[] Glowing { get; private set; } = [];
+        /// <summary>Which pass each triangle is drawn in - see <see cref="Binned"/>: nought for none.</summary>
+        internal byte[] Kinds { get; private set; } = [];
 
-        /// <summary>Room for the two lists of triangles a keeping drawing walks.</summary>
-        internal void Listed(int triangles)
+        /// <summary>Where each pass's bin for each band starts in <see cref="BinEntries"/>, the pass's bands one after another.</summary>
+        internal int[] BinStarts { get; private set; } = [];
+
+        /// <summary>Scratch for filling the bins.</summary>
+        internal int[] BinCursors { get; private set; } = [];
+
+        /// <summary>The triangles in every bin, each bin in the mesh's order.</summary>
+        internal int[] BinEntries { get; private set; } = [];
+
+        /// <summary>Room for sorting this many triangles into this many bands - and for listing the clock's, where asked.</summary>
+        internal void Binning(int triangles, int bands, bool clock)
         {
-            if (Clocked.Length < triangles)
+            if (Kinds.Length < triangles)
+            {
+                Kinds = new byte[triangles];
+            }
+
+            if (clock && Clocked.Length < triangles)
             {
                 Clocked = new int[triangles];
-                Glowing = new int[triangles];
+            }
+
+            if (BinStarts.Length != (3 * bands) + 1)
+            {
+                BinStarts = new int[(3 * bands) + 1];
+                BinCursors = new int[3 * bands];
+            }
+        }
+
+        /// <summary>Room for this many bin entries.</summary>
+        internal void Entries(int count)
+        {
+            if (BinEntries.Length < count)
+            {
+                BinEntries = new int[Math.Max(count, BinEntries.Length * 2)];
             }
         }
 
@@ -557,21 +585,25 @@ public static class MeshPicture
         Mipmaps?[] palette = Palette(mesh, usable, skins);
 
         // EVERY VERTEX ONCE, not once per triangle it sits in. A closed mesh lists each vertex in
-        // about six triangles, so transforming at the corners was six transforms for one.
+        // about six triangles, so transforming at the corners was six transforms for one. In slices
+        // on every core where there are enough to pay for it - see Sliced.
         int vertices = positions.Length;
         int triangles = mesh.Indices.Length / 3;
         canvas.Fit(vertices, triangles);
         Vector3[] corners = canvas.Corners;
         Vector3[] facings = canvas.Facings;
-        for (var point = 0; point < vertices; point++)
+        Vector3[] places = canvas.Placed(positions, mesh.Positions);
+        Vector3[] turns = canvas.Turned(normals, mesh.Normals);
+        Sliced(canvas, vertices, (from, upto) =>
         {
-            Vector3 place = Vector3.Transform(positions[point], view);
-            corners[point] = new Vector3((place.X * scale) + centre.X, (place.Y * scale) + centre.Y, place.Z);
-            facings[point] = Vector3.TransformNormal(normals[point], view);
-        }
+            for (int point = from; point < upto; point++)
+            {
+                Vector3 place = Vector3.Transform(places[point], view);
+                corners[point] = new Vector3((place.X * scale) + centre.X, (place.Y * scale) + centre.Y, place.Z);
+                facings[point] = Vector3.TransformNormal(turns[point], view);
+            }
+        });
 
-        // And every triangle's rows and skin level once, so a band can pass over the triangles
-        // that do not reach it with one comparison each.
         int[] tops = canvas.Tops;
         int[] feet = canvas.Feet;
         float[] levels = canvas.Levels;
@@ -594,109 +626,85 @@ public static class MeshPicture
         }
 
         bool shaded = programs.Length > 0;
-        Vector3[] places = [];
-        Vector3[] turns = [];
         if (shaded)
         {
             canvas.Levelled(triangles * stride);
-            places = canvas.Placed(positions, mesh.Positions);
-            turns = canvas.Turned(normals, mesh.Normals);
         }
 
-        // THE CLOCK'S TRIANGLES, LISTED APART where the canvas keeps the still part - see Again. A
-        // triangle runs its program only where it is solid or cut out, so only those can be the
-        // clock's; the translucent ones are listed too, since they are laid over whatever the clock
-        // changed and are drawn again with it.
-        bool[] ticking = [];
-        int clocked = 0;
-        int glowing = 0;
-        if (canvas.Keeps && Array.Exists(programs, one => one.UsesTime))
-        {
-            ticking = Array.ConvertAll(programs, one => one.UsesTime);
-            canvas.Listed(triangles);
-            int[] shadesOf = canvas.Shades;
-            MaterialBlend[] blendsOf = canvas.Blends;
-            for (var one = 0; one < triangles; one++)
-            {
-                MaterialBlend blend = blendsOf[one];
-                if (shadesOf[one] >= 0 && ticking[shadesOf[one]] && blend is MaterialBlend.Opaque or MaterialBlend.Cutout)
-                {
-                    canvas.Clocked[clocked++] = one;
-                }
-                else if (blend is MaterialBlend.Alpha or MaterialBlend.Additive)
-                {
-                    canvas.Glowing[glowing++] = one;
-                }
-            }
-
-            if (clocked > 0)
-            {
-                canvas.Keeping();
-            }
-        }
-
+        // And every triangle's rows, skin level and read levels once, for every band to read - in
+        // slices like the vertices, each slice with its own registers for the programs' levels.
         int[] shadeOf = canvas.Shades;
         float[] shadeLevels = canvas.ShadeLevels;
-        Span<Vector4> scratch = shaded ? stackalloc Vector4[ShadeProgram.MostRegisters] : default;
-        Span<Vector2> spots = shaded ? stackalloc Vector2[Math.Max(1, stride) * 3] : default;
-        Span<Vector2> cornerSpots = shaded ? stackalloc Vector2[3] : default;
-        Span<Vector3> cornerPlaces = shaded ? stackalloc Vector3[3] : default;
-        Span<Vector3> cornerTurns = shaded ? stackalloc Vector3[3] : default;
-        Span<Vector4> cornerColours = shaded ? stackalloc Vector4[3] : default;
-        ShadeProgram? preset = null;
-        for (var one = 0; one < triangles; one++)
+        float time = canvas.Time;
+        Sliced(canvas, triangles, (from, upto) =>
         {
-            Vector3 a = corners[indices[one * 3]];
-            Vector3 b = corners[indices[(one * 3) + 1]];
-            Vector3 c = corners[indices[(one * 3) + 2]];
-            float area = Cross(a, b, c);
-            if (!(MathF.Abs(area) >= 1e-6f))
+            Span<Vector4> scratch = shaded ? stackalloc Vector4[ShadeProgram.MostRegisters] : default;
+            Span<Vector2> spots = shaded ? stackalloc Vector2[Math.Max(1, stride) * 3] : default;
+            Span<Vector2> cornerSpots = shaded ? stackalloc Vector2[3] : default;
+            Span<Vector3> cornerPlaces = shaded ? stackalloc Vector3[3] : default;
+            Span<Vector3> cornerTurns = shaded ? stackalloc Vector3[3] : default;
+            Span<Vector4> cornerColours = shaded ? stackalloc Vector4[3] : default;
+            ShadeProgram? preset = null;
+            for (int one = from; one < upto; one++)
             {
-                tops[one] = int.MaxValue;
-                feet[one] = int.MinValue;
-                continue;
-            }
-
-            tops[one] = Math.Max(0, (int)MathF.Floor(Min3(a.Y, b.Y, c.Y)));
-            feet[one] = Math.Min(size - 1, (int)MathF.Ceiling(Max3(a.Y, b.Y, c.Y)));
-
-            // AGAINST THE TEXTURE THIS TRIANGLE WEARS, because the level is worked out from how
-            // many texels a pixel steps across and the parts of a monster are not all painted
-            // at the same resolution: a 512 square cloak read at a 2048 square body's level is
-            // the grain this calculation exists to avoid.
-            Mipmaps? worn = palette[wears[one]];
-            levels[one] = worn is null
-                ? 0f
-                : Level(
-                    a, b, c,
-                    mesh.Coordinates[indices[one * 3]],
-                    mesh.Coordinates[indices[(one * 3) + 1]],
-                    mesh.Coordinates[indices[(one * 3) + 2]],
-                    area, worn);
-
-            // A SHADED TRIANGLE'S READS EACH TAKE A LEVEL OF THEIR OWN: a rock texture tiled twelve
-            // times over the shape steps across twelve times the texels its mask does.
-            if (shaded && shadeOf[one] >= 0)
-            {
-                ShadeProgram program = programs[shadeOf[one]];
-                if (!ReferenceEquals(program, preset))
+                Vector3 a = corners[indices[one * 3]];
+                Vector3 b = corners[indices[(one * 3) + 1]];
+                Vector3 c = corners[indices[(one * 3) + 2]];
+                float area = Cross(a, b, c);
+                if (!(MathF.Abs(area) >= 1e-6f))
                 {
-                    program.Preset(scratch, canvas.Time);
-                    preset = program;
+                    tops[one] = int.MaxValue;
+                    feet[one] = int.MinValue;
+                    continue;
                 }
 
-                Graded(
-                    mesh, program, one, positions, normals, a, b, c, area,
-                    scratch, spots, cornerSpots, cornerPlaces, cornerTurns, cornerColours, shadeLevels.AsSpan(one * stride, program.Samples));
+                tops[one] = Math.Max(0, (int)MathF.Floor(Min3(a.Y, b.Y, c.Y)));
+                feet[one] = Math.Min(size - 1, (int)MathF.Ceiling(Max3(a.Y, b.Y, c.Y)));
+
+                // AGAINST THE TEXTURE THIS TRIANGLE WEARS, because the level is worked out from how
+                // many texels a pixel steps across and the parts of a monster are not all painted
+                // at the same resolution: a 512 square cloak read at a 2048 square body's level is
+                // the grain this calculation exists to avoid.
+                Mipmaps? worn = palette[wears[one]];
+                levels[one] = worn is null
+                    ? 0f
+                    : Level(
+                        a, b, c,
+                        mesh.Coordinates[indices[one * 3]],
+                        mesh.Coordinates[indices[(one * 3) + 1]],
+                        mesh.Coordinates[indices[(one * 3) + 2]],
+                        area, worn);
+
+                // A SHADED TRIANGLE'S READS EACH TAKE A LEVEL OF THEIR OWN: a rock texture tiled twelve
+                // times over the shape steps across twelve times the texels its mask does.
+                if (shaded && shadeOf[one] >= 0)
+                {
+                    ShadeProgram program = programs[shadeOf[one]];
+                    if (!ReferenceEquals(program, preset))
+                    {
+                        program.Preset(scratch, time);
+                        preset = program;
+                    }
+
+                    Graded(
+                        mesh, program, one, places, turns, a, b, c, area,
+                        scratch, spots, cornerSpots, cornerPlaces, cornerTurns, cornerColours, shadeLevels.AsSpan(one * stride, program.Samples));
+                }
             }
+        });
+
+        // THE CLOCK'S TRIANGLES APART where the canvas keeps the still part - see Again. A triangle
+        // runs its program only where it is solid or cut out, so only those can be the clock's.
+        bool[] ticking = canvas.Keeps && Array.Exists(programs, one => one.UsesTime)
+            ? Array.ConvertAll(programs, one => one.UsesTime)
+            : [];
+        int clocked = Binned(canvas, triangles, ticking);
+        if (clocked > 0)
+        {
+            canvas.Keeping();
         }
 
-        // IN BANDS OF ROWS, EACH ON ITS OWN THREAD. A pixel belongs to one band and the triangles
-        // are walked in the mesh's order within it, so the picture is the sequential one to the
-        // byte however many threads share it - the depth test never sees two threads at once.
-        // More bands than threads, so a band the model does not reach costs nothing much and the
-        // ones through its middle are shared out.
-        var drawn = new Drawn(mesh, triangles, lamp, ink, palette, translucent, programs, stride, places, turns, ticking, clocked, glowing);
+        var drawn = new Drawn(mesh, triangles, lamp, ink, palette, translucent, programs, stride, places, turns, ticking, clocked);
         InBands(canvas, new Drawing(canvas, drawn), again: false);
         if (clocked > 0)
         {
@@ -799,14 +807,13 @@ public static class MeshPicture
     /// </remarks>
     private static void InBands(Canvas canvas, Drawing drawing, bool again)
     {
-        const int height = 8;
         int size = canvas.Size;
-        int bands = (size + height - 1) / height;
+        int bands = Bands(size);
         if (canvas.Threads == 1)
         {
             for (var band = 0; band < bands; band++)
             {
-                drawing.Band(band * height, Math.Min(size, (band + 1) * height), again);
+                drawing.Band(band, band * BandRows, Math.Min(size, (band + 1) * BandRows), again);
             }
         }
         else
@@ -814,7 +821,7 @@ public static class MeshPicture
             Parallel.For(
                 0, bands,
                 new ParallelOptions { MaxDegreeOfParallelism = canvas.Threads },
-                band => drawing.Band(band * height, Math.Min(size, (band + 1) * height), again));
+                band => drawing.Band(band, band * BandRows, Math.Min(size, (band + 1) * BandRows), again));
         }
     }
 
@@ -850,10 +857,133 @@ public static class MeshPicture
     /// <param name="Turns">The model-space normals a program reads.</param>
     /// <param name="Ticking">Which programs read the clock, by their place in <paramref name="Programs"/> - empty where the drawing keeps nothing.</param>
     /// <param name="Clocked">How many of <see cref="Canvas.Clocked"/> are the clock's - nought where the drawing keeps nothing.</param>
-    /// <param name="Glowing">How many of <see cref="Canvas.Glowing"/> are translucent.</param>
     internal sealed record Drawn(
         SkinnedMesh Mesh, int Triangles, Vector3 Lamp, Vector3 Ink, Mipmaps?[] Palette, bool Translucent,
-        ShadeProgram[] Programs, int Stride, Vector3[] Places, Vector3[] Turns, bool[] Ticking, int Clocked, int Glowing);
+        ShadeProgram[] Programs, int Stride, Vector3[] Places, Vector3[] Turns, bool[] Ticking, int Clocked);
+
+    /// <summary>The rows in one band - see <see cref="InBands"/>.</summary>
+    private const int BandRows = 8;
+
+    /// <summary>How many bands a picture this size is drawn in.</summary>
+    private static int Bands(int size) => (size + BandRows - 1) / BandRows;
+
+    /// <summary>
+    /// Runs <paramref name="body"/> over nought to <paramref name="count"/> in slices, on as many threads
+    /// as the canvas allows - where there are enough to pay for the hand-off, and in one go where not.
+    /// </summary>
+    /// <remarks>
+    /// THE SAME NUMBERS EITHER WAY: what is worked out per vertex or per triangle depends on that one
+    /// alone. Measured on a million-triangle mesh, the vertices and the triangles' rows and levels took
+    /// a quarter of a drawing on one thread while the bands were on four.
+    /// </remarks>
+    private static void Sliced(Canvas canvas, int count, Action<int, int> body)
+    {
+        const int least = 16384;
+        if (canvas.Threads == 1 || count < least * 2)
+        {
+            body(0, count);
+            return;
+        }
+
+        int slices = Math.Min(canvas.Threads * 4, (count + least - 1) / least);
+        int each = (count + slices - 1) / slices;
+        Parallel.For(
+            0, slices,
+            new ParallelOptions { MaxDegreeOfParallelism = canvas.Threads },
+            slice => body(slice * each, Math.Min(count, (slice + 1) * each)));
+    }
+
+    /// <summary>
+    /// Sorts the triangles into the bands they reach, pass by pass and each band in the mesh's order -
+    /// and lists the clock's apart. Returns how many are the clock's.
+    /// </summary>
+    /// <remarks>
+    /// WHY THERE ARE BINS. Every band used to walk every triangle and skip those that did not reach it:
+    /// a million triangles in the 96 bands of a 768 square picture is 94 million skips a drawing, and
+    /// on that mesh they were most of its time - the bands' share grew with the number of bands, not
+    /// with the pixels drawn. Sorted once, a band walks only what reaches it, in the same order, so the
+    /// picture is the same to the byte.
+    ///
+    /// THREE PASSES' WORTH: the solid and cut-out triangles drawn first, the clock's where the canvas
+    /// keeps (see Again), and the translucent ones last. A triangle off the picture, too thin to have
+    /// an area, or shadow-only is in none.
+    /// </remarks>
+    private static int Binned(Canvas canvas, int triangles, bool[] ticking)
+    {
+        int bands = Bands(canvas.Size);
+        canvas.Binning(triangles, bands, ticking.Length > 0);
+        byte[] kinds = canvas.Kinds;
+        int[] tops = canvas.Tops;
+        int[] feet = canvas.Feet;
+        MaterialBlend[] blends = canvas.Blends;
+        int[] shades = canvas.Shades;
+        int[] starts = canvas.BinStarts;
+        Array.Clear(starts, 0, (3 * bands) + 1);
+
+        var clocked = 0;
+        for (var one = 0; one < triangles; one++)
+        {
+            byte kind;
+            MaterialBlend blend = blends[one];
+            if (tops[one] > feet[one] || blend == MaterialBlend.ShadowOnly)
+            {
+                kind = 0;
+            }
+            else if (blend is MaterialBlend.Alpha or MaterialBlend.Additive)
+            {
+                kind = 3;
+            }
+            else if (ticking.Length > 0 && shades[one] >= 0 && ticking[shades[one]])
+            {
+                kind = 2;
+                canvas.Clocked[clocked++] = one;
+            }
+            else
+            {
+                kind = 1;
+            }
+
+            kinds[one] = kind;
+            if (kind == 0)
+            {
+                continue;
+            }
+
+            int row = (kind - 1) * bands;
+            int last = feet[one] / BandRows;
+            for (int band = tops[one] / BandRows; band <= last; band++)
+            {
+                starts[row + band + 1]++;
+            }
+        }
+
+        for (var at = 1; at <= 3 * bands; at++)
+        {
+            starts[at] += starts[at - 1];
+        }
+
+        canvas.Entries(starts[3 * bands]);
+        int[] cursors = canvas.BinCursors;
+        int[] entries = canvas.BinEntries;
+        Array.Copy(starts, cursors, 3 * bands);
+        for (var one = 0; one < triangles; one++)
+        {
+            byte kind = kinds[one];
+            if (kind == 0)
+            {
+                continue;
+            }
+
+            int row = (kind - 1) * bands;
+            int last = feet[one] / BandRows;
+            for (int band = tops[one] / BandRows; band <= last; band++)
+            {
+                entries[cursors[row + band]++] = one;
+            }
+        }
+
+        return clocked;
+    }
 
     /// <summary>
     /// The distinct textures a drawing may read, with "none" at nought.
@@ -1123,7 +1253,6 @@ public static class MeshPicture
         private readonly float[] _levels;
         private readonly int[] _indices;
         private readonly Vector2[] _coordinates;
-        private readonly int _triangles;
         private readonly Vector3 _lamp;
         private readonly Vector3 _ink;
         private readonly Mipmaps?[] _palette;
@@ -1146,11 +1275,9 @@ public static class MeshPicture
         private readonly byte[] _keptPixels;
         private readonly float[] _keptDepth;
         private readonly int[] _keptWinners;
-        private readonly bool[] _ticking;
-        private readonly int[] _clocked;
-        private readonly int _clockedCount;
-        private readonly int[] _glowing;
-        private readonly int _glowingCount;
+        private readonly int[] _binStarts;
+        private readonly int[] _binEntries;
+        private readonly int _bands;
 
         public Drawing(Canvas canvas, Drawn drawn)
         {
@@ -1167,11 +1294,9 @@ public static class MeshPicture
             _keptPixels = canvas.KeptPixels;
             _keptDepth = canvas.KeptDepth;
             _keptWinners = canvas.KeptWinners;
-            _ticking = drawn.Ticking;
-            _clocked = canvas.Clocked;
-            _clockedCount = drawn.Clocked;
-            _glowing = canvas.Glowing;
-            _glowingCount = drawn.Glowing;
+            _binStarts = canvas.BinStarts;
+            _binEntries = canvas.BinEntries;
+            _bands = Bands(canvas.Size);
             _pixels = canvas.Pixels;
             _depth = canvas.Depth;
             _size = canvas.Size;
@@ -1182,7 +1307,6 @@ public static class MeshPicture
             _levels = canvas.Levels;
             _indices = mesh.Indices;
             _coordinates = mesh.Coordinates;
-            _triangles = drawn.Triangles;
             _lamp = drawn.Lamp;
             _ink = drawn.Ink;
             _palette = drawn.Palette;
@@ -1202,10 +1326,11 @@ public static class MeshPicture
         /// among translucent triangles is the file's rather than back to front; additive does not
         /// care, and mixed shapes overlapping themselves are the one place it could show.
         /// </remarks>
+        /// <param name="band">Which band, from the top.</param>
         /// <param name="top">The band's first row.</param>
         /// <param name="end">The row after its last.</param>
         /// <param name="again">True to put the kept still part back and draw only the clock's triangles and the translucent ones - see <see cref="Again"/>.</param>
-        public void Band(int top, int end, bool again)
+        public void Band(int band, int top, int end, bool again)
         {
             if (again)
             {
@@ -1214,61 +1339,27 @@ public static class MeshPicture
             else
             {
                 // A KEEPING DRAWING DRAWS THE STILL PART FIRST, and keeps it before the clock's.
-                bool keeping = _winners is not null;
-                for (var one = 0; one < _triangles; one++)
-                {
-                    if (_feet[one] < top || _tops[one] >= end || Translucent(_blends[one]) || _blends[one] == MaterialBlend.ShadowOnly
-                        || (keeping && _shades[one] >= 0 && _ticking[_shades[one]]))
-                    {
-                        continue;
-                    }
-
-                    Rasterise(one, Math.Max(_tops[one], top), Math.Min(_feet[one], end - 1));
-                }
-
-                if (keeping)
+                Pass(1, band, top, end);
+                if (_winners is not null)
                 {
                     Kept(top, end, back: false);
                 }
             }
 
-            for (var at = 0; at < _clockedCount; at++)
+            Pass(2, band, top, end);
+            if (_translucent)
             {
-                int one = _clocked[at];
-                if (_feet[one] >= top && _tops[one] < end)
-                {
-                    Rasterise(one, Math.Max(_tops[one], top), Math.Min(_feet[one], end - 1));
-                }
+                Pass(3, band, top, end);
             }
+        }
 
-            if (!_translucent)
+        /// <summary>Draws one pass's triangles that reach the band, in the mesh's order - see <see cref="Binned"/>.</summary>
+        private void Pass(int kind, int band, int top, int end)
+        {
+            int bin = ((kind - 1) * _bands) + band;
+            for (int at = _binStarts[bin], upto = _binStarts[bin + 1]; at < upto; at++)
             {
-                return;
-            }
-
-            // FROM THE LIST WHERE THERE IS ONE, so drawing the clock's part again does not walk every
-            // triangle of a tile to find the few translucent ones.
-            if (_winners is not null)
-            {
-                for (var at = 0; at < _glowingCount; at++)
-                {
-                    int one = _glowing[at];
-                    if (_feet[one] >= top && _tops[one] < end)
-                    {
-                        Rasterise(one, Math.Max(_tops[one], top), Math.Min(_feet[one], end - 1));
-                    }
-                }
-
-                return;
-            }
-
-            for (var one = 0; one < _triangles; one++)
-            {
-                if (_feet[one] < top || _tops[one] >= end || !Translucent(_blends[one]))
-                {
-                    continue;
-                }
-
+                int one = _binEntries[at];
                 Rasterise(one, Math.Max(_tops[one], top), Math.Min(_feet[one], end - 1));
             }
         }
