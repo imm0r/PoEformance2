@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Numerics;
 using System.Runtime.Versioning;
 using ImGuiNET;
@@ -161,6 +162,9 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     /// <summary>The "around you" row's value of <see cref="_ghosted"/>.</summary>
     private const int GhostAround = -2;
 
+    /// <summary>Whether a room whose place is outlined is drawn as the area laid it - see LaidRoomModels.</summary>
+    private bool _asLaid = true;
+
     /// <summary>Every tile file's identity read for the area in <see cref="_identitiesOf"/> - one read per file across every room searched there.</summary>
     private ConcurrentDictionary<string, TileIdentity?> _identities = new(StringComparer.OrdinalIgnoreCase);
     private TerrainGrid? _identitiesOf;
@@ -291,7 +295,10 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     /// named tileset's overrides itself, so the key is the whole of what is drawn and two tilesets
     /// are two keys.
     /// </remarks>
-    public static MonsterModel Load(Func<string, byte[]?> read, string key)
+    /// <param name="read">How to read a file out of the install.</param>
+    /// <param name="key">What to load - see <see cref="TileKey"/> and <see cref="RoomKey"/>.</param>
+    /// <param name="terrain">The current area, for a room laid from its tiles; null leaves such a room out.</param>
+    public static MonsterModel Load(Func<string, byte[]?> read, string key, Func<TerrainGrid?>? terrain = null)
     {
         ArgumentNullException.ThrowIfNull(key);
 
@@ -312,8 +319,21 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         }
 
         RoomKey room = RoomKey.Read(key);
-        return RoomModels.Of(read, room.Path, shaded: true, doodads: room.Doodads, tools: room.Tools);
+        if (!room.TryLaid(out int x, out int y, out int turn, out int area))
+        {
+            return RoomModels.Of(read, room.Path, shaded: true, doodads: room.Doodads, tools: room.Tools);
+        }
+
+        // ONLY IN THE AREA THE PLACE WAS FOUND IN: a place is a tile of one area's grid, and the key
+        // names that grid so a new area cannot lay the room over somebody else's tiles.
+        TerrainGrid? grid = terrain?.Invoke();
+        return grid is not null && Stamp(grid) == area
+            ? LaidRoomModels.Of(read, room.Path, grid, x, y, turn, shaded: true, doodads: room.Doodads, tools: room.Tools)
+            : MonsterModel.None with { Why = "the area this place was found in is gone - pick the room's place again" };
     }
+
+    /// <summary>The mark a key carries for the area a room's place was found in - the grid's own, for this session.</summary>
+    public static int Stamp(TerrainGrid grid) => RuntimeHelpers.GetHashCode(grid);
 
     /// <summary>What the tile or room is and where it is used, then its geometry under it.</summary>
     protected override void Pane()
@@ -380,7 +400,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         }
 
         string key = room
-            ? new RoomKey(chosen, _doodads, _tools).ToString()
+            ? new RoomKey(chosen, _doodads, _tools, LaidPlace()).ToString()
             : new TileKey(chosen, _ground, _walls, Placing(chosen), Laying(chosen)).ToString();
         if (!string.Equals(key, _subjectKey, StringComparison.Ordinal))
         {
@@ -446,6 +466,29 @@ public sealed class TileBookWindow : BookWindow<TileBook>
                 + " the room names DoodadInvisible beside a blocker - so they are hidden unless this is on."
                 + " Everything from Metadata/Terrain/Doodads/Tools/ counts, which is a rule on the folder's name.");
         }
+
+        ImGui.SameLine();
+        ImGui.Checkbox("as laid##roomlaid", ref _asLaid);
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("With a place picked below, the room as the area laid it there: the tiles the game actually put down -"
+                + " the joins to the map included - each turned the way the game laid it, and the room's doodads set on them.\n"
+                + "Off, or with no place picked: the room's doodads as its file has them.");
+        }
+    }
+
+    /// <summary>The place the room is drawn laid at, as the key writes it - or empty for the room as its file has it.</summary>
+    private string LaidPlace()
+    {
+        if (!_asLaid || _searchedIn is not { } grid || _found is not { } found)
+        {
+            return string.Empty;
+        }
+
+        RoomCandidate? picked = _ghosted >= 0 && _ghosted < found.Candidates.Count
+            ? found.Candidates[_ghosted]
+            : _ghosted == GhostAround ? _around?.Where : null;
+        return picked is { } place ? RoomKey.LaidAt(place.X, place.Y, place.Turn, Stamp(grid)) : string.Empty;
     }
 
     /// <summary>

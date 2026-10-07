@@ -1,3 +1,4 @@
+using System.Numerics;
 using PoEformance.Game.Files;
 
 namespace PoEformance.Game.World;
@@ -462,6 +463,34 @@ public static class RoomFinder
         }
 
         return ((u - 1) / 2, (v - 1) / 2);
+    }
+
+    /// <summary>
+    /// The matrix taking a point of the room as its file has it - (u, v) in tiles, u along its columns and v along its lines - to the footprint of a candidate laid one of the eight ways, in tiles from the footprint's corner.
+    /// </summary>
+    /// <remarks>
+    /// THE CORNERS' OWN ARITHMETIC, made a matrix - see <see cref="Placed"/>: mirrored first, u to
+    /// w - u, then each quarter turn (u, v) to (h - v, u). A point goes where the corner it sits on
+    /// goes, so a room's doodads land where its corners were found. Rows, as System.Numerics
+    /// multiplies: a point times the matrix.
+    /// </remarks>
+    public static Matrix3x2 Laying(int width, int height, int turn)
+    {
+        Matrix3x2 laying = Matrix3x2.Identity;
+        float w = width;
+        float h = height;
+        if (turn >= 4)
+        {
+            laying *= new Matrix3x2(-1f, 0f, 0f, 1f, w, 0f);
+        }
+
+        for (var quarter = 0; quarter < (turn & 3); quarter++)
+        {
+            laying *= new Matrix3x2(0f, 1f, -1f, 0f, h, 0f);
+            (w, h) = (h, w);
+        }
+
+        return laying;
     }
 
     /// <summary>Whether one placement ranks above another: more tiles agreeing, then more corners - without the tiles, corners alone.</summary>

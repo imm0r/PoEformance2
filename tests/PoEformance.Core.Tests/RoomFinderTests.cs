@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Numerics;
 using System.Text;
 using PoEformance.Game.Files;
 using PoEformance.Game.World;
@@ -281,6 +282,34 @@ public class RoomFinderTests
         }
 
         return (Laid(paths, ids), identities);
+    }
+
+    /// <summary>
+    /// A point of the room goes where its corners were found: the laying matrix and the found placement agree corner for corner.
+    /// </summary>
+    /// <remarks>
+    /// The area helper presses the pattern in mirrored and turned a quarter at (12, 4): corner (u, v)
+    /// lands at (12 + 2 - v, 4 + 3 - u), written out by hand there - so the matrix the room's doodads
+    /// are laid by is checked against that, not against the finder's own arithmetic.
+    /// </remarks>
+    [Fact]
+    public void APOINTOfTheRoomIsLaidWhereItsCornersWereFound()
+    {
+        (TerrainGroundTypes ground, _) = Area(withRoom: true);
+        RoomCandidate found = Assert.Single(RoomFinder.Find(RoomLayout.Parse(Room(Pattern, 3, 2)), ground, TilesX, TilesY).Candidates);
+        Matrix3x2 laying = RoomFinder.Laying(3, 2, found.Turn);
+        for (var u = 0; u <= 3; u++)
+        {
+            for (var v = 0; v <= 2; v++)
+            {
+                Vector2 at = Vector2.Transform(new Vector2(u, v), laying);
+                Assert.Equal((12f + 2 - v, 4f + 3 - u), (found.X + at.X, found.Y + at.Y));
+            }
+        }
+
+        // As written it is the room itself; turned a quarter, (u, v) goes to (h - v, u).
+        Assert.Equal(Matrix3x2.Identity, RoomFinder.Laying(3, 2, 0));
+        Assert.Equal(new Vector2(2f - 1f, 3f), Vector2.Transform(new Vector2(3f, 1f), RoomFinder.Laying(3, 2, 1)));
     }
 
     /// <summary>What follows the doodads in a version 36 room, down to an optional line of ground overrides.</summary>
