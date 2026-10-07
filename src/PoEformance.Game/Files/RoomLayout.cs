@@ -76,6 +76,12 @@ public readonly record struct RoomSlot(char Kind, int[] Numbers)
 ///     "string"              from 35
 ///     grid                  h lines of w slots
 ///     doodads               a group
+///     doodad connections    a group, from 23
+///     decals                a group
+///     boss lines            from 22: a count, then that many lines of quoted strings
+///     zones                 from 27: a group, counted below 33 and ended by -1 from it
+///     tags                  optional: a count and that many words, on one line
+///     ground overrides      optional: (w - 1) * (h - 1) types on one line, the grid's inner corners
 ///
 /// A GROUP is a count line and that many lines below version 32, and lines up to a line reading
 /// <c>-1</c> from 32. A doodad line, by version:
@@ -85,6 +91,14 @@ public readonly record struct RoomSlot(char Kind, int[] Numbers)
 ///
 /// zao's <c>arm.hpp</c> keeps the same fields - his own doodad reader is commented out - and names
 /// the four floats a quaternion. Only the angle is used for the turn; the four are stepped over.
+///
+/// THE GROUND OVERRIDES name a ground type at each inner corner of the grid - the corners between
+/// slots, whose own corner types are mostly nought - line by line in the grid's order. poe_data_tools
+/// reads them and calls them overrides; that is the whole of what is known, so they are read as
+/// written and a type there is taken as the corner's (see RoomFinder). Many rooms have no such line.
+///
+/// THE BOSS LINES carry poe_data_tools' warning: the last of them is often written without its line
+/// end, so whatever follows its quoted strings is the start of the next line, and is read as one.
 ///
 /// THE UNIT OF x AND y IS WRITTEN DOWN NOWHERE. Both are whole numbers, and neither reference says
 /// whether they count the 23 cells of a tile or the 250 world units of one; see RoomModels for how
@@ -120,6 +134,20 @@ public sealed class RoomLayout
 
     /// <summary>Why the slot grid did not read, or empty. A grid that will not read leaves the doodads standing.</summary>
     public string SlotsWhy { get; private init; } = string.Empty;
+
+    /// <summary>
+    /// The ground types the file names at the grid's inner corners, line by line, <see cref="Width"/> - 1 to a line, as string indices from one - empty where the file has no such line; see the class remarks.
+    /// </summary>
+    public IReadOnlyList<int> GroundOverrides { get; private init; } = [];
+
+    /// <summary>Why what follows the doodads did not read as far as the ground overrides, or empty - empty too where the file simply has none.</summary>
+    public string OverridesWhy { get; private init; } = string.Empty;
+
+    /// <summary>The type the file names at an inner grid corner, (1, 1) to (<see cref="Width"/> - 1, <see cref="Height"/> - 1), as a string index from one; nought for none, or outside.</summary>
+    public int OverrideAt(int u, int v)
+        => GroundOverrides.Count == (Width - 1) * (Height - 1) && u >= 1 && u < Width && v >= 1 && v < Height
+            ? GroundOverrides[((v - 1) * (Width - 1)) + u - 1]
+            : 0;
 
     /// <summary>The slot at a column and grid line, line 0 being the file's first and the room's down side.</summary>
     public RoomSlot SlotAt(int column, int line)
@@ -247,6 +275,7 @@ public sealed class RoomLayout
             doodads.Add(Doodad(line, version));
         }
 
+        (int[] overrides, string overridesWhy) = Tail(lines, at, version, width, height);
         return new RoomLayout
         {
             Version = version,
@@ -256,7 +285,122 @@ public sealed class RoomLayout
             Strings = strings,
             Slots = slotsWhy.Length == 0 ? slots : [],
             SlotsWhy = slotsWhy,
+            GroundOverrides = overrides,
+            OverridesWhy = overridesWhy,
         };
+    }
+
+    /// <summary>
+    /// Everything after the doodads, read as far as the ground overrides at the end - the overrides, or none and why.
+    /// </summary>
+    /// <remarks>
+    /// GIVEN UP, NOT THROWN, where it does not read: the grid and the doodads before it are the room,
+    /// and a tail this does not know must not cost them.
+    /// </remarks>
+    private static (int[] Overrides, string Why) Tail(string[] lines, int at, int version, int width, int height)
+    {
+        try
+        {
+            if (version >= 23)
+            {
+                Group(lines, ref at, version);                       // Doodad connections.
+            }
+
+            Group(lines, ref at, version);                           // Decals.
+            if (version >= 22 && BossLines(lines, ref at) is { } carried)
+            {
+                lines = [carried, .. lines.AsSpan(at)];
+                at = 0;
+            }
+
+            if (version >= 27)
+            {
+                Group(lines, ref at, version, terminatedFrom: 33);   // Zones.
+            }
+
+            if (at < lines.Length && Tags(lines[at]))
+            {
+                at++;
+            }
+
+            int inner = (width - 1) * (height - 1);
+            if (at >= lines.Length || inner == 0)
+            {
+                return ([], string.Empty);
+            }
+
+            string[] words = Words(lines[at]);
+            if (words.Length != inner)
+            {
+                return ([], $"the line after the tags holds {words.Length} numbers, where the grid's {inner} inner corners would take {inner}");
+            }
+
+            var overrides = new int[inner];
+            for (var one = 0; one < inner; one++)
+            {
+                overrides[one] = Whole(words[one], "a ground override");
+            }
+
+            return (overrides, string.Empty);
+        }
+        catch (FormatException exception)
+        {
+            return ([], exception.Message);
+        }
+    }
+
+    /// <summary>
+    /// The boss lines: a count, then that many lines of quoted strings - and whatever follows the last one's strings, the next line's start, or null.
+    /// </summary>
+    private static string? BossLines(string[] lines, ref int at)
+    {
+        int count = Whole(Line(lines, ref at), 0, "the boss lines' count");
+        if (count < 0)
+        {
+            throw new FormatException($"the boss lines' count reads {count}");
+        }
+
+        string trailing = string.Empty;
+        for (var one = 0; one < count; one++)
+        {
+            string line = Line(lines, ref at);
+            int position = 0;
+            int quoted = 0;
+            while (true)
+            {
+                while (position < line.Length && char.IsWhiteSpace(line[position]))
+                {
+                    position++;
+                }
+
+                if (position >= line.Length || line[position] != '"')
+                {
+                    break;
+                }
+
+                position = Quoted(line, position).After;
+                quoted++;
+            }
+
+            if (quoted == 0)
+            {
+                throw new FormatException("a boss line with no quoted string");
+            }
+
+            trailing = line[position..].Trim();
+        }
+
+        return trailing.Length > 0 ? trailing : null;
+    }
+
+    /// <summary>Whether a line is the tags: a count, then exactly that many words.</summary>
+    private static bool Tags(string line)
+    {
+        string[] words = Words(line);
+        return words.Length > 0
+            && int.TryParse(words[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out int count)
+            && count >= 0
+            && words.Length == count + 1;
     }
 
     /// <summary>
@@ -321,11 +465,11 @@ public sealed class RoomLayout
         return found == width;
     }
 
-    /// <summary>One group's lines: counted below version 32, ended by a <c>-1</c> line from it.</summary>
-    private static List<string> Group(string[] lines, ref int at, int version)
+    /// <summary>One group's lines: counted below version <paramref name="terminatedFrom"/>, ended by a <c>-1</c> line from it.</summary>
+    private static List<string> Group(string[] lines, ref int at, int version, int terminatedFrom = 32)
     {
         var kept = new List<string>();
-        if (version < 32)
+        if (version < terminatedFrom)
         {
             int count = Whole(Line(lines, ref at), 0, "a group's count");
             if (count < 0)

@@ -1232,15 +1232,37 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         }
 
         // WHERE IT PARTS WITH THE AREA: a red dot on each corner whose ground is not the room's, an
-        // orange ring on each tile whose definition is not what its slot asks for.
-        foreach ((int x, int y) in ghost.Misses.Corners)
+        // orange ring on each tile whose definition is not what its slot asks for - and those a join
+        // explains drawn over in cyan, the same mark a touch larger, so no lookup is needed per mark.
+        // See RoomMisses for what counts as a join.
+        RoomMisses misses = ghost.Misses;
+        foreach ((int x, int y) in misses.Corners)
         {
             draw.AddCircleFilled(Grounded(ghost.Grid, map, player, x * Cells, y * Cells), 3.5f, 0xFF_3030E0);
         }
 
-        foreach ((int x, int y) in ghost.Misses.Tiles)
+        foreach ((int x, int y) in misses.Tiles)
         {
             draw.AddCircle(Grounded(ghost.Grid, map, player, (x * Cells) + (Cells / 2), (y * Cells) + (Cells / 2)), 5f, 0xFF_2090F0, 12, 2f);
+        }
+
+        const uint Joined = 0xFF_E0C030;
+        foreach ((int x, int y) in misses.JoinCorners)
+        {
+            draw.AddCircleFilled(Grounded(ghost.Grid, map, player, x * Cells, y * Cells), 4f, Joined);
+        }
+
+        foreach ((int x, int y) in misses.Openings)
+        {
+            draw.AddCircle(Grounded(ghost.Grid, map, player, (x * Cells) + (Cells / 2), (y * Cells) + (Cells / 2)), 5f, Joined, 12, 2.5f);
+        }
+
+        // A CAP, the tile beside an opening, the same ring with a dot in it.
+        foreach ((int x, int y) in misses.Caps)
+        {
+            Vector2 cap = Grounded(ghost.Grid, map, player, (x * Cells) + (Cells / 2), (y * Cells) + (Cells / 2));
+            draw.AddCircle(cap, 5f, Joined, 12, 2.5f);
+            draw.AddCircleFilled(cap, 1.75f, Joined);
         }
 
         Vector2 middle = (corners[0] + corners[1] + corners[2] + corners[3]) * 0.25f;

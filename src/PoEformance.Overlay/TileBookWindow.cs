@@ -169,6 +169,12 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     private (Task<RoomPlace?> Task, RoomSearch For)? _probing;
     private RoomPlace? _around;
     private string _aroundRow = string.Empty;
+
+    /// <summary>The outlined candidate's misses in words, made once per pick - see <see cref="Parting"/>.</summary>
+    private string[] _partLines = [];
+    private string _partsHeader = "##roomparts";
+    private RoomSearch? _partsOf;
+    private RoomCandidate? _partsFor;
     private RoomSearch? _probedIn;
     private (int X, int Y) _probedAt = (-1, -1);
 
@@ -500,7 +506,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             TileIdentity? Identity(string path) => known.GetOrAdd(path, one => TileIdentity.Of(TileModels.Defined(read, one).Definition));
             bool anywhere = _anywhere;
             _searching = Task.Run(() => RoomFinder.Find(
-                RoomLayout.Read(read(room)), ground, wide, tall, laid, Identity, walkable: anywhere ? null : grid.WalkableTileMask()));
+                RoomLayout.Read(read(room)), ground, wide, tall, laid, Identity, walkable: grid.WalkableTileMask(), anywhere: anywhere));
         }
 
         if (_found is null && _searching is { IsCompleted: true } done)
@@ -509,7 +515,8 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             _rows = new string[_found.Candidates.Count];
             for (var one = 0; one < _rows.Length; one++)
             {
-                _rows[one] = Said(_found.Candidates[one], _found.TileChecked) + string.Create(CultureInfo.InvariantCulture, $"##where{one}");
+                RoomMisses? misses = one < _found.Misses.Count ? _found.Misses[one] : null;
+                _rows[one] = Said(_found.Candidates[one], _found.TileChecked, misses) + string.Create(CultureInfo.InvariantCulture, $"##where{one}");
             }
         }
 
@@ -533,6 +540,12 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             left += string.Create(CultureInfo.InvariantCulture, $"; {found.Free} corners the room leaves unnamed are free");
         }
 
+        left += found.Overrides
+            ? string.Create(CultureInfo.InvariantCulture, $"; {found.Overridden} inner corners named by the file's ground overrides")
+            : found.OverridesWhy.Length > 0
+                ? "; the file's tail did not read: " + found.OverridesWhy
+                : "; no ground overrides in the file";
+
         string standing = found.Standing ? " over walkable ground" : string.Empty;
 
         // THE BEST SHARE SAID OUTRIGHT where nothing fits: a "nearest" agreeing on under half its
@@ -552,6 +565,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         float rows = Math.Min(found.Candidates.Count, 6);
         if (rows == 0)
         {
+            Parting(found);
             return;
         }
 
@@ -580,6 +594,100 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         }
 
         ImGui.EndChild();
+        Parting(found);
+    }
+
+    /// <summary>
+    /// Every place the outlined candidate parts with the area, one line each, with a button to copy them.
+    /// </summary>
+    /// <remarks>
+    /// THE DATA FOR WHAT IS NOT DECODED YET. Each tile names what the room asks for and what was laid,
+    /// whether it can be walked on, the room sides its slot lies on and that slot's edge and exit
+    /// numbers as the file writes them - poe_data_tools names the exit pairs and does not say what
+    /// their values mean, and a join's tiles beside a slot's numbers is how to find out. Worked out
+    /// once per pick, not per frame.
+    /// </remarks>
+    private void Parting(RoomSearch found)
+    {
+        RoomCandidate? picked = _ghosted >= 0 && _ghosted < found.Candidates.Count
+            ? found.Candidates[_ghosted]
+            : _ghosted == GhostAround ? _around?.Where : null;
+        if (picked is not { } candidate)
+        {
+            return;
+        }
+
+        if (!ReferenceEquals(found, _partsOf) || _partsFor != candidate)
+        {
+            _partsOf = found;
+            _partsFor = candidate;
+            IReadOnlyList<RoomPart> parts = found.Parts(candidate);
+            _partLines = new string[parts.Count];
+            for (var one = 0; one < parts.Count; one++)
+            {
+                _partLines[one] = PartSaid(parts[one]);
+            }
+
+            _partsHeader = string.Create(CultureInfo.InvariantCulture,
+                $"where tile {candidate.X}, {candidate.Y} ({RoomFinder.Said(candidate.Turn)}) parts with the area: {parts.Count} misses##roomparts");
+        }
+
+        if (!ImGui.CollapsingHeader(_partsHeader))
+        {
+            return;
+        }
+
+        if (ImGui.SmallButton("copy##roompartscopy"))
+        {
+            ImGui.SetClipboardText(string.Join('\n', _partLines));
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("Copies every line below, to paste where the room's joins are being worked out.");
+        }
+
+        float rows = Math.Clamp(_partLines.Length, 1, 8);
+        if (ImGui.BeginChild("##roomparts", new Vector2(0f, (rows * ImGui.GetTextLineHeightWithSpacing()) + ImGui.GetStyle().FramePadding.Y), ImGuiChildFlags.Borders, ImGuiWindowFlags.HorizontalScrollbar))
+        {
+            foreach (string line in _partLines)
+            {
+                ImGui.TextUnformatted(line);
+            }
+        }
+
+        ImGui.EndChild();
+    }
+
+    /// <summary>One miss in a line's words.</summary>
+    private static string PartSaid(RoomPart part)
+    {
+        string join = part.Join switch
+        {
+            RoomJoin.Opening => "opening",
+            RoomJoin.Cap => "cap",
+            RoomJoin.Corner => "join corner",
+            _ => "elsewhere",
+        };
+        string sides = part.Sides.Length > 0 ? " (" + part.Sides + ")" : string.Empty;
+        if (part.IsCorner)
+        {
+            return string.Create(CultureInfo.InvariantCulture,
+                $"corner {part.X}, {part.Y}  ·  {join}  ·  room corner {part.RoomU}, {part.RoomV}{sides}  ·  wants {part.Wanted}  ·  laid {part.Laid}");
+        }
+
+        var exits = new System.Text.StringBuilder();
+        for (var side = 0; side < part.SideEdges.Count && side < 4; side++)
+        {
+            string edge = part.SideEdges[side].Length > 0 ? Path.GetFileNameWithoutExtension(part.SideEdges[side]) : "-";
+            string pair = (2 * side) + 1 < part.SideExits.Count
+                ? string.Create(CultureInfo.InvariantCulture, $"{part.SideExits[2 * side]}/{part.SideExits[(2 * side) + 1]}")
+                : "?";
+            exits.Append(CultureInfo.InvariantCulture, $" {"DRUL"[side]}:{edge} {pair}");
+        }
+
+        return string.Create(CultureInfo.InvariantCulture,
+            $"tile {part.X}, {part.Y}  ·  {join}  ·  slot {part.RoomU}, {part.RoomV}{sides}  ·  {(part.Walkable ? "walkable" : "not walkable")}  ·  wants {part.Wanted}  ·  laid {part.Laid}  ·  slot sides{exits}");
     }
 
     /// <summary>What a candidate row's figures mean.</summary>
@@ -587,18 +695,24 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         + "Tiles: each of the room's slots against the tile laid where it falls - size, tag, edge and ground types, whichever way round.\n"
         + "Big: the slots bigger than one tile, which the ground leaves out and which make a room this room.\n"
         + "Places are ranked by their tiles, then their corners: where a room lies, the area lays its own tiles along the sides it joins the map by.\n"
-        + "On the map, red dots are corners that disagree and orange rings tiles that do.";
+        + "On the map, red dots are corners that disagree and orange rings tiles that do; cyan marks the ones at a join -"
+        + " a ring for a rim tile turned to walkable ground with walkable ground beyond it, a ring with a dot for a miss beside it,"
+        + " and a dot for its corners.\n"
+        + "Joins: how many such runs; off elsewhere: the misses no join explains.";
 
-    /// <summary>A candidate in a row's words.</summary>
-    private static string Said(RoomCandidate where, bool tileChecked)
+    /// <summary>A candidate in a row's words, with how its misses fall where they were sorted into joins.</summary>
+    private static string Said(RoomCandidate where, bool tileChecked, RoomMisses? misses)
     {
         string tiles = !tileChecked
             ? string.Empty
             : where.Big > 0
                 ? string.Create(CultureInfo.InvariantCulture, $"  ·  tiles {where.TilesAgree}/{where.Tiles}, big {where.BigAgree}/{where.Big}")
                 : string.Create(CultureInfo.InvariantCulture, $"  ·  tiles {where.TilesAgree}/{where.Tiles}");
+        string joins = misses is { Classified: true } sorted
+            ? string.Create(CultureInfo.InvariantCulture, $"  ·  joins {sorted.Joins}, {sorted.Elsewhere} off elsewhere")
+            : string.Empty;
         return string.Create(CultureInfo.InvariantCulture,
-            $"tile {where.X}, {where.Y}  ·  {RoomFinder.Said(where.Turn)}  ·  {where.Matched}/{where.Corners} corners ({Share(where)}%){tiles}");
+            $"tile {where.X}, {where.Y}  ·  {RoomFinder.Said(where.Turn)}  ·  {where.Matched}/{where.Corners} corners ({Share(where)}%){tiles}{joins}");
     }
 
     /// <summary>
@@ -623,7 +737,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             if (ReferenceEquals(done.For, found))
             {
                 _around = done.Task.IsCompletedSuccessfully ? done.Task.Result : null;
-                _aroundRow = _around is { } scored ? "around you: " + Said(scored.Where, found.TileChecked) + "##wherearound" : string.Empty;
+                _aroundRow = _around is { } scored ? "around you: " + Said(scored.Where, found.TileChecked, scored.Misses) + "##wherearound" : string.Empty;
                 if (_ghosted == GhostAround)
                 {
                     Ghost?.Invoke(_around is { } moved ? new RoomGhost(grid, room, moved.Where, moved.Misses) : null);
