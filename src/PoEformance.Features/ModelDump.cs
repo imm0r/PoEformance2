@@ -174,11 +174,17 @@ public static class ModelDump
             said.AppendLine(arm is { Length: > 0 } ? StatDescriptionFiles.Decode(arm).TrimEnd() : "(not in the install)");
         }
 
-        // A MODEL THAT DID NOT LOAD is dumped as far as its own file and its reason - which is what the
-        // question is about when nothing drew.
+        // A MODEL THAT DID NOT LOAD is dumped as far as its own files and its reason - which is what the
+        // question is about when nothing drew. A room's own file is above; a tile's are below.
         if (!model.Ready)
         {
-            return said.AppendLine().Append("did not load: ").AppendLine(model.Why).ToString();
+            said.AppendLine().Append("did not load: ").AppendLine(model.Why);
+            if (!room)
+            {
+                Unloaded(read, path, said);
+            }
+
+            return said.ToString();
         }
 
         // DRAWN AS A TILESET, the materials below are the ones it swapped in - say so first, or the
@@ -429,12 +435,107 @@ public static class ModelDump
         Tilesets(read, Slashed(path), tilesets, names, own, printed, said);
     }
 
-    /// <summary>A ground mesh in one line: its size, and where its coordinates and positions lie.</summary>
-    private static string Spread(SkinnedMesh mesh)
+    /// <summary>Most sub-tiles printed for a tile that did not load; a template is allowed far more.</summary>
+    private const int MostSubTileLines = 256;
+
+    /// <summary>
+    /// A tile that drew nothing, file by file: its definitions, its templates, and what each sub-tile's mesh holds.
+    /// </summary>
+    /// <remarks>
+    /// "THE SUB-TILES HOLD NO GEOMETRY" IS A VERDICT, NOT AN ANSWER. It says every file read and
+    /// none carried a mesh, and the raft's meta_tile.tdt said it with nothing behind it, because
+    /// the dump stopped at the reason. Whether such a tile is a placeholder, names files this
+    /// reader does not follow, or keeps its geometry somewhere this reader skips is in the files,
+    /// so they are printed: every definition along the inheritance and every template verbatim,
+    /// and per sub-tile its mesh's size, version, opening bytes and what each block came to.
+    /// </remarks>
+    private static void Unloaded(Func<string, byte[]?> read, string path, StringBuilder said)
+    {
+        var hops = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        string at = Slashed(path);
+        TileDefinition definition = TileDefinition.None;
+        while (hops.Add(at) && hops.Count <= MostHops)
+        {
+            said.AppendLine().Append("=== .tdt ").AppendLine(at);
+            said.AppendLine(Text(read, at));
+            definition = TileDefinition.Read(read(at));
+            if (!definition.Ready || definition.Inherits.Length == 0)
+            {
+                break;
+            }
+
+            at = Slashed(definition.Inherits);
+        }
+
+        if (!definition.Ready)
+        {
+            said.Append("the definition did not read: ").Append(at).Append(" - ").AppendLine(definition.Why);
+            return;
+        }
+
+        int printed = 0;
+        foreach (string template in definition.Templates)
+        {
+            byte[]? raw = read(Slashed(template));
+            said.AppendLine().Append("=== .tgt ").AppendLine(template);
+            said.AppendLine(raw is { Length: > 0 } ? Trimmed(StatDescriptionFiles.Decode(raw)) : "(not in the install)");
+
+            TileTemplate layout = TileTemplate.Read(raw);
+            if (!layout.Ready)
+            {
+                said.Append("the template did not read: ").AppendLine(layout.Why);
+                continue;
+            }
+
+            said.AppendLine().Append("=== sub-tiles of ").Append(template).Append(" (")
+                .Append(Say(layout.Width)).Append('x').Append(Say(layout.Height)).AppendLine(")");
+            for (var y = 1; y <= layout.Height; y++)
+            {
+                for (var x = 1; x <= layout.Width; x++)
+                {
+                    if (printed++ == MostSubTileLines)
+                    {
+                        said.AppendLine("  (the rest left out)");
+                    }
+
+                    if (printed > MostSubTileLines)
+                    {
+                        continue;
+                    }
+
+                    string mesh = layout.MeshOf(x, y);
+                    said.Append("  c").Append(Say(x)).Append('r').Append(Say(y)).Append(' ')
+                        .AppendLine(mesh.Length > 0 ? mesh : "(no mesh named)");
+                    byte[]? bytes = mesh.Length > 0 ? read(Slashed(mesh)) : null;
+                    if (bytes is not { Length: > 0 })
+                    {
+                        said.AppendLine("    (not in the install)");
+                        continue;
+                    }
+
+                    TileMesh part = TileMesh.Read(bytes);
+                    said.Append("    ").Append(Say(bytes.Length)).Append(" bytes · version ").Append(Say(part.Version))
+                        .Append(part.Exact ? " · the walk ends at the end of the file" : " · the walk does not end at the end of the file")
+                        .AppendLine(part.Ready ? string.Empty : " · did not read: " + part.Why);
+                    said.Append("    opening bytes: ").AppendLine(Convert.ToHexString(bytes, 0, Math.Min(bytes.Length, 48)));
+                    said.Append("    props: ").AppendLine(Spread(part.Props, "none"));
+                    if (part.Props.Ready)
+                    {
+                        Facts(said, "      ", part.Props.Facts);
+                    }
+
+                    said.Append("    ground: ").AppendLine(Spread(part.Ground));
+                }
+            }
+        }
+    }
+
+    /// <summary>A mesh in one line: its size, and where its coordinates and positions lie.</summary>
+    private static string Spread(SkinnedMesh mesh, string empty = "no ground")
     {
         if (!mesh.Ready)
         {
-            return "no ground";
+            return empty;
         }
 
         var line = new StringBuilder();
