@@ -32,11 +32,12 @@ namespace PoEformance.Features;
 /// whole, with a material naming it - the graph most held-back terrain materials name, where any
 /// does - which is what deciding one needs to read.
 ///
-/// AND HOW OFTEN THE BLEND RULE MATTERS. Where two of a material's graphs name a blend mode, nothing
-/// says which stands, and the picture can be drawn either way ("blend: first" or "last" - see
-/// MonsterModel.LastModes). Every material's two answers are worked out by the picture's own walk
-/// (MonsterModels.Paints.Modes) and counted where they differ - by name, and by what is drawn - so
-/// whether the switch is worth keeping is a number rather than a feeling.
+/// AND HOW OFTEN THE BLEND RULE MATTERS. Where two of a material's graphs name a blend mode, no
+/// file says which stands; the picture draws the last (see MonsterModels.Paints.Modes for why).
+/// Every material's two answers are worked out by the picture's own walk and counted where they
+/// differ - by name, and by what is drawn - so what that rule decides is a number rather than a
+/// feeling. The first run is why there is no longer a switch for it: 3,459 materials of 112,255
+/// drew differently, nearly all effects and microtransactions, and terrain almost never.
 /// </remarks>
 public static class GraphSurvey
 {

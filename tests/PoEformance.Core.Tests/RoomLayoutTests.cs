@@ -238,10 +238,16 @@ public class RoomLayoutTests
             return got;
         }
 
-        MonsterModel model = RoomModels.Of(Read, "Metadata/Terrain/Woods/Rooms/Clearing.arm");
+        var progress = new ModelProgress();
+        MonsterModel model = RoomModels.Of(Read, "Metadata/Terrain/Woods/Rooms/Clearing.arm", progress: progress);
 
         Assert.True(model.Ready, model.Why);
         Assert.Equal(2, model.Skins.Count);
+
+        // THE BAR FOLLOWED THE DOODADS, the outermost step - each doodad's own painting inside it did not count.
+        Assert.Equal("laying the doodads", progress.Stage);
+        Assert.True(progress.Total > 0);
+        Assert.Equal(progress.Total, progress.Done);
         Assert.NotNull(model.Skins[0]);
         Assert.Same(model.Skins[0], model.Skins[1]);
         Assert.Equal(1, handed.Count(one => one == "art/rock.dds"));
@@ -249,6 +255,9 @@ public class RoomLayoutTests
 
         // AND EACH SHAPE'S COLOUR MAP IS CARRIED, so the dump names it rather than "tex -".
         Assert.Equal(["art/rock.dds", "art/rock.dds"], model.ShapeTextures);
+
+        // AND WHAT EACH SHAPE CAME FROM, so the probe can name the doodad under a pixel.
+        Assert.Equal(["Metadata/Doodads/Rock.ao", "Metadata/Doodads/Tree.ao"], model.ShapeSources);
     }
 
     [Fact]

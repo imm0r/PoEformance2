@@ -19,42 +19,49 @@ internal sealed class ModelPile
 
     public List<string> Modes { get; } = [];
 
-    public List<string> LastModes { get; } = [];
-
     public List<string> Wearing { get; } = [];
 
     public List<string> Textures { get; } = [];
+
+    /// <summary>What each shape came from - see MonsterModel.ShapeSources.</summary>
+    public List<string> Sources { get; } = [];
 
     /// <summary>Triangles laid so far.</summary>
     public long Triangles { get; private set; }
 
     /// <summary>A painted model, placed.</summary>
-    public void Add(MonsterModel model, Matrix4x4 place)
+    /// <param name="model">The model.</param>
+    /// <param name="place">Where it goes.</param>
+    /// <param name="source">What it came from, for every one of its shapes.</param>
+    public void Add(MonsterModel model, Matrix4x4 place, string source)
     {
         Joins.Add(new MeshJoin(model.Mesh, null, null, place));
         for (var shape = 0; shape < model.Mesh.Shapes.Count; shape++)
         {
             Skins.Add(shape < model.Skins.Count ? model.Skins[shape] : model.Skin);
             Modes.Add(shape < model.Modes.Count ? model.Modes[shape] : string.Empty);
-            LastModes.Add(shape < model.LastModes.Count ? model.LastModes[shape] : Modes[^1]);
             Wearing.Add(shape < model.ShapeMaterials.Count ? model.ShapeMaterials[shape] : string.Empty);
             Textures.Add(shape < model.ShapeTextures.Count ? model.ShapeTextures[shape] : string.Empty);
+            Sources.Add(source);
         }
 
         Triangles += model.Mesh.Triangles;
     }
 
     /// <summary>An unpainted mesh, placed.</summary>
-    public void AddPlain(SkinnedMesh mesh, Matrix4x4 place)
+    /// <param name="mesh">The mesh.</param>
+    /// <param name="place">Where it goes.</param>
+    /// <param name="source">What it came from, for every one of its shapes.</param>
+    public void AddPlain(SkinnedMesh mesh, Matrix4x4 place, string source)
     {
         Joins.Add(new MeshJoin(mesh, null, null, place));
         for (var shape = 0; shape < mesh.Shapes.Count; shape++)
         {
             Skins.Add(null);
             Modes.Add(string.Empty);
-            LastModes.Add(string.Empty);
             Wearing.Add(string.Empty);
             Textures.Add(string.Empty);
+            Sources.Add(source);
         }
 
         Triangles += mesh.Triangles;

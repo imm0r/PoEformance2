@@ -85,6 +85,7 @@ public static class TileModels
     /// a piece several tiles across keeps its shape. The point is the template's origin, which moves
     /// the picture but not the tile - the pane frames on the model's own box.
     /// </param>
+    /// <param name="progress">Where the build says how far it has got, or null - see <see cref="ModelProgress"/>.</param>
     public static MonsterModel Of(
         Func<string, byte[]?>? read,
         string? path,
@@ -93,7 +94,8 @@ public static class TileModels
         bool shaded = false,
         IReadOnlyDictionary<string, string>? swaps = null,
         string tileset = "",
-        TileOrientation laid = default)
+        TileOrientation laid = default,
+        ModelProgress? progress = null)
     {
         if (read is null)
         {
@@ -105,7 +107,7 @@ public static class TileModels
             return MonsterModel.None with { Why = "no tile to read" };
         }
 
-        return Built(read, path, ground, walls, shaded, swaps, tileset, laid, paints: null, apart: false).Model;
+        return Built(read, path, ground, walls, shaded, swaps, tileset, laid, new MonsterModels.Paints { Progress = progress }, apart: false).Model;
     }
 
     /// <summary>
@@ -174,9 +176,12 @@ public static class TileModels
         int subTiles = 0;
         Matrix4x4? turn = Turned(laid);
 
-        foreach (string template in definition.Templates)
+        // THE TEMPLATES READ FIRST, so the bar knows how many sub-tiles there are before the first is read.
+        (string Path, TileTemplate Layout)[] layouts = [.. definition.Templates.Select(one => (one, TileTemplate.Read(Counted(one))))];
+        int expected = layouts.Sum(one => one.Layout.Ready && one.Layout.Width * one.Layout.Height <= MostSubTiles ? one.Layout.Width * one.Layout.Height : 0);
+        ModelProgress.Step reading = ModelProgress.Begin(paints?.Progress, "reading the sub-tiles", expected);
+        foreach ((string template, TileTemplate layout) in layouts)
         {
-            TileTemplate layout = TileTemplate.Read(Counted(template));
             if (!layout.Ready)
             {
                 said.Add($"the template did not read: {template} - {layout.Why}");
@@ -198,6 +203,7 @@ public static class TileModels
                 {
                     string mesh = layout.MeshOf(x, y);
                     TileMesh part = TileMesh.Read(Counted(mesh));
+                    reading.Advance();
                     if (!part.Ready)
                     {
                         said.Add($"the sub-tile did not read: {mesh} - {part.Why}");
@@ -225,6 +231,8 @@ public static class TileModels
                 }
             }
         }
+
+        reading.Dispose();
 
         // THE GROUND AFTER THE PROPS, so the props' shapes keep the numbers the runs gave them and
         // every ground shape comes after - unnamed, and so unpainted. Or apart, where asked.
@@ -345,7 +353,6 @@ public static class TileModels
         var shapes = new MeshShape[kept];
         var skins = new Mipmaps?[kept];
         var modes = new string[kept];
-        var lastModes = new string[kept];
         var materials = new string[kept];
         var painted = new string[kept];
         Vector3[] positions = mesh.Positions;
@@ -374,7 +381,6 @@ public static class TileModels
             shapes[next] = part with { From = at, Count = length };
             skins[next] = model.Skins[shape];
             modes[next] = model.Modes[shape];
-            lastModes[next] = shape < model.LastModes.Count ? model.LastModes[shape] : model.Modes[shape];
             materials[next] = shape < model.ShapeMaterials.Count ? model.ShapeMaterials[shape] : string.Empty;
             painted[next] = textures[shape];
             at += length;
@@ -396,7 +402,6 @@ public static class TileModels
         {
             Skins = skins,
             Modes = modes,
-            LastModes = lastModes,
             Materials = model.Materials,
             BodyLeast = least,
             BodyMost = most,

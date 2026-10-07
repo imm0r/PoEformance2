@@ -287,6 +287,9 @@ public sealed class MonsterPortrait
     private string _shown = string.Empty;
     private string _wanted = string.Empty;
     private Task<MonsterModel>? _loading;
+
+    /// <summary>How far the running load has got - see <see cref="Building"/>.</summary>
+    private ModelProgress? _progress;
     private MonsterModel _model = MonsterModel.None;
 
     private IntPtr _texture;
@@ -556,9 +559,9 @@ public sealed class MonsterPortrait
     /// draws a terrain tile instead - a .tdt, not an .ao - and everything after the load is the
     /// same: the camera, the floor, the turning, the export. Handed the install, the variety the
     /// caller drew with, the key it drew under and whether attachments are wanted; run on the
-    /// thread pool like the walk it replaces.
+    /// thread pool like the walk it replaces, with where to say how far it has got - see ModelProgress.
     /// </remarks>
-    public Func<Func<string, byte[]?>, MonsterVariety, string, bool, MonsterModel>? Load { get; set; }
+    public Func<Func<string, byte[]?>, MonsterVariety, string, bool, ModelProgress, MonsterModel>? Load { get; set; }
 
     /// <summary>
     /// Whether the line under the picture names the shader graphs the model's materials use.
@@ -597,7 +600,7 @@ public sealed class MonsterPortrait
     /// </summary>
     private IReadOnlyList<MaterialBlend>? Blends()
     {
-        IReadOnlyList<MaterialBlend> all = LastBlend ? _model.LastBlends : _model.Blends;
+        IReadOnlyList<MaterialBlend> all = _model.Blends;
         if (Translucent)
         {
             return all;
@@ -627,35 +630,7 @@ public sealed class MonsterPortrait
     private IReadOnlyList<MaterialBlend>? _maskedOf;
     private IReadOnlyList<MaterialBlend>? _masked;
 
-    /// <summary>
-    /// Whether a material whose graphs name two blend modes is drawn with the last one's rather than the first's - see MonsterModel.LastModes.
-    /// </summary>
-    /// <remarks>
-    /// A CHOICE BECAUSE NOTHING SAYS WHICH STANDS. The first stays the usual, being what every
-    /// picture so far was drawn with; the button beside the rate turns it, and
-    /// <see cref="LastBlendChanged"/> carries the choice to every book and the settings.
-    /// </remarks>
-    public bool LastBlend
-    {
-        get => _lastBlend;
-        set
-        {
-            if (_lastBlend != value)
-            {
-                _lastBlend = value;
-
-                // THE LINE UNDER THE PICTURE NAMES THE MODES, so it follows the choice.
-                Said();
-            }
-        }
-    }
-
-    private bool _lastBlend;
-
-    /// <summary>Told when the blend button is pressed, with the new choice.</summary>
-    public Action<bool>? LastBlendChanged { get; set; }
-
-    /// <summary>The blends the last picture was drawn with, compared by reference - a press of the blend button redraws.</summary>
+    /// <summary>The blends the last picture was drawn with, compared by reference - a turn of the translucency switches redraws.</summary>
     private IReadOnlyList<MaterialBlend>? _drawnBlends;
 
     /// <summary>
@@ -907,10 +882,15 @@ public sealed class MonsterPortrait
 
         if (_texture == IntPtr.Zero)
         {
-            ImGui.TextDisabled(
-                _loading is { IsCompleted: false }
-                    ? "reading the model…"
-                    : Why.Length > 0 ? ImGuiText.Escape(Why) : "no model");
+            if (_loading is { IsCompleted: false })
+            {
+                Building(wide);
+            }
+            else
+            {
+                ImGui.TextDisabled(Why.Length > 0 ? ImGuiText.Escape(Why) : "no model");
+            }
+
             if (_cost.Length > 0)
             {
                 ImGui.TextDisabled(_cost);
@@ -990,6 +970,14 @@ public sealed class MonsterPortrait
 
         _held = held;
 
+        // A CLICK, NOT A DRAG, PROBES THE PIXEL UNDER IT while probing - see PictureProbe. As a share
+        // of the picture, because the next drawing may be at another rung than this one.
+        if (_probing && ImGui.IsItemDeactivated() && ImGui.GetMouseDragDelta(ImGuiMouseButton.Left) == Vector2.Zero && side > 0f)
+        {
+            _probeAt = (ImGui.GetMousePos() - corner) / side;
+            _probeAsked = true;
+        }
+
         // EVERYTHING THAT ASKS ABOUT "THE ITEM" ASKS BEFORE THE NEXT ITEM IS SUBMITTED, because
         // ImGui answers for the last item and that would then be the orbit button: the wheel's
         // owner is claimed on the picture, not on a button in its corner.
@@ -1016,12 +1004,13 @@ public sealed class MonsterPortrait
             _cornered = false;
             ClockToggle(corner);
             LightToggle(corner);
-            BlendToggle(corner);
+            ProbeToggle(corner);
         }
 
         ImGui.SetCursorScreenPos(below);
         Shots();
         Status();
+        Probed();
     }
 
     /// <summary>The redraw rate as the pane shows it, made again only when the number changes - it is asked every frame.</summary>
@@ -1113,52 +1102,101 @@ public sealed class MonsterPortrait
     }
 
     /// <summary>
-    /// The blend button beside the others, where a material of the model names two blend modes: the first graph's or the last's.
+    /// What the load is doing while it runs: the step, how far into it, for how long - and a bar for the step.
     /// </summary>
-    private void BlendToggle(Vector2 corner)
+    /// <remarks>
+    /// "READING THE MODEL" SAID ONE THING FOR SECONDS, and a room takes seconds: whether it was still
+    /// working or had quietly failed was a guess, and "reading" was not even what it was doing for most
+    /// of them - it is building. The seconds move every frame whatever the step, so a stalled build and
+    /// a slow one look different; the bar follows the step the build is on - see ModelProgress.
+    /// </remarks>
+    private void Building(float wide)
     {
-        if (!HasTwoBlends())
+        ModelProgress? progress = _progress;
+        ImGui.TextDisabled(progress is null ? "building the model…" : ImGuiText.Escape(progress.Said()));
+        if (progress is { Total: > 0 })
         {
-            return;
+            ImGui.ProgressBar(progress.Fraction, new Vector2(Math.Min(wide, ImGui.GetContentRegionAvail().X), 0f), string.Empty);
         }
+    }
 
+    /// <summary>
+    /// The probe button beside the others: while it is on, a click on the picture lists what that pixel is made of, and every drawing counts how its translucent layers came out.
+    /// </summary>
+    /// <remarks>
+    /// A DIAGNOSIS ASKED FOR, NOT A FEATURE LEFT RUNNING: off, a drawing does not look at either. See
+    /// PictureProbe for what it answers, and MeshPicture's PixelProbe for how it is recorded.
+    /// </remarks>
+    private void ProbeToggle(Vector2 corner)
+    {
         Cornered(corner);
-        if (ImGui.SmallButton(LastBlend ? "blend: last##monster-blend" : "blend: first##monster-blend"))
+        if (ImGui.SmallButton(_probing ? "probe: on##monster-probe" : "probe##monster-probe"))
         {
-            LastBlend = !LastBlend;
-            LastBlendChanged?.Invoke(LastBlend);
+            _probing = !_probing;
+            _probeAt = null;
+            _probeLines = [];
+            _layerLines = [];
+
+            // DRAWN AGAIN AT ONCE, so the layers' lines are there without waiting for a turn.
+            _probeAsked = _probing;
         }
 
         if (ImGui.IsItemHovered())
         {
-            ImGui.SetTooltip("A material of this model names a blend mode in more than one of its graphs, and nothing says which stands.\n"
-                + "First: the first graph to name one wins - what every picture was drawn with before.\n"
-                + "Last: the last one wins - the later graphs seen so far are all called Force-something, which reads like an override.\n"
-                + "The dump's shapes list shows both where they differ.");
+            ImGui.SetTooltip("Click the picture to list every surface under that pixel, nearest first: material, blend,\n"
+                + "what drew it, where it came from, and for a mixed layer how far in front of the solid behind it lies and its alpha.\n"
+                + "While on, every drawing also counts how each translucent material came out over the whole picture.\n"
+                + "\"copy probe\" puts the lines on the clipboard.");
         }
     }
 
-    /// <summary>Whether a shape of the model has a different blend mode under the two readings. Worked out once per model.</summary>
-    private bool HasTwoBlends()
+    /// <summary>The probe's lines under the picture, with a button that copies them - see <see cref="ProbeToggle"/>.</summary>
+    private void Probed()
     {
-        if (!ReferenceEquals(_twoBlendsOf, _model))
+        if (!_probing)
         {
-            _twoBlendsOf = _model;
-            _twoBlends = false;
-            IReadOnlyList<string> first = _model.Modes;
-            IReadOnlyList<string> last = _model.LastModes;
-            for (var one = 0; one < first.Count && one < last.Count && !_twoBlends; one++)
-            {
-                _twoBlends = !string.Equals(first[one], last[one], StringComparison.OrdinalIgnoreCase);
-            }
+            return;
         }
 
-        return _twoBlends;
+        if (!ReferenceEquals(_probedModel, _model) || (_probeLines.Count == 0 && _layerLines.Count == 0))
+        {
+            ImGuiText.Wrapped(OverlayInk.Quiet, "probe: click the picture to see what that pixel is made of");
+            return;
+        }
+
+        if (ImGui.SmallButton("copy probe##monster-probe-copy"))
+        {
+            ImGui.SetClipboardText(string.Join('\n', _probeLines.Concat(_layerLines)));
+        }
+
+        foreach (string line in _probeLines)
+        {
+            ImGuiText.Wrapped(OverlayInk.Quiet, ImGuiText.Escape(line));
+        }
+
+        foreach (string line in _layerLines)
+        {
+            ImGuiText.Wrapped(OverlayInk.Quiet, ImGuiText.Escape(line));
+        }
     }
 
-    /// <summary>The model <see cref="_twoBlends"/> was worked out for.</summary>
-    private MonsterModel? _twoBlendsOf;
-    private bool _twoBlends;
+    /// <summary>Whether the probe is on - see <see cref="ProbeToggle"/>.</summary>
+    private bool _probing;
+
+    /// <summary>Where the last click probed, as a share of the picture from its top left, or null.</summary>
+    private Vector2? _probeAt;
+
+    /// <summary>Whether the next frame draws the picture whole for the probe, whether or not anything moved.</summary>
+    private bool _probeAsked;
+
+    /// <summary>What the drawings count the translucent layers into, while probing. One for the pane, reused.</summary>
+    private readonly LayerTally _tally = new();
+
+    /// <summary>The model the probe's lines are about, so a new one does not show the last one's.</summary>
+    private MonsterModel? _probedModel;
+
+    private IReadOnlyList<string> _probeLines = [];
+    private IReadOnlyList<string> _layerLines = [];
 
     /// <summary>Whether a button already sits in the picture's corner row this frame - see <see cref="Cornered"/>.</summary>
     private bool _cornered;
@@ -1252,7 +1290,7 @@ public sealed class MonsterPortrait
             // SHORTER THAN THE BOOK'S, and deliberately so: this pane is a line of a page about
             // something else, and a model that will not read must not push the components down
             // the screen with a paragraph. The Monster Book is where the reason is spelled out.
-            ImGui.TextDisabled(_loading is { IsCompleted: false } ? "reading the model…" : "no model");
+            ImGui.TextDisabled(_loading is { IsCompleted: false } ? "building the model…" : "no model");
             return;
         }
 
@@ -2103,7 +2141,7 @@ public sealed class MonsterPortrait
 
         // THE RAW MODE AND WHAT IT IS TAKEN TO MEAN, side by side, and called a guess - the rule
         // reading the word is chosen, not measured. See MaterialBlends.
-        string[] modes = [.. (LastBlend && _model.LastModes.Count > 0 ? _model.LastModes : _model.Modes)
+        string[] modes = [.. _model.Modes
             .Where(one => one.Length > 0).Distinct(StringComparer.OrdinalIgnoreCase)];
         _blend = ShowShaders && modes.Length > 0
             ? "blend (guessed from the word): " + ImGuiText.Escape(string.Join(", ",
@@ -2310,10 +2348,12 @@ public sealed class MonsterPortrait
         bool wearing = Parts;
         _dressed = wearing;
         bool shaded = Shaded;
-        Func<Func<string, byte[]?>, MonsterVariety, string, bool, MonsterModel>? load = Load;
+        Func<Func<string, byte[]?>, MonsterVariety, string, bool, ModelProgress, MonsterModel>? load = Load;
+        var progress = new ModelProgress();
+        _progress = progress;
         _loading = load is null
-            ? Task.Run(() => MonsterModels.Of(read, one, wearing, shaded))
-            : Task.Run(() => load(read, one, path, wearing));
+            ? Task.Run(() => MonsterModels.Of(read, one, wearing, shaded, progress))
+            : Task.Run(() => load(read, one, path, wearing, progress));
     }
 
     /// <summary>Takes a finished load, and re-renders when anything it depends on moved.</summary>
@@ -2373,7 +2413,8 @@ public sealed class MonsterPortrait
             || _drawnGrey != Greyed
             || !ReferenceEquals(_drawnShades, ShadesOf(_model))
             || !ReferenceEquals(_drawnBlends, Blends())
-            || (posed && (_drawnFrame != _frame || _drawnAnimation != _chosen));
+            || (posed && (_drawnFrame != _frame || _drawnAnimation != _chosen))
+            || _probeAsked;
 
         if (moved)
         {
@@ -2725,21 +2766,24 @@ public sealed class MonsterPortrait
             // them into the image straight away - so nothing here outlives the next redraw.
             GamePicture drawn;
             float lowest;
+            MeshPicture.Canvas canvas = Probing(Clocked(Canvas(size)), size);
             if (posed && _pose is not null && _tracks is not null)
             {
                 _pose.Take(_tracks, _frame);
                 _pose.Move(_model.Mesh, _posed, _posedNormals);
                 lowest = Lowest(_posed);
                 drawn = MeshPicture.Of(
-                    _model.Mesh, Clocked(Canvas(size)), _posed, _posedNormals, _turn, _tilt, Ink,
+                    _model.Mesh, canvas, _posed, _posedNormals, _turn, _tilt, Ink,
                     _model.Skin, _zoom, _pan, _model.Skins, Blends(), ShadesOf(_model));
             }
             else
             {
                 lowest = _model.Mesh.Most.Z;
                 drawn = MeshPicture.Of(
-                    _model.Mesh, Clocked(Canvas(size)), _turn, _tilt, Ink, _model.Skin, _zoom, _pan, _model.Skins, Blends(), ShadesOf(_model));
+                    _model.Mesh, canvas, _turn, _tilt, Ink, _model.Skin, _zoom, _pan, _model.Skins, Blends(), ShadesOf(_model));
             }
+
+            Probed(canvas);
 
             _rate.Redrawn(ImGui.GetTime());
             Planted(lowest);
@@ -2949,8 +2993,8 @@ public sealed class MonsterPortrait
             if (ImGui.IsItemHovered())
             {
                 ImGui.SetTooltip("Reads every material in the install and writes which graph nodes keep the most of them"
-                    + " from being coloured by their graphs, ranked, and how often \"blend: first\" and \"last\" draw a material"
-                    + " differently - " + GraphSurvey.File + " beside the dumps, with "
+                    + " from being coloured by their graphs, ranked, and how often a material's first and last blend modes"
+                    + " draw it differently - " + GraphSurvey.File + " beside the dumps, with "
                     + GraphSurvey.ExamplesFile + ": a whole graph for each thing a graph reads from the vertex side. Takes a while.");
             }
         }
@@ -3266,6 +3310,45 @@ public sealed class MonsterPortrait
     {
         canvas.Time = _clock;
         return canvas;
+    }
+
+    /// <summary>The canvas with the probe's pixel and the layers' tally set where the probe is on, and neither where not.</summary>
+    /// <remarks>
+    /// THE ASK IS LET GO OF HERE, BEFORE THE DRAWING, so a picture that fails to draw is not asked
+    /// for again on every frame - the same reason Render records what it draws before drawing it.
+    /// </remarks>
+    private MeshPicture.Canvas Probing(MeshPicture.Canvas canvas, int size)
+    {
+        canvas.Tally = _probing ? _tally : null;
+        canvas.Probe = _probing && _probeAsked && _probeAt is { } at
+            ? new PixelProbe((int)MathF.Floor(at.X * size), (int)MathF.Floor(at.Y * size))
+            : null;
+        _probeAsked = false;
+        return canvas;
+    }
+
+    /// <summary>Turns what a probing drawing recorded into the lines under the picture, and lets go of the probe.</summary>
+    private void Probed(MeshPicture.Canvas canvas)
+    {
+        if (!_probing)
+        {
+            return;
+        }
+
+        IReadOnlyList<ShadeProgram?>? shades = ShadesOf(_model);
+        if (!ReferenceEquals(_probedModel, _model))
+        {
+            _probedModel = _model;
+            _probeLines = [];
+        }
+
+        if (canvas.Probe is { Drawn: true } probe)
+        {
+            _probeLines = PictureProbe.Lines(probe, _model, shades);
+        }
+
+        _layerLines = PictureProbe.Layers(_tally, _model, shades);
+        canvas.Probe = null;
     }
 
     /// <summary>

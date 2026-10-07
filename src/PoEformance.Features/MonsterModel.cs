@@ -231,6 +231,8 @@ public sealed record MonsterModel(
     /// <remarks>
     /// THE RAW WORD, kept beside <see cref="Blends"/>, because what it is taken to mean is a rule on
     /// words that the first real effect may prove wrong - see MaterialBlends.
+    ///
+    /// WHERE TWO GRAPHS NAME ONE, THE LAST STANDS - see Paints.Modes for why.
     /// </remarks>
     public IReadOnlyList<string> Modes { get; init; } = [];
 
@@ -238,24 +240,6 @@ public sealed record MonsterModel(
     public IReadOnlyList<MaterialBlend> Blends => _blends ??= [.. Modes.Select(MaterialBlends.Of)];
 
     private MaterialBlend[]? _blends;
-
-    /// <summary>
-    /// Each shape's blend mode where the LAST of its material's graphs to name one wins - empty where no walk worked it out, and <see cref="Modes"/> stands.
-    /// </summary>
-    /// <remarks>
-    /// THE OTHER READING, KEPT BESIDE THE FIRST. A material whose graphs name two modes says nothing
-    /// about which stands. Every one of the four seen so far names the second in a graph called
-    /// Force-something - VertexColourToAlbedo's "Opaque" then ForceAlphaBlendNoGI's
-    /// "AlphaBlendNoGI" on the deserted room's walk blocker - which reads like an override, but no
-    /// reference says so. So both are worked out and the picture is drawn with whichever is chosen;
-    /// see Paints.Modes.
-    /// </remarks>
-    public IReadOnlyList<string> LastModes { get; init; } = [];
-
-    /// <summary>How each shape is drawn where the last graph's mode wins, from <see cref="LastModes"/>; <see cref="Blends"/> where that is empty.</summary>
-    public IReadOnlyList<MaterialBlend> LastBlends => LastModes.Count == 0 ? Blends : _lastBlends ??= [.. LastModes.Select(MaterialBlends.Of)];
-
-    private MaterialBlend[]? _lastBlends;
 
     /// <summary>
     /// How many <c>.sm</c> files the body itself is, before anything worn over it.
@@ -290,6 +274,15 @@ public sealed record MonsterModel(
 
     /// <summary>Each shape's colour texture, by path - empty where none was found. See <see cref="ShapeMaterials"/>.</summary>
     public IReadOnlyList<string> ShapeTextures { get; init; } = [];
+
+    /// <summary>
+    /// What each shape of a room came from - a doodad's <c>.ao</c>, a tile piece's file, the ground under it - or empty where the model is not a room.
+    /// </summary>
+    /// <remarks>
+    /// FOR THE PROBE, which names what is under a pixel: a material says what a surface is painted
+    /// with, and the same mud is worn by a tile, a doodad and a pile of rubble. See MeshPicture's PixelProbe.
+    /// </remarks>
+    public IReadOnlyList<string> ShapeSources { get; init; } = [];
 
     /// <summary>How many of a tile's black-wall shapes were left out. See TileModels.BlackWall.</summary>
     public int Walls { get; init; }
@@ -406,7 +399,8 @@ public static class MonsterModels
     /// Whether each shape's material's shader graphs are read and compiled - see <see cref="Shaded"/>.
     /// Off gives exactly the model this returned before graphs were read.
     /// </param>
-    public static MonsterModel Of(Func<string, byte[]?>? read, MonsterVariety? one, bool wearing = true, bool shaded = false)
+    /// <param name="progress">Where the build says how far it has got, or null - see <see cref="ModelProgress"/>.</param>
+    public static MonsterModel Of(Func<string, byte[]?>? read, MonsterVariety? one, bool wearing = true, bool shaded = false, ModelProgress? progress = null)
     {
         if (read is null)
         {
@@ -421,13 +415,9 @@ public static class MonsterModels
             };
         }
 
-        if (!shaded)
-        {
-            return OfFiles(read, named, wearing);
-        }
-
-        var paints = new Paints();
-        return Shaded(read, OfFiles(read, named, wearing, paints), paints);
+        var paints = new Paints { Progress = progress };
+        MonsterModel model = OfFiles(read, named, wearing, paints);
+        return shaded ? Shaded(read, model, paints) : model;
     }
 
     /// <summary>
@@ -477,8 +467,10 @@ public static class MonsterModels
         var drawn = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var clocked = new List<string>();
         var unshaded = new List<string>();
+        using ModelProgress.Step step = ModelProgress.Begin(paints.Progress, "compiling the shader graphs", count);
         for (var shape = 0; shape < count; shape++)
         {
+            step.Advance();
             string material = wearing[shape];
             if (material.Length == 0 || MaterialFile.SelectorOf(material) >= 0)
             {
@@ -685,14 +677,9 @@ public static class MonsterModels
             // THE MODES RIDE WITH THE SKINS, padded to each piece's own shape count so the two lists
             // stay aligned however short a piece's came back.
             List<string> modes = [.. Padded(dress.Modes, dress.Skins.Count), .. parts.SelectMany(one => Padded(one.Modes, one.Skins.Count))];
-            List<string> lastModes =
-            [
-                .. Padded(dress.LastModes, dress.Skins.Count),
-                .. parts.SelectMany(one => Padded(one.LastModes.Count > 0 ? one.LastModes : one.Modes, one.Skins.Count)),
-            ];
             List<string> wears = [.. Padded(dress.ShapeMaterials, dress.Skins.Count), .. parts.SelectMany(one => Padded(one.Wearing, one.Skins.Count))];
             mesh = SkinnedMesh.Joined(join);
-            dress = dress with { Skins = worn, Modes = modes, LastModes = lastModes, ShapeMaterials = wears };
+            dress = dress with { Skins = worn, Modes = modes, ShapeMaterials = wears };
         }
 
         return new MonsterModel(mesh, skin, manifest.Geometry, material, string.Empty, paint)
@@ -705,7 +692,6 @@ public static class MonsterModels
             BodyFacts = facts,
             Skins = dress.Skins,
             Modes = dress.Modes,
-            LastModes = dress.LastModes,
             Materials = dress.Materials,
             NamedInAo = found.Materials.Count,
             NamedInMesh = manifest.Materials.Count,
@@ -818,7 +804,6 @@ public static class MonsterModels
             BodyFacts = mesh.Facts,
             Skins = dress.Skins,
             Modes = dress.Modes,
-            LastModes = dress.LastModes,
             Materials = dress.Materials,
             NamedInAo = named.Count,
             Runs = dress.Runs,
@@ -845,9 +830,6 @@ public static class MonsterModels
     {
         /// <summary>Each of its shapes' materials as written - see MonsterModel.ShapeMaterials.</summary>
         public IReadOnlyList<string> Wearing { get; init; } = [];
-
-        /// <summary>Each of its shapes' blend modes where the last graph wins - see MonsterModel.LastModes.</summary>
-        public IReadOnlyList<string> LastModes { get; init; } = [];
     }
 
     /// <summary>The entry keys whose value is another .ao. From the format diagram; see AoSurvey.</summary>
@@ -912,7 +894,7 @@ public static class MonsterModels
 
             // NO BONES AND NO PLACE: the section's own vertex bones index the body's rig
             // already, so handing null keeps them and the join leaves the geometry where it is.
-            parts.Add(new Part(mesh, null, null, null, dress.Skins, dress.Modes) { Wearing = dress.ShapeMaterials, LastModes = dress.LastModes });
+            parts.Add(new Part(mesh, null, null, null, dress.Skins, dress.Modes) { Wearing = dress.ShapeMaterials });
         }
 
         return parts;
@@ -1597,12 +1579,12 @@ public static class MonsterModels
         {
             // NO PLACE: the correction already carries wherever the piece belongs, because a
             // socketed piece's own bind cancels down to exactly its socket's transform.
-            var worn = new Part(Corrected(mesh, map.Into), map.Bones, mesh.Weights, null, dress.Skins, dress.Modes) { Wearing = dress.ShapeMaterials, LastModes = dress.LastModes };
+            var worn = new Part(Corrected(mesh, map.Into), map.Bones, mesh.Weights, null, dress.Skins, dress.Modes) { Wearing = dress.ShapeMaterials };
             return (worn, map.Under, Told(hung, where, PartKind.Skin, counted, worn));
         }
 
         (byte[] bones, byte[] weights) = Bound(mesh.Positions.Length, bone);
-        var rigid = new Part(mesh, bones, weights, place, dress.Skins, dress.Modes) { Wearing = dress.ShapeMaterials, LastModes = dress.LastModes };
+        var rigid = new Part(mesh, bones, weights, place, dress.Skins, dress.Modes) { Wearing = dress.ShapeMaterials };
         return (rigid, body, Told(hung, where, PartKind.Rigid, counted, rigid));
     }
 
@@ -1913,7 +1895,7 @@ public static class MonsterModels
         Dress dress = Dressed(
             read, prop.Mesh, prop.Named, MeshManifest.None, fallback, string.Empty, paints);
         (byte[] bones, byte[] weights) = Bound(prop.Mesh.Positions.Length, bone);
-        return new Part(prop.Mesh, bones, weights, place, dress.Skins, dress.Modes) { Wearing = dress.ShapeMaterials, LastModes = dress.LastModes };
+        return new Part(prop.Mesh, bones, weights, place, dress.Skins, dress.Modes) { Wearing = dress.ShapeMaterials };
     }
 
     /// <summary>
@@ -2338,12 +2320,13 @@ public static class MonsterModels
 
         var skins = new Mipmaps?[mesh.Shapes.Count];
         var modes = new string[mesh.Shapes.Count];
-        var lastModes = new string[mesh.Shapes.Count];
         var wearing = new string[mesh.Shapes.Count];
         var painted = new string[mesh.Shapes.Count];
         var used = new List<string>();
+        using ModelProgress.Step step = ModelProgress.Begin(paints.Progress, "painting the shapes", mesh.Shapes.Count);
         for (var shape = 0; shape < mesh.Shapes.Count; shape++)
         {
+            step.Advance();
             // AS WRITTEN, colon and all. The number picks a graph INSIDE the material, one
             // per shape - see MaterialFile.Graphs - so two shapes naming the same file are
             // two different textures and the cache has to tell them apart by the whole
@@ -2355,11 +2338,10 @@ public static class MonsterModels
             {
                 skins[shape] = fallback;
                 modes[shape] = string.Empty;
-                lastModes[shape] = string.Empty;
                 continue;
             }
 
-            (modes[shape], lastModes[shape]) = paints.Modes(read, wants);
+            modes[shape] = paints.Modes(read, wants).Last;
 
             (Mipmaps? worn, _, string texture, bool said) = Colour(read, mesh, wants, paints);
             painted[shape] = worn is not null ? texture : string.Empty;
@@ -2389,7 +2371,6 @@ public static class MonsterModels
         {
             Runs = spread.Count > 0,
             Modes = modes,
-            LastModes = lastModes,
             ShapeMaterials = wearing,
             ShapeTextures = painted,
         };
@@ -2411,9 +2392,6 @@ public static class MonsterModels
 
         /// <summary>Each shape's material blend mode, raw - see MonsterModel.Modes.</summary>
         public IReadOnlyList<string> Modes { get; init; } = [];
-
-        /// <summary>The same where the last graph wins - see MonsterModel.LastModes.</summary>
-        public IReadOnlyList<string> LastModes { get; init; } = [];
 
         /// <summary>Each shape's material as written - see MonsterModel.ShapeMaterials.</summary>
         public IReadOnlyList<string> ShapeMaterials { get; init; } = [];
@@ -2571,6 +2549,10 @@ public static class MonsterModels
     /// <summary>What has already been read, so nothing is read or decoded twice.</summary>
     internal sealed class Paints
     {
+        /// <summary>Where the build this cache serves says how far it has got, or null - see <see cref="ModelProgress"/>.</summary>
+        /// <remarks>ON THE CACHE because the cache is the one thing every step of a build is handed already.</remarks>
+        public ModelProgress? Progress { get; init; }
+
         /// <summary>Material file by its path, with the selector taken off.</summary>
         public Dictionary<string, MaterialFile> Files { get; } = new(StringComparer.OrdinalIgnoreCase);
 
@@ -2581,19 +2563,23 @@ public static class MonsterModels
         private readonly Dictionary<string, string> _graphs = new(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
-        /// The blend mode a material asks for, as it spells it, or empty - where the first graph to name one wins.
-        /// </summary>
-        public string Mode(Func<string, byte[]?> read, string material) => Modes(read, material).First;
-
-        /// <summary>
         /// The blend mode a material asks for, as it spells it, or empty: where the first graph to name one wins, and where the last does.
         /// </summary>
         /// <remarks>
         /// THE MATERIAL'S OWN WORD FIRST - its defaultgraph's overriden_blend_mode - in both readings,
         /// and the graphs it is an instance of after it: zao's reader puts the member on both, and the
-        /// nearer file is the one that overrides, as everywhere else in this walk. Which of two graphs
-        /// naming a mode stands is NOT written down anywhere, so both answers are given - see
-        /// MonsterModel.LastModes. Every graph is read for the second, once each through the cache.
+        /// nearer file is the one that overrides, as everywhere else in this walk.
+        ///
+        /// THE PICTURE DRAWS THE LAST. Which of two graphs naming a mode stands is written down
+        /// nowhere, and for a while both were drawable behind a switch. What decided it is the files:
+        /// every ground layer of seepage's offices names AlphaBlend in its contact-fade graph and then
+        /// ForceNoZWriteAlphaBlend AFTER it, and the deserted room's walk blocker names Opaque and then
+        /// ForceAlphaBlendNoGI. Under "the first stands" every one of those Force graphs would be dead
+        /// weight. That is a reading of how the files are written, not the engine's code, so the first
+        /// is still worked out: the graph survey counts where the two differ (3,459 of 112,255
+        /// materials the first time it ran, nearly all effects and microtransactions, terrain almost
+        /// never - which is why switching never changed a tile). Every graph is read for the second,
+        /// once each through the cache.
         /// </remarks>
         public (string First, string Last) Modes(Func<string, byte[]?> read, string material)
         {
