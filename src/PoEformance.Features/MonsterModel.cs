@@ -240,6 +240,24 @@ public sealed record MonsterModel(
     private MaterialBlend[]? _blends;
 
     /// <summary>
+    /// Each shape's blend mode where the LAST of its material's graphs to name one wins - empty where no walk worked it out, and <see cref="Modes"/> stands.
+    /// </summary>
+    /// <remarks>
+    /// THE OTHER READING, KEPT BESIDE THE FIRST. A material whose graphs name two modes says nothing
+    /// about which stands. Every one of the four seen so far names the second in a graph called
+    /// Force-something - VertexColourToAlbedo's "Opaque" then ForceAlphaBlendNoGI's
+    /// "AlphaBlendNoGI" on the deserted room's walk blocker - which reads like an override, but no
+    /// reference says so. So both are worked out and the picture is drawn with whichever is chosen;
+    /// see Paints.Modes.
+    /// </remarks>
+    public IReadOnlyList<string> LastModes { get; init; } = [];
+
+    /// <summary>How each shape is drawn where the last graph's mode wins, from <see cref="LastModes"/>; <see cref="Blends"/> where that is empty.</summary>
+    public IReadOnlyList<MaterialBlend> LastBlends => LastModes.Count == 0 ? Blends : _lastBlends ??= [.. LastModes.Select(MaterialBlends.Of)];
+
+    private MaterialBlend[]? _lastBlends;
+
+    /// <summary>
     /// How many <c>.sm</c> files the body itself is, before anything worn over it.
     /// </summary>
     /// <remarks>
@@ -667,9 +685,14 @@ public static class MonsterModels
             // THE MODES RIDE WITH THE SKINS, padded to each piece's own shape count so the two lists
             // stay aligned however short a piece's came back.
             List<string> modes = [.. Padded(dress.Modes, dress.Skins.Count), .. parts.SelectMany(one => Padded(one.Modes, one.Skins.Count))];
+            List<string> lastModes =
+            [
+                .. Padded(dress.LastModes, dress.Skins.Count),
+                .. parts.SelectMany(one => Padded(one.LastModes.Count > 0 ? one.LastModes : one.Modes, one.Skins.Count)),
+            ];
             List<string> wears = [.. Padded(dress.ShapeMaterials, dress.Skins.Count), .. parts.SelectMany(one => Padded(one.Wearing, one.Skins.Count))];
             mesh = SkinnedMesh.Joined(join);
-            dress = dress with { Skins = worn, Modes = modes, ShapeMaterials = wears };
+            dress = dress with { Skins = worn, Modes = modes, LastModes = lastModes, ShapeMaterials = wears };
         }
 
         return new MonsterModel(mesh, skin, manifest.Geometry, material, string.Empty, paint)
@@ -682,6 +705,7 @@ public static class MonsterModels
             BodyFacts = facts,
             Skins = dress.Skins,
             Modes = dress.Modes,
+            LastModes = dress.LastModes,
             Materials = dress.Materials,
             NamedInAo = found.Materials.Count,
             NamedInMesh = manifest.Materials.Count,
@@ -794,6 +818,7 @@ public static class MonsterModels
             BodyFacts = mesh.Facts,
             Skins = dress.Skins,
             Modes = dress.Modes,
+            LastModes = dress.LastModes,
             Materials = dress.Materials,
             NamedInAo = named.Count,
             Runs = dress.Runs,
@@ -820,6 +845,9 @@ public static class MonsterModels
     {
         /// <summary>Each of its shapes' materials as written - see MonsterModel.ShapeMaterials.</summary>
         public IReadOnlyList<string> Wearing { get; init; } = [];
+
+        /// <summary>Each of its shapes' blend modes where the last graph wins - see MonsterModel.LastModes.</summary>
+        public IReadOnlyList<string> LastModes { get; init; } = [];
     }
 
     /// <summary>The entry keys whose value is another .ao. From the format diagram; see AoSurvey.</summary>
@@ -884,7 +912,7 @@ public static class MonsterModels
 
             // NO BONES AND NO PLACE: the section's own vertex bones index the body's rig
             // already, so handing null keeps them and the join leaves the geometry where it is.
-            parts.Add(new Part(mesh, null, null, null, dress.Skins, dress.Modes) { Wearing = dress.ShapeMaterials });
+            parts.Add(new Part(mesh, null, null, null, dress.Skins, dress.Modes) { Wearing = dress.ShapeMaterials, LastModes = dress.LastModes });
         }
 
         return parts;
@@ -1569,12 +1597,12 @@ public static class MonsterModels
         {
             // NO PLACE: the correction already carries wherever the piece belongs, because a
             // socketed piece's own bind cancels down to exactly its socket's transform.
-            var worn = new Part(Corrected(mesh, map.Into), map.Bones, mesh.Weights, null, dress.Skins, dress.Modes) { Wearing = dress.ShapeMaterials };
+            var worn = new Part(Corrected(mesh, map.Into), map.Bones, mesh.Weights, null, dress.Skins, dress.Modes) { Wearing = dress.ShapeMaterials, LastModes = dress.LastModes };
             return (worn, map.Under, Told(hung, where, PartKind.Skin, counted, worn));
         }
 
         (byte[] bones, byte[] weights) = Bound(mesh.Positions.Length, bone);
-        var rigid = new Part(mesh, bones, weights, place, dress.Skins, dress.Modes) { Wearing = dress.ShapeMaterials };
+        var rigid = new Part(mesh, bones, weights, place, dress.Skins, dress.Modes) { Wearing = dress.ShapeMaterials, LastModes = dress.LastModes };
         return (rigid, body, Told(hung, where, PartKind.Rigid, counted, rigid));
     }
 
@@ -1885,7 +1913,7 @@ public static class MonsterModels
         Dress dress = Dressed(
             read, prop.Mesh, prop.Named, MeshManifest.None, fallback, string.Empty, paints);
         (byte[] bones, byte[] weights) = Bound(prop.Mesh.Positions.Length, bone);
-        return new Part(prop.Mesh, bones, weights, place, dress.Skins, dress.Modes) { Wearing = dress.ShapeMaterials };
+        return new Part(prop.Mesh, bones, weights, place, dress.Skins, dress.Modes) { Wearing = dress.ShapeMaterials, LastModes = dress.LastModes };
     }
 
     /// <summary>
@@ -2310,6 +2338,7 @@ public static class MonsterModels
 
         var skins = new Mipmaps?[mesh.Shapes.Count];
         var modes = new string[mesh.Shapes.Count];
+        var lastModes = new string[mesh.Shapes.Count];
         var wearing = new string[mesh.Shapes.Count];
         var painted = new string[mesh.Shapes.Count];
         var used = new List<string>();
@@ -2326,10 +2355,11 @@ public static class MonsterModels
             {
                 skins[shape] = fallback;
                 modes[shape] = string.Empty;
+                lastModes[shape] = string.Empty;
                 continue;
             }
 
-            modes[shape] = paints.Mode(read, wants);
+            (modes[shape], lastModes[shape]) = paints.Modes(read, wants);
 
             (Mipmaps? worn, _, string texture, bool said) = Colour(read, mesh, wants, paints);
             painted[shape] = worn is not null ? texture : string.Empty;
@@ -2359,6 +2389,7 @@ public static class MonsterModels
         {
             Runs = spread.Count > 0,
             Modes = modes,
+            LastModes = lastModes,
             ShapeMaterials = wearing,
             ShapeTextures = painted,
         };
@@ -2380,6 +2411,9 @@ public static class MonsterModels
 
         /// <summary>Each shape's material blend mode, raw - see MonsterModel.Modes.</summary>
         public IReadOnlyList<string> Modes { get; init; } = [];
+
+        /// <summary>The same where the last graph wins - see MonsterModel.LastModes.</summary>
+        public IReadOnlyList<string> LastModes { get; init; } = [];
 
         /// <summary>Each shape's material as written - see MonsterModel.ShapeMaterials.</summary>
         public IReadOnlyList<string> ShapeMaterials { get; init; } = [];
@@ -2540,24 +2574,31 @@ public static class MonsterModels
         /// <summary>Material file by its path, with the selector taken off.</summary>
         public Dictionary<string, MaterialFile> Files { get; } = new(StringComparer.OrdinalIgnoreCase);
 
-        /// <summary>Blend mode by material file, worked out once. See <see cref="Mode"/>.</summary>
-        private readonly Dictionary<string, string> _modes = new(StringComparer.OrdinalIgnoreCase);
+        /// <summary>Blend modes by material file, the first graph's and the last's, worked out once. See <see cref="Modes"/>.</summary>
+        private readonly Dictionary<string, (string First, string Last)> _modes = new(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>A shader graph's own blend mode by its path, read once however many materials name it.</summary>
         private readonly Dictionary<string, string> _graphs = new(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
-        /// The blend mode a material asks for, as it spells it, or empty.
+        /// The blend mode a material asks for, as it spells it, or empty - where the first graph to name one wins.
+        /// </summary>
+        public string Mode(Func<string, byte[]?> read, string material) => Modes(read, material).First;
+
+        /// <summary>
+        /// The blend mode a material asks for, as it spells it, or empty: where the first graph to name one wins, and where the last does.
         /// </summary>
         /// <remarks>
-        /// THE MATERIAL'S OWN WORD FIRST - its defaultgraph's overriden_blend_mode - and the graph it is
-        /// an instance of second: the first parent that names one. zao's reader puts the member on
-        /// both, and the nearer file is the one that overrides, as everywhere else in this walk.
+        /// THE MATERIAL'S OWN WORD FIRST - its defaultgraph's overriden_blend_mode - in both readings,
+        /// and the graphs it is an instance of after it: zao's reader puts the member on both, and the
+        /// nearer file is the one that overrides, as everywhere else in this walk. Which of two graphs
+        /// naming a mode stands is NOT written down anywhere, so both answers are given - see
+        /// MonsterModel.LastModes. Every graph is read for the second, once each through the cache.
         /// </remarks>
-        public string Mode(Func<string, byte[]?> read, string material)
+        public (string First, string Last) Modes(Func<string, byte[]?> read, string material)
         {
             string file = MaterialFile.Bare(material);
-            if (_modes.TryGetValue(file, out string? known))
+            if (_modes.TryGetValue(file, out (string, string) known))
             {
                 return known;
             }
@@ -2568,30 +2609,33 @@ public static class MonsterModels
                 Files[file] = paint;
             }
 
-            string mode = paint.Blend;
-            foreach (string parent in paint.Parents)
+            string first = paint.Blend;
+            string last = paint.Blend;
+            if (paint.Blend.Length == 0)
             {
-                if (mode.Length > 0)
+                foreach (string parent in paint.Parents)
                 {
-                    break;
-                }
+                    if (parent.Length == 0)
+                    {
+                        continue;
+                    }
 
-                if (parent.Length == 0)
-                {
-                    continue;
-                }
+                    if (!_graphs.TryGetValue(parent, out string? graph))
+                    {
+                        graph = MaterialFile.GraphBlend(read(parent.Replace('\\', '/').Trim()));
+                        _graphs[parent] = graph;
+                    }
 
-                if (!_graphs.TryGetValue(parent, out string? graph))
-                {
-                    graph = MaterialFile.GraphBlend(read(parent.Replace('\\', '/').Trim()));
-                    _graphs[parent] = graph;
+                    if (graph.Length > 0)
+                    {
+                        first = first.Length > 0 ? first : graph;
+                        last = graph;
+                    }
                 }
-
-                mode = graph;
             }
 
-            _modes[file] = mode;
-            return mode;
+            _modes[file] = (first, last);
+            return (first, last);
         }
 
         /// <summary>Every parent graph the read materials name, distinct. See MonsterModel.Shaders.</summary>

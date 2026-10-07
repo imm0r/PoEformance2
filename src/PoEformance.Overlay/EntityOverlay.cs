@@ -552,6 +552,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             ModelLight = _monsterBook?.Model?.Light ?? basis.ModelLight,
             ModelLightTarget = _monsterBook?.Model?.LightTarget ?? basis.ModelLightTarget,
             ModelFlatLight = _modelWants.ModelFlatLight,
+            ModelLastBlend = _modelWants.ModelLastBlend,
             ShowProjectiles = _projectiles.Enabled,
             ProjectileTrails = _projectiles.ShowTrails,
             ProjectilePaths = _projectiles.ShowPaths,
@@ -780,16 +781,37 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         pane.FlatLightChanged = flat =>
         {
             _modelWants = _modelWants with { ModelFlatLight = flat };
-            foreach (MonsterPortrait? other in (MonsterPortrait?[])[_monsterBook?.Model, _itemBook?.Model, _tileBook?.Model, _effectBook?.Model])
+            foreach (MonsterPortrait other in Panes())
             {
-                if (other is not null)
-                {
-                    other.FlatLight = flat;
-                }
+                other.FlatLight = flat;
             }
 
             SettingsChanged?.Invoke();
         };
+
+        pane.LastBlend = _modelWants.ModelLastBlend;
+        pane.LastBlendChanged = last =>
+        {
+            _modelWants = _modelWants with { ModelLastBlend = last };
+            foreach (MonsterPortrait other in Panes())
+            {
+                other.LastBlend = last;
+            }
+
+            SettingsChanged?.Invoke();
+        };
+    }
+
+    /// <summary>Every book's model pane that is attached.</summary>
+    private IEnumerable<MonsterPortrait> Panes()
+    {
+        foreach (MonsterPortrait? one in (MonsterPortrait?[])[_monsterBook?.Model, _itemBook?.Model, _tileBook?.Model, _effectBook?.Model])
+        {
+            if (one is not null)
+            {
+                yield return one;
+            }
+        }
     }
 
     /// <summary>

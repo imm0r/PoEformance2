@@ -298,6 +298,9 @@ public static class ModelDump
                 .Append("	mat ").Append(one < materials.Count && materials[one].Length > 0 ? materials[one] : "-")
                 .Append("	tex ").Append(one < textures.Count && textures[one].Length > 0 ? textures[one] : "-")
                 .Append("	blend ").Append(one < modes.Count && modes[one].Length > 0 ? modes[one] : "-")
+                .Append(one < model.LastModes.Count && one < modes.Count && !string.Equals(model.LastModes[one], modes[one], StringComparison.OrdinalIgnoreCase)
+                    ? " (last graph's: " + (model.LastModes[one].Length > 0 ? model.LastModes[one] : "-") + ")"
+                    : string.Empty)
                 .Append("	graphs ").Append(one < model.Shades.Count && model.Shades[one] is not null ? "program" : "-")
                 .AppendLine(one < model.GlossShades.Count && model.GlossShades[one] is { HasGloss: true } ? " · glossy" : string.Empty);
         }

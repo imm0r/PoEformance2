@@ -1684,6 +1684,44 @@ public class MonsterModelTests
         Assert.Null(shaded.GlossShades[0]);
     }
 
+    /// <summary>
+    /// A material whose graphs name two blend modes is read both ways: the first graph's, as before, and the last's beside it.
+    /// </summary>
+    /// <remarks>
+    /// VertexColourTransparentc.mat from the deserted 1open_01 dump, cut to its blend: VertexColourToAlbedo
+    /// says "Opaque", ForceAlphaBlendNoGI after it "AlphaBlendNoGI". Which stands is not written down,
+    /// so the model carries both and the picture draws whichever is chosen. A material's own word
+    /// stands in both readings.
+    /// </remarks>
+    [Fact]
+    public void AMATERIALNamingTwoBlendModesIsReadBothWays()
+    {
+        var install = new Fake();
+        install.Files["art/blocker.fmt"] = Packed.Fmt("art/blocker.mat");
+        install.Files["art/blocker.mat"] = Encoding.UTF8.GetBytes(
+            """{"version":4,"graphinstances":[{"parent":"Metadata/Materials/VertexColourToAlbedo.fxgraph"},{"parent":"Metadata/Effects/Graphs/General/ForceAlphaBlendNoGI.fxgraph"}]}""");
+        install.Files["Metadata/Materials/VertexColourToAlbedo.fxgraph"] = Encoding.UTF8.GetBytes("""{"version":3,"overriden_blend_mode":"Opaque","nodes":[]}""");
+        install.Files["Metadata/Effects/Graphs/General/ForceAlphaBlendNoGI.fxgraph"] = Encoding.UTF8.GetBytes("""{"version":3,"overriden_blend_mode":"AlphaBlendNoGI"}""");
+
+        MonsterModel model = MonsterModels.OfFiles(install.Read, ["art/blocker.fmt"]);
+
+        Assert.True(model.Ready, model.Why);
+        Assert.Equal(["Opaque"], model.Modes);
+        Assert.Equal(["AlphaBlendNoGI"], model.LastModes);
+        Assert.Equal([MaterialBlend.Opaque], model.Blends);
+        Assert.Equal([MaterialBlend.Alpha], model.LastBlends);
+
+        string dump = ModelDump.OfTile(install.Read, "Metadata/Terrain/Test/Blocker.tdt", model);
+        Assert.Contains("blend Opaque (last graph's: AlphaBlendNoGI)", dump, StringComparison.Ordinal);
+
+        // THE MATERIAL'S OWN WORD STANDS EITHER WAY.
+        install.Files["art/blocker.mat"] = Encoding.UTF8.GetBytes(
+            """{"version":4,"defaultgraph":{"overriden_blend_mode":"AlphaTestWithShadow"},"graphinstances":[{"parent":"Metadata/Materials/VertexColourToAlbedo.fxgraph"},{"parent":"Metadata/Effects/Graphs/General/ForceAlphaBlendNoGI.fxgraph"}]}""");
+        MonsterModel own = MonsterModels.OfFiles(install.Read, ["art/blocker.fmt"]);
+        Assert.Equal(["AlphaTestWithShadow"], own.Modes);
+        Assert.Equal(["AlphaTestWithShadow"], own.LastModes);
+    }
+
     /// <summary>The skin still wins wherever there is one, so no monster changes.</summary>
     [Fact]
     public void ANDASkinStillWinsOverAPropWhereTheChainNamesBoth()

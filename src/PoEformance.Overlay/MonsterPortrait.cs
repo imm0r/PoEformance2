@@ -597,9 +597,10 @@ public sealed class MonsterPortrait
     /// </summary>
     private IReadOnlyList<MaterialBlend>? Blends()
     {
+        IReadOnlyList<MaterialBlend> all = LastBlend ? _model.LastBlends : _model.Blends;
         if (Translucent)
         {
-            return _model.Blends;
+            return all;
         }
 
         if (!Masked)
@@ -607,11 +608,10 @@ public sealed class MonsterPortrait
             return null;
         }
 
-        // Worked out once per model: the picture asks on every redraw, and a drag is many of those.
-        if (!ReferenceEquals(_maskedOf, _model))
+        // Worked out once per list: the picture asks on every redraw, and a drag is many of those.
+        if (!ReferenceEquals(_maskedOf, all))
         {
-            _maskedOf = _model;
-            IReadOnlyList<MaterialBlend> all = _model.Blends;
+            _maskedOf = all;
             var kept = new MaterialBlend[all.Count];
             for (var one = 0; one < kept.Length; one++)
             {
@@ -624,8 +624,39 @@ public sealed class MonsterPortrait
         return _masked;
     }
 
-    private MonsterModel? _maskedOf;
+    private IReadOnlyList<MaterialBlend>? _maskedOf;
     private IReadOnlyList<MaterialBlend>? _masked;
+
+    /// <summary>
+    /// Whether a material whose graphs name two blend modes is drawn with the last one's rather than the first's - see MonsterModel.LastModes.
+    /// </summary>
+    /// <remarks>
+    /// A CHOICE BECAUSE NOTHING SAYS WHICH STANDS. The first stays the usual, being what every
+    /// picture so far was drawn with; the button beside the rate turns it, and
+    /// <see cref="LastBlendChanged"/> carries the choice to every book and the settings.
+    /// </remarks>
+    public bool LastBlend
+    {
+        get => _lastBlend;
+        set
+        {
+            if (_lastBlend != value)
+            {
+                _lastBlend = value;
+
+                // THE LINE UNDER THE PICTURE NAMES THE MODES, so it follows the choice.
+                Said();
+            }
+        }
+    }
+
+    private bool _lastBlend;
+
+    /// <summary>Told when the blend button is pressed, with the new choice.</summary>
+    public Action<bool>? LastBlendChanged { get; set; }
+
+    /// <summary>The blends the last picture was drawn with, compared by reference - a press of the blend button redraws.</summary>
+    private IReadOnlyList<MaterialBlend>? _drawnBlends;
 
     /// <summary>
     /// Whether a material's colour is worked out from its shader graphs where they say more than a texture.
@@ -982,8 +1013,10 @@ public sealed class MonsterPortrait
         if (_pose is null || !_model.Moves)
         {
             Rate(draw, corner);
+            _cornered = false;
             ClockToggle(corner);
             LightToggle(corner);
+            BlendToggle(corner);
         }
 
         ImGui.SetCursorScreenPos(below);
@@ -1042,8 +1075,7 @@ public sealed class MonsterPortrait
             return;
         }
 
-        float inset = ImGui.GetStyle().ItemSpacing.X;
-        ImGui.SetCursorScreenPos(new Vector2(corner.X + (inset * 2f) + ImGui.CalcTextSize(RateRoom).X, corner.Y + inset));
+        Cornered(corner);
         if (ImGui.SmallButton(_playing ? "Pause##monster-clock" : "Play##monster-clock"))
         {
             _playing = !_playing;
@@ -1064,16 +1096,7 @@ public sealed class MonsterPortrait
             return;
         }
 
-        if (HasClock())
-        {
-            ImGui.SameLine();
-        }
-        else
-        {
-            float inset = ImGui.GetStyle().ItemSpacing.X;
-            ImGui.SetCursorScreenPos(new Vector2(corner.X + (inset * 2f) + ImGui.CalcTextSize(RateRoom).X, corner.Y + inset));
-        }
-
+        Cornered(corner);
         if (ImGui.SmallButton(FlatLight ? "flat light##monster-light" : "game light##monster-light"))
         {
             FlatLight = !FlatLight;
@@ -1087,6 +1110,71 @@ public sealed class MonsterPortrait
                 + " Reads the gloss texture and works out a lobe per pixel.\n"
                 + "Flat light: what the specular colour has past a dielectric's 0.04 is laid onto the albedo and shaded with it. Cheaper.");
         }
+    }
+
+    /// <summary>
+    /// The blend button beside the others, where a material of the model names two blend modes: the first graph's or the last's.
+    /// </summary>
+    private void BlendToggle(Vector2 corner)
+    {
+        if (!HasTwoBlends())
+        {
+            return;
+        }
+
+        Cornered(corner);
+        if (ImGui.SmallButton(LastBlend ? "blend: last##monster-blend" : "blend: first##monster-blend"))
+        {
+            LastBlend = !LastBlend;
+            LastBlendChanged?.Invoke(LastBlend);
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("A material of this model names a blend mode in more than one of its graphs, and nothing says which stands.\n"
+                + "First: the first graph to name one wins - what every picture was drawn with before.\n"
+                + "Last: the last one wins - the later graphs seen so far are all called Force-something, which reads like an override.\n"
+                + "The dump's shapes list shows both where they differ.");
+        }
+    }
+
+    /// <summary>Whether a shape of the model has a different blend mode under the two readings. Worked out once per model.</summary>
+    private bool HasTwoBlends()
+    {
+        if (!ReferenceEquals(_twoBlendsOf, _model))
+        {
+            _twoBlendsOf = _model;
+            _twoBlends = false;
+            IReadOnlyList<string> first = _model.Modes;
+            IReadOnlyList<string> last = _model.LastModes;
+            for (var one = 0; one < first.Count && one < last.Count && !_twoBlends; one++)
+            {
+                _twoBlends = !string.Equals(first[one], last[one], StringComparison.OrdinalIgnoreCase);
+            }
+        }
+
+        return _twoBlends;
+    }
+
+    /// <summary>The model <see cref="_twoBlends"/> was worked out for.</summary>
+    private MonsterModel? _twoBlendsOf;
+    private bool _twoBlends;
+
+    /// <summary>Whether a button already sits in the picture's corner row this frame - see <see cref="Cornered"/>.</summary>
+    private bool _cornered;
+
+    /// <summary>Puts the next corner button beside the rate, or beside the button before it.</summary>
+    private void Cornered(Vector2 corner)
+    {
+        if (_cornered)
+        {
+            ImGui.SameLine();
+            return;
+        }
+
+        float inset = ImGui.GetStyle().ItemSpacing.X;
+        ImGui.SetCursorScreenPos(new Vector2(corner.X + (inset * 2f) + ImGui.CalcTextSize(RateRoom).X, corner.Y + inset));
+        _cornered = true;
     }
 
     /// <summary>The room the rate is given, three digits wide, so the button beside it does not shuffle as the number changes.</summary>
@@ -2015,7 +2103,8 @@ public sealed class MonsterPortrait
 
         // THE RAW MODE AND WHAT IT IS TAKEN TO MEAN, side by side, and called a guess - the rule
         // reading the word is chosen, not measured. See MaterialBlends.
-        string[] modes = [.. _model.Modes.Where(one => one.Length > 0).Distinct(StringComparer.OrdinalIgnoreCase)];
+        string[] modes = [.. (LastBlend && _model.LastModes.Count > 0 ? _model.LastModes : _model.Modes)
+            .Where(one => one.Length > 0).Distinct(StringComparer.OrdinalIgnoreCase)];
         _blend = ShowShaders && modes.Length > 0
             ? "blend (guessed from the word): " + ImGuiText.Escape(string.Join(", ",
                 modes.Select(one => $"{one} -> {MaterialBlends.Of(one).ToString().ToLowerInvariant()}")))
@@ -2283,6 +2372,7 @@ public sealed class MonsterPortrait
             // until something else moves, which reads as neither working.
             || _drawnGrey != Greyed
             || !ReferenceEquals(_drawnShades, ShadesOf(_model))
+            || !ReferenceEquals(_drawnBlends, Blends())
             || (posed && (_drawnFrame != _frame || _drawnAnimation != _chosen));
 
         if (moved)
@@ -2626,6 +2716,7 @@ public sealed class MonsterPortrait
         _drawnGrey = Greyed;
         _drawnClock = _clock;
         _drawnShades = ShadesOf(_model);
+        _drawnBlends = Blends();
         _drawing++;
 
         try

@@ -223,6 +223,11 @@ public sealed record OverlaySettings(
     // book, since it is the same question in each. See MonsterPortrait.FlatLight.
     [property: JsonPropertyName("modelFlatLight")] bool ModelFlatLight = false,
 
+    // Whether a material whose graphs name two blend modes is drawn with the last one's rather
+    // than the first's. Off, the usual, is the first - what every picture was drawn with before
+    // the choice existed. One for every book. See MonsterPortrait.LastBlend.
+    [property: JsonPropertyName("modelLastBlend")] bool ModelLastBlend = false,
+
     // Whether the monster book's facet rail has a pane of its own. ON by default, because a rail
     // nobody knows about is a rail nobody opens - and OFF is a real setting because this window is
     // read WHILE PLAYING: three panes wide enough to read is most of a monitor, and the game wants

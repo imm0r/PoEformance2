@@ -172,6 +172,7 @@ public static class RoomModels
         var joins = new List<MeshJoin>();
         var skins = new List<Mipmaps?>();
         var modes = new List<string>();
+        var lastModes = new List<string>();
         var wearing = new List<string>();
         var textures = new List<string>();
         float size = CellSize;
@@ -229,6 +230,7 @@ public static class RoomModels
             {
                 skins.Add(shape < model.Skins.Count ? model.Skins[shape] : model.Skin);
                 modes.Add(shape < model.Modes.Count ? model.Modes[shape] : string.Empty);
+                lastModes.Add(shape < model.LastModes.Count ? model.LastModes[shape] : modes[^1]);
                 wearing.Add(shape < model.ShapeMaterials.Count ? model.ShapeMaterials[shape] : string.Empty);
                 textures.Add(shape < model.ShapeTextures.Count ? model.ShapeTextures[shape] : string.Empty);
             }
@@ -274,6 +276,7 @@ public static class RoomModels
         {
             Skins = skins,
             Modes = modes,
+            LastModes = lastModes,
             ShapeMaterials = wearing,
 
             // CARRIED LIKE THE MATERIALS, so the dump's "tex" column names each doodad's colour map;

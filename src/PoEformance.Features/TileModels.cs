@@ -296,6 +296,7 @@ public static class TileModels
         var shapes = new MeshShape[kept];
         var skins = new Mipmaps?[kept];
         var modes = new string[kept];
+        var lastModes = new string[kept];
         var materials = new string[kept];
         var painted = new string[kept];
         Vector3[] positions = mesh.Positions;
@@ -324,6 +325,7 @@ public static class TileModels
             shapes[next] = part with { From = at, Count = length };
             skins[next] = model.Skins[shape];
             modes[next] = model.Modes[shape];
+            lastModes[next] = shape < model.LastModes.Count ? model.LastModes[shape] : model.Modes[shape];
             materials[next] = shape < model.ShapeMaterials.Count ? model.ShapeMaterials[shape] : string.Empty;
             painted[next] = textures[shape];
             at += length;
@@ -345,6 +347,7 @@ public static class TileModels
         {
             Skins = skins,
             Modes = modes,
+            LastModes = lastModes,
             Materials = model.Materials,
             BodyLeast = least,
             BodyMost = most,
