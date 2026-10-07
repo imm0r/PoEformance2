@@ -749,41 +749,49 @@ public static class MeshPicture
         }
 
         // THE CLOCK'S TRIANGLES' READ LEVELS, at the new time: a muddle moves the coordinates the
-        // levels are worked out from. Every other triangle's are as the whole drawing left them.
-        Span<Vector4> scratch = stackalloc Vector4[ShadeProgram.MostRegisters];
-        Span<Vector2> spots = stackalloc Vector2[Math.Max(1, drawn.Stride) * 3];
-        Span<Vector2> cornerSpots = stackalloc Vector2[3];
-        Span<Vector3> cornerPlaces = stackalloc Vector3[3];
-        Span<Vector3> cornerTurns = stackalloc Vector3[3];
-        Span<Vector4> cornerColours = stackalloc Vector4[3];
+        // levels are worked out from. Every other triangle's are as the whole drawing left them. In
+        // slices like the whole drawing's: on a tile whose clock covers half a million triangles they
+        // were most of a tick on one thread.
         int[] indices = drawn.Mesh.Indices;
         Vector3[] corners = canvas.Corners;
         int[] shadeOf = canvas.Shades;
-        ShadeProgram? preset = null;
-        for (var at = 0; at < drawn.Clocked; at++)
+        int[] clocked = canvas.Clocked;
+        float[] shadeLevels = canvas.ShadeLevels;
+        float time = canvas.Time;
+        Sliced(canvas, drawn.Clocked, (from, upto) =>
         {
-            int one = canvas.Clocked[at];
-            Vector3 a = corners[indices[one * 3]];
-            Vector3 b = corners[indices[(one * 3) + 1]];
-            Vector3 c = corners[indices[(one * 3) + 2]];
-            float area = Cross(a, b, c);
-            if (!(MathF.Abs(area) >= 1e-6f))
+            Span<Vector4> scratch = stackalloc Vector4[ShadeProgram.MostRegisters];
+            Span<Vector2> spots = stackalloc Vector2[Math.Max(1, drawn.Stride) * 3];
+            Span<Vector2> cornerSpots = stackalloc Vector2[3];
+            Span<Vector3> cornerPlaces = stackalloc Vector3[3];
+            Span<Vector3> cornerTurns = stackalloc Vector3[3];
+            Span<Vector4> cornerColours = stackalloc Vector4[3];
+            ShadeProgram? preset = null;
+            for (int at = from; at < upto; at++)
             {
-                continue;
-            }
+                int one = clocked[at];
+                Vector3 a = corners[indices[one * 3]];
+                Vector3 b = corners[indices[(one * 3) + 1]];
+                Vector3 c = corners[indices[(one * 3) + 2]];
+                float area = Cross(a, b, c);
+                if (!(MathF.Abs(area) >= 1e-6f))
+                {
+                    continue;
+                }
 
-            ShadeProgram program = drawn.Programs[shadeOf[one]];
-            if (!ReferenceEquals(program, preset))
-            {
-                program.Preset(scratch, canvas.Time);
-                preset = program;
-            }
+                ShadeProgram program = drawn.Programs[shadeOf[one]];
+                if (!ReferenceEquals(program, preset))
+                {
+                    program.Preset(scratch, time);
+                    preset = program;
+                }
 
-            Graded(
-                drawn.Mesh, program, one, drawn.Places, drawn.Turns, a, b, c, area,
-                scratch, spots, cornerSpots, cornerPlaces, cornerTurns, cornerColours,
-                canvas.ShadeLevels.AsSpan(one * drawn.Stride, program.Samples));
-        }
+                Graded(
+                    drawn.Mesh, program, one, drawn.Places, drawn.Turns, a, b, c, area,
+                    scratch, spots, cornerSpots, cornerPlaces, cornerTurns, cornerColours,
+                    shadeLevels.AsSpan(one * drawn.Stride, program.Samples));
+            }
+        });
 
         if (drawn.Translucent)
         {

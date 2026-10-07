@@ -515,6 +515,16 @@ public class MeshPictureTests
 
         Assert.Equal(0, Differing(alone, shared));
         Assert.True(alone.Where((_, at) => at % 4 == 3).Count(alpha => alpha > 0) > 1000, "the grid fills a good part of the picture");
+
+        // AND WITH THE CLOCK, past the size where its levels are worked out in slices too: drawn again
+        // on four threads, the whole drawing at the new time on one.
+        ShadeProgram?[] ticking = [null, Clocked()];
+        var keeping = new MeshPicture.Canvas(160, 4) { Keeps = true, Time = 0.25f };
+        MeshPicture.Of(mesh, keeping, 0.5f, 0.7f, skins: skins, shades: ticking);
+        keeping.Time = 0.75f;
+        Assert.True(MeshPicture.Again(keeping, out GamePicture again));
+        byte[] whole = MeshPicture.Of(mesh, new MeshPicture.Canvas(160, 1) { Time = 0.75f }, 0.5f, 0.7f, skins: skins, shades: ticking).Rgba;
+        Assert.Equal(0, Differing(whole, again.Rgba));
     }
 
     /// <summary>No canvas is a mistake in the caller, not a picture of nothing.</summary>
