@@ -11,7 +11,7 @@ namespace PoEformance.Core.Tests;
 /// <remarks>
 /// THE AREA IS BUILT SO THE ANSWER IS KNOWN: floor on the left and walkable, wall on the right, and
 /// the room's corner pattern pressed into the wall turned a quarter and mirrored. The pattern holds
-/// blank corners, which nothing else in the area has, so exactly one place and one way round can
+/// rubble corners, which nothing else in the area has, so exactly one place and one way round can
 /// fit - and the placement is worked out here from the two operations written out, not from the
 /// finder's own arithmetic.
 /// </remarks>
@@ -25,16 +25,17 @@ public class RoomFinderTests
 
     private const string WallType = "Metadata/Terrain/Test/wall.gt";
     private const string FloorType = "Metadata/Terrain/Test/floor.gt";
+    private const string RubbleType = "Metadata/Terrain/Test/rubble.gt";
 
-    private static readonly string[] Types = [string.Empty, WallType, FloorType];
+    private static readonly string[] Types = [string.Empty, WallType, FloorType, RubbleType];
 
-    /// <summary>The room's corner types, [u, v] for a three by two room: 0 blank, 1 wall, 2 floor - no symmetry.</summary>
+    /// <summary>The room's corner types, [u, v] for a three by two room: 1 wall, 2 floor, 3 rubble - which only the room has - and no symmetry.</summary>
     private static readonly int[,] Pattern =
     {
-        { 1, 0, 1 },
-        { 0, 2, 1 },
-        { 2, 2, 0 },
-        { 1, 0, 2 },
+        { 1, 3, 1 },
+        { 3, 2, 1 },
+        { 2, 2, 3 },
+        { 1, 3, 2 },
     };
 
     [Fact]
@@ -45,13 +46,13 @@ public class RoomFinderTests
         Assert.True(room.Ready, room.Why);
         Assert.Equal(string.Empty, room.SlotsWhy);
         Assert.Equal(6, room.Slots.Count);
-        Assert.Equal([WallType, FloorType], room.Strings);
+        Assert.Equal([WallType, FloorType, RubbleType], room.Strings);
 
         // The slot at column 1, line 0: its down-left corner is the grid corner (1, 0), its up-right (2, 1).
         RoomSlot slot = room.SlotAt(1, 0);
         Assert.True(slot.IsTile);
         Assert.Equal((1, 1), (slot.Width, slot.Height));
-        Assert.Equal(string.Empty, room.Named(slot.Ground(0)));
+        Assert.Equal(RubbleType, room.Named(slot.Ground(0)));
         Assert.Equal(FloorType, room.Named(slot.Ground(1)));
         Assert.Equal(FloorType, room.Named(slot.Ground(2)));
         Assert.Equal(FloorType, room.Named(slot.Ground(3)));
@@ -89,6 +90,29 @@ public class RoomFinderTests
         // AND WHERE IT MISSES: the one corner spoiled, for the map's red dot.
         int at = search.Candidates.ToList().IndexOf(new RoomCandidate(12, 4, 5, 2, 3, 11, 12));
         Assert.Equal([(14, 7)], search.Misses[at].Corners);
+    }
+
+    /// <summary>
+    /// A corner the room leaves at nought names no ground and fits whatever the area laid there.
+    /// </summary>
+    /// <remarks>
+    /// THE ROOMS' OWN READING: the channel's 1open_01.arm leaves its 36 inner corners - its floor - at
+    /// nought while the area names that floor's type. Here the area keeps floor at the corner the room
+    /// now leaves unnamed, and the room is still found, exactly, with that corner counted free.
+    /// </remarks>
+    [Fact]
+    public void ACORNERTheRoomLeavesUnnamedFitsWhateverTheAreaLaidThere()
+    {
+        (TerrainGroundTypes ground, _) = Area(withRoom: true);
+        var freed = (int[,])Pattern.Clone();
+        freed[1, 1] = 0;
+
+        RoomSearch search = RoomFinder.Find(RoomLayout.Parse(Room(freed, 3, 2)), ground, TilesX, TilesY);
+
+        Assert.True(search.Found);
+        RoomCandidate only = Assert.Single(search.Candidates);
+        Assert.Equal(new RoomCandidate(12, 4, 5, 2, 3, 11, 11), only);
+        Assert.Equal(1, search.Free);
     }
 
     /// <summary>
@@ -182,6 +206,7 @@ public class RoomFinderTests
     {
         1 => WallType,
         2 => FloorType,
+        3 => RubbleType,
         _ => string.Empty,
     };
 
@@ -222,7 +247,7 @@ public class RoomFinderTests
 
         Assert.Empty(search.Candidates);
         Assert.Equal(6, search.Left);
-        Assert.Contains("no one by one k slot", search.Why, StringComparison.Ordinal);
+        Assert.Contains("names no corner's ground in a one by one k slot", search.Why, StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -296,13 +321,14 @@ public class RoomFinderTests
         return Path.Combine(dir.FullName, "tests", "fixtures", path);
     }
 
-    /// <summary>A version 36 room of one by one k slots whose corners carry the pattern, by the down-left, down-right, up-right, up-left order.</summary>
+    /// <summary>A version 36 room of one by one k slots whose corners carry the pattern, by the down-left, down-right, up-right, up-left order; nought names no ground.</summary>
     private static string Room(int[,] pattern, int width, int height)
     {
         var text = new StringBuilder();
-        text.AppendLine("version 36").AppendLine("2")
+        text.AppendLine("version 36").AppendLine("3")
             .AppendLine(CultureInfo.InvariantCulture, $"\"{WallType}\"")
             .AppendLine(CultureInfo.InvariantCulture, $"\"{FloorType}\"")
+            .AppendLine(CultureInfo.InvariantCulture, $"\"{RubbleType}\"")
             .AppendLine("5 3").AppendLine("0").AppendLine("\"roomtag\"").AppendLine("0")
             .AppendLine(CultureInfo.InvariantCulture, $"k {width} {height} 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0");
         for (var group = 0; group < 6; group++)
