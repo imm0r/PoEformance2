@@ -1,0 +1,719 @@
+{
+    "version": 6,
+    "shader_group": [
+        "Material"
+    ],
+    "nodes": [
+        {
+            "type": "InputVertexUV",
+            "index": 0,
+            "stage": "LocalTransform",
+            "ui_position": [
+                800.0,
+                -510.0
+            ]
+        },
+        {
+            "type": "VertexUV",
+            "index": 0,
+            "stage": "LocalTransform",
+            "ui_position": [
+                1300.0,
+                -510.0
+            ]
+        },
+        {
+            "type": "InputVertexPosition",
+            "index": 0,
+            "stage": "WorldTransform",
+            "ui_position": [
+                800.0,
+                -510.0
+            ]
+        },
+        {
+            "type": "VertexPosition",
+            "index": 0,
+            "stage": "WorldTransform",
+            "ui_position": [
+                1300.0,
+                -510.0
+            ]
+        },
+        {
+            "type": "InputVertexNormal",
+            "index": 0,
+            "stage": "WorldTransform",
+            "ui_position": [
+                1300.0,
+                -510.0
+            ]
+        },
+        {
+            "type": "VertexNormal",
+            "index": 0,
+            "stage": "WorldTransform",
+            "ui_position": [
+                1800.0,
+                -510.0
+            ]
+        },
+        {
+            "type": "InputUV",
+            "index": 0,
+            "stage": "UVSetup",
+            "ui_position": [
+                800.0,
+                20.0
+            ]
+        },
+        {
+            "type": "UV",
+            "index": 0,
+            "stage": "UVSetup",
+            "ui_position": [
+                1099.9998779296876,
+                18.571428298950197
+            ]
+        },
+        {
+            "type": "InputIndirectColor",
+            "index": 0,
+            "stage": "Texturing_Final",
+            "ui_position": [
+                1099.9998779296876,
+                18.571428298950197
+            ]
+        },
+        {
+            "type": "ConstantFloat",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": 1.0
+                }
+            ],
+            "custom_parameter": "OcclusionPower",
+            "ui_position": [
+                1713.6148681640626,
+                631.5260009765625
+            ]
+        },
+        {
+            "type": "Power",
+            "index": 0,
+            "ui_position": [
+                2127.11572265625,
+                513.5258178710938
+            ]
+        },
+        {
+            "type": "InputTbnNormal",
+            "index": 0,
+            "stage": "Texturing_Final",
+            "ui_position": [
+                1099.9998779296876,
+                18.571428298950197
+            ]
+        },
+        {
+            "type": "InputTbnBasis",
+            "index": 0,
+            "stage": "Texturing_Final",
+            "ui_position": [
+                1099.9998779296876,
+                18.571428298950197
+            ]
+        },
+        {
+            "type": "Transform",
+            "index": 0,
+            "ui_position": [
+                1946.6148681640626,
+                296.7756652832031
+            ]
+        },
+        {
+            "type": "Normalize3",
+            "index": 0,
+            "ui_position": [
+                2191.864990234375,
+                356.27587890625
+            ]
+        },
+        {
+            "type": "Multiply3",
+            "index": 0,
+            "ui_position": [
+                2451.365234375,
+                461.0258483886719
+            ]
+        },
+        {
+            "type": "OutputBentNormal",
+            "index": 0,
+            "ui_position": [
+                2693.5458984375,
+                426.3472900390625
+            ]
+        },
+        {
+            "type": "ConstantFloat",
+            "index": 1,
+            "parameters": [
+                {
+                    "value": 2.0
+                }
+            ],
+            "custom_parameter": "Sharpness",
+            "ui_position": [
+                2290.58349609375,
+                675.916748046875
+            ]
+        },
+        {
+            "type": "OutputBentNormalShadowSharpness",
+            "index": 0,
+            "ui_position": [
+                2605.333984375,
+                658.416748046875
+            ]
+        },
+        {
+            "type": "Add",
+            "index": 0,
+            "ui_position": [
+                3010.583984375,
+                467.16668701171877
+            ]
+        },
+        {
+            "type": "ConnectionPixel",
+            "index": 0,
+            "stage": "Texturing_Final",
+            "ui_position": [
+                3385.96923828125,
+                35.0
+            ]
+        },
+        {
+            "type": "InputUV",
+            "index": 0,
+            "stage": "Texturing_Final",
+            "ui_position": [
+                1099.9998779296876,
+                18.571428298950197
+            ]
+        },
+        {
+            "type": "UV",
+            "index": 0,
+            "stage": "Texturing_Final",
+            "ui_position": [
+                3385.96923828125,
+                35.0
+            ]
+        },
+        {
+            "type": "InputAlbedoColor",
+            "index": 0,
+            "stage": "Texturing_Final",
+            "ui_position": [
+                1099.9998779296876,
+                18.571428298950197
+            ]
+        },
+        {
+            "type": "AlbedoColor",
+            "index": 0,
+            "stage": "Texturing_Final",
+            "ui_position": [
+                3385.96923828125,
+                35.0
+            ]
+        },
+        {
+            "type": "TbnNormal",
+            "index": 0,
+            "stage": "Texturing_Final",
+            "ui_position": [
+                3385.96923828125,
+                35.0
+            ]
+        },
+        {
+            "type": "InputGlossiness",
+            "index": 0,
+            "stage": "Texturing_Final",
+            "ui_position": [
+                1300.0,
+                20.0
+            ]
+        },
+        {
+            "type": "Glossiness",
+            "index": 0,
+            "stage": "Texturing_Final",
+            "ui_position": [
+                1800.0,
+                20.0
+            ]
+        },
+        {
+            "type": "InputSpecularPower",
+            "index": 0,
+            "stage": "Texturing_Final",
+            "ui_position": [
+                1099.9998779296876,
+                18.571428298950197
+            ]
+        },
+        {
+            "type": "SpecularPower",
+            "index": 0,
+            "stage": "Texturing_Final",
+            "ui_position": [
+                3385.96923828125,
+                35.0
+            ]
+        },
+        {
+            "type": "InputSpecularColor",
+            "index": 0,
+            "stage": "Texturing_Final",
+            "ui_position": [
+                1099.9998779296876,
+                18.571428298950197
+            ]
+        },
+        {
+            "type": "SpecularColor",
+            "index": 0,
+            "stage": "Texturing_Final",
+            "ui_position": [
+                3385.96923828125,
+                35.0
+            ]
+        },
+        {
+            "type": "InputEmissiveColor",
+            "index": 0,
+            "stage": "Texturing_Final",
+            "ui_position": [
+                1099.9998779296876,
+                18.571428298950197
+            ]
+        },
+        {
+            "type": "EmissiveColor",
+            "index": 0,
+            "stage": "Texturing_Final",
+            "ui_position": [
+                3385.96923828125,
+                35.0
+            ]
+        },
+        {
+            "type": "IndirectColor",
+            "index": 0,
+            "stage": "Texturing_Final",
+            "ui_position": [
+                3385.96923828125,
+                35.0
+            ]
+        },
+        {
+            "type": "TbnBasis",
+            "index": 0,
+            "stage": "Texturing_Final",
+            "ui_position": [
+                3385.96923828125,
+                35.0
+            ]
+        },
+        {
+            "type": "UseBentNormalContactShadows",
+            "index": 0,
+            "ui_position": [
+                2707.0,
+                -350.0
+            ]
+        },
+        {
+            "type": "UseBentNormalSpecularOcclusion",
+            "index": 0,
+            "ui_position": [
+                2707.0,
+                -311.0
+            ]
+        },
+        {
+            "type": "InputConnectionPixel",
+            "index": 0,
+            "stage": "Texturing_Final",
+            "ui_position": [
+                1099.9998779296876,
+                18.571428298950197
+            ]
+        },
+        {
+            "type": "ObjectTransform",
+            "index": 0,
+            "ui_position": [
+                1033.25,
+                -403.75006103515627
+            ]
+        }
+    ],
+    "links": [
+        {
+            "src": {
+                "type": "InputVertexUV",
+                "index": 0,
+                "stage": "LocalTransform",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "VertexUV",
+                "index": 0,
+                "stage": "LocalTransform",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputVertexPosition",
+                "index": 0,
+                "stage": "WorldTransform",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "VertexPosition",
+                "index": 0,
+                "stage": "WorldTransform",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputVertexNormal",
+                "index": 0,
+                "stage": "WorldTransform",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "VertexNormal",
+                "index": 0,
+                "stage": "WorldTransform",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputUV",
+                "index": 0,
+                "stage": "UVSetup",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "UV",
+                "index": 0,
+                "stage": "UVSetup",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputIndirectColor",
+                "index": 0,
+                "stage": "Texturing_Final",
+                "variable": "output",
+                "swizzle": "w"
+            },
+            "dst": {
+                "type": "Power",
+                "index": 0,
+                "variable": "base"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Power",
+                "index": 0,
+                "variable": "exp"
+            }
+        },
+        {
+            "src": {
+                "type": "InputTbnNormal",
+                "index": 0,
+                "stage": "Texturing_Final",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Transform",
+                "index": 0,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputTbnBasis",
+                "index": 0,
+                "stage": "Texturing_Final",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Transform",
+                "index": 0,
+                "variable": "inmatrix"
+            }
+        },
+        {
+            "src": {
+                "type": "Transform",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Normalize3",
+                "index": 0,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "Power",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply3",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Normalize3",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply3",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply3",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "OutputBentNormal",
+                "index": 0,
+                "variable": "bent_normal"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "OutputBentNormalShadowSharpness",
+                "index": 0,
+                "variable": "shadow_sharpness"
+            }
+        },
+        {
+            "src": {
+                "type": "OutputBentNormal",
+                "index": 0,
+                "variable": "connection"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "OutputBentNormalShadowSharpness",
+                "index": 0,
+                "variable": "connection"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Add",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "ConnectionPixel",
+                "index": 0,
+                "stage": "Texturing_Final",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputUV",
+                "index": 0,
+                "stage": "Texturing_Final",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "UV",
+                "index": 0,
+                "stage": "Texturing_Final",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputAlbedoColor",
+                "index": 0,
+                "stage": "Texturing_Final",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "AlbedoColor",
+                "index": 0,
+                "stage": "Texturing_Final",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputTbnNormal",
+                "index": 0,
+                "stage": "Texturing_Final",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "TbnNormal",
+                "index": 0,
+                "stage": "Texturing_Final",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputGlossiness",
+                "index": 0,
+                "stage": "Texturing_Final",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Glossiness",
+                "index": 0,
+                "stage": "Texturing_Final",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputSpecularPower",
+                "index": 0,
+                "stage": "Texturing_Final",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SpecularPower",
+                "index": 0,
+                "stage": "Texturing_Final",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputSpecularColor",
+                "index": 0,
+                "stage": "Texturing_Final",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SpecularColor",
+                "index": 0,
+                "stage": "Texturing_Final",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputEmissiveColor",
+                "index": 0,
+                "stage": "Texturing_Final",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "EmissiveColor",
+                "index": 0,
+                "stage": "Texturing_Final",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputIndirectColor",
+                "index": 0,
+                "stage": "Texturing_Final",
+                "variable": "output",
+                "swizzle": "w"
+            },
+            "dst": {
+                "type": "IndirectColor",
+                "index": 0,
+                "stage": "Texturing_Final",
+                "variable": "input",
+                "swizzle": "w"
+            }
+        },
+        {
+            "src": {
+                "type": "InputIndirectColor",
+                "index": 0,
+                "stage": "Texturing_Final",
+                "variable": "output",
+                "swizzle": "xyz"
+            },
+            "dst": {
+                "type": "IndirectColor",
+                "index": 0,
+                "stage": "Texturing_Final",
+                "variable": "input",
+                "swizzle": "xyz"
+            }
+        },
+        {
+            "src": {
+                "type": "InputTbnBasis",
+                "index": 0,
+                "stage": "Texturing_Final",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "TbnBasis",
+                "index": 0,
+                "stage": "Texturing_Final",
+                "variable": "input"
+            }
+        }
+    ]
+}

@@ -1,0 +1,416 @@
+{
+    "version": 3,
+    "shader_group": [
+        "Material"
+    ],
+    "nodes": [
+        {
+            "type": "InputVertexUV",
+            "index": 0,
+            "stage": "VertexInit",
+            "ui_position": [
+                800.0,
+                -510.0
+            ]
+        },
+        {
+            "type": "VertexUV",
+            "index": 0,
+            "stage": "VertexInit",
+            "ui_position": [
+                1300.0,
+                -510.0
+            ]
+        },
+        {
+            "type": "InputVertexPosition",
+            "index": 0,
+            "stage": "VertexInit",
+            "ui_position": [
+                800.0,
+                -510.0
+            ]
+        },
+        {
+            "type": "VertexPosition",
+            "index": 0,
+            "stage": "VertexInit",
+            "ui_position": [
+                1300.0,
+                -510.0
+            ]
+        },
+        {
+            "type": "InputAlbedoColor",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                1293.0,
+                294.0
+            ]
+        },
+        {
+            "type": "SampleTexture",
+            "index": 0,
+            "parameters": [
+                {
+                    "srgb": true
+                },
+                {}
+            ],
+            "custom_parameter": "texture",
+            "ui_position": [
+                1809.0,
+                417.0
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": 1.0
+                }
+            ],
+            "custom_parameter": "scale",
+            "ui_position": [
+                1818.0,
+                596.0
+            ]
+        },
+        {
+            "type": "Multiply4",
+            "index": 0,
+            "ui_position": [
+                2129.0,
+                447.0
+            ]
+        },
+        {
+            "type": "Multiply4",
+            "index": 1,
+            "ui_position": [
+                2316.0,
+                346.0
+            ]
+        },
+        {
+            "type": "Dummy4",
+            "index": 0,
+            "ui_position": [
+                1084.0,
+                2.0
+            ]
+        },
+        {
+            "type": "ConstantPixel3",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": [
+                        -100.0,
+                        50.0,
+                        1.0
+                    ]
+                }
+            ],
+            "custom_parameter": "Height_Length_Mult",
+            "ui_position": [
+                1293.0,
+                740.0
+            ]
+        },
+        {
+            "type": "Subtract",
+            "index": 0,
+            "ui_position": [
+                1602.0,
+                662.0
+            ]
+        },
+        {
+            "type": "Divide",
+            "index": 0,
+            "ui_position": [
+                1782.0,
+                714.0
+            ]
+        },
+        {
+            "type": "Multiply",
+            "index": 0,
+            "ui_position": [
+                1958.0,
+                762.0
+            ]
+        },
+        {
+            "type": "Saturate",
+            "index": 0,
+            "ui_position": [
+                2142.0,
+                828.0
+            ]
+        },
+        {
+            "type": "Lerp4",
+            "index": 0,
+            "ui_position": [
+                2557.0,
+                295.0
+            ]
+        },
+        {
+            "type": "AlbedoColor",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                2773.0,
+                295.0
+            ]
+        }
+    ],
+    "links": [
+        {
+            "src": {
+                "type": "InputVertexUV",
+                "index": 0,
+                "stage": "VertexInit",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "VertexUV",
+                "index": 0,
+                "stage": "VertexInit",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputVertexPosition",
+                "index": 0,
+                "stage": "VertexInit",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "VertexPosition",
+                "index": 0,
+                "stage": "VertexInit",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputVertexUV",
+                "index": 0,
+                "stage": "VertexInit",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SampleTexture",
+                "index": 0,
+                "variable": "uv"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTexture",
+                "index": 0,
+                "variable": "rgba"
+            },
+            "dst": {
+                "type": "Multiply4",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply4",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "InputAlbedoColor",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply4",
+                "index": 1,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply4",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply4",
+                "index": 1,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "InputVertexPosition",
+                "index": 0,
+                "stage": "VertexInit",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Dummy4",
+                "index": 0,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy4",
+                "index": 0,
+                "variable": "out_value",
+                "swizzle": "z"
+            },
+            "dst": {
+                "type": "Subtract",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel3",
+                "index": 0,
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "Subtract",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Subtract",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Divide",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel3",
+                "index": 0,
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "Divide",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Divide",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel3",
+                "index": 0,
+                "variable": "output",
+                "swizzle": "z"
+            },
+            "dst": {
+                "type": "Multiply",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 0,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputAlbedoColor",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp4",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply4",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp4",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp4",
+                "index": 0,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp4",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "AlbedoColor",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "input"
+            }
+        }
+    ]
+}
