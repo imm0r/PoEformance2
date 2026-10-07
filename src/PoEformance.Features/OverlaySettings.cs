@@ -177,6 +177,10 @@ public sealed record OverlaySettings(
     // in the code (RoomModels.UsualDoodads) for everybody who never moved the slider.
     [property: JsonPropertyName("roomDoodads")] int RoomDoodads = 0,
 
+    // Whether the tile book's rooms place the level editor's tools - walk blockers and markers the
+    // game does not draw. Off, the usual, hides them. See RoomModels.IsTool.
+    [property: JsonPropertyName("roomTools")] bool RoomTools = false,
+
     // And the effect book's, kept apart for the same reason. See EffectBookWindow.
     [property: JsonPropertyName("effectColumns")] IReadOnlyList<string>? EffectColumns = null,
     [property: JsonPropertyName("effectColumnWidths")] IReadOnlyDictionary<string, int>? EffectColumnWidths = null,

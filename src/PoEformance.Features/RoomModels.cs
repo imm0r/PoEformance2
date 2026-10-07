@@ -50,6 +50,31 @@ public static class RoomModels
     /// </remarks>
     public const int TrianglesPerDoodad = 1000;
 
+    /// <summary>The object a room names beside a doodad the game places and never draws.</summary>
+    public const string InvisibleStub = "Metadata/MiscellaneousObjects/DoodadInvisible";
+
+    /// <summary>The folder of the level editor's own pieces - walk blockers, markers, pins.</summary>
+    public const string ToolFolder = "Metadata/Terrain/Doodads/Tools/";
+
+    /// <summary>
+    /// Whether a doodad is one of the level editor's tools rather than part of the scene.
+    /// </summary>
+    /// <remarks>
+    /// TWO WORDS, ONE THE GAME'S AND ONE A FOLDER'S. A room names an object beside each doodad, and
+    /// the yellow box in the deserted 1open_01.arm - Blocker_Walk_3_1_01, its colour the vertex
+    /// colours of VertexColourTransparentc.mat at a quarter of their alpha - is placed as
+    /// <see cref="InvisibleStub"/>: the game says outright that it is not drawn. Its siblings in
+    /// <see cref="ToolFolder"/> are not always placed that way - invisible_blocker.ao as a plain
+    /// Doodad, marker4.ao as a BossArenaBlocker, the pins as league markers - but they are the same
+    /// kind of thing: walk blockers in a flat vertex colour and markers wearing iconsc.mat, a
+    /// camera-facing sheet of editor icons hung 350 units over the pin. That half is a rule on a
+    /// folder's name, not the game's word, which is why it is a choice the book offers rather than
+    /// a filter it applies.
+    /// </remarks>
+    public static bool IsTool(RoomDoodad doodad)
+        => string.Equals(doodad.Stub, InvisibleStub, StringComparison.OrdinalIgnoreCase)
+            || doodad.Ao.StartsWith(ToolFolder, StringComparison.OrdinalIgnoreCase);
+
     /// <summary>Cells to a tile - the grid a room's doodad positions and a tile's walkability are written in.</summary>
     public const int CellsPerTile = 23;
 
@@ -93,7 +118,13 @@ public static class RoomModels
     /// <param name="path">The room's <c>.arm</c>.</param>
     /// <param name="shaded">Whether each material's shader graphs are read - see MonsterModels.Shaded.</param>
     /// <param name="doodads">Most doodads placed - see <see cref="UsualDoodads"/>; zero or less is the usual.</param>
-    public static MonsterModel Of(Func<string, byte[]?>? read, string? path, bool shaded = false, int doodads = UsualDoodads)
+    /// <param name="tools">Whether the level editor's tools are placed too - see <see cref="IsTool"/>.</param>
+    public static MonsterModel Of(
+        Func<string, byte[]?>? read,
+        string? path,
+        bool shaded = false,
+        int doodads = UsualDoodads,
+        bool tools = false)
     {
         if (read is null)
         {
@@ -145,7 +176,7 @@ public static class RoomModels
         var textures = new List<string>();
         float size = CellSize;
         var triangles = 0;
-        int placed = 0, missing = 0, capped = 0;
+        int placed = 0, missing = 0, capped = 0, hidden = 0;
         int mostDoodads = doodads > 0 ? doodads : UsualDoodads;
         long mostTriangles = (long)mostDoodads * TrianglesPerDoodad;
         string firstMissing = string.Empty;
@@ -154,6 +185,12 @@ public static class RoomModels
         {
             if (one.Ao.Length == 0)
             {
+                continue;
+            }
+
+            if (!tools && IsTool(one))
+            {
+                hidden++;
                 continue;
             }
 
@@ -207,7 +244,9 @@ public static class RoomModels
             {
                 Why = firstMissing.Length > 0
                     ? $"none of the room's doodads drew; the first: {firstMissing}"
-                    : $"the room's doodads hold no geometry: {path}",
+                    : hidden > 0 && placed == 0
+                        ? $"the room places only the level editor's tools, which are hidden: {path}"
+                        : $"the room's doodads hold no geometry: {path}",
                 Bytes = bytes,
                 Files = files,
             };
@@ -217,6 +256,12 @@ public static class RoomModels
         if (missing > 0)
         {
             said.Add(string.Create(CultureInfo.InvariantCulture, $"{missing} doodads did not draw; the first: {firstMissing}"));
+        }
+
+        if (hidden > 0)
+        {
+            said.Add(string.Create(CultureInfo.InvariantCulture,
+                $"{hidden} of the level editor's tools hidden - walk blockers and markers the game does not draw; \"tools\" shows them"));
         }
 
         if (capped > 0)

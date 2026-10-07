@@ -69,6 +69,9 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     /// </remarks>
     private int _laid = -1;
 
+    /// <summary>Whether a room places the level editor's tools - see RoomModels.IsTool. Kept in the settings; see <see cref="Tools"/>.</summary>
+    private bool _tools;
+
     /// <summary>Most doodads a room places - see RoomModels.UsualDoodads. Kept in the settings; see <see cref="Doodads"/>.</summary>
     private int _doodads = RoomModels.UsualDoodads;
 
@@ -127,6 +130,13 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             _doodads = value <= 0 ? RoomModels.UsualDoodads : Math.Clamp(value, RoomModels.LeastDoodads, RoomModels.MostDoodads);
             _dragging = _doodads;
         }
+    }
+
+    /// <summary>Whether a room places the level editor's tools, as the box has it - what the settings keep.</summary>
+    public bool Tools
+    {
+        get => _tools;
+        set => _tools = value;
     }
 
     /// <inheritdoc/>
@@ -245,7 +255,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         }
 
         RoomKey room = RoomKey.Read(key);
-        return RoomModels.Of(read, room.Path, shaded: true, doodads: room.Doodads);
+        return RoomModels.Of(read, room.Path, shaded: true, doodads: room.Doodads, tools: room.Tools);
     }
 
     /// <summary>What the tile or room is and where it is used, then its geometry under it.</summary>
@@ -309,7 +319,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         }
 
         string key = room
-            ? new RoomKey(chosen, _doodads).ToString()
+            ? new RoomKey(chosen, _doodads, _tools).ToString()
             : new TileKey(chosen, _ground, _walls, Placing(chosen), Laying(chosen)).ToString();
         if (!string.Equals(key, _subjectKey, StringComparison.Ordinal))
         {
@@ -361,6 +371,19 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         if (ImGui.IsItemHovered())
         {
             ImGui.SetTooltip(DoodadsSaid);
+        }
+
+        ImGui.SameLine();
+        if (ImGui.Checkbox("tools##roomtools", ref _tools))
+        {
+            Changed?.Invoke();
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("The level editor's own pieces: walk blockers and markers. The game places them and does not draw them -"
+                + " the room names DoodadInvisible beside a blocker - so they are hidden unless this is on."
+                + " Everything from Metadata/Terrain/Doodads/Tools/ counts, which is a rule on the folder's name.");
         }
     }
 

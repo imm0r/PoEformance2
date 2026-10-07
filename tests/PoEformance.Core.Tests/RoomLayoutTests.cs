@@ -259,6 +259,47 @@ public class RoomLayoutTests
         // Outside the slider's ends, or not a number: the usual.
         Assert.Equal(RoomModels.UsualDoodads, RoomKey.Read(path + "|doodads=99999").Doodads);
         Assert.Equal(RoomModels.UsualDoodads, RoomKey.Read(path + "|doodads=lots").Doodads);
+
+        // AND THE TOOLS, with the cap or alone - and a key without them hides them.
+        Assert.Equal(path + "|tools", new RoomKey(path, Tools: true).ToString());
+        Assert.Equal(path + "|doodads=800+tools", new RoomKey(path, 800, Tools: true).ToString());
+        Assert.Equal(new RoomKey(path, 800, Tools: true), RoomKey.Read(path + "|doodads=800+tools"));
+        Assert.Equal(new RoomKey(path, Tools: true), RoomKey.Read(path + "|tools"));
+        Assert.False(RoomKey.Read(path + "|doodads=800").Tools);
+    }
+
+    /// <summary>
+    /// The level editor's tools are hidden unless asked for: a doodad the room names DoodadInvisible, and anything from the tools folder.
+    /// </summary>
+    [Fact]
+    public void THELEVELEDITORSToolsAreHiddenUnlessAskedFor()
+    {
+        Dictionary<string, byte[]> files = Install();
+        const string path = "Metadata/Terrain/Woods/Rooms/Clearing.arm";
+        const string Blocker = "Metadata/Terrain/Doodads/Tools/Blocker_Walk_3_1_01.ao";
+        files[path] = Encoding.Unicode.GetBytes(Version31
+            .Replace("\"Metadata/Doodads/Rock.ao\" \"stub\"", "\"Metadata/Doodads/Rock.ao\" \"Metadata/MiscellaneousObjects/DoodadInvisible\"", StringComparison.Ordinal)
+            .Replace("\"Metadata/Doodads/Tree.ao\"", "\"" + Blocker + "\"", StringComparison.Ordinal));
+        files[Blocker] = files["Metadata/Doodads/Tree.ao"];
+        Func<string, byte[]?> read = one => files.GetValueOrDefault(one);
+
+        RoomLayout room = RoomLayout.Read(read(path));
+        Assert.All(room.Doodads, one => Assert.True(RoomModels.IsTool(one), one.Ao));
+
+        MonsterModel hidden = RoomModels.Of(read, path);
+        Assert.False(hidden.Ready);
+        Assert.Contains("the room places only the level editor's tools, which are hidden", hidden.Why, StringComparison.Ordinal);
+
+        MonsterModel shown = RoomModels.Of(read, path, tools: true);
+        Assert.True(shown.Ready, shown.Why);
+        Assert.Equal(2, shown.Parts);
+
+        // ONE OF EACH, so the line under the picture says how many went.
+        files[path] = Encoding.Unicode.GetBytes(Version31.Replace("\"Metadata/Doodads/Tree.ao\"", "\"" + Blocker + "\"", StringComparison.Ordinal));
+        MonsterModel one = RoomModels.Of(read, path);
+        Assert.True(one.Ready, one.Why);
+        Assert.Equal(1, one.Parts);
+        Assert.Contains("1 of the level editor's tools hidden", one.Move, StringComparison.Ordinal);
     }
 
     [Fact]
