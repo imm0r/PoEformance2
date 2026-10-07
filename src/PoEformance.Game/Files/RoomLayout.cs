@@ -16,14 +16,15 @@ namespace PoEformance.Game.Files;
 public readonly record struct RoomDoodad(int X, int Y, float Turn, float Scale, string Ao, string Stub)
 {
     /// <summary>
-    /// The first of the line's counted floats, or null where it counts none - what it means is not settled; see the remarks.
+    /// The first of the line's counted floats - the doodad's height in the area's own z - or null where it counts none and the doodad stands on the ground.
     /// </summary>
     /// <remarks>
     /// NEITHER REFERENCE NAMES IT. poe_data_tools reads it as "floats", a count and that many values;
-    /// annalithic's poeformats as "unk7". In seepage's 2x2_offices_01 twelve of fifty-four doodads carry
-    /// one value - 0, 10, -45, -115, -240 - and none carries two. One of them is in memory: a
-    /// VaalPotCluster01 whose line says -115 has a Render z of -115, and its own TerrainHeight is -115
-    /// too. Kept so that is checked against more of the game - see LaidRoomModels' doodad heights line.
+    /// annalithic's poeformats as "unk7". THE GAME DOES: in seepage's 2x2_offices_01 twelve of fifty-four
+    /// doodads carry one value - 0, 10, -45, -115, -240 - and none carries two; a VaalPotCluster01 whose
+    /// line says -115 has a Render z of -115, and the room laid in its area came out with every doodad
+    /// where the game has it once each was set at its value rather than on the ground. Up is minus z, so
+    /// -240 is a light hanging over its pots and 10 a mud pile sunk into the floor.
     /// </remarks>
     public float? Height { get; init; }
 

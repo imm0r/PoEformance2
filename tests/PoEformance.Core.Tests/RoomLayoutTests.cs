@@ -371,24 +371,26 @@ public class RoomLayoutTests
         Assert.Equal(level, RoomKey.Read(level.ToString()));
         Assert.False(RoomKey.Read(key.ToString()).AtLevel);
 
-        // AND HOW HIGH A DOODAD WITH A HEIGHT IS SET, ground unless written.
-        var file = new RoomKey(path, Heights: DoodadHeight.File);
-        Assert.Equal(path + "|heights=file", file.ToString());
-        Assert.Equal(file, RoomKey.Read(file.ToString()));
+        // AND HOW HIGH A DOODAD WITH A HEIGHT IS SET, at its line's height unless written.
+        var ground = new RoomKey(path, Heights: DoodadHeight.Ground);
+        Assert.Equal(path + "|heights=ground", ground.ToString());
+        Assert.Equal(ground, RoomKey.Read(ground.ToString()));
         var added = new RoomKey(path, Laid: laid, AtLevel: true, Heights: DoodadHeight.Added);
         Assert.Equal(path + "|laid=13,21,7,-12345+level+heights=added", added.ToString());
         Assert.Equal(added, RoomKey.Read(added.ToString()));
-        Assert.Equal(DoodadHeight.Ground, RoomKey.Read(level.ToString()).Heights);
-        Assert.Equal(DoodadHeight.Ground, RoomKey.Read(path + "|heights=sideways").Heights);
+        Assert.Equal(path, new RoomKey(path, Heights: DoodadHeight.File).ToString());
+        Assert.Equal(DoodadHeight.File, RoomKey.Read(level.ToString()).Heights);
+        Assert.Equal(DoodadHeight.File, RoomKey.Read(path + "|heights=file").Heights);
+        Assert.Equal(DoodadHeight.File, RoomKey.Read(path + "|heights=sideways").Heights);
     }
 
-    /// <summary>A doodad whose line carries a height is set at it where asked, on a room of its own where the ground is nought; one carrying none stays put.</summary>
+    /// <summary>A doodad whose line carries a height is set at it - the usual - on a room of its own where the ground is nought; one carrying none stays put.</summary>
     [Fact]
     public void ADOODADWithAHeightIsSetAtItWhereAsked()
     {
         Dictionary<string, byte[]> files = Install();
-        MonsterModel ground = RoomModels.Of(p => files.GetValueOrDefault(p), "Metadata/Terrain/Woods/Rooms/Clearing.arm");
-        MonsterModel file = RoomModels.Of(p => files.GetValueOrDefault(p), "Metadata/Terrain/Woods/Rooms/Clearing.arm", heights: DoodadHeight.File);
+        MonsterModel ground = RoomModels.Of(p => files.GetValueOrDefault(p), "Metadata/Terrain/Woods/Rooms/Clearing.arm", heights: DoodadHeight.Ground);
+        MonsterModel file = RoomModels.Of(p => files.GetValueOrDefault(p), "Metadata/Terrain/Woods/Rooms/Clearing.arm");
         MonsterModel added = RoomModels.Of(p => files.GetValueOrDefault(p), "Metadata/Terrain/Woods/Rooms/Clearing.arm", heights: DoodadHeight.Added);
         Assert.True(ground.Ready, ground.Why);
 

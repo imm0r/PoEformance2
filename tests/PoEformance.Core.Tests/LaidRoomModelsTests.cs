@@ -360,8 +360,20 @@ public class LaidRoomModelsTests
         // WITHOUT THE AREA'S ENTITIES THERE IS NO LINE, and none of them found says so.
         Assert.DoesNotContain("doodad heights:", Laid(placement: 3, selector: 0, lies: 3, flat: true, doodads: doodads).Move, StringComparison.Ordinal);
         Assert.Contains(
-            "doodad heights: none of the room's doodads is in memory",
+            "doodad heights: none of the room's doodads is in memory as an entity - 1 entities read, 0 with a path the room names as a stub",
             Laid(placement: 3, selector: 0, lies: 3, flat: true, doodads: doodads, entities: [entities[2]]).Move,
+            StringComparison.Ordinal);
+
+        // AND WHY: the pot too far from any of its doodads, and one whose path spells the name another way.
+        WorldEntity far = entities[1];
+        WorldEntity spelt = new(4, 4, "Metadata/Other/Pot@2", EntityKind.Unknown, at, at, -115f);
+        Assert.Contains(
+            "doodad heights: none of the room's doodads is in memory as an entity - 2 entities read, 1 with a path the room names as a stub, the nearest ",
+            Laid(placement: 3, selector: 0, lies: 3, flat: true, doodads: doodads, entities: [far, spelt]).Move,
+            StringComparison.Ordinal);
+        Assert.Contains(
+            "; 1 with a stub's name in another path, such as Metadata/Other/Pot@2",
+            Laid(placement: 3, selector: 0, lies: 3, flat: true, doodads: doodads, entities: [far, spelt]).Move,
             StringComparison.Ordinal);
     }
 

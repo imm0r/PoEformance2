@@ -95,7 +95,7 @@ public static class LaidRoomModels
         bool tools = false,
         bool atLevel = false,
         ModelProgress? progress = null,
-        DoodadHeight heights = DoodadHeight.Ground,
+        DoodadHeight heights = DoodadHeight.File,
         IReadOnlyList<WorldEntity>? entities = null)
     {
         if (read is null)
@@ -439,6 +439,7 @@ public static class LaidRoomModels
         // both claim the one entity nearer to either, and the second pot report a height it never had.
         var pairs = new List<(float Distance, int Doodad, WorldEntity Entity)>();
         var cells = new Vector2[room.Doodads.Count];
+        float nearest = float.PositiveInfinity;
         for (var at = 0; at < room.Doodads.Count; at++)
         {
             RoomDoodad one = room.Doodads[at];
@@ -451,6 +452,7 @@ public static class LaidRoomModels
             foreach (WorldEntity entity in candidates)
             {
                 float distance = Vector2.Distance(new Vector2(entity.WorldX, entity.WorldY), cells[at]);
+                nearest = MathF.Min(nearest, distance);
                 if (distance <= TileModels.Side)
                 {
                     pairs.Add((distance, at, entity));
@@ -502,12 +504,68 @@ public static class LaidRoomModels
 
         if (found == 0)
         {
-            return "doodad heights: none of the room's doodads is in memory as an entity - the game makes entities of few doodads, and holds them only near the player";
+            return Missed(room, entities, byPath, nearest);
         }
 
         string counted = string.Create(CultureInfo.InvariantCulture,
             $"doodad heights: {found} of the room's doodads are in memory as entities, {carrying} with a height in their line - z is that height on {asHeight}, the ground plus it on {asAdded}, the ground on {asGround}");
         return counted + "; " + string.Join("; ", listed) + (found > listed.Count ? string.Create(CultureInfo.InvariantCulture, $"; and {found - listed.Count} more") : string.Empty);
+    }
+
+    /// <summary>
+    /// Why no doodad was found: how many entities were read, how many carry a path the room names as a stub and how near the nearest came, and how many carry a stub's name in another path.
+    /// </summary>
+    /// <remarks>
+    /// THE NEAR MISSES, because "none" alone cannot say whether the place was wrong, the path was
+    /// spelt another way, or the game simply holds none of them - the first report of this line was
+    /// exactly that, beside a pot read by hand from memory minutes before.
+    /// </remarks>
+    private static string Missed(
+        RoomLayout room, IReadOnlyList<WorldEntity> entities, Dictionary<string, List<WorldEntity>> byPath, float nearest)
+    {
+        var stubs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (RoomDoodad one in room.Doodads)
+        {
+            if (one.Stub.Length > 0 && stubs.Add(one.Stub))
+            {
+                names.Add(Tail(one.Stub));
+            }
+        }
+
+        int sharing = 0;
+        foreach (string stub in stubs)
+        {
+            sharing += byPath.TryGetValue(stub, out List<WorldEntity>? same) ? same.Count : 0;
+        }
+
+        int alike = 0;
+        string example = string.Empty;
+        foreach (WorldEntity entity in entities)
+        {
+            if (entity.Path.Length == 0 || stubs.Contains(entity.Path))
+            {
+                continue;
+            }
+
+            foreach (string name in names)
+            {
+                if (entity.Path.Contains(name, StringComparison.OrdinalIgnoreCase))
+                {
+                    alike++;
+                    if (example.Length == 0)
+                    {
+                        example = entity.Path;
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        return string.Create(CultureInfo.InvariantCulture, $"doodad heights: none of the room's doodads is in memory as an entity - {entities.Count} entities read, {sharing} with a path the room names as a stub")
+            + (sharing > 0 ? string.Create(CultureInfo.InvariantCulture, $", the nearest {nearest:0} units from such a doodad (a tile is {TileModels.Side:0})") : string.Empty)
+            + (alike > 0 ? string.Create(CultureInfo.InvariantCulture, $"; {alike} with a stub's name in another path, such as {example}") : string.Empty);
     }
 
     /// <summary>A place in the room, in tiles from its corner, as a place in the area in world units.</summary>

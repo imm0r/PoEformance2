@@ -3013,6 +3013,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 Load = (read, _, key, _, progress) => TileBookWindow.Load(read, key, () => _snapshot.Terrain as TerrainGrid, progress, () => _snapshot.Entities),
                 Ink = TileBookWindow.GroundInk,
                 Shaded = true,
+
+                // TRANSLUCENT, because a tile's ground layers are mixed shapes that fade into the ground
+                // under them - see the property - and drawn solid they were the slab of mud over the floor.
+                Translucent = true,
                 Masked = true,
                 Tilesets = catalog,
                 Shaders = () => ShaderFiles,

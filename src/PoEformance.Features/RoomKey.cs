@@ -17,7 +17,7 @@ namespace PoEformance.Features;
 /// <param name="AtLevel">Whether a laid room's pieces are set at their tiles' own levels rather than fitted to the area's ground - see LaidRoomModels.</param>
 /// <param name="Heights">How high a doodad that carries a height in its line is set - see <see cref="DoodadHeight"/>.</param>
 public readonly record struct RoomKey(
-    string Path, int Doodads = RoomModels.UsualDoodads, bool Tools = false, string Laid = "", bool AtLevel = false, DoodadHeight Heights = DoodadHeight.Ground)
+    string Path, int Doodads = RoomModels.UsualDoodads, bool Tools = false, string Laid = "", bool AtLevel = false, DoodadHeight Heights = DoodadHeight.File)
 {
     /// <summary>What starts the word naming the place the room is laid at.</summary>
     public const string LaidWord = "laid=";
@@ -31,13 +31,13 @@ public readonly record struct RoomKey(
     /// <summary>The word saying a laid room's pieces are set at their tiles' own levels.</summary>
     public const string LevelWord = "level";
 
-    /// <summary>What starts the word naming how doodads with a height are set; "file" or "added" follows.</summary>
+    /// <summary>What starts the word naming how doodads with a height are set where it is not the usual; "ground" or "added" follows.</summary>
     public const string HeightsWord = "heights=";
 
     /// <summary>The key as a string - the bare path at the usual choices.</summary>
     public override string ToString()
     {
-        if (Doodads == RoomModels.UsualDoodads && !Tools && Laid.Length == 0 && !AtLevel && Heights == DoodadHeight.Ground)
+        if (Doodads == RoomModels.UsualDoodads && !Tools && Laid.Length == 0 && !AtLevel && Heights == DoodadHeight.File)
         {
             return Path;
         }
@@ -63,9 +63,9 @@ public readonly record struct RoomKey(
             words.Add(LevelWord);
         }
 
-        if (Heights != DoodadHeight.Ground)
+        if (Heights != DoodadHeight.File)
         {
-            words.Add(HeightsWord + (Heights == DoodadHeight.File ? "file" : "added"));
+            words.Add(HeightsWord + (Heights == DoodadHeight.Ground ? "ground" : "added"));
         }
 
         return string.Concat(Path, TileKey.Mark.ToString(), string.Join(TileKey.WordMark, words));
@@ -101,7 +101,7 @@ public readonly record struct RoomKey(
         int doodads = RoomModels.UsualDoodads;
         var tools = false;
         var level = false;
-        var heights = DoodadHeight.Ground;
+        var heights = DoodadHeight.File;
         string laid = string.Empty;
         ReadOnlySpan<char> words = key.AsSpan(mark + 1);
         foreach (Range one in words.Split(TileKey.WordMark))
@@ -128,7 +128,7 @@ public readonly record struct RoomKey(
             else if (word.StartsWith(HeightsWord, StringComparison.Ordinal))
             {
                 ReadOnlySpan<char> how = word[HeightsWord.Length..];
-                heights = how.SequenceEqual("file") ? DoodadHeight.File : how.SequenceEqual("added") ? DoodadHeight.Added : DoodadHeight.Ground;
+                heights = how.SequenceEqual("ground") ? DoodadHeight.Ground : how.SequenceEqual("added") ? DoodadHeight.Added : DoodadHeight.File;
             }
         }
 
@@ -141,18 +141,19 @@ public readonly record struct RoomKey(
 /// How high a doodad whose line carries a height is set: on the ground, at the height, or at the ground plus the height.
 /// </summary>
 /// <remarks>
-/// A CHOICE BECAUSE IT IS NOT SETTLED - see RoomDoodad.Height. A doodad whose line carries none is on the
-/// ground whichever is chosen. "At the height" and "the ground plus it" are the two readings the one
-/// pot read from memory could not tell apart, its ground being where the height put it; the doodad
-/// heights line under a laid room counts which of the three the game's entities agree with.
+/// AT THE HEIGHT IS THE USUAL, AND THE GAME SAID SO: seepage's 2x2_offices_01 laid at its place in the
+/// area came out with every doodad where the game has it once they were set at their lines' heights -
+/// on the ground, the shelves and pots and gem piles had sunk into floors raised around them or stood on
+/// air - and the one pot read from memory sits at exactly its line's -115. A doodad whose line carries
+/// none is on the ground whichever is chosen. The other two stay to hold against the game.
 /// </remarks>
 public enum DoodadHeight : byte
 {
+    /// <summary>At the height itself, in the area's own z - the usual.</summary>
+    File,
+
     /// <summary>On the ground under it, the height ignored - every picture before the height was read.</summary>
     Ground,
-
-    /// <summary>At the height itself, in the area's own z.</summary>
-    File,
 
     /// <summary>At the ground under it plus the height.</summary>
     Added,
