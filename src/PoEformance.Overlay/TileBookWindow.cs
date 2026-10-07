@@ -532,20 +532,6 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             return;
         }
 
-        string left = found.Left > 0
-            ? string.Create(CultureInfo.InvariantCulture, $"; {found.Left} slots bigger than a tile left out of the ground")
-            : string.Empty;
-        if (found.Free > 0)
-        {
-            left += string.Create(CultureInfo.InvariantCulture, $"; {found.Free} corners the room leaves unnamed are free");
-        }
-
-        left += found.Overrides
-            ? string.Create(CultureInfo.InvariantCulture, $"; {found.Overridden} inner corners named by the file's ground overrides")
-            : found.OverridesWhy.Length > 0
-                ? "; the file's tail did not read: " + found.OverridesWhy
-                : "; no ground overrides in the file";
-
         string standing = found.Standing ? " over walkable ground" : string.Empty;
 
         // THE BEST SHARE SAID OUTRIGHT where nothing fits: a "nearest" agreeing on under half its
@@ -553,12 +539,34 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         int best = found.Candidates.Count > 0 ? Share(found.Candidates[0]) : 0;
         ImGui.TextDisabled(ImGuiText.Escape(found.TileChecked
             ? string.Create(CultureInfo.InvariantCulture,
-                $"where it lies: places{standing} ranked by the tiles laid, then the corners - {found.Fits} fit all {found.Corners} corners{left}; pick one to outline it on the large map")
+                $"where it lies: places{standing} ranked by the tiles laid, then the corners - {found.Fits} fit all {found.Corners} corners; pick one to outline it on the large map")
             : found.Found
                 ? string.Create(CultureInfo.InvariantCulture,
-                    $"where it lies: {found.Fits} place{(found.Fits == 1 ? string.Empty : "s")}{standing} fit all {found.Corners} corners{left} - pick one to outline it on the large map")
+                    $"where it lies: {found.Fits} place{(found.Fits == 1 ? string.Empty : "s")}{standing} fit all {found.Corners} corners - pick one to outline it on the large map")
                 : string.Create(CultureInfo.InvariantCulture,
-                    $"where it lies: nowhere{standing} fits all {found.Corners} corners{left}; the nearest agrees on {best}% - pick one to see where it parts:")));
+                    $"where it lies: nowhere{standing} fits all {found.Corners} corners; the nearest agrees on {best}% - pick one to see where it parts:")));
+
+        // WHAT THE ROOM'S FILE GAVE THE SEARCH, on a line of its own and wrapped: at the end of the
+        // line above it was cut off by the pane's edge, the overrides with it.
+        var facts = new List<string>(3);
+        if (found.Free > 0)
+        {
+            facts.Add(string.Create(CultureInfo.InvariantCulture, $"{found.Free} corners the room leaves unnamed are free"));
+        }
+
+        if (found.Left > 0)
+        {
+            facts.Add(string.Create(CultureInfo.InvariantCulture, $"{found.Left} slots bigger than a tile left out of the ground"));
+        }
+
+        facts.Add(found.Overrides
+            ? string.Create(CultureInfo.InvariantCulture, $"{found.Overridden} inner corners named by the file's ground overrides")
+            : found.OverridesWhy.Length > 0
+                ? "the file's tail did not read: " + found.OverridesWhy
+                : "no ground overrides in the file");
+        ImGui.PushTextWrapPos(0f);
+        ImGui.TextDisabled(ImGuiText.Escape("the room's file: " + string.Join("  ·  ", facts)));
+        ImGui.PopTextWrapPos();
 
         Around(grid, room, found);
 
@@ -622,6 +630,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             _partsOf = found;
             _partsFor = candidate;
             IReadOnlyList<RoomPart> parts = found.Parts(candidate);
+            int elsewhere = parts.Count(one => one.Join == RoomJoin.None);
             _partLines = new string[parts.Count];
             for (var one = 0; one < parts.Count; one++)
             {
@@ -629,7 +638,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             }
 
             _partsHeader = string.Create(CultureInfo.InvariantCulture,
-                $"where tile {candidate.X}, {candidate.Y} ({RoomFinder.Said(candidate.Turn)}) parts with the area: {parts.Count} misses##roomparts");
+                $"where tile {candidate.X}, {candidate.Y} ({RoomFinder.Said(candidate.Turn)}) parts with the area: {parts.Count} misses, {elsewhere} of them at no join##roomparts");
         }
 
         if (!ImGui.CollapsingHeader(_partsHeader))
@@ -698,7 +707,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         + "On the map, red dots are corners that disagree and orange rings tiles that do; cyan marks the ones at a join -"
         + " a ring for a rim tile turned to walkable ground with walkable ground beyond it, a ring with a dot for a miss beside it,"
         + " and a dot for its corners.\n"
-        + "Joins: how many such runs; off elsewhere: the misses no join explains.";
+        + "Joins: how many such runs; beside them: of the corners and tiles no join explains, how many agree.";
 
     /// <summary>A candidate in a row's words, with how its misses fall where they were sorted into joins.</summary>
     private static string Said(RoomCandidate where, bool tileChecked, RoomMisses? misses)
@@ -709,7 +718,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
                 ? string.Create(CultureInfo.InvariantCulture, $"  ·  tiles {where.TilesAgree}/{where.Tiles}, big {where.BigAgree}/{where.Big}")
                 : string.Create(CultureInfo.InvariantCulture, $"  ·  tiles {where.TilesAgree}/{where.Tiles}");
         string joins = misses is { Classified: true } sorted
-            ? string.Create(CultureInfo.InvariantCulture, $"  ·  joins {sorted.Joins}, {sorted.Elsewhere} off elsewhere")
+            ? string.Create(CultureInfo.InvariantCulture, $"  ·  joins {sorted.Joins}  ·  {Beside(where, sorted)}% beside them")
             : string.Empty;
         return string.Create(CultureInfo.InvariantCulture,
             $"tile {where.X}, {where.Y}  ·  {RoomFinder.Said(where.Turn)}  ·  {where.Matched}/{where.Corners} corners ({Share(where)}%){tiles}{joins}");
@@ -769,6 +778,15 @@ public sealed class TileBookWindow : BookWindow<TileBook>
                 + " whether or not that made the list below. Standing in the room, this is where it is: what it scores here"
                 + " against the list's first row says whether the search can tell it apart.\n" + RowSaid);
         }
+    }
+
+    /// <summary>
+    /// How much of a candidate's corners and tiles agree that no join explains, as a whole percentage rounded down - 100 where every miss is a join's.
+    /// </summary>
+    private static int Beside(RoomCandidate where, RoomMisses misses)
+    {
+        int beside = where.Corners + where.Tiles - misses.Openings.Count - misses.Caps.Count - misses.JoinCorners.Count;
+        return beside > 0 ? (beside - misses.Elsewhere) * 100 / beside : 100;
     }
 
     /// <summary>How much of a candidate's corners agree, as a whole percentage, rounded down so nothing short of all reads 100.</summary>
