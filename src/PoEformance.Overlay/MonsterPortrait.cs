@@ -342,6 +342,18 @@ public sealed class MonsterPortrait
     private float _clock;
     private float _drawnClock = float.NaN;
 
+    /// <summary>The picture the clock last asked for, while it is being drawn - see <see cref="ClockBehind"/>.</summary>
+    private Task<ClockPicture>? _clockDrawing;
+
+    /// <summary>The clock's own canvas: a drawing behind the frame never shares the frame's.</summary>
+    private MeshPicture.Canvas? _clockCanvas;
+
+    /// <summary>
+    /// How many pictures the frame has drawn. A clock drawing asked for before the latest is not shown -
+    /// it would put back a picture from before a turn, a zoom or another model.
+    /// </summary>
+    private int _drawing;
+
     /// <summary>The model <see cref="_timed"/> was worked out for.</summary>
     private MonsterModel? _timedOf;
     private bool _timed;
@@ -947,6 +959,7 @@ public sealed class MonsterPortrait
         if (_pose is null || !_model.Moves)
         {
             Rate(draw, corner);
+            ClockToggle(corner);
         }
 
         ImGui.SetCursorScreenPos(below);
@@ -988,6 +1001,33 @@ public sealed class MonsterPortrait
 
     /// <summary>The rate's shadow: black, mostly opaque.</summary>
     private const uint RateShadow = 0xC0000000;
+
+    /// <summary>
+    /// Pause or Play beside the rate, where the picture runs with the clock and has no animation row to carry the button.
+    /// </summary>
+    /// <remarks>
+    /// THE ROW'S OWN BUTTON, for the pictures without the row: a tile runs with the clock as a monster
+    /// runs an animation, and there was no way to stop one - the row holding Pause is drawn only where
+    /// there is something to play. Paused, the picture goes back to the pane's own rung and holds still.
+    /// Drawn after the picture, so it takes the click - see the grip in <see cref="Draw"/>.
+    /// </remarks>
+    private void ClockToggle(Vector2 corner)
+    {
+        if (!HasClock())
+        {
+            return;
+        }
+
+        float inset = ImGui.GetStyle().ItemSpacing.X;
+        ImGui.SetCursorScreenPos(new Vector2(corner.X + (inset * 2f) + ImGui.CalcTextSize(RateRoom).X, corner.Y + inset));
+        if (ImGui.SmallButton(_playing ? "Pause##monster-clock" : "Play##monster-clock"))
+        {
+            _playing = !_playing;
+        }
+    }
+
+    /// <summary>The room the rate is given, three digits wide, so the button beside it does not shuffle as the number changes.</summary>
+    private const string RateRoom = "999 fps";
 
     /// <summary>
     /// Carries the camera on one step of its lap, where the orbit is running.
@@ -1144,7 +1184,7 @@ public sealed class MonsterPortrait
 
         string toggle = _playing ? "Pause" : "Play";
         float button = ImGui.CalcTextSize("Pause").X + (style.FramePadding.X * 2f);
-        float reserved = ImGui.CalcTextSize("999 fps").X;
+        float reserved = ImGui.CalcTextSize(RateRoom).X;
         ImGui.SameLine();
         float left = MathF.Max(ImGui.GetCursorScreenPos().X, row.X + side - (reserved + style.ItemSpacing.X + button));
 
@@ -2179,17 +2219,30 @@ public sealed class MonsterPortrait
             // and has to redraw one - without this the switch and the slider do nothing at all
             // until something else moves, which reads as neither working.
             || _drawnGrey != Greyed
-            || (posed && (_drawnFrame != _frame || _drawnAnimation != _chosen))
+            || (posed && (_drawnFrame != _frame || _drawnAnimation != _chosen));
 
-            // A PROGRAM THAT READS THE CLOCK changes the picture as the clock runs - see Ticking.
-            || (ticking && _drawnClock != _clock);
-
-        if (!moved)
+        if (moved)
         {
+            Render(size, posed);
             return;
         }
 
-        Render(size, posed);
+        ClockLanded(size);
+
+        // A PROGRAM THAT READS THE CLOCK changes the picture as the clock runs - see Ticking. Behind
+        // the frame where nothing else moved, and on it where a pose is held: the pose's buffers
+        // are the frame's, and a drawing on a task must not read them while the frame writes them.
+        if (ticking && _drawnClock != _clock)
+        {
+            if (posed)
+            {
+                Render(size, posed);
+            }
+            else
+            {
+                ClockBehind(size);
+            }
+        }
     }
 
     /// <summary>Builds the pose for a model that just arrived, and starts its first animation.</summary>
@@ -2302,22 +2355,132 @@ public sealed class MonsterPortrait
     /// Whether the picture runs with the clock: a shade program of the model reads <c>Time</c>, and it is playing.
     /// </summary>
     /// <remarks>
-    /// AN ANIMATION OF ITS OWN, and paid for like one - redrawn every frame at the capped rung while
-    /// it runs. Worked out once per model, since it is asked every frame.
+    /// AN ANIMATION OF ITS OWN, and drawn at the capped rung like one while it runs - but behind
+    /// the frame, not on it, where nothing else moved: see <see cref="ClockBehind"/>.
     /// </remarks>
-    private bool Ticking
-    {
-        get
-        {
-            if (!ReferenceEquals(_timedOf, _model))
-            {
-                _timedOf = _model;
-                _timed = _model.Shades.Any(one => one is { UsesTime: true });
-            }
+    private bool Ticking => _playing && HasClock();
 
-            return _playing && Shaded && _timed;
+    /// <summary>Whether a shade program of the model reads <c>Time</c>, drawn shaded. Worked out once per model, since it is asked every frame.</summary>
+    private bool HasClock()
+    {
+        if (!ReferenceEquals(_timedOf, _model))
+        {
+            _timedOf = _model;
+            _timed = _model.Shades.Any(one => one is { UsesTime: true });
+        }
+
+        return Shaded && _timed;
+    }
+
+    /// <summary>
+    /// Takes a picture the clock asked for once it has been drawn, and shows it - unless the frame
+    /// drew since it was asked for, or the model or the size moved on.
+    /// </summary>
+    private void ClockLanded(int size)
+    {
+        if (_clockDrawing is not { IsCompleted: true } done)
+        {
+            return;
+        }
+
+        // LET GO FIRST, stale or not: its canvas is free again only once nothing waits on it.
+        _clockDrawing = null;
+        ClockPicture drawn = done.Result;
+        if (drawn.Drawing != _drawing || !ReferenceEquals(drawn.Model, _model) || drawn.Size != size)
+        {
+            return;
+        }
+
+        if (drawn.Failed.Length > 0)
+        {
+            Why = drawn.Failed;
+            Drop();
+            return;
+        }
+
+        _rate.Redrawn(ImGui.GetTime());
+        try
+        {
+            Upload(drawn.Picture);
+        }
+        catch (Exception exception) when (exception is not (OutOfMemoryException or StackOverflowException))
+        {
+            Why = $"the model would not draw: {exception.Message}";
+            Drop();
         }
     }
+
+    /// <summary>
+    /// Draws the picture at the clock's new time on a task, into a canvas of its own, while the
+    /// frame goes on showing the last one.
+    /// </summary>
+    /// <remarks>
+    /// THE FRAME DOES NOT WAIT FOR THE CLOCK. A tile as large as meta_tile.tdt takes longer to draw
+    /// than a frame lasts, and drawn on the frame every tick it held the whole overlay to its own
+    /// pace. Behind the frame it costs the picture its rate and nothing else: the overlay stays at
+    /// its own, and the picture moves on as fast as the tile can be drawn.
+    ///
+    /// ONE AT A TIME, because the canvas is the drawing's until its picture has been uploaded - the
+    /// next is asked for on the first frame after that. Everything the drawing reads is taken here,
+    /// on the frame: the model and its programs are never changed once loaded, and the blends are
+    /// a list made once per model.
+    /// </remarks>
+    private void ClockBehind(int size)
+    {
+        if (_clockDrawing is not null)
+        {
+            return;
+        }
+
+        if (_clockCanvas is not { } canvas || canvas.Size != size)
+        {
+            canvas = new MeshPicture.Canvas(size);
+            _clockCanvas = canvas;
+        }
+
+        canvas.Time = _clock;
+        _drawnClock = _clock;
+        MonsterModel model = _model;
+        float turn = _turn;
+        float tilt = _tilt;
+        float zoom = _zoom;
+        Vector2 pan = _pan;
+        Vector3 ink = Ink;
+        float grey = Grey ? GreyFactor : float.NaN;
+        IReadOnlyList<MaterialBlend>? blends = Blends();
+        IReadOnlyList<ShadeProgram?>? shades = Shaded ? model.Shades : null;
+        int drawing = _drawing;
+        _clockDrawing = Task.Run(() =>
+        {
+            try
+            {
+                GamePicture drawn = MeshPicture.Of(model.Mesh, canvas, turn, tilt, ink, model.Skin, zoom, pan, model.Skins, blends, shades);
+                if (!drawn.Ready)
+                {
+                    return new ClockPicture(drawn, model, size, drawing, "the model drew nothing");
+                }
+
+                if (!float.IsNaN(grey))
+                {
+                    PictureGrey.Apply(drawn.Rgba.AsSpan(0, drawn.Width * drawn.Height * 4), grey);
+                }
+
+                return new ClockPicture(drawn, model, size, drawing, string.Empty);
+            }
+            catch (Exception exception) when (exception is not (OutOfMemoryException or StackOverflowException))
+            {
+                return new ClockPicture(default, model, size, drawing, $"the model would not draw: {exception.Message}");
+            }
+        });
+    }
+
+    /// <summary>A picture the clock asked for, and what it was asked for with - see <see cref="ClockLanded"/>.</summary>
+    /// <param name="Picture">The pixels, on the clock's own canvas.</param>
+    /// <param name="Model">The model it is of.</param>
+    /// <param name="Size">The rung it was drawn at.</param>
+    /// <param name="Drawing">Which of the frame's drawings it followed - see <see cref="_drawing"/>.</param>
+    /// <param name="Failed">Why there is no picture, or empty.</param>
+    private sealed record ClockPicture(GamePicture Picture, MonsterModel Model, int Size, int Drawing, string Failed);
 
     /// <summary>The buffers for one size, kept until the size changes.</summary>
     /// <remarks>
@@ -2356,6 +2519,7 @@ public sealed class MonsterPortrait
         _drawnAnimation = _chosen;
         _drawnGrey = Greyed;
         _drawnClock = _clock;
+        _drawing++;
 
         try
         {
@@ -2396,14 +2560,7 @@ public sealed class MonsterPortrait
                 PictureGrey.Apply(drawn.Rgba.AsSpan(0, drawn.Width * drawn.Height * 4), GreyFactor);
             }
 
-            using var image = Image.LoadPixelData<Rgba32>(Contiguous, drawn.Rgba, drawn.Width, drawn.Height);
-
-            // A NEW KEY EACH TIME, because the renderer caches by key and the pixels change on
-            // every turn - reusing one hands back the picture from the first frame forever.
-            Drop();
-            _key = _prefix + _keys++.ToString(CultureInfo.InvariantCulture);
-            _texture = _upload!(_key, image, false);
-            Why = string.Empty;
+            Upload(drawn);
         }
         catch (Exception exception) when (exception is not (OutOfMemoryException or StackOverflowException))
         {
@@ -2412,6 +2569,19 @@ public sealed class MonsterPortrait
             Why = $"the model would not draw: {exception.Message}";
             Drop();
         }
+    }
+
+    /// <summary>Hands a drawn picture to the renderer in place of the one shown.</summary>
+    private void Upload(GamePicture drawn)
+    {
+        using var image = Image.LoadPixelData<Rgba32>(Contiguous, drawn.Rgba, drawn.Width, drawn.Height);
+
+        // A NEW KEY EACH TIME, because the renderer caches by key and the pixels change on
+        // every turn - reusing one hands back the picture from the first frame forever.
+        Drop();
+        _key = _prefix + _keys++.ToString(CultureInfo.InvariantCulture);
+        _texture = _upload!(_key, image, false);
+        Why = string.Empty;
     }
 
     /// <summary>Says so, in the lines, when the model as drawn has its lowest point well under the floor.</summary>
