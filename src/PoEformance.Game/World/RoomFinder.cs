@@ -50,11 +50,82 @@ public sealed record TileIdentity(int Width, int Height, string Tag, IReadOnlyLi
 /// <summary>Where a candidate and the area part ways, for the map to mark.</summary>
 /// <param name="Corners">The area corners whose ground is not the room's, by tile corner.</param>
 /// <param name="Tiles">The area tiles whose definition is not what the room's slot there asks for, by tile.</param>
+/// <remarks>
+/// AND WHICH OF THOSE ARE A JOIN, where the walkable ground was to hand. Where a room is joined to the
+/// rest of the map, the area lays its own tiles over the room's closed rim - in seepage, every miss of
+/// two rooms found where they stand lay at a join: a run of tiles turned to walkable floor, their
+/// corners with it, and one more tile at each end of the run, the wall stopping there. So a miss is
+/// counted as a join by that pattern, read off the area alone: an OPENING is a rim tile that misses,
+/// can be walked on and has walkable ground across the rim; a CAP is a rim tile that misses beside an
+/// opening; a JOIN CORNER is a missed corner of an opening. The rule comes from one room's screenshot
+/// and only says what the map marks - nothing is ranked by it.
+/// </remarks>
 public sealed record RoomMisses(IReadOnlyList<(int X, int Y)> Corners, IReadOnlyList<(int X, int Y)> Tiles)
 {
     /// <summary>Nothing missed.</summary>
     public static RoomMisses None { get; } = new([], []);
+
+    /// <summary>Whether the misses were sorted into joins and the rest - false where the walkable ground was not to hand.</summary>
+    public bool Classified { get; init; }
+
+    /// <summary>Of <see cref="Tiles"/>, the openings: rim tiles that miss, can be walked on and have walkable ground across the rim.</summary>
+    public IReadOnlyList<(int X, int Y)> Openings { get; init; } = [];
+
+    /// <summary>Of <see cref="Tiles"/>, the caps: rim tiles that miss beside an opening.</summary>
+    public IReadOnlyList<(int X, int Y)> Caps { get; init; } = [];
+
+    /// <summary>Of <see cref="Corners"/>, the ones at a corner of an opening.</summary>
+    public IReadOnlyList<(int X, int Y)> JoinCorners { get; init; } = [];
+
+    /// <summary>How many separate runs of openings there are.</summary>
+    public int Joins { get; init; }
+
+    /// <summary>How many misses, corners and tiles together, are none of a join's.</summary>
+    public int Elsewhere => Corners.Count + Tiles.Count - Openings.Count - Caps.Count - JoinCorners.Count;
 }
+
+/// <summary>What part of a join a miss is, if any - see <see cref="RoomMisses"/>.</summary>
+public enum RoomJoin
+{
+    /// <summary>No part of a join.</summary>
+    None,
+
+    /// <summary>A rim tile turned to walkable ground.</summary>
+    Opening,
+
+    /// <summary>A rim tile that misses beside an opening.</summary>
+    Cap,
+
+    /// <summary>A missed corner of an opening.</summary>
+    Corner,
+}
+
+/// <summary>One place a candidate parts with the area, said in full for the diagnostic list.</summary>
+/// <param name="IsCorner">A corner, or else a tile.</param>
+/// <param name="X">The area tile or corner, across.</param>
+/// <param name="Y">The area tile or corner, down.</param>
+/// <param name="Join">What part of a join it is.</param>
+/// <param name="RoomU">The room's slot column for a tile, the room's grid corner for a corner.</param>
+/// <param name="RoomV">The slot's line, or the corner's.</param>
+/// <param name="Sides">The room's own sides it lies on - D, R, U, L, the room's down being its grid's first line - or empty inside.</param>
+/// <param name="Wanted">What the room asks for there.</param>
+/// <param name="Laid">What the area laid there.</param>
+/// <param name="Walkable">Whether the tile has walkable ground - for a corner, false.</param>
+/// <param name="SideEdges">A tile's slot's edge types, down, right, up, left, as the file writes them; empty for a corner.</param>
+/// <param name="SideExits">A tile's slot's exit pairs, two to a side in the same order, as the file writes them; empty for a corner.</param>
+public sealed record RoomPart(
+    bool IsCorner,
+    int X,
+    int Y,
+    RoomJoin Join,
+    int RoomU,
+    int RoomV,
+    string Sides,
+    string Wanted,
+    string Laid,
+    bool Walkable,
+    IReadOnlyList<string> SideEdges,
+    IReadOnlyList<int> SideExits);
 
 /// <summary>One placement of a room and where it parts with the area.</summary>
 /// <param name="Where">The placement.</param>
@@ -87,6 +158,15 @@ public sealed record RoomSearch(IReadOnlyList<RoomCandidate> Candidates, int Cor
     /// <summary>Whether placements covering no walkable tile were left out.</summary>
     public bool Standing { get; init; }
 
+    /// <summary>Whether the room's file has a line of ground overrides.</summary>
+    public bool Overrides { get; init; }
+
+    /// <summary>How many of the stamp's corners the file's ground overrides name.</summary>
+    public int Overridden { get; init; }
+
+    /// <summary>Why the file's tail did not read as far as the ground overrides, or empty.</summary>
+    public string OverridesWhy { get; init; } = string.Empty;
+
     /// <summary>Whether any candidate agrees everywhere.</summary>
     public bool Found => Candidates.Count > 0 && Candidates[0].Exact;
 
@@ -102,6 +182,10 @@ public sealed record RoomSearch(IReadOnlyList<RoomCandidate> Candidates, int Cor
     /// there - whether or not that place made the list. Not thread-safe against itself: one call at a time.
     /// </remarks>
     public RoomPlace? Around(int tileX, int tileY) => Placements?.Around(tileX, tileY);
+
+    /// <summary>Every place one candidate parts with the area, said in full - tiles, then corners - or empty for a search that did not run.</summary>
+    /// <remarks>Safe beside a running <see cref="Around"/>: it reads nothing either keeps.</remarks>
+    public IReadOnlyList<RoomPart> Parts(RoomCandidate candidate) => Placements?.Parts(candidate) ?? [];
 }
 
 /// <summary>
@@ -190,7 +274,8 @@ public static class RoomFinder
     /// <param name="tiles">The tiles actually laid, to check each placement's slots against; null leaves the check out.</param>
     /// <param name="identity">A tile file's identity - its definition with the inheritance followed - or null where it does not read. Called from the search's thread.</param>
     /// <param name="most">Most candidates listed.</param>
-    /// <param name="walkable">Which tiles have ground anybody can stand on, row by row - TerrainGrid.WalkableTileMask - to leave out every placement covering none; null, or a mask of no walkable tile at all, leaves nothing out.</param>
+    /// <param name="walkable">Which tiles have ground anybody can stand on, row by row - TerrainGrid.WalkableTileMask - to leave out every placement covering none, and to tell a join among the misses; null leaves both out, and a mask of no walkable tile at all leaves nothing out.</param>
+    /// <param name="anywhere">Whether to keep the placements covering no walkable tile too - the mask still telling the joins.</param>
     public static RoomSearch Find(
         RoomLayout room,
         TerrainGroundTypes ground,
@@ -199,7 +284,8 @@ public static class RoomFinder
         TerrainTiles? tiles = null,
         Func<string, TileIdentity?>? identity = null,
         int most = MostCandidates,
-        bool[]? walkable = null)
+        bool[]? walkable = null,
+        bool anywhere = false)
     {
         ArgumentNullException.ThrowIfNull(room);
         ArgumentNullException.ThrowIfNull(ground);
@@ -219,7 +305,7 @@ public static class RoomFinder
             return RoomSearch.Not($"the area's ground types are not to be trusted: {ground.Note}");
         }
 
-        (Dictionary<(int U, int V), int>? stamp, int left, int free, string why) = Stamped(room, ground);
+        (Dictionary<(int U, int V), int>? stamp, int left, int free, int overridden, string why) = Stamped(room, ground);
         if (stamp is null)
         {
             return RoomSearch.Not(why);
@@ -231,9 +317,10 @@ public static class RoomFinder
                 with { Left = left, Free = free };
         }
 
-        var placements = new RoomPlacements(room, stamp, ground, tilesX, tilesY, tiles, identity);
+        bool[]? mask = walkable is not null && walkable.Length >= tilesX * tilesY ? walkable : null;
+        var placements = new RoomPlacements(room, stamp, ground, tilesX, tilesY, tiles, identity, mask);
         bool checking = placements.Checks;
-        int[]? standing = Summed(walkable, tilesX, tilesY);
+        int[]? standing = anywhere ? null : Summed(mask, tilesX, tilesY);
         int corners = stamp.Count;
         int capacity = Math.Max(checking ? most : Math.Max(most, Nearest), 1);
         var ranked = new List<RoomCandidate>(capacity + 1);
@@ -317,6 +404,9 @@ public static class RoomFinder
             Free = free,
             Fits = fits,
             Standing = standing is not null,
+            Overrides = room.GroundOverrides.Count > 0,
+            Overridden = overridden,
+            OverridesWhy = room.OverridesWhy,
             Placements = placements,
         };
     }
@@ -411,7 +501,7 @@ public static class RoomFinder
     /// <summary>
     /// The room's corner stamp - grid corner to the area type it must be - or null and why.
     /// </summary>
-    private static (Dictionary<(int U, int V), int>? Stamp, int Left, int Free, string Why) Stamped(RoomLayout room, TerrainGroundTypes ground)
+    private static (Dictionary<(int U, int V), int>? Stamp, int Left, int Free, int Overridden, string Why) Stamped(RoomLayout room, TerrainGroundTypes ground)
     {
         var stamp = new Dictionary<(int U, int V), int>();
         var torn = new HashSet<(int U, int V)>();
@@ -457,7 +547,7 @@ public static class RoomFinder
                     int wants = TypeOf(ground, name);
                     if (wants < 0)
                     {
-                        return (null, left, 0, name.Length == 0
+                        return (null, left, 0, 0, name.Length == 0
                             ? $"a slot names ground type {index}, past the room's {room.Strings.Count} strings"
                             : $"the room's ground type {name} is not among this area's - it is not laid here");
                     }
@@ -479,10 +569,38 @@ public static class RoomFinder
             }
         }
 
+        // THE FILE'S GROUND OVERRIDES LAST: a type one names at an inner corner is that corner's,
+        // whatever the slots round it say - see RoomLayout.GroundOverrides.
+        int overridden = 0;
+        for (var v = 1; v < room.Height; v++)
+        {
+            for (var u = 1; u < room.Width; u++)
+            {
+                int index = room.OverrideAt(u, v);
+                if (index == 0)
+                {
+                    continue;
+                }
+
+                string name = room.Named(index);
+                int wants = TypeOf(ground, name);
+                if (wants < 0)
+                {
+                    return (null, left, 0, 0, name.Length == 0
+                        ? $"a ground override names type {index}, past the room's {room.Strings.Count} strings"
+                        : $"the room's overriding ground type {name} is not among this area's - it is not laid here");
+                }
+
+                stamp[(u, v)] = wants;
+                torn.Remove((u, v));
+                overridden++;
+            }
+        }
+
         // A CORNER ONE SLOT LEAVES FREE AND ANOTHER NAMES is named; only the ones nobody names are free.
         unnamed.ExceptWith(stamp.Keys);
         unnamed.ExceptWith(torn);
-        return (stamp, left, unnamed.Count, string.Empty);
+        return (stamp, left, unnamed.Count, overridden, string.Empty);
     }
 
     /// <summary>The area's index for a ground type file, or -1.</summary>

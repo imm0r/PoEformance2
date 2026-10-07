@@ -101,6 +101,57 @@ public class RoomLayoutTests
         Assert.Equal("Metadata/Doodads/Rhoa.ao", rhoa.Ao);
     }
 
+    /// <summary>A three by two room of version 36 whose tail after the doodads ends in the given lines.</summary>
+    private static string Tailed(params string[] tail) => string.Join('\n', [
+        "version 36", "1", "\"Metadata/Terrain/Woods/ground.gt\"", "5 3", "0", "\"roomtag\"", "0",
+        "k 3 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0",
+        "-1", "-1", "-1", "-1", "-1", "-1", "\"\"",
+        "n n n", "n n n",
+        "4 6 1 0.1 0.2 3.14 0 0 0 1 1 0 0 1 \"Metadata/Doodads/Rhoa.ao\" \"stub\" 0", "-1",
+        .. tail]);
+
+    /// <summary>
+    /// The tail after the doodads is read as poe_data_tools reads it, to the ground overrides at the very end.
+    /// </summary>
+    /// <remarks>
+    /// AND PAST ITS WARNING: the last boss line is often written without its line end, so the line
+    /// after it - here the zones' closing -1 - follows its quoted strings, and must be read as a line.
+    /// </remarks>
+    [Fact]
+    public void THEGROUNDOverridesAtTheEndAreReadEvenWhereTheLastBossLineSwallowedTheNext()
+    {
+        RoomLayout room = RoomLayout.Parse(Tailed("-1", "-1", "1", "\"Boss\" \"Metadata/Monsters/Boss\" -1", "1 nospawner", "1 0"));
+
+        Assert.True(room.Ready, room.Why);
+        Assert.Equal(string.Empty, room.OverridesWhy);
+        Assert.Equal([1, 0], room.GroundOverrides);
+        Assert.Equal(1, room.OverrideAt(1, 1));
+        Assert.Equal(0, room.OverrideAt(2, 1));
+        Assert.Equal(0, room.OverrideAt(0, 0));
+        Assert.Single(room.Doodads);
+
+        // The same with the line end where it belongs.
+        Assert.Equal([1, 0], RoomLayout.Parse(Tailed("-1", "-1", "1", "\"Boss\" \"Metadata/Monsters/Boss\"", "-1", "0", "1 0")).GroundOverrides);
+    }
+
+    /// <summary>
+    /// A room with no line of overrides has none and nothing to say about it; one whose line does not fit its grid says so, and keeps its doodads.
+    /// </summary>
+    [Fact]
+    public void ANDAROOMWithoutThemHasNoneAndABadLineSaysWhyKeepingTheRest()
+    {
+        RoomLayout none = RoomLayout.Parse(Tailed("-1", "-1", "0", "-1", "0"));
+        Assert.Empty(none.GroundOverrides);
+        Assert.Equal(string.Empty, none.OverridesWhy);
+
+        RoomLayout bad = RoomLayout.Parse(Tailed("-1", "-1", "0", "-1", "0", "1 0 1"));
+        Assert.True(bad.Ready, bad.Why);
+        Assert.Empty(bad.GroundOverrides);
+        Assert.Contains("2 inner corners", bad.OverridesWhy, StringComparison.Ordinal);
+        Assert.Single(bad.Doodads);
+        Assert.Equal(6, bad.Slots.Count);
+    }
+
     [Fact]
     public void ANDADoodadWhoseNumbersDoNotAddUpIsRefusedRatherThanMisread()
     {

@@ -283,6 +283,94 @@ public class RoomFinderTests
         return (Laid(paths, ids), identities);
     }
 
+    /// <summary>What follows the doodads in a version 36 room, down to an optional line of ground overrides.</summary>
+    private static string Tail(string overrides = "") => "-1\n-1\n0\n-1\n0\n" + (overrides.Length > 0 ? overrides + "\n" : string.Empty);
+
+    /// <summary>
+    /// The file's ground overrides name an inner corner its slots leave free, and the search holds the area to it.
+    /// </summary>
+    /// <remarks>
+    /// The room's inner corners are (1, 1) and (2, 1), written in that order. With (1, 1) freed in the
+    /// slots and named floor by the overrides - what the area has there - the room is found with every
+    /// corner named; named rubble instead, it misses there by one.
+    /// </remarks>
+    [Fact]
+    public void THEFILESGroundOverridesNameAnInnerCornerAndTheSearchHoldsTheAreaToIt()
+    {
+        (TerrainGroundTypes ground, _) = Area(withRoom: true);
+        var freed = (int[,])Pattern.Clone();
+        freed[1, 1] = 0;
+
+        RoomSearch named = RoomFinder.Find(RoomLayout.Parse(Room(freed, 3, 2) + Tail("2 0")), ground, TilesX, TilesY);
+
+        Assert.True(named.Overrides);
+        Assert.Equal(1, named.Overridden);
+        Assert.Equal(0, named.Free);
+        Assert.True(named.Found);
+        Assert.Equal(new RoomCandidate(12, 4, 5, 2, 3, 12, 12), Assert.Single(named.Candidates));
+
+        RoomSearch wrong = RoomFinder.Find(RoomLayout.Parse(Room(freed, 3, 2) + Tail("3 0")), ground, TilesX, TilesY);
+        Assert.False(wrong.Found);
+        Assert.Contains(new RoomCandidate(12, 4, 5, 2, 3, 11, 12), wrong.Candidates);
+
+        RoomSearch without = RoomFinder.Find(RoomLayout.Parse(Room(freed, 3, 2) + Tail()), ground, TilesX, TilesY);
+        Assert.False(without.Overrides);
+        Assert.Equal(string.Empty, without.OverridesWhy);
+        Assert.Equal(1, without.Free);
+    }
+
+    /// <summary>
+    /// Where the room is joined to the map, its misses are told apart: the opening, the tiles beside it, and the opening's corners.
+    /// </summary>
+    /// <remarks>
+    /// SEEPAGE'S OFFICES, made small. The room lies at (12, 4) over tiles 12..13 by 4..6. On its right
+    /// rim the area laid its own tiles: (13, 5) walkable with walkable ground beyond at (14, 5) - the
+    /// opening - and (13, 4), (13, 6) beside it, not walkable - the caps - and turned the opening's
+    /// corner (14, 5) from floor to wall. Every miss is a join's; none is anywhere else.
+    /// </remarks>
+    [Fact]
+    public void WHERETheRoomIsJoinedToTheMapItsMissesAreToldApartAsAJoin()
+    {
+        (TerrainGroundTypes ground, _) = Area(withRoom: true, set: [(14, 5, 1)]);
+        (TerrainTiles laid, Dictionary<string, TileIdentity> identities) = RoomAndDecoyTiles();
+        foreach ((int x, int y) in new[] { (13, 4), (13, 5), (13, 6) })
+        {
+            string path = string.Create(CultureInfo.InvariantCulture, $"Metadata/Terrain/Test/tile_{x}_{y}.tdt");
+            identities[path] = identities[path] with { Edges = ["Metadata/Terrain/Test/door.et", "", "", ""] };
+        }
+
+        var walkable = new bool[TilesX * TilesY];
+        foreach ((int x, int y) in new[] { (12, 4), (12, 5), (12, 6), (13, 5), (14, 5) })
+        {
+            walkable[(y * TilesX) + x] = true;
+        }
+
+        RoomSearch search = RoomFinder.Find(RoomLayout.Parse(Room(Pattern, 3, 2)), ground, TilesX, TilesY, laid, path => identities.GetValueOrDefault(path), walkable: walkable);
+
+        int at = search.Candidates.ToList().FindIndex(one => (one.X, one.Y, one.Turn) == (12, 4, 5));
+        Assert.True(at >= 0);
+        Assert.Equal((11, 3, 6), (search.Candidates[at].Matched, search.Candidates[at].TilesAgree, search.Candidates[at].Tiles));
+        RoomMisses misses = search.Misses[at];
+        Assert.True(misses.Classified);
+        Assert.Equal([(13, 5)], misses.Openings);
+        Assert.Equal([(13, 4), (13, 6)], misses.Caps.OrderBy(one => one.Y));
+        Assert.Equal([(14, 5)], misses.JoinCorners);
+        Assert.Equal(1, misses.Joins);
+        Assert.Equal(0, misses.Elsewhere);
+
+        // AND IN FULL: the opening's tile and corner, each with what was asked and what was laid.
+        IReadOnlyList<RoomPart> parts = search.Parts(search.Candidates[at]);
+        Assert.Equal(4, parts.Count);
+        RoomPart opening = Assert.Single(parts, one => one.Join == RoomJoin.Opening);
+        Assert.Equal((13, 5, false, true), (opening.X, opening.Y, opening.IsCorner, opening.Walkable));
+        Assert.Equal(4, opening.SideEdges.Count);
+        Assert.Equal(8, opening.SideExits.Count);
+        Assert.Contains("door", opening.Laid, StringComparison.Ordinal);
+        RoomPart corner = Assert.Single(parts, one => one.IsCorner);
+        Assert.Equal((14, 5, RoomJoin.Corner, "floor", "wall"), (corner.X, corner.Y, corner.Join, corner.Wanted, corner.Laid));
+        Assert.Equal(2, parts.Count(one => one.Join == RoomJoin.Cap));
+    }
+
     /// <summary>
     /// A slot bigger than a tile, left out of the ground's stamp, is checked against the tile laid where it falls - either way round.
     /// </summary>
@@ -481,7 +569,7 @@ public class RoomFinderTests
     /// Floor and walkable on the left, wall on the right, and - where asked - the pattern pressed into
     /// the wall at tile (12, 4), mirrored and then turned a quarter: (u, v) goes to (3 - u, v), then to (2 - v, 3 - u).
     /// </summary>
-    private static (TerrainGroundTypes Ground, TerrainGrid Walkable) Area(bool withRoom, bool spoil = false, bool decoy = false)
+    private static (TerrainGroundTypes Ground, TerrainGrid Walkable) Area(bool withRoom, bool spoil = false, bool decoy = false, (int X, int Y, byte Type)[]? set = null)
     {
         int across = TilesX + 1;
         var corners = new byte[across * (TilesY + 1) * Corner];
@@ -523,6 +611,11 @@ public class RoomFinderTests
         {
             // One wall corner of the room's turned to floor: where it lies, the room now misses by one.
             corners[(((4 + 3) * across) + 12 + 2) * Corner] = 2;
+        }
+
+        foreach ((int x, int y, byte type) in set ?? [])
+        {
+            corners[((y * across) + x) * Corner] = type;
         }
 
         int width = TilesX * Cells;
