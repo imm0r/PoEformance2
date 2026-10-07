@@ -1180,6 +1180,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// <summary>The place the tile book picked for a room, outlined on the large map - see <see cref="RoomGhost"/>.</summary>
     private RoomGhost? _roomGhost;
 
+    /// <summary>A grid cell on the large map at the ground's height under it.</summary>
+    private static Vector2 Grounded(TerrainGrid grid, MapView map, WorldEntity player, int cellX, int cellY)
+        => map.Project(
+            cellX * MapView.WorldToGrid,
+            cellY * MapView.WorldToGrid,
+            grid.HeightAt(Math.Max(0, cellX - 1), Math.Max(0, cellY - 1)),
+            player.WorldX,
+            player.WorldY,
+            player.TerrainHeight);
+
     /// <summary>
     /// Outlines the room candidate the tile book picked, on the large map, with the room's name in the middle.
     /// </summary>
@@ -1204,13 +1214,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         {
             int cellX = (where.X + (one is 1 or 2 ? where.Width : 0)) * Cells;
             int cellY = (where.Y + (one >= 2 ? where.Height : 0)) * Cells;
-            corners[one] = map.Project(
-                cellX * MapView.WorldToGrid,
-                cellY * MapView.WorldToGrid,
-                ghost.Grid.HeightAt(Math.Max(0, cellX - 1), Math.Max(0, cellY - 1)),
-                player.WorldX,
-                player.WorldY,
-                player.TerrainHeight);
+            corners[one] = Grounded(ghost.Grid, map, player, cellX, cellY);
         }
 
         uint colour = Style.Colour(StyleCatalogue.Keys.Room);
@@ -1218,6 +1222,18 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         for (var one = 0; one < 4; one++)
         {
             draw.AddLine(corners[one], corners[(one + 1) & 3], colour, width);
+        }
+
+        // WHERE IT PARTS WITH THE AREA: a red dot on each corner whose ground is not the room's, an
+        // orange ring on each tile whose definition is not what its slot asks for.
+        foreach ((int x, int y) in ghost.Misses.Corners)
+        {
+            draw.AddCircleFilled(Grounded(ghost.Grid, map, player, x * Cells, y * Cells), 3.5f, 0xFF_3030E0);
+        }
+
+        foreach ((int x, int y) in ghost.Misses.Tiles)
+        {
+            draw.AddCircle(Grounded(ghost.Grid, map, player, (x * Cells) + (Cells / 2), (y * Cells) + (Cells / 2)), 5f, 0xFF_2090F0, 12, 2f);
         }
 
         Vector2 middle = (corners[0] + corners[1] + corners[2] + corners[3]) * 0.25f;

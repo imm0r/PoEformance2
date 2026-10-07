@@ -58,6 +58,17 @@ public sealed class TileDefinition
     /// </remarks>
     public IReadOnlyList<string> Grounds { get; private init; } = [];
 
+    /// <summary>
+    /// The edge type on each side, as <c>.et</c> paths: down, right, up, left. Empty where unsaid.
+    /// </summary>
+    /// <remarks>
+    /// zao's <c>sideEts</c> and annalithic's <c>edgeTypeDown</c> to <c>edgeTypeLeft</c>: four string
+    /// references straight after the tag, in every version. The same self-check as the grounds - a
+    /// string that is not an <c>.et</c> reads as empty. A room's k slot names the same four, in the
+    /// same order; see RoomSlot.
+    /// </remarks>
+    public IReadOnlyList<string> Edges { get; private init; } = [];
+
     /// <summary>Why nothing was read, or empty.</summary>
     public string Why { get; private init; } = string.Empty;
 
@@ -115,7 +126,13 @@ public sealed class TileDefinition
         string templates = version > 4 ? table.Ref(Next(file, ref at)) : string.Empty;
         string tag = table.Ref(Next(file, ref at));
 
-        at += 16;                                        // The four side edge types.
+        // THE FOUR SIDE EDGE TYPES, while there are bytes for them - see Edges.
+        var edges = new string[4];
+        for (var side = 0; side < 4; side++)
+        {
+            string type = table.Ref(Next(file, ref at));
+            edges[side] = type.EndsWith(".et", StringComparison.OrdinalIgnoreCase) ? type : string.Empty;
+        }
 
         int width;
         int height;
@@ -175,6 +192,7 @@ public sealed class TileDefinition
             Width = width,
             Height = height,
             Grounds = grounds,
+            Edges = edges,
         };
     }
 

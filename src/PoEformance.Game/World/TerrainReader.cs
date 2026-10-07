@@ -46,10 +46,12 @@ public sealed class TerrainGrid
         IReadOnlyList<TerrainRoom>? rooms = null,
         IReadOnlyList<string>? roomProbe = null,
         TerrainGroundTypes? ground = null,
-        string groundNote = "")
+        string groundNote = "",
+        TerrainTiles? tiles = null)
     {
         ArgumentNullException.ThrowIfNull(cells);
         _cells = cells;
+        Tiles = tiles;
         _landmarks = landmarks ?? [];
         _rooms = rooms ?? [];
         RoomProbeLines = roomProbe ?? [];
@@ -143,6 +145,9 @@ public sealed class TerrainGrid
     /// <see cref="TerrainGroundTypes"/> for the two checks it has to survive first.
     /// </remarks>
     public TerrainGroundTypes? Ground { get; }
+
+    /// <summary>Which file each tile was laid from and how, or null where the tile pass did not run - see <see cref="TerrainTiles"/>.</summary>
+    public TerrainTiles? Tiles { get; }
 
     /// <summary>What the ground read came back as, whether or not it came back with a ground.</summary>
     public string GroundNote { get; }
@@ -836,7 +841,7 @@ public sealed class TerrainReader
 
         return new TerrainGrid(
             cells, stride, (int)rows, tilesX, tilesY, heights, _heightNote, _landmarks, _rooms,
-            _probe, ground, _groundNote);
+            _probe, ground, _groundNote, _tiles);
     }
 
     /// <summary>
@@ -944,6 +949,7 @@ public sealed class TerrainReader
 
     /// <summary>The rooms the same read found. See TerrainGrid.Rooms.</summary>
     private IReadOnlyList<TerrainRoom> _rooms = [];
+    private TerrainTiles? _tiles;
 
     /// <summary>
     /// Whether to go looking for the ROOM level while the tiles are being read.
@@ -1003,6 +1009,7 @@ public sealed class TerrainReader
         {
             _landmarks = [];
             _rooms = [];
+            _tiles = null;
             return;
         }
 
@@ -1017,6 +1024,13 @@ public sealed class TerrainReader
         // How each tile was laid, as the room's bit - see TerrainRoom.Turns. Null without the
         // rotation tables, which leaves every room's set empty rather than claiming "as authored".
         byte[]? turns = orientations is null ? null : new byte[count];
+
+        // AND PER TILE FOR THE ROOM SEARCH - see TerrainTiles: the piece of its template each tile
+        // is, and its placement as a number, -1 where it was not decoded.
+        var subX = new byte[count];
+        var subY = new byte[count];
+        var placements = new sbyte[count];
+        Array.Fill(placements, (sbyte)-1);
 
         for (long i = 0; i < count; i++)
         {
@@ -1054,11 +1068,14 @@ public sealed class TerrainReader
 
             tilePath[i] = id;
             string path = paths[id];
+            subX[i] = tiles[at + _tileIdX];
+            subY[i] = tiles[at + _tileIdY];
 
             if (turns is not null)
             {
                 int placement = orientations![tiles[at + _rotationSelector]].Placement;
                 turns[i] = placement < 0 ? (byte)0 : (byte)(1 << placement);
+                placements[i] = (sbyte)placement;
             }
 
             if (_probeTile < 0)
@@ -1089,6 +1106,7 @@ public sealed class TerrainReader
         // hand, which counts every tile as walkable - see TerrainRooms.Find: no opinion has to
         // mean no filter, never an empty map.
         int wide = (int)tilesX;
+        _tiles = new TerrainTiles(paths, tilePath, subX, subY, placements, wide, (int)(count / tilesX));
         bool[]? walkable = _walkable?.WalkableTileMask();
         _rooms = TerrainRooms.Find(
             paths, tilePath, wide, (int)(count / tilesX),
@@ -1120,6 +1138,7 @@ public sealed class TerrainReader
         // unread, and keeping the last area's answers would put its rooms on this area's map.
         _landmarks = [];
         _rooms = [];
+        _tiles = null;
         _probe = [];
 
         if (tilesX <= 0 || tilesY <= 0)

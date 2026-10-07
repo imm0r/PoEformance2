@@ -213,6 +213,14 @@ public class TileOrientationTests
         TerrainRoom room = Assert.Single(grid!.Rooms);
         TileOrientation[] table = TileOrientation.Table(GameSelectors, GameHelper);
         Assert.Equal((byte)((1 << table[1].Placement) | (1 << table[6].Placement)), room.Turns);
+
+        // AND EVERY TILE IS KEPT FOR THE ROOM SEARCH: its file and the way it was laid.
+        TerrainTiles laid = Assert.IsType<TerrainTiles>(grid.Tiles);
+        Assert.Equal((2, 1), (laid.Width, laid.Height));
+        Assert.Equal("Metadata/Terrain/Test/Arena.tdt", laid.PathAt(1, 0));
+        Assert.Equal(table[1].Placement, laid.PlacementAt(0, 0));
+        Assert.Equal(table[6].Placement, laid.PlacementAt(1, 0));
+        Assert.Equal(string.Empty, laid.PathAt(2, 0));
     }
 
     [Fact]

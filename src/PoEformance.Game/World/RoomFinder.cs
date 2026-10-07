@@ -16,6 +16,44 @@ public readonly record struct RoomCandidate(int X, int Y, int Turn, int Width, i
 {
     /// <summary>Whether every corner the room names agrees.</summary>
     public bool Exact => Matched == Corners;
+
+    /// <summary>How many of the room's k slots met a laid tile whose definition could be read - nought where the tiles were not to hand.</summary>
+    public int Tiles { get; init; }
+
+    /// <summary>How many of those the laid tile agrees with - see <see cref="RoomFinder"/>.</summary>
+    public int TilesAgree { get; init; }
+
+    /// <summary>How many of <see cref="Tiles"/> are slots bigger than one tile - the ones the ground stamp leaves out.</summary>
+    public int Big { get; init; }
+
+    /// <summary>How many of those agree.</summary>
+    public int BigAgree { get; init; }
+}
+
+/// <summary>
+/// What a tile definition says about itself that a room's slot asks for: its size, its tag, and its edge and corner ground types.
+/// </summary>
+/// <param name="Width">Tiles across, as authored.</param>
+/// <param name="Height">Tiles down.</param>
+/// <param name="Tag">Its tag, or empty.</param>
+/// <param name="Edges">Its four edge types, down, right, up, left - see TileDefinition.Edges.</param>
+/// <param name="Grounds">Its four corner ground types, down-left round to up-left.</param>
+public sealed record TileIdentity(int Width, int Height, string Tag, IReadOnlyList<string> Edges, IReadOnlyList<string> Grounds)
+{
+    /// <summary>A definition's identity, or null where it did not read or does not carry all four of each.</summary>
+    public static TileIdentity? Of(TileDefinition? definition)
+        => definition is { Ready: true, Width: > 0, Height: > 0 } && definition.Edges.Count == 4 && definition.Grounds.Count == 4
+            ? new TileIdentity(definition.Width, definition.Height, definition.Tag, definition.Edges, definition.Grounds)
+            : null;
+}
+
+/// <summary>Where a candidate and the area part ways, for the map to mark.</summary>
+/// <param name="Corners">The area corners whose ground is not the room's, by tile corner.</param>
+/// <param name="Tiles">The area tiles whose definition is not what the room's slot there asks for, by tile.</param>
+public sealed record RoomMisses(IReadOnlyList<(int X, int Y)> Corners, IReadOnlyList<(int X, int Y)> Tiles)
+{
+    /// <summary>Nothing missed.</summary>
+    public static RoomMisses None { get; } = new([], []);
 }
 
 /// <summary>What a search for a room came to: the places, and what it rested on.</summary>
@@ -28,6 +66,12 @@ public sealed record RoomSearch(IReadOnlyList<RoomCandidate> Candidates, int Cor
 {
     /// <summary>No search.</summary>
     public static RoomSearch Not(string why) => new([], 0, 0, 0, why);
+
+    /// <summary>Where each candidate parts with the area, in the same order - empty for a search that did not run.</summary>
+    public IReadOnlyList<RoomMisses> Misses { get; init; } = [];
+
+    /// <summary>Whether the candidates were checked against the tiles actually laid.</summary>
+    public bool TileChecked { get; init; }
 
     /// <summary>Whether any candidate agrees everywhere.</summary>
     public bool Found => Candidates.Count > 0 && Candidates[0].Exact;
@@ -58,6 +102,18 @@ public sealed record RoomSearch(IReadOnlyList<RoomCandidate> Candidates, int Cor
 /// EXACT, OR THE NEAREST. A room laid where the ground says it was agrees at every corner, and those
 /// are listed; where none does, the few nearest are listed instead with how far off they are,
 /// because "nothing" and "nearly here" are different answers to a person checking the map.
+///
+/// AND THE TILES, WHERE THEY ARE TO HAND. A ground stamp cannot tell apart rooms that share their
+/// border - Atziri's temple is a grid of them, every candidate 76 of 80 - but every k slot asks for
+/// a TILE, and the terrain says which tile was laid on every cell (TerrainTiles). So each candidate
+/// is checked slot by slot against the definition laid where that slot falls, the big slots
+/// included: those are what the stamp leaves out and what makes a room this room. The check is the
+/// part of a slot no placement changes - the size as an unordered pair, the tag where the slot
+/// names one, and the edge and corner ground types as sets of four - because which side of a turned
+/// tile meets which side of a turned room is a convention nothing here has settled for tiles. The
+/// cell a slot falls on is the one at its own column and line, which every reading of a slot's
+/// footprint covers. Candidates are then ranked by how many tiles agree, and from a wider pool than
+/// is shown, so the room among a dozen equal borders can rise to the top.
 /// </remarks>
 public static class RoomFinder
 {
@@ -66,6 +122,9 @@ public static class RoomFinder
 
     /// <summary>How many of the nearest are listed where nothing matches exactly.</summary>
     public const int Nearest = 5;
+
+    /// <summary>How many of the nearest are kept to be ranked by their tiles before the list is cut to <see cref="Nearest"/>.</summary>
+    private const int Pool = 64;
 
     /// <summary>A stamp value meaning "a corner the area lists with a blank name".</summary>
     private const int Blank = -2;
@@ -87,8 +146,17 @@ public static class RoomFinder
     /// <param name="ground">The area's ground types per tile corner.</param>
     /// <param name="tilesX">The area's tiles across.</param>
     /// <param name="tilesY">The area's tiles down.</param>
+    /// <param name="tiles">The tiles actually laid, to check each candidate's slots against; null leaves the check out.</param>
+    /// <param name="identity">A tile file's identity - its definition with the inheritance followed - or null where it does not read.</param>
     /// <param name="most">Most exact candidates listed.</param>
-    public static RoomSearch Find(RoomLayout room, TerrainGroundTypes ground, int tilesX, int tilesY, int most = MostCandidates)
+    public static RoomSearch Find(
+        RoomLayout room,
+        TerrainGroundTypes ground,
+        int tilesX,
+        int tilesY,
+        TerrainTiles? tiles = null,
+        Func<string, TileIdentity?>? identity = null,
+        int most = MostCandidates)
     {
         ArgumentNullException.ThrowIfNull(room);
         ArgumentNullException.ThrowIfNull(ground);
@@ -139,6 +207,8 @@ public static class RoomFinder
         var exact = new List<RoomCandidate>();
         int more = 0;
         var near = new List<RoomCandidate>();
+        bool checking = tiles is not null && identity is not null;
+        int keep = checking ? Pool : Nearest;
         int corners = stamp.Count;
         var us = new int[corners];
         var vs = new int[corners];
@@ -175,7 +245,7 @@ public static class RoomFinder
                     // THE NEAREST ONLY WHILE NOTHING IS EXACT, and only while it could still make the list.
                     if (exact.Count == 0)
                     {
-                        int worst = near.Count < Nearest ? corners : corners - near[^1].Matched;
+                        int worst = near.Count < keep ? corners : corners - near[^1].Matched;
                         int misses = 1;
                         for (at++; at < corners && misses < worst; at++)
                         {
@@ -185,16 +255,205 @@ public static class RoomFinder
                             }
                         }
 
-                        if (misses < worst || near.Count < Nearest)
+                        if (misses < worst || near.Count < keep)
                         {
-                            Nearer(near, new RoomCandidate(x, y, turn, wide, tall, corners - misses, corners));
+                            Nearer(near, new RoomCandidate(x, y, turn, wide, tall, corners - misses, corners), keep);
                         }
                     }
                 }
             }
         }
 
-        return new RoomSearch(exact.Count > 0 ? exact : near, corners, more, left, string.Empty);
+        List<RoomCandidate> found = exact.Count > 0 ? exact : near;
+        var check = checking ? new TileCheck(room, tiles!, identity!) : null;
+        if (check is not null)
+        {
+            for (var one = 0; one < found.Count; one++)
+            {
+                found[one] = check.Scored(found[one]);
+            }
+
+            // RANKED BY THE TILES, the ground breaking ties - stably, so equals keep the grid's order.
+            found = exact.Count > 0
+                ? [.. found.OrderByDescending(one => one.TilesAgree)]
+                : [.. found.OrderByDescending(one => one.TilesAgree).ThenByDescending(one => one.Matched)];
+        }
+
+        if (exact.Count == 0 && found.Count > Nearest)
+        {
+            found.RemoveRange(Nearest, found.Count - Nearest);
+        }
+
+        var parted = new RoomMisses[found.Count];
+        for (var one = 0; one < found.Count; one++)
+        {
+            IReadOnlyList<(int X, int Y)> astray = found[one].Exact ? [] : Astray(found[one], stamp, room, area, across, blank, us, vs, wants);
+            IReadOnlyList<(int X, int Y)> unlike = check?.Unlike(found[one]) ?? [];
+            parted[one] = astray.Count == 0 && unlike.Count == 0 ? RoomMisses.None : new RoomMisses(astray, unlike);
+        }
+
+        return new RoomSearch(found, corners, more, left, string.Empty) { Misses = parted, TileChecked = check is not null };
+    }
+
+    /// <summary>The area corners where one candidate's stamp and the ground disagree.</summary>
+    private static List<(int X, int Y)> Astray(
+        RoomCandidate candidate, Dictionary<(int U, int V), int> stamp, RoomLayout room,
+        int[] area, int across, bool[] blank, int[] us, int[] vs, int[] wants)
+    {
+        Placed(stamp, room.Width, room.Height, candidate.Turn, us, vs, wants);
+        var astray = new List<(int X, int Y)>();
+        for (var at = 0; at < stamp.Count; at++)
+        {
+            int x = candidate.X + us[at];
+            int y = candidate.Y + vs[at];
+            if (!Agrees(area[(y * across) + x], wants[at], blank))
+            {
+                astray.Add((x, y));
+            }
+        }
+
+        return astray;
+    }
+
+    /// <summary>
+    /// The area cell a room's slot falls on, for a candidate laid one of the eight ways: its centre, laid that way, floored.
+    /// </summary>
+    /// <remarks>The corners' own arithmetic on a grid twice as fine, so a centre is a whole number.</remarks>
+    internal static (int X, int Y) CellOf(int column, int line, int width, int height, int turn)
+    {
+        int u = (2 * column) + 1;
+        int v = (2 * line) + 1;
+        int w = 2 * width;
+        int h = 2 * height;
+        if (turn >= 4)
+        {
+            u = w - u;
+        }
+
+        for (var quarter = 0; quarter < (turn & 3); quarter++)
+        {
+            (u, v) = (h - v, u);
+            (w, h) = (h, w);
+        }
+
+        return ((u - 1) / 2, (v - 1) / 2);
+    }
+
+    /// <summary>
+    /// A room's k slots checked against the tiles laid under a candidate - see the class remarks.
+    /// </summary>
+    private sealed class TileCheck
+    {
+        private readonly RoomLayout _room;
+        private readonly TerrainTiles _tiles;
+        private readonly Func<string, TileIdentity?> _identity;
+        private readonly List<Wanted> _slots = [];
+        private readonly Dictionary<int, Laid?> _laid = [];
+
+        public TileCheck(RoomLayout room, TerrainTiles tiles, Func<string, TileIdentity?> identity)
+        {
+            _room = room;
+            _tiles = tiles;
+            _identity = identity;
+            for (var line = 0; line < room.Height; line++)
+            {
+                for (var column = 0; column < room.Width; column++)
+                {
+                    RoomSlot slot = room.SlotAt(column, line);
+                    if (slot.IsTile)
+                    {
+                        _slots.Add(new Wanted(
+                            column, line, slot.Width, slot.Height, room.Named(slot.Tag),
+                            Sorted(slot.Edge(0), slot.Edge(1), slot.Edge(2), slot.Edge(3)),
+                            Sorted(slot.Ground(0), slot.Ground(1), slot.Ground(2), slot.Ground(3))));
+                    }
+                }
+            }
+        }
+
+        /// <summary>The candidate with its tile counts.</summary>
+        public RoomCandidate Scored(RoomCandidate candidate)
+        {
+            int tiles = 0, agree = 0, big = 0, bigAgree = 0;
+            foreach (Wanted slot in _slots)
+            {
+                bool? same = Agrees(candidate, slot, out _);
+                if (same is null)
+                {
+                    continue;
+                }
+
+                bool large = slot.Width > 1 || slot.Height > 1;
+                tiles++;
+                big += large ? 1 : 0;
+                if (same == true)
+                {
+                    agree++;
+                    bigAgree += large ? 1 : 0;
+                }
+            }
+
+            return candidate with { Tiles = tiles, TilesAgree = agree, Big = big, BigAgree = bigAgree };
+        }
+
+        /// <summary>The area tiles under a candidate that are not what their slot asks for.</summary>
+        public List<(int X, int Y)> Unlike(RoomCandidate candidate)
+        {
+            var unlike = new List<(int X, int Y)>();
+            foreach (Wanted slot in _slots)
+            {
+                if (Agrees(candidate, slot, out (int X, int Y) cell) == false)
+                {
+                    unlike.Add(cell);
+                }
+            }
+
+            return unlike;
+        }
+
+        /// <summary>Whether the tile under a slot is what it asks for, or null where there is no tile or no definition to say.</summary>
+        private bool? Agrees(RoomCandidate candidate, Wanted slot, out (int X, int Y) cell)
+        {
+            (int x, int y) = CellOf(slot.Column, slot.Line, _room.Width, _room.Height, candidate.Turn);
+            cell = (candidate.X + x, candidate.Y + y);
+            int id = _tiles.IdAt(cell.X, cell.Y);
+            if (id < 0)
+            {
+                return null;
+            }
+
+            if (!_laid.TryGetValue(id, out Laid? laid))
+            {
+                laid = _identity(_tiles.Paths[id]) is { Edges.Count: 4, Grounds.Count: 4 } tile
+                    ? new Laid(tile.Width, tile.Height, tile.Tag, Sorted(tile.Edges), Sorted(tile.Grounds))
+                    : null;
+                _laid[id] = laid;
+            }
+
+            if (laid is null)
+            {
+                return null;
+            }
+
+            bool sized = (laid.Width == slot.Width && laid.Height == slot.Height) || (laid.Width == slot.Height && laid.Height == slot.Width);
+            return sized
+                && (slot.Tag.Length == 0 || string.Equals(slot.Tag, laid.Tag, StringComparison.OrdinalIgnoreCase))
+                && laid.Edges.SequenceEqual(slot.Edges, StringComparer.OrdinalIgnoreCase)
+                && laid.Grounds.SequenceEqual(slot.Grounds, StringComparer.OrdinalIgnoreCase);
+        }
+
+        private string[] Sorted(int a, int b, int c, int d) => Sorted([_room.Named(a), _room.Named(b), _room.Named(c), _room.Named(d)]);
+
+        private static string[] Sorted(IReadOnlyList<string> four)
+        {
+            string[] sorted = [.. four.Select(one => one.Replace('\\', '/'))];
+            Array.Sort(sorted, StringComparer.OrdinalIgnoreCase);
+            return sorted;
+        }
+
+        private readonly record struct Wanted(int Column, int Line, int Width, int Height, string Tag, string[] Edges, string[] Grounds);
+
+        private sealed record Laid(int Width, int Height, string Tag, string[] Edges, string[] Grounds);
     }
 
     /// <summary>
@@ -324,8 +583,8 @@ public static class RoomFinder
     private static bool Agrees(int area, int wants, bool[] blank)
         => wants == Blank ? (uint)area < (uint)blank.Length && blank[area] : area == wants;
 
-    /// <summary>Puts a candidate into the short list of the nearest, best first, keeping it to <see cref="Nearest"/>.</summary>
-    private static void Nearer(List<RoomCandidate> near, RoomCandidate candidate)
+    /// <summary>Puts a candidate into the short list of the nearest, best first, keeping it to <paramref name="keep"/>.</summary>
+    private static void Nearer(List<RoomCandidate> near, RoomCandidate candidate, int keep)
     {
         int at = near.Count;
         while (at > 0 && near[at - 1].Matched < candidate.Matched)
@@ -334,7 +593,7 @@ public static class RoomFinder
         }
 
         near.Insert(at, candidate);
-        if (near.Count > Nearest)
+        if (near.Count > keep)
         {
             near.RemoveAt(near.Count - 1);
         }
