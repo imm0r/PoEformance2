@@ -13,8 +13,8 @@ namespace PoEformance.Core.Tests;
 /// THE AREA IS BUILT SO THE ANSWER IS KNOWN. One tile file, its ground a plane that rises 0.2 per
 /// unit across and 0.1 down its own frame, laid at area tile (1, 1); and the area's sub-tile heights
 /// written from that same plane - through the game's own selector tables, so a turned tile is read
-/// back through the decode the heights use - with the file's Y either counting the way the template
-/// index does or the other way. The room's laying must find whichever way the area was built.
+/// back through the decode the heights use - with the file lying on the template any of the eight
+/// ways a square can. The room's laying must find whichever way the area was built.
 /// </remarks>
 public class LaidRoomModelsTests
 {
@@ -25,17 +25,37 @@ public class LaidRoomModelsTests
     private const string TilePath = "Metadata/Terrain/Test/slope.tdt";
     private const string TemplatePath = "Art/Models/Terrain/Test/Slope.tgt";
     private const string MeshPath = "Art/Models/Terrain/Test/Slope.tgm";
+    private const string TallPath = "Metadata/Terrain/Test/tall.tdt";
+    private const string TallTemplatePath = "Art/Models/Terrain/Test/Tall.tgt";
 
     /// <summary>The tile's ground, in its own frame.</summary>
     private static float Plane(float x, float y) => (0.2f * x) + (0.1f * y);
 
-    [Fact]
-    public void ATILELaidAsAuthoredIsSetOnTheAreasGroundAndTheGroundSaysTheFilesYCountsAsTheIndexDoes()
+    /// <summary>
+    /// Whichever of the eight ways the area's heights were written with the file lying, the ground says so - and the file is drawn lying that way.
+    /// </summary>
+    /// <remarks>
+    /// THE PLANE TELLS ALL EIGHT APART because its two slopes differ, 0.2 across and 0.1 down: each
+    /// way of lying puts the high corner somewhere else or the steeper slope along the other axis.
+    /// That only holds with the heights counted the one way - turned half round and upside down, a
+    /// plane is the same plane - which is why the sign is the game's and not a ninth question.
+    /// </remarks>
+    [Theory]
+    [InlineData(3, "as filed (x, y)", 250f, 250f)]
+    [InlineData(2, "(x, -y)", 250f, 0f)]
+    [InlineData(1, "(-x, y)", 0f, 250f)]
+    [InlineData(0, "(-x, -y)", 0f, 0f)]
+    [InlineData(7, "(y, x)", 250f, 250f)]
+    [InlineData(4, "(-y, -x)", 0f, 0f)]
+    [InlineData(5, "(y, -x)", 250f, 0f)]
+    [InlineData(6, "(-y, x)", 0f, 250f)]
+    public void ATILELaidAsAuthoredLiesOnTheAreasGroundTheWayTheHeightsWereWritten(int lies, string said, float topX, float topY)
     {
-        MonsterModel room = Laid(placement: 3, selector: 0, overturned: false);
+        MonsterModel room = Laid(placement: 3, selector: 0, lies);
 
         Assert.True(room.Ready, room.Why);
-        Assert.Contains("heights: drawn Y as filed, heights as the area's", room.Move, StringComparison.Ordinal);
+        Assert.Contains("heights: drawn with the files ", room.Move, StringComparison.Ordinal);
+        Assert.Contains(said + " before the game's own turn - 1/1 sloped pieces", room.Move, StringComparison.Ordinal);
         Assert.Contains("1 pieces of 1 tile files", room.Move, StringComparison.Ordinal);
 
         // Over the room's one tile, its corner at the picture's origin.
@@ -44,41 +64,46 @@ public class LaidRoomModelsTests
         Assert.Equal(250f, room.BodyMost.X, 0.5f);
         Assert.Equal(250f, room.BodyMost.Y, 0.5f);
 
-        // On the area's ground: the high corner as high as the plane says, within a height step.
+        // On the area's ground: the high corner where the area has it, as high as the plane says.
         Vector3 top = Highest(room);
-        Assert.Equal((250f, 250f), (top.X, top.Y));
+        Assert.Equal((topX, topY), (top.X, top.Y));
         Assert.Equal(Plane(250f, 250f), top.Z, 8f);
-    }
-
-    [Fact]
-    public void ANDWhereTheAreaCountsTheFilesYTheOtherWayTheGroundSaysSo()
-    {
-        MonsterModel room = Laid(placement: 3, selector: 0, overturned: true);
-
-        Assert.True(room.Ready, room.Why);
-        Assert.Contains("heights: drawn Y turned over, heights as the area's", room.Move, StringComparison.Ordinal);
-
-        // Turned over about its middle: the file's high corner at the area's (250, 0).
-        Vector3 top = Highest(room);
-        Assert.Equal((250f, 0f), (top.X, top.Y));
     }
 
     [Fact]
     public void ATILETurnedAQuarterIsTurnedTheWayTheGameReadsItsHeights()
     {
         // Selector 1, turned 90 degrees - placement 6, X' = -Y and Y' = X about the middle.
-        MonsterModel room = Laid(placement: 6, selector: 1, overturned: false);
+        MonsterModel room = Laid(placement: 6, selector: 1, lies: 3);
 
         Assert.True(room.Ready, room.Why);
-        Assert.Contains("heights: drawn Y as filed, heights as the area's", room.Move, StringComparison.Ordinal);
+        Assert.Contains("heights: drawn with the files as filed (x, y)", room.Move, StringComparison.Ordinal);
         Vector3 top = Highest(room);
         Assert.Equal((0f, 250f), (top.X, top.Y));
+    }
+
+    /// <summary>
+    /// The way the file lies is undone BEFORE the game's turn, not after: turned over and then a quarter round is not a quarter round and then turned over.
+    /// </summary>
+    /// <remarks>
+    /// The two orders differ by a half turn wherever the turn is a quarter, so the wrong one would be
+    /// found as the file lying (-x, y) rather than (x, -y) - which is what this pins.
+    /// </remarks>
+    [Fact]
+    public void THEWayAFileLiesComesBeforeTheGamesTurn()
+    {
+        MonsterModel room = Laid(placement: 6, selector: 1, lies: 2);
+
+        Assert.True(room.Ready, room.Why);
+        Assert.Contains("heights: drawn with the files mirrored, turned 180° (x, -y) before the game's own turn - 1/1", room.Move, StringComparison.Ordinal);
+        Vector3 top = Highest(room);
+        Assert.Equal((250f, 250f), (top.X, top.Y));
     }
 
     [Fact]
     public void WITHNoSlopeNothingIsSettledAndTheLineSaysSo()
     {
-        MonsterModel room = Laid(placement: 3, selector: 0, overturned: false, flat: true);
+        MonsterModel room = Laid(placement: 3, selector: 0, lies: 3, flat: true);
 
         Assert.True(room.Ready, room.Why);
         Assert.Contains("no sloped piece", room.Move, StringComparison.Ordinal);
@@ -88,7 +113,7 @@ public class LaidRoomModelsTests
     public void AROOMWithNoTilesReadFromTheAreaSaysWhy()
     {
         var grid = new TerrainGrid(new byte[((TilesX * Cells) + 1) / 2 * TilesY * Cells], ((TilesX * Cells) + 1) / 2, TilesY * Cells, TilesX, TilesY, heights: null);
-        MonsterModel room = LaidRoomModels.Of(Files(overturned: false).GetValueOrDefault, RoomPath, grid, 1, 1, 0);
+        MonsterModel room = LaidRoomModels.Of(Files().GetValueOrDefault, RoomPath, grid, 1, 1, 0);
 
         Assert.False(room.Ready);
         Assert.Contains("tiles are not read", room.Why, StringComparison.Ordinal);
@@ -146,8 +171,45 @@ public class LaidRoomModelsTests
         Assert.Equal([new TilePiece(0, 3, 2, 0, 3, 0, Whole: true)], tiles.Pieces(3, 0, 1, 1, _ => (2, 1)));
     }
 
-    /// <summary>The room laid over an area whose one tile is laid the given way, its heights written with the file's Y as the index counts it or turned over.</summary>
-    private static MonsterModel Laid(int placement, byte selector, bool overturned, bool flat = false)
+    /// <summary>
+    /// A piece several tiles across is checked against the area's own index, and the line says which way of counting the file's rows the area agrees with.
+    /// </summary>
+    /// <remarks>
+    /// One column, two rows, laid as authored, the area naming row 0 at the nearer area tile and row 1
+    /// at the further. The files lay row 1 at the top (TileModels), and laid as filed the top goes to
+    /// the further area tile - so the area's index agrees counting from the file's BOTTOM, and the line
+    /// has to say exactly that, with nothing sloped to settle anything else.
+    /// </remarks>
+    [Fact]
+    public void APIECESeveralTilesAcrossIsCheckedAgainstTheAreasOwnIndex()
+    {
+        var ids = new int[TilesX * TilesY];
+        Array.Fill(ids, -1);
+        var subY = new byte[ids.Length];
+        var placements = new sbyte[ids.Length];
+        Array.Fill(placements, (sbyte)-1);
+        foreach ((int at, byte row) in new[] { ((1 * TilesX) + 1, (byte)0), ((2 * TilesX) + 1, (byte)1) })
+        {
+            ids[at] = 0;
+            subY[at] = row;
+            placements[at] = 3;
+        }
+
+        var tiles = new TerrainTiles([TallPath], ids, new byte[ids.Length], subY, placements, TilesX, TilesY);
+        int stride = ((TilesX * Cells) + 1) / 2;
+        var grid = new TerrainGrid(new byte[stride * TilesY * Cells], stride, TilesY * Cells, TilesX, TilesY, heights: null, tiles: tiles);
+
+        MonsterModel room = LaidRoomModels.Of(Files().GetValueOrDefault, RoomPath, grid, 1, 1, 0);
+
+        Assert.True(room.Ready, room.Why);
+        Assert.Contains("1 pieces of 1 tile files", room.Move, StringComparison.Ordinal);
+        Assert.Contains("sub-tiles: of 1 pieces several tiles across, 0 have every tile where the area's own index puts it counting the file's rows from the top, 1 counting them from the bottom", room.Move, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// The room laid over an area whose one tile is laid the given way, its heights written with the file lying on the template as <paramref name="lies"/> says - TileOrientation's placement numbers.
+    /// </summary>
+    private static MonsterModel Laid(int placement, byte selector, int lies, bool flat = false)
     {
         var ids = new int[TilesX * TilesY];
         Array.Fill(ids, -1);
@@ -158,16 +220,20 @@ public class LaidRoomModelsTests
         placements[at] = (sbyte)placement;
         var tiles = new TerrainTiles([TilePath], ids, new byte[ids.Length], new byte[ids.Length], placements, TilesX, TilesY);
 
-        // THE AREA'S SUB-TILE HEIGHTS, from the plane: template cell (tx, ty) is the file's point at
-        // its middle, its Y counted down from the far edge where the area counts it the other way.
+        // THE AREA'S SUB-TILE HEIGHTS, from the plane: template cell (tx, ty) is the file's point the
+        // way of lying takes there - its inverse, a signed permutation's transpose, about the middle.
+        (int xx, int xy, int yx, int yy) = TileOrientation.OfPlacement(lies).Turn;
         float cell = TileModels.Side / Cells;
+        float half = TileModels.Side / 2f;
         var array = new byte[Cells * Cells];
         for (var ty = 0; ty < Cells; ty++)
         {
             for (var tx = 0; tx < Cells; tx++)
             {
-                float fx = (tx + 0.5f) * cell;
-                float fy = overturned ? TileModels.Side - ((ty + 0.5f) * cell) : (ty + 0.5f) * cell;
+                float cx = ((tx + 0.5f) * cell) - half;
+                float cy = ((ty + 0.5f) * cell) - half;
+                float fx = (xx * cx) + (yx * cy) + half;
+                float fy = (xy * cx) + (yy * cy) + half;
                 float height = flat ? 0f : Plane(fx, fy);
                 array[(ty * Cells) + tx] = unchecked((byte)(sbyte)Math.Round(height / TerrainHeightField.HeightScale));
             }
@@ -183,7 +249,7 @@ public class LaidRoomModelsTests
 
         int stride = ((TilesX * Cells) + 1) / 2;
         var grid = new TerrainGrid(new byte[stride * TilesY * Cells], stride, TilesY * Cells, TilesX, TilesY, heights, tiles: tiles);
-        return LaidRoomModels.Of(Files(overturned).GetValueOrDefault, RoomPath, grid, 1, 1, 0);
+        return LaidRoomModels.Of(Files().GetValueOrDefault, RoomPath, grid, 1, 1, 0);
     }
 
     /// <summary>The vertex with the greatest height.</summary>
@@ -193,16 +259,19 @@ public class LaidRoomModelsTests
         return new Vector3(MathF.Round(top.X), MathF.Round(top.Y), top.Z);
     }
 
-    /// <summary>The install: the room, and the tile's definition, template and mesh.</summary>
-    private static Dictionary<string, byte[]> Files(bool overturned)
+    /// <summary>The install: the room, the one by one tile's definition, template and mesh, and a one by two tile's.</summary>
+    private static Dictionary<string, byte[]> Files()
     {
-        _ = overturned;
         return new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase)
         {
             [RoomPath] = Text(RoomText),
             [TilePath] = Tdt(TemplatePath),
             [TemplatePath] = Text("version 3\nSize 1 1\nTileMeshRoot \"Art/Models/Terrain/Test/Slope\"\n"),
             [MeshPath] = Tgm(10),
+            [TallPath] = Tdt(TallTemplatePath),
+            [TallTemplatePath] = Text("version 3\nSize 1 2\nTileMeshRoot \"Art/Models/Terrain/Test/Tall\"\n"),
+            ["Art/Models/Terrain/Test/Tall_c1r1.tgm"] = Tgm(2),
+            ["Art/Models/Terrain/Test/Tall_c1r2.tgm"] = Tgm(2),
         };
     }
 

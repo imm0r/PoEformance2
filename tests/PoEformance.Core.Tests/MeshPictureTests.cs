@@ -229,8 +229,10 @@ public class MeshPictureTests
 
         GamePicture apart = MeshPicture.Of(parts, Size, skin: red, skins: [red, blue]);
 
-        (byte leftRed, byte leftBlue) = Spot(apart, Size / 4, Size / 2);
-        (byte rightRed, byte rightBlue) = Spot(apart, Size * 3 / 4, Size / 2);
+        // The shape at -x is drawn on the picture's RIGHT and the one at +x on its left: the
+        // game's frame is left-handed and the picture draws it so - see MeshPicture.
+        (byte leftRed, byte leftBlue) = Spot(apart, Size * 3 / 4, Size / 2);
+        (byte rightRed, byte rightBlue) = Spot(apart, Size / 4, Size / 2);
 
         Assert.True(leftRed > leftBlue * 2, $"the left shape should be red: {leftRed},{leftBlue}");
         Assert.True(rightBlue > rightRed * 2, $"the right shape should be blue: {rightRed},{rightBlue}");
@@ -244,7 +246,7 @@ public class MeshPictureTests
         // A shape with no texture of its own falls back to ink rather than to a neighbour's
         // sheet - the caller decides what to hand over, and null means "not this one".
         GamePicture half = MeshPicture.Of(parts, Size, skin: null, skins: [red, null]);
-        (byte inkRed, byte inkBlue) = Spot(half, Size * 3 / 4, Size / 2);
+        (byte inkRed, byte inkBlue) = Spot(half, Size / 4, Size / 2);
         Assert.True(
             inkRed > 0 && Math.Abs(inkRed - inkBlue) < 40,
             $"an unpainted shape should be plain ink: {inkRed},{inkBlue}");
@@ -627,8 +629,10 @@ public class MeshPictureTests
 
         Assert.InRange(camera.Place(new Vector3(0f, 0f, -40f)).Y * Side, seen.Top - 1f, seen.Top + 1f);
         Assert.InRange(camera.Place(Vector3.Zero).Y * Side, seen.Foot - 1f, seen.Foot + 1f);
-        Assert.InRange(camera.Place(new Vector3(-20f, 0f, -36f)).X * Side, seen.Left - 1f, seen.Left + 1f);
-        Assert.InRange(camera.Place(new Vector3(20f, 0f, -36f)).X * Side, seen.Right - 1f, seen.Right + 1f);
+        // +x on the left, -x on the right, seen from where turn and tilt nought put the eye: the
+        // game's frame is left-handed - see MeshPicture.
+        Assert.InRange(camera.Place(new Vector3(20f, 0f, -36f)).X * Side, seen.Left - 1f, seen.Left + 1f);
+        Assert.InRange(camera.Place(new Vector3(-20f, 0f, -36f)).X * Side, seen.Right - 1f, seen.Right + 1f);
 
         // Nothing to look at is a camera that says so, rather than one that places things anyway.
         Assert.False(MeshPicture.Camera.Of(null, 0f, 0f, 1f, Vector2.Zero).Ready);

@@ -16,18 +16,34 @@ namespace PoEformance.Features;
 /// the heights are read through), about the middle of its own ground, at the middle of the area
 /// tiles the piece covers.
 ///
-/// TWO THINGS THE FILES DO NOT SAY ARE SETTLED BY THE GROUND. Whether a tile's mesh counts its Y the
-/// way the game's sub-tile index does, or the other way, and whether its heights count the way the
-/// area's do: each is tried, and every piece's ground is asked how high it is at nine points and
-/// held against the height the area itself has there. A slope - a stair, a ramp - fits one way
-/// only, so the way the sloped pieces fit best is the way every piece is drawn, and the line under
-/// the picture says how well, and how well the others did. With no slope in the room nothing is
-/// settled and the files are taken as they are. Each piece is then raised to the area's own ground,
-/// the doodads with it.
+/// ONE THING THE FILES DO NOT SAY IS SETTLED BY THE GROUND: how a tile's mesh lies on the template
+/// the game's turn is read through - as filed, turned, or turned over. All eight ways a square can lie
+/// are tried, the turn the game laid each piece applied after, and every piece's ground is asked
+/// how high it is at nine points per tile and held against the height the area itself has there. A
+/// slope - a stair, a ramp - fits one way only, so the way the sloped pieces fit best is the way
+/// every piece is drawn, and the line under the picture says how well, and how well the next did.
+/// With no slope in the room nothing is settled and the files are taken as filed. Each piece is then
+/// raised to the area's own ground, the doodads with it.
+///
+/// THE HEIGHTS COUNT THE GAME'S WAY, DOWN, IN BOTH, and are not tried the other way any more. The
+/// area's are GameHelper2's terrain heights, which go into the world as its z, and the world's up is
+/// minus z (a health bar floats at z less the model's height); the files' up is minus z as well,
+/// which is why the tile book stands its walls up. Trying the other sign as well, as 0.1.102 did, is
+/// worse than redundant: a slope turned half round and counted upside down is the same slope, so
+/// the two answers cannot be told apart on a ramp or an even stair, and a choice between them is a
+/// coin toss that shows as pieces turned round. The room that showed it chose "Y turned over,
+/// heights the other way" on 6 of its 14 sloped pieces.
+///
+/// AND A PIECE SEVERAL TILES ACROSS IS CHECKED AGAINST THE AREA'S OWN INDEX: every one of its area
+/// tiles names the column and row of the file it holds, so where the drawing puts each sub-tile can
+/// be compared with where the game says it is - counting the rows from the top, as the files are laid
+/// out (TileModels), and from the bottom, so that the line says which one the area agrees with.
 ///
 /// THE DOODADS GO WHERE THE ROOM'S CORNERS WERE FOUND - RoomFinder.Laying, the corners' own
-/// arithmetic - a doodad's x and y counting the room's columns and lines, as annalithic's importer
-/// lays a slot at (x, y) and a doodad at its own (x, y) in one frame.
+/// arithmetic - a doodad's x and y counting the room's columns and lines, the frame
+/// RoomModels.SpreadOf already draws a room's doodads in. That is this project's reading and still
+/// waits on the game: annalithic/poeterrain is a Path of Exile 1 importer, and both the line that
+/// reads its doodads and the loop that places them are commented out, so it settles nothing here.
 /// </remarks>
 public static class LaidRoomModels
 {
@@ -39,6 +55,9 @@ public static class LaidRoomModels
 
     /// <summary>How much the area's own ground must rise within a piece for it to count as sloped.</summary>
     private const float Rise = 4f;
+
+    /// <summary>The eight ways a file can lie on its template, as TileOrientation numbers its placements - as filed first.</summary>
+    private static readonly int[] Relations = [3, 0, 1, 2, 4, 5, 6, 7];
 
     /// <summary>
     /// The room laid where the search found it, or why not. Never throws.
@@ -108,7 +127,7 @@ public static class LaidRoomModels
             if (!made.TryGetValue(id, out Made? one))
             {
                 (MonsterModel props, SkinnedMesh ground, int across, int down) = TileModels.Apart(Counted, tiles.Paths[id], walls: true, paints);
-                one = new Made(props, ground, Math.Max(1, across), Math.Max(1, down), Middle(props, ground));
+                one = Made.Of(props, ground, across, down);
                 made[id] = one;
             }
 
@@ -117,17 +136,18 @@ public static class LaidRoomModels
 
         List<TilePiece> pieces = tiles.Pieces(x, y, wide, tall, id => (Of(id).Width, Of(id).Height));
 
-        // THE WAY THE FILES ARE SET ON THE GROUND, from the sloped pieces - see the remarks.
-        var ways = new Way[4];
+        // THE WAY THE FILES LIE ON THE TEMPLATE, from the sloped pieces - see the remarks. As filed
+        // comes first, so it is the one kept wherever the ground cannot tell two ways apart.
+        var ways = new Way[Relations.Length];
         for (var way = 0; way < ways.Length; way++)
         {
-            ways[way] = new Way(way >= 2, (way & 1) == 1 ? -1f : 1f);
+            ways[way] = new Way(Relations[way]);
         }
 
         foreach (TilePiece piece in pieces)
         {
             Made one = Of(piece.Id);
-            if (!piece.Whole || !one.Ground.Ready || !Way.Rises(piece, grid))
+            if (!piece.Whole || one.Lookup is null || !Way.Rises(piece, grid))
             {
                 continue;
             }
@@ -149,6 +169,7 @@ public static class LaidRoomModels
         var pile = new ModelPile();
         long mostTriangles = (long)(doodads > 0 ? doodads : RoomModels.UsualDoodads) * RoomModels.TrianglesPerDoodad;
         int laidPieces = 0, broken = 0, bare = 0, capped = 0, unturned = 0;
+        int several = 0, fromTop = 0, fromBottom = 0;
         var used = new HashSet<int>();
         foreach (TilePiece piece in pieces)
         {
@@ -165,6 +186,14 @@ public static class LaidRoomModels
                 continue;
             }
 
+            Matrix3x2 flat = chosen.Flat(piece, one, x, y);
+            if (piece.Width * piece.Height > 1)
+            {
+                several++;
+                fromTop += Named(piece, one, tiles, x, y, flat, fromTheTop: true) ? 1 : 0;
+                fromBottom += Named(piece, one, tiles, x, y, flat, fromTheTop: false) ? 1 : 0;
+            }
+
             long cost = (one.Props.Ready ? one.Props.Mesh.Triangles : 0) + (one.Ground.Ready ? one.Ground.Triangles : 0);
             if (pile.Triangles + cost > mostTriangles)
             {
@@ -172,8 +201,7 @@ public static class LaidRoomModels
                 continue;
             }
 
-            Matrix3x2 flat = chosen.Flat(piece, one, x, y);
-            float lift = chosen.Lift(piece, one, grid, x, y, flat);
+            float lift = Way.Lift(piece, one, grid, x, y, flat);
             Matrix4x4 place = Spatial(flat) * Matrix4x4.CreateTranslation(0f, 0f, lift);
             if (one.Props.Ready)
             {
@@ -193,13 +221,12 @@ public static class LaidRoomModels
         // THE DOODADS, where the corners were found and on the area's ground under them.
         Matrix3x2 laying = RoomFinder.Laying(room.Width, room.Height, turn);
         Matrix4x4 beyondFlat = Spatial(Matrix3x2.CreateScale(1f / TileModels.Side) * laying * Matrix3x2.CreateScale(TileModels.Side));
-        float sign = chosen.Sign;
         RoomModels.Doodads laid = RoomModels.Lay(room, Counted, paints, pile, doodads, tools, one =>
         {
             Vector2 at = Vector2.Transform(new Vector2(one.X, one.Y) / RoomModels.CellsPerTile, laying);
             int cellX = (int)((x + at.X) * RoomModels.CellsPerTile);
             int cellY = (int)((y + at.Y) * RoomModels.CellsPerTile);
-            return beyondFlat * Matrix4x4.CreateTranslation(0f, 0f, sign * grid.HeightAt(cellX, cellY));
+            return beyondFlat * Matrix4x4.CreateTranslation(0f, 0f, grid.HeightAt(cellX, cellY));
         });
 
         SkinnedMesh joined = SkinnedMesh.Joined(pile.Joins);
@@ -222,6 +249,12 @@ public static class LaidRoomModels
                 + (unturned > 0 ? string.Create(CultureInfo.InvariantCulture, $", {unturned} laid no way the game's tables said - drawn as their files have them") : string.Empty),
             Heights(ways, chosen, settled),
         };
+        if (several > 0)
+        {
+            said.Add(string.Create(CultureInfo.InvariantCulture,
+                $"sub-tiles: of {several} pieces several tiles across, {fromTop} have every tile where the area's own index puts it counting the file's rows from the top, {fromBottom} counting them from the bottom"));
+        }
+
         said.AddRange(laid.Said());
 
         MonsterModel model = RoomModels.Piled(joined, pile, path, made.Values.Select(one => one.Props).Concat(laid.Models)) with
@@ -235,29 +268,46 @@ public static class LaidRoomModels
         return shaded ? MonsterModels.Shaded(Counted, model, paints) : model;
     }
 
-    /// <summary>What the ground said about each way of setting the files on it, for the line under the picture.</summary>
+    /// <summary>What the ground said about the ways a file can lie, for the line under the picture.</summary>
     private static string Heights(Way[] ways, Way chosen, bool settled)
     {
-        string Each(Way one) => string.Create(CultureInfo.InvariantCulture,
-            $"{one.Said} {one.Fitting}/{one.Sloped}");
-        string all = string.Join(", ", ways.Select(Each));
-        return settled
-            ? string.Create(CultureInfo.InvariantCulture,
-                $"heights: drawn {chosen.Said} - sloped pieces whose ground meets the area's within {Fits} units, each way: {all}")
-            : "heights: no sloped piece to settle how the files' ground counts - drawn as the files have it, each piece raised to the area's ground";
-    }
-
-    /// <summary>The middle of a tile file's ground, in its own frame - or of its props where it has no ground.</summary>
-    private static Vector2 Middle(MonsterModel props, SkinnedMesh ground)
-    {
-        if (ground.Ready)
+        if (!settled)
         {
-            return new Vector2((ground.Least.X + ground.Most.X) / 2f, (ground.Least.Y + ground.Most.Y) / 2f);
+            return "heights: no sloped piece to settle how the files lie on the area's ground - drawn as filed, each piece raised to the area's ground";
         }
 
-        return props.Ready
-            ? new Vector2((props.Mesh.Least.X + props.Mesh.Most.X) / 2f, (props.Mesh.Least.Y + props.Mesh.Most.Y) / 2f)
-            : Vector2.Zero;
+        Way[] ranked = [.. ways.OrderBy(one => one.Residual)];
+        Way next = ranked[0] == chosen ? ranked[1] : ranked[0];
+        int rest = ways.Where(one => one != chosen && one != next).Max(one => one.Fitting);
+        return string.Create(CultureInfo.InvariantCulture,
+            $"heights: drawn with the files {chosen.Said} before the game's own turn - {chosen.Fitting}/{chosen.Sloped} sloped pieces meet the area's ground within {Fits} units; next {next.Said} {next.Fitting}/{next.Sloped}; the other {ways.Length - 2} at most {rest}/{chosen.Sloped}");
+    }
+
+    /// <summary>
+    /// Whether every area tile of a piece holds the sub-tile the drawing puts over it, by the area's own index: its column, and its row counted from the file's top or its bottom.
+    /// </summary>
+    private static bool Named(TilePiece piece, Made one, TerrainTiles tiles, int x, int y, Matrix3x2 flat, bool fromTheTop)
+    {
+        if (!Matrix3x2.Invert(flat, out Matrix3x2 back))
+        {
+            return false;
+        }
+
+        for (int tileY = piece.MinY; tileY <= piece.MaxY; tileY++)
+        {
+            for (int tileX = piece.MinX; tileX <= piece.MaxX; tileX++)
+            {
+                Vector2 file = Vector2.Transform(new Vector2(tileX - x + 0.5f, tileY - y + 0.5f) * TileModels.Side, back);
+                int column = (int)MathF.Floor((file.X - one.Least.X) / TileModels.Side);
+                int row = (int)MathF.Floor((fromTheTop ? one.Most.Y - file.Y : file.Y - one.Least.Y) / TileModels.Side);
+                if (tiles.SubAt(tileX, tileY) != (column, row))
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     /// <summary>A flat placement as a placement in space, the height left alone.</summary>
@@ -267,47 +317,48 @@ public static class LaidRoomModels
         0f, 0f, 1f, 0f,
         flat.M31, flat.M32, 0f, 1f);
 
-    /// <summary>How high a mesh is at a point, from the first triangle over it - or null where none is.</summary>
-    private static float? HeightOf(SkinnedMesh mesh, Vector2 at)
+    /// <summary>One tile file, made once: its props, its ground and where to ask it a height, its size in tiles, and its box in its own frame - the ground's, or the props' where it has none.</summary>
+    private sealed record Made(MonsterModel Props, SkinnedMesh Ground, GroundLookup? Lookup, int Width, int Height, Vector2 Least, Vector2 Most)
     {
-        Vector3[] points = mesh.Positions;
-        int[] indices = mesh.Indices;
-        for (var one = 0; one + 2 < indices.Length; one += 3)
+        /// <summary>The middle of the box, which a piece is turned about.</summary>
+        public Vector2 Middle => (Least + Most) / 2f;
+
+        public static Made Of(MonsterModel props, SkinnedMesh ground, int across, int down)
         {
-            Vector3 a = points[indices[one]];
-            Vector3 b = points[indices[one + 1]];
-            Vector3 c = points[indices[one + 2]];
-            float d = ((b.Y - c.Y) * (a.X - c.X)) + ((c.X - b.X) * (a.Y - c.Y));
-            if (MathF.Abs(d) < 1e-6f)
-            {
-                continue;
-            }
-
-            float wa = (((b.Y - c.Y) * (at.X - c.X)) + ((c.X - b.X) * (at.Y - c.Y))) / d;
-            float wb = (((c.Y - a.Y) * (at.X - c.X)) + ((a.X - c.X) * (at.Y - c.Y))) / d;
-            float wc = 1f - wa - wb;
-            if (wa >= -1e-4f && wb >= -1e-4f && wc >= -1e-4f)
-            {
-                return (wa * a.Z) + (wb * b.Z) + (wc * c.Z);
-            }
+            (Vector3 least, Vector3 most) = ground.Ready
+                ? (ground.Least, ground.Most)
+                : props.Ready ? (props.Mesh.Least, props.Mesh.Most) : (Vector3.Zero, Vector3.Zero);
+            return new Made(
+                props,
+                ground,
+                ground.Ready ? new GroundLookup(ground) : null,
+                Math.Max(1, across),
+                Math.Max(1, down),
+                new Vector2(least.X, least.Y),
+                new Vector2(most.X, most.Y));
         }
-
-        return null;
     }
 
-    /// <summary>One tile file, made once: its props, its ground, its size in tiles, and the middle of its ground.</summary>
-    private sealed record Made(MonsterModel Props, SkinnedMesh Ground, int Width, int Height, Vector2 Middle);
-
     /// <summary>
-    /// One way of setting the files on the ground - their Y as it is or turned over, their heights counting as the area's or the other way - and how well the sloped pieces fit it.
+    /// One way a file can lie on the template the game's turn is read through, and how well the sloped pieces fit it.
     /// </summary>
-    private sealed class Way(bool overturned, float sign)
+    private sealed class Way
     {
-        /// <summary>Whether the file's Y is turned over before the game's turn.</summary>
-        public bool Overturned { get; } = overturned;
+        private readonly Matrix3x2 _lies;
 
-        /// <summary>How the file's heights count against the area's: 1 the same way, -1 the other.</summary>
-        public float Sign { get; } = sign;
+        /// <param name="relation">The way, numbered as TileOrientation numbers its placements.</param>
+        public Way(int relation)
+        {
+            TileOrientation lies = TileOrientation.OfPlacement(relation);
+            _lies = TileModels.Turned(lies) is { } turned
+                ? new Matrix3x2(turned.M11, turned.M12, turned.M21, turned.M22, 0f, 0f)
+                : Matrix3x2.Identity;
+            (int xx, int xy, int yx, int yy) = lies.Turn;
+            Said = (lies.Degrees == 0 && !lies.Mirrored ? "as filed" : lies.ToString()) + " (" + Axis(xx, xy) + ", " + Axis(yx, yy) + ")";
+        }
+
+        /// <summary>This way in words, and where the file's x and y go: "mirrored, turned 180° (x, -y)".</summary>
+        public string Said { get; }
 
         /// <summary>Sloped pieces weighed.</summary>
         public int Sloped { get; private set; }
@@ -318,20 +369,12 @@ public static class LaidRoomModels
         /// <summary>The squared misses over every sloped piece, after each was raised to fit as well as it can.</summary>
         public double Residual { get; private set; }
 
-        /// <summary>This way in words.</summary>
-        public string Said => (Overturned ? "Y turned over" : "Y as filed") + (Sign > 0 ? ", heights as the area's" : ", heights the other way");
-
         /// <summary>
-        /// Where a piece's file goes, flat: its ground's middle to the origin, its Y turned over where this way says, the game's turn, then out to the middle of the area tiles it covers - from the room's corner, in world units.
+        /// Where a piece's file goes, flat: its middle to the origin, laid on the template this way, the game's turn, then out to the middle of the area tiles it covers - from the room's corner, in world units.
         /// </summary>
         public Matrix3x2 Flat(TilePiece piece, Made one, int x, int y)
         {
-            Matrix3x2 flat = Matrix3x2.CreateTranslation(-one.Middle);
-            if (Overturned)
-            {
-                flat *= Matrix3x2.CreateScale(1f, -1f);
-            }
-
+            Matrix3x2 flat = Matrix3x2.CreateTranslation(-one.Middle) * _lies;
             if (TileModels.Turned(TileOrientation.OfPlacement(piece.Placement)) is { } turned)
             {
                 flat *= new Matrix3x2(turned.M11, turned.M12, turned.M21, turned.M22, 0f, 0f);
@@ -343,23 +386,25 @@ public static class LaidRoomModels
             return flat * Matrix3x2.CreateTranslation(middle);
         }
 
-        /// <summary>How far to raise a piece so its ground meets the area's on average, in the files' count.</summary>
-        public float Lift(TilePiece piece, Made one, TerrainGrid grid, int x, int y, Matrix3x2 flat)
+        /// <summary>How far to raise a piece so its ground meets the area's on average.</summary>
+        public static float Lift(TilePiece piece, Made one, TerrainGrid grid, int x, int y, Matrix3x2 flat)
         {
-            if (!one.Ground.Ready || !Matrix3x2.Invert(flat, out Matrix3x2 back))
+            int middleX = ((piece.MinX + piece.MaxX + 1) * RoomModels.CellsPerTile) / 2;
+            int middleY = ((piece.MinY + piece.MaxY + 1) * RoomModels.CellsPerTile) / 2;
+            if (one.Lookup is null || !Matrix3x2.Invert(flat, out Matrix3x2 back))
             {
-                return Sign * grid.HeightAt((((piece.MinX + piece.MaxX + 1) * RoomModels.CellsPerTile) / 2), (((piece.MinY + piece.MaxY + 1) * RoomModels.CellsPerTile) / 2));
+                return grid.HeightAt(middleX, middleY);
             }
 
             double sum = 0;
             int count = 0;
-            foreach ((float file, float area) in Samples(piece, one, grid, x, y, back))
+            foreach ((float file, float area) in Samples(piece, one.Lookup, grid, x, y, back))
             {
-                sum += (Sign * area) - file;
+                sum += area - file;
                 count++;
             }
 
-            return count > 0 ? (float)(sum / count) : Sign * grid.HeightAt(piece.MinX * RoomModels.CellsPerTile, piece.MinY * RoomModels.CellsPerTile);
+            return count > 0 ? (float)(sum / count) : grid.HeightAt(middleX, middleY);
         }
 
         /// <summary>Whether the area's own ground rises within a piece - asked of the area alone, before any mesh is.</summary>
@@ -389,27 +434,36 @@ public static class LaidRoomModels
         /// <summary>Weighs one sloped piece against this way.</summary>
         public void Weigh(TilePiece piece, Made one, TerrainGrid grid, int x, int y)
         {
-            Matrix3x2 flat = Flat(piece, one, x, y);
-            if (!Matrix3x2.Invert(flat, out Matrix3x2 back))
+            if (one.Lookup is null || !Matrix3x2.Invert(Flat(piece, one, x, y), out Matrix3x2 back))
             {
                 return;
             }
 
-            var pairs = Samples(piece, one, grid, x, y, back).ToList();
-            if (pairs.Count < 3)
+            double sum = 0;
+            double squares = 0;
+            int count = 0;
+            foreach ((float file, float area) in Samples(piece, one.Lookup, grid, x, y, back))
+            {
+                double miss = area - file;
+                sum += miss;
+                squares += miss * miss;
+                count++;
+            }
+
+            if (count < 3)
             {
                 return;
             }
 
-            double lift = pairs.Average(pair => (Sign * pair.Area) - pair.File);
-            double squared = pairs.Sum(pair => Math.Pow((Sign * pair.Area) - pair.File - lift, 2));
+            // The squared misses about their mean, which is what is left once the piece is raised.
+            double squared = Math.Max(0, squares - (sum * sum / count));
             Sloped++;
             Residual += squared;
-            Fitting += Math.Sqrt(squared / pairs.Count) <= Fits ? 1 : 0;
+            Fitting += Math.Sqrt(squared / count) <= Fits ? 1 : 0;
         }
 
         /// <summary>The file's ground height and the area's at the points asked, in every tile of the piece.</summary>
-        private static IEnumerable<(float File, float Area)> Samples(TilePiece piece, Made one, TerrainGrid grid, int x, int y, Matrix3x2 back)
+        private static IEnumerable<(float File, float Area)> Samples(TilePiece piece, GroundLookup ground, TerrainGrid grid, int x, int y, Matrix3x2 back)
         {
             float cell = TileModels.Side / RoomModels.CellsPerTile;
             for (int tileY = piece.MinY; tileY <= piece.MaxY; tileY++)
@@ -423,7 +477,7 @@ public static class LaidRoomModels
                             var world = new Vector2(
                                 ((tileX - x) * TileModels.Side) + ((across + 0.5f) * cell),
                                 ((tileY - y) * TileModels.Side) + ((down + 0.5f) * cell));
-                            if (HeightOf(one.Ground, Vector2.Transform(world, back)) is { } file)
+                            if (ground.HeightAt(Vector2.Transform(world, back)) is { } file)
                             {
                                 yield return (file, grid.HeightAt((tileX * RoomModels.CellsPerTile) + across, (tileY * RoomModels.CellsPerTile) + down));
                             }
@@ -431,6 +485,155 @@ public static class LaidRoomModels
                     }
                 }
             }
+        }
+
+        /// <summary>One file axis's place in words.</summary>
+        private static string Axis(int onX, int onY) => (onX, onY) switch
+        {
+            (1, 0) => "x",
+            (-1, 0) => "-x",
+            (0, 1) => "y",
+            (0, -1) => "-y",
+            _ => "?",
+        };
+    }
+
+    /// <summary>
+    /// A ground's triangles filed by the squares they reach, so a height is asked of the few under a point rather than of every one.
+    /// </summary>
+    /// <remarks>
+    /// EIGHT WAYS ASK EIGHT TIMES as many heights as one did, of every sloped piece and then of every
+    /// piece laid, and a scan of the whole ground per point grew with the ground's size on top. Filed
+    /// once per tile file, a point looks only at its own square's list, in the mesh's order - so the
+    /// triangle that answers is the same first one the full scan found.
+    /// </remarks>
+    private sealed class GroundLookup
+    {
+        /// <summary>A square's side in world units: a cell and a half, about the size of a ground triangle.</summary>
+        private const float Step = 16f;
+
+        /// <summary>The most squares each way, whatever the ground's size.</summary>
+        private const int MostSquares = 256;
+
+        private readonly Vector3[] _points;
+        private readonly int[] _indices;
+        private readonly Vector2 _least;
+        private readonly float _stepX;
+        private readonly float _stepY;
+        private readonly int _across;
+        private readonly int _down;
+        private readonly int[] _starts;
+        private readonly int[] _filed;
+
+        public GroundLookup(SkinnedMesh mesh)
+        {
+            _points = mesh.Positions;
+            _indices = mesh.Indices;
+            _least = new Vector2(mesh.Least.X, mesh.Least.Y);
+            float wide = MathF.Max(mesh.Most.X - mesh.Least.X, 1e-3f);
+            float tall = MathF.Max(mesh.Most.Y - mesh.Least.Y, 1e-3f);
+            _across = Math.Clamp((int)MathF.Ceiling(wide / Step), 1, MostSquares);
+            _down = Math.Clamp((int)MathF.Ceiling(tall / Step), 1, MostSquares);
+            _stepX = wide / _across;
+            _stepY = tall / _down;
+
+            // Counted, summed, then filed: two passes and no list per square.
+            _starts = new int[(_across * _down) + 1];
+            for (var one = 0; one + 2 < _indices.Length; one += 3)
+            {
+                (int fromX, int fromY, int toX, int toY) = Reach(one);
+                for (int squareY = fromY; squareY <= toY; squareY++)
+                {
+                    for (int squareX = fromX; squareX <= toX; squareX++)
+                    {
+                        _starts[(squareY * _across) + squareX + 1]++;
+                    }
+                }
+            }
+
+            for (var square = 1; square < _starts.Length; square++)
+            {
+                _starts[square] += _starts[square - 1];
+            }
+
+            _filed = new int[_starts[^1]];
+            int[] next = _starts[..^1];
+            for (var one = 0; one + 2 < _indices.Length; one += 3)
+            {
+                (int fromX, int fromY, int toX, int toY) = Reach(one);
+                for (int squareY = fromY; squareY <= toY; squareY++)
+                {
+                    for (int squareX = fromX; squareX <= toX; squareX++)
+                    {
+                        _filed[next[(squareY * _across) + squareX]++] = one;
+                    }
+                }
+            }
+        }
+
+        /// <summary>How high the ground is at a point, from the first triangle over it - or null where none is.</summary>
+        public float? HeightAt(Vector2 at)
+        {
+            int squareX = Square(at.X - _least.X, _stepX, _across);
+            int squareY = Square(at.Y - _least.Y, _stepY, _down);
+            if (squareX < 0 || squareY < 0)
+            {
+                return null;
+            }
+
+            int square = (squareY * _across) + squareX;
+            for (int filed = _starts[square]; filed < _starts[square + 1]; filed++)
+            {
+                int one = _filed[filed];
+                Vector3 a = _points[_indices[one]];
+                Vector3 b = _points[_indices[one + 1]];
+                Vector3 c = _points[_indices[one + 2]];
+                float d = ((b.Y - c.Y) * (a.X - c.X)) + ((c.X - b.X) * (a.Y - c.Y));
+                if (MathF.Abs(d) < 1e-6f)
+                {
+                    continue;
+                }
+
+                float wa = (((b.Y - c.Y) * (at.X - c.X)) + ((c.X - b.X) * (at.Y - c.Y))) / d;
+                float wb = (((c.Y - a.Y) * (at.X - c.X)) + ((a.X - c.X) * (at.Y - c.Y))) / d;
+                float wc = 1f - wa - wb;
+                if (wa >= -1e-4f && wb >= -1e-4f && wc >= -1e-4f)
+                {
+                    return (wa * a.Z) + (wb * b.Z) + (wc * c.Z);
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>The squares a triangle's box reaches, a hair wider so a point on its edge finds it.</summary>
+        private (int FromX, int FromY, int ToX, int ToY) Reach(int one)
+        {
+            Vector3 a = _points[_indices[one]];
+            Vector3 b = _points[_indices[one + 1]];
+            Vector3 c = _points[_indices[one + 2]];
+            const float hair = 1e-2f;
+            float leastX = MathF.Min(a.X, MathF.Min(b.X, c.X)) - _least.X - hair;
+            float mostX = MathF.Max(a.X, MathF.Max(b.X, c.X)) - _least.X + hair;
+            float leastY = MathF.Min(a.Y, MathF.Min(b.Y, c.Y)) - _least.Y - hair;
+            float mostY = MathF.Max(a.Y, MathF.Max(b.Y, c.Y)) - _least.Y + hair;
+            return (
+                Math.Clamp((int)MathF.Floor(leastX / _stepX), 0, _across - 1),
+                Math.Clamp((int)MathF.Floor(leastY / _stepY), 0, _down - 1),
+                Math.Clamp((int)MathF.Floor(mostX / _stepX), 0, _across - 1),
+                Math.Clamp((int)MathF.Floor(mostY / _stepY), 0, _down - 1));
+        }
+
+        /// <summary>Which square an offset falls in, the far edge counted in the last - or -1 outside the ground.</summary>
+        private static int Square(float offset, float step, int count)
+        {
+            if (!float.IsFinite(offset) || offset < -1e-2f)
+            {
+                return -1;
+            }
+
+            int square = (int)MathF.Floor(offset / step);
+            return square < count ? Math.Max(square, 0) : offset <= (count * step) + 1e-2f ? count - 1 : -1;
         }
     }
 }

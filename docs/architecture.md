@@ -2147,7 +2147,8 @@ interesting part was not the feature:
   What is DISPUTED is the name of the first. RePoE and `poe_data_tools` call the pair
   `exit`/`virtual_exit`; `Arm.cs` calls the first `edgeLengthDown`/`Right`/`Up`/`Left`. Two names
   to one - but names are not evidence, and only one reading is load-bearing anywhere:
-  `annalithic/poeterrain/Assets/ArmImportComponent.cs` USES the value as a distance, building a mesh
+  `annalithic/poeterrain/Assets/ArmImportComponent.cs` - a Path of Exile 1 importer - USES the value
+  as a distance, building a mesh
   with `x = sizeX * 3` and treating `edgeLength == x` as "the edge runs the whole way". That
   accounts for the dump - 3 dominates because most slots are single tiles whose edge spans them
   completely, and eight of the ten values (3, 6, 9, 12, 15, 18, 21, 99) are multiples of three,
@@ -2172,7 +2173,7 @@ interesting part was not the feature:
 
   **AND THE ORIGIN IS A COMPASS CORNER, confirmed twice over from two directions.**
   `poe_data_tools` resolves it as `Direction::diagonals()[origin]`, so 0-3 are SW, SE, NE, NW. The
-  renderer never says that and does not have to: `ArmImportComponent` shifts x by `-(sizeX - 1)`
+  renderer never says that and does not have to: `ArmImportComponent` (PoE1) shifts x by `-(sizeX - 1)`
   for origin 1 or 2 and y by `-(sizeY - 1)` for 2 or 3 - which is exactly "the two EAST corners"
   and "the two NORTH corners" under that mapping. A name from one source and arithmetic from
   another, agreeing without either knowing about the other.
@@ -2225,7 +2226,9 @@ interesting part was not the feature:
   game's own FILES rather than only against walkability. Not built; recorded because it is the
   strongest check still available to that feature.
 
-  **A TILE IS PAINTED AS FOUR QUARTERS, ONE PER CORNER — the game does not take a majority.**
+  **A TILE IS PAINTED AS FOUR QUARTERS, ONE PER CORNER — in a Path of Exile 1 importer.** That
+  importer (its paths name 3.17 Siege to 3.21 Crucible) is the only source, so for PoE2 this is a
+  reading carried over, not something the game has shown.
   `ArmImportComponent.cs` is a renderer rather than a parser, and that is what makes it say
   something the parsers cannot. Its `CreateMesh` builds a slot as a fan of triangles from the four
   corners to a midpoint, and assigns the submeshes in order
@@ -2235,8 +2238,8 @@ interesting part was not the feature:
   and so on), which is what makes an unnamed edge invisible rather than blank.
 
   That has a direct consequence for `TerrainGroundTypes`, which reduces a tile's four corners to a
-  MAJORITY before drawing. The majority is this project's invention, not the game's: the game
-  draws all four.
+  MAJORITY before drawing. The majority is this project's invention: poeterrain draws all four, and
+  PoE2 is taken to do the same until its own files or the game say otherwise.
 
   **What that reduction can cost is ONE thing, not a general loss of detail, and the difference is
   the whole reason there is a probe rather than a change.** The ground layer writes a NAME AT A

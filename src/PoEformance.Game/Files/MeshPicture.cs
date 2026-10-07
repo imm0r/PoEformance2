@@ -43,6 +43,22 @@ namespace PoEformance.Game.Files;
 /// zero and the head is at -189. Read with y as the up axis a skeleton comes out lying on its
 /// face, 29 units tall and 154 wide.
 ///
+/// AND IT IS A LEFT-HANDED FRAME, which the picture has to draw as one or it shows the game's
+/// mirror image. Found when a room laid from an area's own tiles would not turn to match the game
+/// however it was turned, because it was the game's room in a mirror. Two measurements say so,
+/// each without the other:
+///
+///     THE WORLD. The game's map draws grid x up and to the right and grid y up and to the left
+///     (MapRadar.Project, which lines up with the map the game draws), with up as minus z. From
+///     above that is x to y anticlockwise, so x × y points up, which is -z: left-handed.
+///     THE FILES. BasicSkeleton's rig has its toes at -y (ankle y +8.6, toe tip -12.7), its back
+///     at +y (aux_back_attachment +13.3), its head along -z - and every L_ bone at +x. Right-
+///     handed, a figure's left is up × forward = -x. Blackguard's rig agrees bone for bone, its
+///     back-left cloth at +x as well.
+///
+/// So the view turns x over once, before anything else turns it. There is no back-face culling to
+/// turn inside out with it - see Drawing - and the floor is placed by the same camera.
+///
 /// THE FLOOR IS NOT DRAWN HERE ANY MORE. It was, one pixel wide and depth-tested against the
 /// model, and it came back from the live client as a staircase: the picture is drawn a rung below
 /// the pane while an animation plays and stretched over it, and a stretched pixel line is steps.
@@ -131,6 +147,12 @@ public static class MeshPicture
             }
 
             Matrix4x4 view = Matrix4x4.CreateTranslation(-middle)
+
+                // THE GAME'S FRAME IS LEFT-HANDED, and every rotation after this is a proper one,
+                // so without this turn-over each picture is the game's mirror image - see the
+                // remarks on the class. X rather than Y because it leaves the side the model is
+                // seen from, and the way a drag turns it, as they were.
+                * Matrix4x4.CreateScale(-1f, 1f, 1f)
                 * Matrix4x4.CreateRotationZ(turn)
                 * Matrix4x4.CreateRotationX(tilt)
 
