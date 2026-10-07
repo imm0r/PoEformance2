@@ -122,30 +122,15 @@ public class RoomFinderTests
     /// THE TEMPLE'S CASE, made small: the pattern pressed twice into the wall, once mirrored and turned
     /// a quarter at (12, 4), once as written at (16, 1). Under the first every slot's cell holds a
     /// tile whose sizes, edges and grounds are what that slot asks for; under the second the tiles
-    /// carry an edge type the room never names. The cells are worked out here by hand: turned that
-    /// way, slot (c, l) falls on cell (13 - l, 6 - c); as written, on (16 + c, 1 + l).
+    /// carry an edge type the room never names - see <see cref="RoomAndDecoyTiles"/>.
     /// </remarks>
     [Fact]
     public void ANDWhereTwoPlacesFitTheGroundTheTilesLaidSayWhichIsTheRoom()
     {
         (TerrainGroundTypes ground, _) = Area(withRoom: true, decoy: true);
         RoomLayout room = RoomLayout.Parse(Room(Pattern, 3, 2));
+        (TerrainTiles laid, Dictionary<string, TileIdentity> identities) = RoomAndDecoyTiles();
 
-        var paths = new List<string>();
-        var identities = new Dictionary<string, TileIdentity>(StringComparer.Ordinal);
-        var ids = new int[TilesX * TilesY];
-        Array.Fill(ids, -1);
-        for (var line = 0; line < 2; line++)
-        {
-            for (var column = 0; column < 3; column++)
-            {
-                IReadOnlyList<string> grounds = Grounds(column, line);
-                Lay(paths, identities, ids, 13 - line, 6 - column, new TileIdentity(1, 1, string.Empty, ["", "", "", ""], grounds));
-                Lay(paths, identities, ids, 16 + column, 1 + line, new TileIdentity(1, 1, string.Empty, ["Metadata/Terrain/Test/cliff.et", "", "", ""], grounds));
-            }
-        }
-
-        TerrainTiles laid = Laid(paths, ids);
         RoomSearch search = RoomFinder.Find(room, ground, TilesX, TilesY, laid, path => identities.GetValueOrDefault(path));
 
         Assert.True(search.TileChecked);
@@ -161,6 +146,79 @@ public class RoomFinderTests
         Assert.Empty(search.Misses[0].Tiles);
         Assert.Equal(6, search.Misses[1].Tiles.Count);
         Assert.Contains((16, 1), search.Misses[1].Tiles);
+    }
+
+    /// <summary>
+    /// More places fit the ground than are listed, and the room is the last of them in grid order; it is still ranked first.
+    /// </summary>
+    /// <remarks>
+    /// THE SEEPAGE CASE, made small. 0.1.97 kept the first fits in grid order up to the cap and ranked
+    /// only those by their tiles; the void past a map's edge fits a room's rim thousands of times and
+    /// comes first in that order, so the room itself was never ranked. Here the cap is one: the decoy,
+    /// as written, comes before the room, mirrored and turned, and only the tiles say which is which.
+    /// </remarks>
+    [Fact]
+    public void MOREPLACESFITTHANARELISTEDAndTheTilesStillRankTheRoomFirst()
+    {
+        (TerrainGroundTypes ground, _) = Area(withRoom: true, decoy: true);
+        (TerrainTiles laid, Dictionary<string, TileIdentity> identities) = RoomAndDecoyTiles();
+
+        RoomSearch search = RoomFinder.Find(RoomLayout.Parse(Room(Pattern, 3, 2)), ground, TilesX, TilesY, laid, path => identities.GetValueOrDefault(path), most: 1);
+
+        RoomCandidate only = Assert.Single(search.Candidates);
+        Assert.Equal((12, 4, 5), (only.X, only.Y, only.Turn));
+        Assert.Equal((6, 6), (only.TilesAgree, only.Tiles));
+        Assert.Equal(2, search.Fits);
+        Assert.Equal(1, search.More);
+    }
+
+    /// <summary>
+    /// The probe for the tile a person stands on gives the room's best placement over it, scored both ways, whether or not it made the list.
+    /// </summary>
+    [Fact]
+    public void AROUNDATileTheRoomIsLaidItsBestWayOverItAndScoredBothWays()
+    {
+        (TerrainGroundTypes ground, _) = Area(withRoom: true, decoy: true);
+        (TerrainTiles laid, Dictionary<string, TileIdentity> identities) = RoomAndDecoyTiles();
+        RoomSearch search = RoomFinder.Find(RoomLayout.Parse(Room(Pattern, 3, 2)), ground, TilesX, TilesY, laid, path => identities.GetValueOrDefault(path), most: 1);
+
+        // Inside the room's footprint, (12..13, 4..6): the room as it was laid, everything agreeing.
+        RoomPlace? room = search.Around(13, 5);
+        Assert.NotNull(room);
+        Assert.Equal(new RoomCandidate(12, 4, 5, 2, 3, 12, 12) { Tiles = 6, TilesAgree = 6 }, room.Where);
+        Assert.Same(RoomMisses.None, room.Misses);
+
+        // Over the decoy, which the list left out: its ground fits, every one of its tiles does not.
+        RoomPlace? decoy = search.Around(17, 2);
+        Assert.NotNull(decoy);
+        Assert.Equal((16, 1, 0, 12, 0), (decoy.Where.X, decoy.Where.Y, decoy.Where.Turn, decoy.Where.Matched, decoy.Where.TilesAgree));
+        Assert.Equal(6, decoy.Misses.Tiles.Count);
+
+        Assert.Null(search.Around(TilesX, 0));
+        Assert.Null(RoomSearch.Not("nothing").Around(13, 5));
+    }
+
+    /// <summary>
+    /// The room's slots as tiles under the room, mirrored and turned at (12, 4), and under the decoy, as written at (16, 1), with an edge the room never names.
+    /// </summary>
+    /// <remarks>The cells by hand: turned that way, slot (c, l) falls on cell (13 - l, 6 - c); as written, on (16 + c, 1 + l).</remarks>
+    private static (TerrainTiles Laid, Dictionary<string, TileIdentity> Identities) RoomAndDecoyTiles()
+    {
+        var paths = new List<string>();
+        var identities = new Dictionary<string, TileIdentity>(StringComparer.Ordinal);
+        var ids = new int[TilesX * TilesY];
+        Array.Fill(ids, -1);
+        for (var line = 0; line < 2; line++)
+        {
+            for (var column = 0; column < 3; column++)
+            {
+                IReadOnlyList<string> grounds = Grounds(column, line);
+                Lay(paths, identities, ids, 13 - line, 6 - column, new TileIdentity(1, 1, string.Empty, ["", "", "", ""], grounds));
+                Lay(paths, identities, ids, 16 + column, 1 + line, new TileIdentity(1, 1, string.Empty, ["Metadata/Terrain/Test/cliff.et", "", "", ""], grounds));
+            }
+        }
+
+        return (Laid(paths, ids), identities);
     }
 
     /// <summary>

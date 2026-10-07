@@ -56,10 +56,15 @@ public sealed record RoomMisses(IReadOnlyList<(int X, int Y)> Corners, IReadOnly
     public static RoomMisses None { get; } = new([], []);
 }
 
+/// <summary>One placement of a room and where it parts with the area.</summary>
+/// <param name="Where">The placement.</param>
+/// <param name="Misses">Where its corners and tiles disagree with the area.</param>
+public sealed record RoomPlace(RoomCandidate Where, RoomMisses Misses);
+
 /// <summary>What a search for a room came to: the places, and what it rested on.</summary>
-/// <param name="Candidates">Exact matches in grid order; where there are none, the nearest few, best first.</param>
+/// <param name="Candidates">Where any placement fits every corner, those - ranked by the tiles laid where the tiles were to hand, else in grid order; where none does, the nearest few, best first.</param>
 /// <param name="Corners">How many corners the room's stamp holds.</param>
-/// <param name="More">Exact matches past the cap, counted and not listed.</param>
+/// <param name="More">Placements that fit every corner past the cap, counted and not listed.</param>
 /// <param name="Left">k slots left out of the stamp, being bigger than one tile - see <see cref="RoomFinder"/>.</param>
 /// <param name="Why">Why there was no search, or empty.</param>
 public sealed record RoomSearch(IReadOnlyList<RoomCandidate> Candidates, int Corners, int More, int Left, string Why)
@@ -76,8 +81,24 @@ public sealed record RoomSearch(IReadOnlyList<RoomCandidate> Candidates, int Cor
     /// <summary>Corners the room's slots leave unnamed - nought, no ground stated - and so free to be anything.</summary>
     public int Free { get; init; }
 
+    /// <summary>How many placements fit every corner the room names, listed or not.</summary>
+    public int Fits { get; init; }
+
     /// <summary>Whether any candidate agrees everywhere.</summary>
     public bool Found => Candidates.Count > 0 && Candidates[0].Exact;
+
+    /// <summary>What the search scored with, kept for <see cref="Around"/>; null for a search that did not run.</summary>
+    internal RoomPlacements? Placements { get; init; }
+
+    /// <summary>
+    /// The best placement whose footprint covers one tile - most tiles agreeing, then most corners - or null outside the area or for a search that did not run.
+    /// </summary>
+    /// <remarks>
+    /// BOTH HALVES OF THE COMPARISON where the room is known to be: a person standing in it asks this
+    /// of the tile under them, and sees how the room's own corners and slots meet what the area laid
+    /// there - whether or not that place made the list. Not thread-safe against itself: one call at a time.
+    /// </remarks>
+    public RoomPlace? Around(int tileX, int tileY) => Placements?.Around(tileX, tileY);
 }
 
 /// <summary>
@@ -113,16 +134,23 @@ public sealed record RoomSearch(IReadOnlyList<RoomCandidate> Candidates, int Cor
 /// because "nothing" and "nearly here" are different answers to a person checking the map.
 ///
 /// AND THE TILES, WHERE THEY ARE TO HAND. A ground stamp cannot tell apart rooms that share their
-/// border - Atziri's temple is a grid of them, every candidate 76 of 80 - but every k slot asks for
-/// a TILE, and the terrain says which tile was laid on every cell (TerrainTiles). So each candidate
-/// is checked slot by slot against the definition laid where that slot falls, the big slots
-/// included: those are what the stamp leaves out and what makes a room this room. The check is the
-/// part of a slot no placement changes - the size as an unordered pair, the tag where the slot
-/// names one, and the edge and corner ground types as sets of four - because which side of a turned
-/// tile meets which side of a turned room is a convention nothing here has settled for tiles. The
-/// cell a slot falls on is the one at its own column and line, which every reading of a slot's
-/// footprint covers. Candidates are then ranked by how many tiles agree, and from a wider pool than
-/// is shown, so the room among a dozen equal borders can rise to the top.
+/// border - Atziri's temple is a grid of them - but every k slot asks for a TILE, and the terrain
+/// says which tile was laid on every cell (TerrainTiles). So each placement is checked slot by slot
+/// against the definition laid where that slot falls, the big slots included: those are what the
+/// stamp leaves out and what makes a room this room. The check is the part of a slot no placement
+/// changes - the size as an unordered pair, the tag where the slot names one, and the edge and corner
+/// ground types as sets of four - because which side of a turned tile meets which side of a turned
+/// room is a convention nothing here has settled for tiles. The cell a slot falls on is the one at
+/// its own column and line, which every reading of a slot's footprint covers.
+///
+/// RANKED ACROSS EVERY PLACEMENT, corners first and the tiles breaking ties. The first version kept
+/// the first two hundred exact fits in grid order and ranked only those, and a seepage area showed
+/// what that does: with most corners free, a room's few named ones are its rim, the void past the
+/// map's edge fits a rim thousands of times over (4696 for one room), and those thousands come first
+/// in grid order - every room was "found" in the void at the map's top, its real place never ranked.
+/// Every placement is scored now, bounded by the worst one still on the list so the scoring stays
+/// cheap, and a tile's verdict against a slot is worked out once per tile file and slot kind, not
+/// once per try.
 /// </remarks>
 public static class RoomFinder
 {
@@ -131,10 +159,6 @@ public static class RoomFinder
 
     /// <summary>How many of the nearest are listed where nothing matches exactly.</summary>
     public const int Nearest = 5;
-
-    /// <summary>How many of the nearest are kept to be ranked by their tiles before the list is cut to <see cref="Nearest"/>.</summary>
-    private const int Pool = 64;
-
 
     /// <summary>A placement in words, for a list a person reads.</summary>
     public static string Said(int turn)
@@ -153,8 +177,8 @@ public static class RoomFinder
     /// <param name="ground">The area's ground types per tile corner.</param>
     /// <param name="tilesX">The area's tiles across.</param>
     /// <param name="tilesY">The area's tiles down.</param>
-    /// <param name="tiles">The tiles actually laid, to check each candidate's slots against; null leaves the check out.</param>
-    /// <param name="identity">A tile file's identity - its definition with the inheritance followed - or null where it does not read.</param>
+    /// <param name="tiles">The tiles actually laid, to check each placement's slots against; null leaves the check out.</param>
+    /// <param name="identity">A tile file's identity - its definition with the inheritance followed - or null where it does not read. Called from the search's thread.</param>
     /// <param name="most">Most exact candidates listed.</param>
     public static RoomSearch Find(
         RoomLayout room,
@@ -195,126 +219,80 @@ public static class RoomFinder
                 with { Left = left, Free = free };
         }
 
-        // THE AREA ONCE, as a flat array: the search asks every corner many times over.
-        int across = tilesX + 1;
-        var area = new int[across * (tilesY + 1)];
-        for (var y = 0; y <= tilesY; y++)
-        {
-            for (var x = 0; x <= tilesX; x++)
-            {
-                area[(y * across) + x] = ground.At(x, y);
-            }
-        }
-
-        var exact = new List<RoomCandidate>();
-        int more = 0;
-        var near = new List<RoomCandidate>();
-        bool checking = tiles is not null && identity is not null;
-        int keep = checking ? Pool : Nearest;
+        var placements = new RoomPlacements(room, stamp, ground, tilesX, tilesY, tiles, identity);
+        bool checking = placements.Checks;
         int corners = stamp.Count;
-        var us = new int[corners];
-        var vs = new int[corners];
-        var wants = new int[corners];
+        int capacity = Math.Max(Math.Max(most, Nearest), 1);
+        var ranked = new List<RoomCandidate>(capacity + 1);
+        int fits = 0;
+        int across = tilesX + 1;
 
         for (var turn = 0; turn < 8; turn++)
         {
-            (int wide, int tall) = Placed(stamp, room.Width, room.Height, turn, us, vs, wants);
+            (int wide, int tall) = placements.Size(turn);
             for (var y = 0; y + tall <= tilesY; y++)
             {
                 for (var x = 0; x + wide <= tilesX; x++)
                 {
-                    // EXACT FIRST, out at the first corner that disagrees - the ordinary case by far.
-                    int at = 0;
-                    while (at < corners && area[((y + vs[at]) * across) + x + us[at]] == wants[at])
+                    // BOUNDED BY THE WORST ON THE LIST: a placement that cannot beat it is left at the
+                    // first miss too many. Ties keep the earlier one, so equals stay in grid order - and
+                    // where the tiles break ties, a tie on corners must still be scored on them.
+                    bool full = ranked.Count == capacity;
+                    int allowed = !full ? corners : corners - ranked[^1].Matched - (checking ? 0 : 1);
+                    int matched = placements.Matched((y * across) + x, turn, allowed);
+                    if (matched < 0)
                     {
-                        at++;
-                    }
-
-                    if (at == corners)
-                    {
-                        if (exact.Count < most)
-                        {
-                            exact.Add(new RoomCandidate(x, y, turn, wide, tall, corners, corners));
-                        }
-                        else
-                        {
-                            more++;
-                        }
-
                         continue;
                     }
 
-                    // THE NEAREST ONLY WHILE NOTHING IS EXACT, and only while it could still make the list.
-                    if (exact.Count == 0)
+                    if (matched == corners)
                     {
-                        int worst = near.Count < keep ? corners : corners - near[^1].Matched;
-                        int misses = 1;
-                        for (at++; at < corners && misses < worst; at++)
+                        fits++;
+                    }
+
+                    var candidate = new RoomCandidate(x, y, turn, wide, tall, matched, corners);
+                    if (checking)
+                    {
+                        int least = full && matched == ranked[^1].Matched ? ranked[^1].TilesAgree + 1 : 0;
+                        if (!placements.Tiles(x, y, turn, least, out int laid, out int agree, out int big, out int bigAgree))
                         {
-                            if (area[((y + vs[at]) * across) + x + us[at]] != wants[at])
-                            {
-                                misses++;
-                            }
+                            continue;
                         }
 
-                        if (misses < worst || near.Count < keep)
-                        {
-                            Nearer(near, new RoomCandidate(x, y, turn, wide, tall, corners - misses, corners), keep);
-                        }
+                        candidate = candidate with { Tiles = laid, TilesAgree = agree, Big = big, BigAgree = bigAgree };
                     }
+
+                    Ranked(ranked, candidate, capacity);
                 }
             }
         }
 
-        List<RoomCandidate> found = exact.Count > 0 ? exact : near;
-        var check = checking ? new TileCheck(room, tiles!, identity!) : null;
-        if (check is not null)
+        // THE FITS ARE THE LIST WHERE THERE ARE ANY - they lead it, having every corner - and the
+        // nearest few where there are none.
+        int exact = 0;
+        while (exact < ranked.Count && ranked[exact].Exact)
         {
-            for (var one = 0; one < found.Count; one++)
-            {
-                found[one] = check.Scored(found[one]);
-            }
-
-            // RANKED BY THE TILES, the ground breaking ties - stably, so equals keep the grid's order.
-            found = exact.Count > 0
-                ? [.. found.OrderByDescending(one => one.TilesAgree)]
-                : [.. found.OrderByDescending(one => one.TilesAgree).ThenByDescending(one => one.Matched)];
+            exact++;
         }
 
-        if (exact.Count == 0 && found.Count > Nearest)
-        {
-            found.RemoveRange(Nearest, found.Count - Nearest);
-        }
+        List<RoomCandidate> found = fits > 0
+            ? ranked.GetRange(0, Math.Min(exact, most))
+            : ranked.GetRange(0, Math.Min(ranked.Count, Nearest));
 
         var parted = new RoomMisses[found.Count];
         for (var one = 0; one < found.Count; one++)
         {
-            IReadOnlyList<(int X, int Y)> astray = found[one].Exact ? [] : Astray(found[one], stamp, room, area, across, us, vs, wants);
-            IReadOnlyList<(int X, int Y)> unlike = check?.Unlike(found[one]) ?? [];
-            parted[one] = astray.Count == 0 && unlike.Count == 0 ? RoomMisses.None : new RoomMisses(astray, unlike);
+            parted[one] = placements.Misses(found[one]);
         }
 
-        return new RoomSearch(found, corners, more, left, string.Empty) { Misses = parted, TileChecked = check is not null, Free = free };
-    }
-
-    /// <summary>The area corners where one candidate's stamp and the ground disagree.</summary>
-    private static List<(int X, int Y)> Astray(
-        RoomCandidate candidate, Dictionary<(int U, int V), int> stamp, RoomLayout room,
-        int[] area, int across, int[] us, int[] vs, int[] wants)
-    {
-        Placed(stamp, room.Width, room.Height, candidate.Turn, us, vs, wants);
-        var astray = new List<(int X, int Y)>();
-        for (var at = 0; at < stamp.Count; at++)
+        return new RoomSearch(found, corners, fits > 0 ? fits - found.Count : 0, left, string.Empty)
         {
-            int x = candidate.X + us[at];
-            int y = candidate.Y + vs[at];
-            if (area[(y * across) + x] != wants[at])
-            {
-                astray.Add((x, y));
-            }
-        }
-
-        return astray;
+            Misses = parted,
+            TileChecked = checking,
+            Free = free,
+            Fits = fits,
+            Placements = placements,
+        };
     }
 
     /// <summary>
@@ -341,121 +319,38 @@ public static class RoomFinder
         return ((u - 1) / 2, (v - 1) / 2);
     }
 
-    /// <summary>
-    /// A room's k slots checked against the tiles laid under a candidate - see the class remarks.
-    /// </summary>
-    private sealed class TileCheck
+    /// <summary>Whether one placement ranks above another: more corners, then more tiles agreeing.</summary>
+    internal static bool Above(in RoomCandidate one, in RoomCandidate other)
+        => one.Matched != other.Matched ? one.Matched > other.Matched : one.TilesAgree > other.TilesAgree;
+
+    /// <summary>Puts a candidate into the ranked list after every one it does not beat, keeping the list to <paramref name="capacity"/>.</summary>
+    private static void Ranked(List<RoomCandidate> ranked, RoomCandidate candidate, int capacity)
     {
-        private readonly RoomLayout _room;
-        private readonly TerrainTiles _tiles;
-        private readonly Func<string, TileIdentity?> _identity;
-        private readonly List<Wanted> _slots = [];
-        private readonly Dictionary<int, Laid?> _laid = [];
-
-        public TileCheck(RoomLayout room, TerrainTiles tiles, Func<string, TileIdentity?> identity)
+        int low = 0;
+        int high = ranked.Count;
+        while (low < high)
         {
-            _room = room;
-            _tiles = tiles;
-            _identity = identity;
-            for (var line = 0; line < room.Height; line++)
+            int middle = (low + high) >>> 1;
+            if (Above(candidate, ranked[middle]))
             {
-                for (var column = 0; column < room.Width; column++)
-                {
-                    RoomSlot slot = room.SlotAt(column, line);
-                    if (slot.IsTile)
-                    {
-                        _slots.Add(new Wanted(
-                            column, line, slot.Width, slot.Height, room.Named(slot.Tag),
-                            Sorted(slot.Edge(0), slot.Edge(1), slot.Edge(2), slot.Edge(3)),
-                            Sorted(slot.Ground(0), slot.Ground(1), slot.Ground(2), slot.Ground(3))));
-                    }
-                }
+                high = middle;
+            }
+            else
+            {
+                low = middle + 1;
             }
         }
 
-        /// <summary>The candidate with its tile counts.</summary>
-        public RoomCandidate Scored(RoomCandidate candidate)
+        if (low >= capacity)
         {
-            int tiles = 0, agree = 0, big = 0, bigAgree = 0;
-            foreach (Wanted slot in _slots)
-            {
-                bool? same = Agrees(candidate, slot, out _);
-                if (same is null)
-                {
-                    continue;
-                }
-
-                bool large = slot.Width > 1 || slot.Height > 1;
-                tiles++;
-                big += large ? 1 : 0;
-                if (same == true)
-                {
-                    agree++;
-                    bigAgree += large ? 1 : 0;
-                }
-            }
-
-            return candidate with { Tiles = tiles, TilesAgree = agree, Big = big, BigAgree = bigAgree };
+            return;
         }
 
-        /// <summary>The area tiles under a candidate that are not what their slot asks for.</summary>
-        public List<(int X, int Y)> Unlike(RoomCandidate candidate)
+        ranked.Insert(low, candidate);
+        if (ranked.Count > capacity)
         {
-            var unlike = new List<(int X, int Y)>();
-            foreach (Wanted slot in _slots)
-            {
-                if (Agrees(candidate, slot, out (int X, int Y) cell) == false)
-                {
-                    unlike.Add(cell);
-                }
-            }
-
-            return unlike;
+            ranked.RemoveAt(ranked.Count - 1);
         }
-
-        /// <summary>Whether the tile under a slot is what it asks for, or null where there is no tile or no definition to say.</summary>
-        private bool? Agrees(RoomCandidate candidate, Wanted slot, out (int X, int Y) cell)
-        {
-            (int x, int y) = CellOf(slot.Column, slot.Line, _room.Width, _room.Height, candidate.Turn);
-            cell = (candidate.X + x, candidate.Y + y);
-            int id = _tiles.IdAt(cell.X, cell.Y);
-            if (id < 0)
-            {
-                return null;
-            }
-
-            if (!_laid.TryGetValue(id, out Laid? laid))
-            {
-                laid = _identity(_tiles.Paths[id]) is { Edges.Count: 4, Grounds.Count: 4 } tile
-                    ? new Laid(tile.Width, tile.Height, tile.Tag, Sorted(tile.Edges), Sorted(tile.Grounds))
-                    : null;
-                _laid[id] = laid;
-            }
-
-            if (laid is null)
-            {
-                return null;
-            }
-
-            bool sized = (laid.Width == slot.Width && laid.Height == slot.Height) || (laid.Width == slot.Height && laid.Height == slot.Width);
-            return sized
-                && (slot.Tag.Length == 0 || string.Equals(slot.Tag, laid.Tag, StringComparison.OrdinalIgnoreCase))
-                && laid.Edges.SequenceEqual(slot.Edges, StringComparer.OrdinalIgnoreCase)
-                && laid.Grounds.SequenceEqual(slot.Grounds, StringComparer.OrdinalIgnoreCase);
-        }
-
-        private string[] Sorted(int a, int b, int c, int d) => Sorted([_room.Named(a), _room.Named(b), _room.Named(c), _room.Named(d)]);
-
-        private static string[] Sorted(IReadOnlyList<string> four)
-        {
-            string[] sorted = [.. four.Select(one => one.Replace('\\', '/'))];
-            Array.Sort(sorted, StringComparer.OrdinalIgnoreCase);
-            return sorted;
-        }
-
-        private readonly record struct Wanted(int Column, int Line, int Width, int Height, string Tag, string[] Edges, string[] Grounds);
-
-        private sealed record Laid(int Width, int Height, string Tag, string[] Edges, string[] Grounds);
     }
 
     /// <summary>
@@ -557,7 +452,7 @@ public static class RoomFinder
     /// Mirrored first where it is, then turned a quarter at a time: a quarter turn takes a corner
     /// (u, v) of a w by h footprint to (h - v, u) of an h by w one.
     /// </remarks>
-    private static (int Wide, int Tall) Placed(
+    internal static (int Wide, int Tall) Placed(
         Dictionary<(int U, int V), int> stamp, int width, int height, int turn, int[] us, int[] vs, int[] wants)
     {
         int quarters = turn & 3;
@@ -584,22 +479,5 @@ public static class RoomFinder
         }
 
         return (wide, tall);
-    }
-
-
-    /// <summary>Puts a candidate into the short list of the nearest, best first, keeping it to <paramref name="keep"/>.</summary>
-    private static void Nearer(List<RoomCandidate> near, RoomCandidate candidate, int keep)
-    {
-        int at = near.Count;
-        while (at > 0 && near[at - 1].Matched < candidate.Matched)
-        {
-            at--;
-        }
-
-        near.Insert(at, candidate);
-        if (near.Count > keep)
-        {
-            near.RemoveAt(near.Count - 1);
-        }
     }
 }
