@@ -313,6 +313,21 @@ public static class MeshPicture
         /// <remarks>On the canvas because it is the caller's, like the frame an animation is drawn at: set it, then draw.</remarks>
         public float Time { get; set; }
 
+        /// <summary>
+        /// A pixel the next whole drawing records every fragment of, or null - see <see cref="PixelProbe"/>.
+        /// </summary>
+        /// <remarks>Cleared and filled by each whole drawing while it is set; <see cref="Again"/> leaves it alone.</remarks>
+        public PixelProbe? Probe { get; set; }
+
+        /// <summary>
+        /// Where the next whole drawing counts how its translucent shapes came out, or null - see <see cref="LayerTally"/>.
+        /// </summary>
+        /// <remarks>
+        /// NULL IS THE USUAL, and then the drawing does not so much as look at it per pixel: the counting
+        /// is a diagnosis asked for, and a picture nobody is diagnosing pays nothing for it.
+        /// </remarks>
+        public LayerTally? Tally { get; set; }
+
         internal byte[] Pixels { get; }
 
         internal float[] Depth { get; }
@@ -729,7 +744,16 @@ public static class MeshPicture
         // A POINT'S DEPTH IS THE VIEW'S THIRD COLUMN, the way into the picture - see ShadeProgram.Eye.
         var eye = new Vector4(view.M13, view.M23, view.M33, view.M43);
         var drawn = new Drawn(mesh, triangles, lamp, ink, palette, translucent, programs, stride, places, turns, ticking, clocked, eye);
-        InBands(canvas, new Drawing(canvas, drawn), again: false);
+        PixelProbe? probe = canvas.Probe is { } asked && asked.X >= 0 && asked.X < size && asked.Y >= 0 && asked.Y < size ? asked : null;
+        probe?.Clear();
+        LayerTally? tally = canvas.Tally;
+        tally?.Reset(mesh.Shapes.Count);
+        InBands(canvas, new Drawing(canvas, drawn, probe), again: false, tally);
+        if (probe is not null)
+        {
+            probe.Final = depth[(probe.Y * size) + probe.X];
+            probe.Drawn = true;
+        }
         if (clocked > 0)
         {
             canvas.Last = drawn;
@@ -822,7 +846,7 @@ public static class MeshPicture
             canvas.Stamped();
         }
 
-        InBands(canvas, new Drawing(canvas, drawn), again: true);
+        InBands(canvas, new Drawing(canvas, drawn, probe: null), again: true, tally: null);
         picture = new GamePicture(canvas.Size, canvas.Size, canvas.Pixels);
         return true;
     }
@@ -837,23 +861,44 @@ public static class MeshPicture
     /// sees two threads at once. More bands than threads, so a band the model does not reach costs
     /// nothing much and the ones through its middle are shared out.
     /// </remarks>
-    private static void InBands(Canvas canvas, Drawing drawing, bool again)
+    private static void InBands(Canvas canvas, Drawing drawing, bool again, LayerTally? tally)
     {
         int size = canvas.Size;
         int bands = Bands(size);
         if (canvas.Threads == 1)
         {
+            int[]? counts = tally is null ? null : new int[tally.Shapes * LayerTally.Slots];
             for (var band = 0; band < bands; band++)
             {
-                drawing.Band(band, band * BandRows, Math.Min(size, (band + 1) * BandRows), again);
+                drawing.Band(band, band * BandRows, Math.Min(size, (band + 1) * BandRows), again, counts);
+            }
+
+            if (counts is not null)
+            {
+                tally!.Add(counts);
             }
         }
-        else
+        else if (tally is null)
         {
             Parallel.For(
                 0, bands,
                 new ParallelOptions { MaxDegreeOfParallelism = canvas.Threads },
-                band => drawing.Band(band, band * BandRows, Math.Min(size, (band + 1) * BandRows), again));
+                band => drawing.Band(band, band * BandRows, Math.Min(size, (band + 1) * BandRows), again, counts: null));
+        }
+        else
+        {
+            // COUNTED PER THREAD AND ADDED ONCE, so the bands never contend for one array.
+            int slots = tally.Shapes * LayerTally.Slots;
+            Parallel.For(
+                0, bands,
+                new ParallelOptions { MaxDegreeOfParallelism = canvas.Threads },
+                () => new int[slots],
+                (band, _, counts) =>
+                {
+                    drawing.Band(band, band * BandRows, Math.Min(size, (band + 1) * BandRows), again, counts);
+                    return counts;
+                },
+                tally.Add);
         }
     }
 
@@ -1333,9 +1378,15 @@ public static class MeshPicture
         private readonly int[] _binEntries;
         private readonly int _bands;
 
-        public Drawing(Canvas canvas, Drawn drawn)
+        /// <summary>The pixel whose fragments are recorded, or null - see <see cref="PixelProbe"/>.</summary>
+        private readonly PixelProbe? _probe;
+        private readonly int _probeAt;
+
+        public Drawing(Canvas canvas, Drawn drawn, PixelProbe? probe)
         {
             SkinnedMesh mesh = drawn.Mesh;
+            _probe = probe;
+            _probeAt = probe is null ? -1 : (probe.Y * canvas.Size) + probe.X;
             _time = canvas.Time;
             _eye = drawn.Eye;
             _programs = drawn.Programs;
@@ -1387,7 +1438,8 @@ public static class MeshPicture
         /// <param name="top">The band's first row.</param>
         /// <param name="end">The row after its last.</param>
         /// <param name="again">True to put the kept still part back and draw only the clock's triangles and the translucent ones - see <see cref="Again"/>.</param>
-        public void Band(int band, int top, int end, bool again)
+        /// <param name="counts">This thread's counts of how the translucent shapes came out, or null - see <see cref="LayerTally"/>.</param>
+        public void Band(int band, int top, int end, bool again, int[]? counts)
         {
             if (again)
             {
@@ -1396,28 +1448,28 @@ public static class MeshPicture
             else
             {
                 // A KEEPING DRAWING DRAWS THE STILL PART FIRST, and keeps it before the clock's.
-                Pass(1, band, top, end);
+                Pass(1, band, top, end, counts);
                 if (_winners is not null)
                 {
                     Kept(top, end, back: false);
                 }
             }
 
-            Pass(2, band, top, end);
+            Pass(2, band, top, end, counts);
             if (_translucent)
             {
-                Pass(3, band, top, end);
+                Pass(3, band, top, end, counts);
             }
         }
 
         /// <summary>Draws one pass's triangles that reach the band, in the mesh's order - see <see cref="Binned"/>.</summary>
-        private void Pass(int kind, int band, int top, int end)
+        private void Pass(int kind, int band, int top, int end, int[]? counts)
         {
             int bin = ((kind - 1) * _bands) + band;
             for (int at = _binStarts[bin], upto = _binStarts[bin + 1]; at < upto; at++)
             {
                 int one = _binEntries[at];
-                Rasterise(one, Math.Max(_tops[one], top), Math.Min(_feet[one], end - 1));
+                Rasterise(one, Math.Max(_tops[one], top), Math.Min(_feet[one], end - 1), counts);
             }
         }
 
@@ -1440,7 +1492,7 @@ public static class MeshPicture
             }
         }
 
-        private void Rasterise(int one, int top, int foot)
+        private void Rasterise(int one, int top, int foot, int[]? counts)
         {
             int i0 = _indices[one * 3];
             int i1 = _indices[(one * 3) + 1];
@@ -1469,6 +1521,9 @@ public static class MeshPicture
             int least = Math.Max(0, (int)MathF.Floor(Min3(c0.X, c1.X, c2.X)));
             int most = Math.Min(_size - 1, (int)MathF.Ceiling(Max3(c0.X, c1.X, c2.X)));
             float level = _levels[one];
+
+            // ONE TEST PER TRIANGLE, so a drawing nobody probes asks nothing per pixel but one false.
+            bool probing = _probe is not null && _probe.Y >= top && _probe.Y <= foot && _probe.X >= least && _probe.X <= most;
 
             // THE TEXTURE THIS TRIANGLE'S SHAPE WEARS, not the model's. See Palette.
             Mipmaps? skin = _palette[_wears[one]];
@@ -1553,8 +1608,14 @@ public static class MeshPicture
                     float third = w2 * inv;
                     float away = (first * c0.Z) + (second * c1.Z) + (third * c2.Z);
                     float held = _depth[at];
+                    bool here = probing && at == _probeAt;
                     if (away >= held && !(ranked && away == held && one < _winners![at]))
                     {
+                        if (here)
+                        {
+                            _probe!.Add(new ProbeFragment(one, Seen.Under, away, held, 0f));
+                        }
+
                         continue;
                     }
 
@@ -1564,6 +1625,11 @@ public static class MeshPicture
                         int owner = _owners[one];
                         if (_stamps[at] == owner)
                         {
+                            if (here)
+                            {
+                                _probe!.Add(new ProbeFragment(one, Seen.Again, away, held, 0f));
+                            }
+
                             continue;
                         }
 
@@ -1591,18 +1657,44 @@ public static class MeshPicture
                                 cover = skinned ? Sample4(skin!, spot_.Of(s0, s1, s2), level).W : 0.5f;
                             }
 
+                            if (counts is not null)
+                            {
+                                LayerTally.Count(counts, owner, cover, away, held);
+                            }
+
                             if (!(cover > 0f))
                             {
+                                if (here)
+                                {
+                                    _probe!.Add(new ProbeFragment(one, float.IsNegativeInfinity(cover) ? Seen.Discarded : Seen.Clear, away, held, 0f));
+                                }
+
                                 continue;
                             }
 
                             _stamps[at] = owner;
                             Over(at, blend, new Vector4(Lit(program, mixed, mixedSpecular, mixedGloss, (first * f0) + (second * f1) + (third * f2)), cover));
+                            if (here)
+                            {
+                                _probe!.Add(new ProbeFragment(one, blend == MaterialBlend.Additive ? Seen.Added : Seen.Mixed, away, held, cover));
+                            }
+
                             continue;
                         }
 
                         _stamps[at] = owner;
-                        Over(at, blend, skinned ? Sample4(skin!, spot_.Of(s0, s1, s2), level) : new Vector4(_ink, 0.5f));
+                        Vector4 plain = skinned ? Sample4(skin!, spot_.Of(s0, s1, s2), level) : new Vector4(_ink, 0.5f);
+                        Over(at, blend, plain);
+                        if (counts is not null)
+                        {
+                            LayerTally.Count(counts, owner, plain.W, away, held);
+                        }
+
+                        if (here)
+                        {
+                            _probe!.Add(new ProbeFragment(one, blend == MaterialBlend.Additive ? Seen.Added : Seen.Mixed, away, held, plain.W));
+                        }
+
                         continue;
                     }
 
@@ -1618,6 +1710,11 @@ public static class MeshPicture
                         if (cut && !program.HasAlpha && skinned
                             && Sample4(skin!, (first * s0) + (second * s1) + (third * s2), level).W < CutoutAlpha)
                         {
+                            if (here)
+                            {
+                                _probe!.Add(new ProbeFragment(one, Seen.Cut, away, held, 0f));
+                            }
+
                             continue;
                         }
 
@@ -1633,6 +1730,11 @@ public static class MeshPicture
                             tinted ? (first * v0) + (second * v1) + (third * v2) : default);
                         if ((cut && program.HasAlpha && alpha < CutoutAlpha) || float.IsNegativeInfinity(alpha))
                         {
+                            if (here)
+                            {
+                                _probe!.Add(new ProbeFragment(one, float.IsNegativeInfinity(alpha) ? Seen.Discarded : Seen.Cut, away, held, 0f));
+                            }
+
                             continue;
                         }
                     }
@@ -1650,6 +1752,11 @@ public static class MeshPicture
                             Vector4 texel = Sample4(skin!, spot, level);
                             if (texel.W < CutoutAlpha)
                             {
+                                if (here)
+                                {
+                                    _probe!.Add(new ProbeFragment(one, Seen.Cut, away, held, 0f));
+                                }
+
                                 continue;
                             }
 
@@ -1665,6 +1772,11 @@ public static class MeshPicture
                     if (ranked)
                     {
                         _winners![at] = one;
+                    }
+
+                    if (here)
+                    {
+                        _probe!.Add(new ProbeFragment(one, Seen.Solid, away, held, 0f));
                     }
 
                     Vector3 shown = Lit(program, colour, specular, gloss, (first * f0) + (second * f1) + (third * f2));

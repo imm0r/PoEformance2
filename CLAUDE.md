@@ -25,6 +25,11 @@ already cost real time on this project.
   every element's StringId, rectangle, flags and child path, and F8 picks whatever is under
   the cursor. Any question of the form "does the game name that thing, and where is it" is
   one screenshot away — ask it there before concluding that something cannot be measured.
+  The model pane has the same thing for its OWN pictures: the corner button "probe", then a
+  click, lists every surface under that pixel (material, blend, program or texture, which
+  doodad or tile piece, depths), and counts how each translucent layer came out over the
+  whole picture. "copy probe" puts it on the clipboard — ask for that text before theorising
+  about why a tile or room looks wrong.
 - **`adamthedash/poe_data_tools`** is to the game's FILE formats what GameHelper2 is to its
   memory: working parsers for `.ao`, `.sm`, `.smd`, `.fmt`, `.mat` and `.ast`. Clone it and
   read the parser, not a diagram of it — `crates/poe_data_tools-lib/src/file_parsers/`.

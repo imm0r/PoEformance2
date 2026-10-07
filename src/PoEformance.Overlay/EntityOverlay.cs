@@ -553,7 +553,6 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             ModelLight = _monsterBook?.Model?.Light ?? basis.ModelLight,
             ModelLightTarget = _monsterBook?.Model?.LightTarget ?? basis.ModelLightTarget,
             ModelFlatLight = _modelWants.ModelFlatLight,
-            ModelLastBlend = _modelWants.ModelLastBlend,
             ShowProjectiles = _projectiles.Enabled,
             ProjectileTrails = _projectiles.ShowTrails,
             ProjectilePaths = _projectiles.ShowPaths,
@@ -785,18 +784,6 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             foreach (MonsterPortrait other in Panes())
             {
                 other.FlatLight = flat;
-            }
-
-            SettingsChanged?.Invoke();
-        };
-
-        pane.LastBlend = _modelWants.ModelLastBlend;
-        pane.LastBlendChanged = last =>
-        {
-            _modelWants = _modelWants with { ModelLastBlend = last };
-            foreach (MonsterPortrait other in Panes())
-            {
-                other.LastBlend = last;
             }
 
             SettingsChanged?.Invoke();
@@ -3023,7 +3010,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Here = PlayerTile,
             Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize)
             {
-                Load = (read, _, key, _) => TileBookWindow.Load(read, key, () => _snapshot.Terrain as TerrainGrid),
+                Load = (read, _, key, _, progress) => TileBookWindow.Load(read, key, () => _snapshot.Terrain as TerrainGrid, progress),
                 Ink = TileBookWindow.GroundInk,
                 Shaded = true,
                 Masked = true,

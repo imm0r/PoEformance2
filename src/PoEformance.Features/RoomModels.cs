@@ -119,12 +119,14 @@ public static class RoomModels
     /// <param name="shaded">Whether each material's shader graphs are read - see MonsterModels.Shaded.</param>
     /// <param name="doodads">Most doodads placed - see <see cref="UsualDoodads"/>; zero or less is the usual.</param>
     /// <param name="tools">Whether the level editor's tools are placed too - see <see cref="IsTool"/>.</param>
+    /// <param name="progress">Where the build says how far it has got, or null - see <see cref="ModelProgress"/>.</param>
     public static MonsterModel Of(
         Func<string, byte[]?>? read,
         string? path,
         bool shaded = false,
         int doodads = UsualDoodads,
-        bool tools = false)
+        bool tools = false,
+        ModelProgress? progress = null)
     {
         if (read is null)
         {
@@ -164,7 +166,7 @@ public static class RoomModels
             return MonsterModel.None with { Why = $"the room places no doodads: {path}", Bytes = bytes, Files = files };
         }
 
-        var paints = new MonsterModels.Paints();
+        var paints = new MonsterModels.Paints { Progress = progress };
         var pile = new ModelPile();
         Doodads laid = Lay(room, Counted, paints, pile, doodads, tools, beyond: null);
 
@@ -249,8 +251,10 @@ public static class RoomModels
         long mostTriangles = (long)mostDoodads * TrianglesPerDoodad;
         string firstMissing = string.Empty;
 
+        using ModelProgress.Step step = ModelProgress.Begin(paints.Progress, "laying the doodads", room.Doodads.Count);
         foreach (RoomDoodad one in room.Doodads)
         {
+            step.Advance();
             if (one.Ao.Length == 0)
             {
                 continue;
@@ -294,7 +298,7 @@ public static class RoomModels
                 place *= beyond(one);
             }
 
-            pile.Add(model, place);
+            pile.Add(model, place, one.Ao);
             triangles += model.Mesh.Triangles;
             placed++;
         }
@@ -310,12 +314,12 @@ public static class RoomModels
         {
             Skins = pile.Skins,
             Modes = pile.Modes,
-            LastModes = pile.LastModes,
             ShapeMaterials = pile.Wearing,
 
             // CARRIED LIKE THE MATERIALS, so the dump's "tex" column names each doodad's colour map;
             // left out, every room shape read "tex -" whether it was textured or not.
             ShapeTextures = pile.Textures,
+            ShapeSources = pile.Sources,
             BodyLeast = joined.Least,
             BodyMost = joined.Most,
             Kind = ModelKind.Room,

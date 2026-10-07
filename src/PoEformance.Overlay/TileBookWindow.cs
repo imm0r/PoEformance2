@@ -301,7 +301,8 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     /// <param name="read">How to read a file out of the install.</param>
     /// <param name="key">What to load - see <see cref="TileKey"/> and <see cref="RoomKey"/>.</param>
     /// <param name="terrain">The current area, for a room laid from its tiles; null leaves such a room out.</param>
-    public static MonsterModel Load(Func<string, byte[]?> read, string key, Func<TerrainGrid?>? terrain = null)
+    /// <param name="progress">Where the build says how far it has got, for the pane's bar, or null.</param>
+    public static MonsterModel Load(Func<string, byte[]?> read, string key, Func<TerrainGrid?>? terrain = null, ModelProgress? progress = null)
     {
         ArgumentNullException.ThrowIfNull(key);
 
@@ -318,20 +319,21 @@ public sealed class TileBookWindow : BookWindow<TileBook>
                 shaded: true,
                 swaps: tile.Tileset.Length > 0 ? TilesetIndex.Overrides(read, tile.Tileset) : null,
                 tileset: tile.Tileset.Length > 0 ? TilesetIndex.Short(tile.Tileset) : string.Empty,
-                laid: TileOrientation.OfPlacement(tile.Laid));
+                laid: TileOrientation.OfPlacement(tile.Laid),
+                progress: progress);
         }
 
         RoomKey room = RoomKey.Read(key);
         if (!room.TryLaid(out int x, out int y, out int turn, out int area))
         {
-            return RoomModels.Of(read, room.Path, shaded: true, doodads: room.Doodads, tools: room.Tools);
+            return RoomModels.Of(read, room.Path, shaded: true, doodads: room.Doodads, tools: room.Tools, progress: progress);
         }
 
         // ONLY IN THE AREA THE PLACE WAS FOUND IN: a place is a tile of one area's grid, and the key
         // names that grid so a new area cannot lay the room over somebody else's tiles.
         TerrainGrid? grid = terrain?.Invoke();
         return grid is not null && Stamp(grid) == area
-            ? LaidRoomModels.Of(read, room.Path, grid, x, y, turn, shaded: true, doodads: room.Doodads, tools: room.Tools, atLevel: room.AtLevel)
+            ? LaidRoomModels.Of(read, room.Path, grid, x, y, turn, shaded: true, doodads: room.Doodads, tools: room.Tools, atLevel: room.AtLevel, progress: progress)
             : MonsterModel.None with { Why = "the area this place was found in is gone - pick the room's place again" };
     }
 

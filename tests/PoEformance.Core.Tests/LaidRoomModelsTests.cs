@@ -146,6 +146,10 @@ public class LaidRoomModelsTests
 
         Assert.True(room.Ready, room.Why);
         Assert.Contains("no sloped piece", room.Move, StringComparison.Ordinal);
+
+        // EVERY SHAPE SAYS WHAT IT CAME FROM: here the one piece's ground, by file and tile.
+        Assert.Equal(room.Mesh.Shapes.Count, room.ShapeSources.Count);
+        Assert.Equal(["ground of " + TilePath + " at tile 1, 1"], room.ShapeSources.Distinct());
     }
 
     [Fact]

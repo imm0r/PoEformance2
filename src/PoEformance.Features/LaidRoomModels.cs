@@ -80,6 +80,7 @@ public static class LaidRoomModels
     /// <param name="doodads">Most doodads placed, and the measure of the tiles' triangles too - see RoomModels.UsualDoodads.</param>
     /// <param name="tools">Whether the level editor's tools are placed too.</param>
     /// <param name="atLevel">Whether each piece is set at its tiles' own level rather than fitted to the area's ground - see the remarks.</param>
+    /// <param name="progress">Where the build says how far it has got, or null - see <see cref="ModelProgress"/>.</param>
     public static MonsterModel Of(
         Func<string, byte[]?>? read,
         string? path,
@@ -90,7 +91,8 @@ public static class LaidRoomModels
         bool shaded = false,
         int doodads = RoomModels.UsualDoodads,
         bool tools = false,
-        bool atLevel = false)
+        bool atLevel = false,
+        ModelProgress? progress = null)
     {
         if (read is null)
         {
@@ -129,9 +131,11 @@ public static class LaidRoomModels
 
         (int wide, int tall) = (turn & 1) == 0 ? (room.Width, room.Height) : (room.Height, room.Width);
 
-        // EACH TILE FILE ONCE, however many pieces of it the room holds.
-        var paints = new MonsterModels.Paints();
+        // EACH TILE FILE ONCE, however many pieces of it the room holds - and counted for the bar as
+        // each is read, which is while the pieces are found: that is where the files are opened.
+        var paints = new MonsterModels.Paints { Progress = progress };
         var made = new Dictionary<int, Made>();
+        ModelProgress.Step reading = ModelProgress.Begin(progress, "reading the tile files", Distinct(tiles, x, y, wide, tall));
         Made Of(int id)
         {
             if (!made.TryGetValue(id, out Made? one))
@@ -139,12 +143,15 @@ public static class LaidRoomModels
                 (MonsterModel props, SkinnedMesh ground, int across, int down) = TileModels.Apart(Counted, tiles.Paths[id], walls: true, paints);
                 one = Made.Of(props, ground, across, down);
                 made[id] = one;
+                reading.Advance();
             }
 
             return one;
         }
 
         List<TilePiece> pieces = tiles.Pieces(x, y, wide, tall, id => (Of(id).Width, Of(id).Height));
+        reading.Dispose();
+        reading = default;
 
         // THE WAY THE FILES LIE ON THE TEMPLATE, from the sloped pieces - see the remarks. As filed
         // comes first, so it is the one kept wherever the ground cannot tell two ways apart.
@@ -224,14 +231,18 @@ public static class LaidRoomModels
 
             float lift = atLevel ? level : height.Fitted;
             Matrix4x4 place = Spatial(flat) * Matrix4x4.CreateTranslation(0f, 0f, lift);
+
+            // NAMED BY FILE AND TILE, so the probe can say which piece a pixel belongs to - one string
+            // per piece, shared by all of its shapes.
+            string called = string.Create(CultureInfo.InvariantCulture, $"{tiles.Paths[piece.Id]} at tile {piece.MinX}, {piece.MinY}");
             if (one.Props.Ready)
             {
-                pile.Add(one.Props, place);
+                pile.Add(one.Props, place, called);
             }
 
             if (one.Ground.Ready)
             {
-                pile.AddPlain(one.Ground, place);
+                pile.AddPlain(one.Ground, place, "ground of " + called);
             }
 
             used.Add(piece.Id);
@@ -366,6 +377,25 @@ public static class LaidRoomModels
     /// Where a piece's height comes out each way: the lift that fits its ground to the area's, how far its ground then misses the area's, and how far it misses at its tile's level - root mean squares, in world units.
     /// </summary>
     private readonly record struct Height(float Fitted, int Samples, double MissFitted, double MissAtLevel);
+
+    /// <summary>How many different tile files the block names - what the bar counts the reading against.</summary>
+    private static int Distinct(TerrainTiles tiles, int x, int y, int wide, int tall)
+    {
+        var seen = new HashSet<int>();
+        for (int row = y; row < y + tall; row++)
+        {
+            for (int column = x; column < x + wide; column++)
+            {
+                int id = tiles.IdAt(column, row);
+                if (id >= 0)
+                {
+                    seen.Add(id);
+                }
+            }
+        }
+
+        return seen.Count;
+    }
 
     /// <summary>A flat placement as a placement in space, the height left alone.</summary>
     private static Matrix4x4 Spatial(Matrix3x2 flat) => new(
