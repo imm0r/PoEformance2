@@ -4,6 +4,7 @@ using System.Runtime.Versioning;
 using ImGuiNET;
 using PoEformance.Features;
 using PoEformance.Game.Entities;
+using PoEformance.Game.Files;
 using PoEformance.Game.World;
 
 namespace PoEformance.Overlay;
@@ -69,6 +70,9 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     /// </remarks>
     private int _laid = -1;
 
+    /// <summary>Whether a room places the level editor's tools - see RoomModels.IsTool. Kept in the settings; see <see cref="Tools"/>.</summary>
+    private bool _tools;
+
     /// <summary>Most doodads a room places - see RoomModels.UsualDoodads. Kept in the settings; see <see cref="Doodads"/>.</summary>
     private int _doodads = RoomModels.UsualDoodads;
 
@@ -127,6 +131,29 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             _doodads = value <= 0 ? RoomModels.UsualDoodads : Math.Clamp(value, RoomModels.LeastDoodads, RoomModels.MostDoodads);
             _dragging = _doodads;
         }
+    }
+
+    /// <summary>The current area's terrain, for finding where a room it loaded was laid. Null leaves the search out.</summary>
+    public Func<TerrainGrid?>? Terrain { get; init; }
+
+    /// <summary>How to read a file out of the install - the room's own, for the search.</summary>
+    public Func<string, byte[]?>? Read { get; init; }
+
+    /// <summary>Told which candidate the large map should outline, or null for none.</summary>
+    public Action<RoomGhost?>? Ghost { get; init; }
+
+    /// <summary>The search running or run for <see cref="_searchedFor"/> in <see cref="_searchedIn"/>.</summary>
+    private Task<RoomSearch>? _searching;
+    private RoomSearch? _found;
+    private string _searchedFor = string.Empty;
+    private TerrainGrid? _searchedIn;
+    private int _ghosted = -1;
+
+    /// <summary>Whether a room places the level editor's tools, as the box has it - what the settings keep.</summary>
+    public bool Tools
+    {
+        get => _tools;
+        set => _tools = value;
     }
 
     /// <inheritdoc/>
@@ -245,7 +272,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         }
 
         RoomKey room = RoomKey.Read(key);
-        return RoomModels.Of(read, room.Path, shaded: true, doodads: room.Doodads);
+        return RoomModels.Of(read, room.Path, shaded: true, doodads: room.Doodads, tools: room.Tools);
     }
 
     /// <summary>What the tile or room is and where it is used, then its geometry under it.</summary>
@@ -298,6 +325,10 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         else
         {
             DoodadCap();
+            if (placed > 0)
+            {
+                Whereabouts(chosen);
+            }
         }
 
         ImGui.Separator();
@@ -309,7 +340,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         }
 
         string key = room
-            ? new RoomKey(chosen, _doodads).ToString()
+            ? new RoomKey(chosen, _doodads, _tools).ToString()
             : new TileKey(chosen, _ground, _walls, Placing(chosen), Laying(chosen)).ToString();
         if (!string.Equals(key, _subjectKey, StringComparison.Ordinal))
         {
@@ -362,6 +393,104 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         {
             ImGui.SetTooltip(DoodadsSaid);
         }
+
+        ImGui.SameLine();
+        if (ImGui.Checkbox("tools##roomtools", ref _tools))
+        {
+            Changed?.Invoke();
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("The level editor's own pieces: walk blockers and markers. The game places them and does not draw them -"
+                + " the room names DoodadInvisible beside a blocker - so they are hidden unless this is on."
+                + " Everything from Metadata/Terrain/Doodads/Tools/ counts, which is a rule on the folder's name.");
+        }
+    }
+
+    /// <summary>
+    /// Where in the current area a room it loaded was laid: found by its ground, listed, and outlined on the large map when picked.
+    /// </summary>
+    /// <remarks>
+    /// OFF THE FRAME, once per room and area: the search tries the room eight ways round at every
+    /// tile corner of the area, which is cheap per try and not per frame. A room found in several
+    /// places lists them all - the map is where a person tells them apart - and one found nowhere
+    /// exactly lists the nearest with how many corners they miss by. See RoomFinder.
+    /// </remarks>
+    private void Whereabouts(string room)
+    {
+        TerrainGrid? grid = Terrain?.Invoke();
+        if (grid?.Ground is not { } ground || Read is not { } read)
+        {
+            ImGui.TextDisabled("where it lies: the area's ground types are not read");
+            return;
+        }
+
+        if (!ReferenceEquals(grid, _searchedIn) || !string.Equals(room, _searchedFor, StringComparison.Ordinal))
+        {
+            _searchedIn = grid;
+            _searchedFor = room;
+            _found = null;
+            _ghosted = -1;
+            Ghost?.Invoke(null);
+            int wide = grid.TilesX;
+            int tall = grid.TilesY;
+            _searching = Task.Run(() => RoomFinder.Find(RoomLayout.Read(read(room)), ground, wide, tall));
+        }
+
+        if (_found is null && _searching is { IsCompleted: true } done)
+        {
+            _found = done.IsCompletedSuccessfully ? done.Result : RoomSearch.Not($"the search failed: {done.Exception?.GetBaseException().Message}");
+        }
+
+        if (_found is not { } found)
+        {
+            ImGui.TextDisabled("where it lies: looking for it in this area...");
+            return;
+        }
+
+        if (found.Why.Length > 0)
+        {
+            ImGui.TextDisabled(ImGuiText.Escape("where it lies: " + found.Why));
+            return;
+        }
+
+        string left = found.Left > 0
+            ? string.Create(CultureInfo.InvariantCulture, $"; {found.Left} slots bigger than a tile left out")
+            : string.Empty;
+        ImGui.TextDisabled(ImGuiText.Escape(found.Found
+            ? string.Create(CultureInfo.InvariantCulture,
+                $"where it lies: {found.Candidates.Count + found.More} place{(found.Candidates.Count + found.More == 1 ? string.Empty : "s")} fit all {found.Corners} corners{left} - pick one to outline it on the large map")
+            : string.Create(CultureInfo.InvariantCulture,
+                $"where it lies: nowhere fits all {found.Corners} corners{left}; the nearest:")));
+
+        float rows = Math.Min(found.Candidates.Count, 6);
+        if (rows == 0)
+        {
+            return;
+        }
+
+        if (ImGui.BeginChild("##roomwhere", new Vector2(0f, (rows * ImGui.GetTextLineHeightWithSpacing()) + ImGui.GetStyle().FramePadding.Y), ImGuiChildFlags.Borders))
+        {
+            for (var one = 0; one < found.Candidates.Count; one++)
+            {
+                RoomCandidate where = found.Candidates[one];
+                string label = string.Create(CultureInfo.InvariantCulture,
+                    $"tile {where.X}, {where.Y}  ·  {RoomFinder.Said(where.Turn)}  ·  {where.Matched}/{where.Corners} corners##where{one}");
+                if (ImGui.Selectable(label, _ghosted == one))
+                {
+                    _ghosted = _ghosted == one ? -1 : one;
+                    Ghost?.Invoke(_ghosted >= 0 ? new RoomGhost(grid, room, where) : null);
+                }
+            }
+
+            if (found.More > 0)
+            {
+                ImGui.TextDisabled(string.Create(CultureInfo.InvariantCulture, $"{found.More} more not listed"));
+            }
+        }
+
+        ImGui.EndChild();
     }
 
     /// <summary>The ways the current area laid a tile, one bit per placement - zero where it did not, or the tables were not read.</summary>

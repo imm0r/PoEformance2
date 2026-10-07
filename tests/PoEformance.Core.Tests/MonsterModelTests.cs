@@ -1635,6 +1635,93 @@ public class MonsterModelTests
         Assert.True(shaded.Files > plain.Files, "the graph's file is counted");
     }
 
+    /// <summary>
+    /// A material drawn as a plain texture is a program all the same where it is lit the game's way: its gloss is not in the texture.
+    /// </summary>
+    /// <remarks>
+    /// DielectricSpecGlossBN's shape, cut down: the colour one plain read, the specular the game's
+    /// 0.04, the gloss a second texture's x. Lit flat the 0.04 adds nothing, so the shape keeps its
+    /// plain skin; lit the game's way it needs the gloss, so the glossy list has its program, bound
+    /// to both textures.
+    /// </remarks>
+    [Fact]
+    public void APLAINMaterialWithAGlossIsAProgramLitTheGamesWay()
+    {
+        var install = Install();
+        install.Files["body.ao"] = Ao(skin: "art/mesh.sm", attach: "art/cannon.ao", skeleton: "art/rig.ast");
+        install.Files["art/cannon.ao"] = Ao(fixture: "art/cannon.fmt");
+        install.Files["art/cannon.fmt"] = Packed.Fmt("art/painted.mat");
+        install.Files["art/painted.mat"] = Encoding.UTF8.GetBytes("""{"graphinstances":[{"parent":"Metadata/Dielectric.fxgraph"}]}""");
+        install.Files["art/skin.dds"] = TileFilesTests.Dds();
+        install.Files["art/gloss.dds"] = TileFilesTests.Dds();
+        install.Files["Metadata/Dielectric.fxgraph"] = Encoding.UTF8.GetBytes(
+            """
+            {"nodes":[
+              {"type":"InputUV","index":0,"stage":"Texturing_Init"},
+              {"type":"SampleTexture","index":0,"parameters":[{"path":"art/skin.dds","srgb":true}]},
+              {"type":"SampleTexture","index":1,"parameters":[{"path":"art/gloss.dds","srgb":false}]},
+              {"type":"ConstantPixel","index":0,"parameters":[{"value":0.03999999910593033}]},
+              {"type":"AlbedoColor","index":0,"stage":"Texturing_Init"},
+              {"type":"SpecularColor","index":0,"stage":"Texturing_Init"},
+              {"type":"Glossiness","index":0,"stage":"Texturing_Init"}],
+             "links":[
+              {"src":{"type":"InputUV","index":0,"stage":"Texturing_Init","variable":"output"},"dst":{"type":"SampleTexture","index":0,"variable":"uv"}},
+              {"src":{"type":"InputUV","index":0,"stage":"Texturing_Init","variable":"output"},"dst":{"type":"SampleTexture","index":1,"variable":"uv"}},
+              {"src":{"type":"SampleTexture","index":0,"variable":"rgba"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input"}},
+              {"src":{"type":"ConstantPixel","index":0,"variable":"output"},"dst":{"type":"SpecularColor","index":0,"stage":"Texturing_Init","variable":"input"}},
+              {"src":{"type":"SampleTexture","index":1,"variable":"rgba","swizzle":"x"},"dst":{"type":"Glossiness","index":0,"stage":"Texturing_Init","variable":"input"}}]}
+            """);
+
+        MonsterModel shaded = MonsterModels.Of(install.Read, Named("body.ao"), shaded: true);
+
+        int prop = shaded.ShapeMaterials.ToList().IndexOf("art/painted.mat");
+        Assert.Null(shaded.Shades[prop]);
+        Assert.NotNull(shaded.Skins[prop]);
+        ShadeProgram glossy = Assert.IsType<ShadeProgram>(shaded.GlossShades[prop]);
+        Assert.True(glossy.Bound);
+        Assert.True(glossy.HasGloss);
+        Assert.Equal(2, glossy.Textures.Count);
+        Assert.Null(shaded.GlossShades[0]);
+    }
+
+    /// <summary>
+    /// A material whose graphs name two blend modes is read both ways: the first graph's, as before, and the last's beside it.
+    /// </summary>
+    /// <remarks>
+    /// VertexColourTransparentc.mat from the deserted 1open_01 dump, cut to its blend: VertexColourToAlbedo
+    /// says "Opaque", ForceAlphaBlendNoGI after it "AlphaBlendNoGI". Which stands is not written down,
+    /// so the model carries both and the picture draws whichever is chosen. A material's own word
+    /// stands in both readings.
+    /// </remarks>
+    [Fact]
+    public void AMATERIALNamingTwoBlendModesIsReadBothWays()
+    {
+        var install = new Fake();
+        install.Files["art/blocker.fmt"] = Packed.Fmt("art/blocker.mat");
+        install.Files["art/blocker.mat"] = Encoding.UTF8.GetBytes(
+            """{"version":4,"graphinstances":[{"parent":"Metadata/Materials/VertexColourToAlbedo.fxgraph"},{"parent":"Metadata/Effects/Graphs/General/ForceAlphaBlendNoGI.fxgraph"}]}""");
+        install.Files["Metadata/Materials/VertexColourToAlbedo.fxgraph"] = Encoding.UTF8.GetBytes("""{"version":3,"overriden_blend_mode":"Opaque","nodes":[]}""");
+        install.Files["Metadata/Effects/Graphs/General/ForceAlphaBlendNoGI.fxgraph"] = Encoding.UTF8.GetBytes("""{"version":3,"overriden_blend_mode":"AlphaBlendNoGI"}""");
+
+        MonsterModel model = MonsterModels.OfFiles(install.Read, ["art/blocker.fmt"]);
+
+        Assert.True(model.Ready, model.Why);
+        Assert.Equal(["Opaque"], model.Modes);
+        Assert.Equal(["AlphaBlendNoGI"], model.LastModes);
+        Assert.Equal([MaterialBlend.Opaque], model.Blends);
+        Assert.Equal([MaterialBlend.Alpha], model.LastBlends);
+
+        string dump = ModelDump.OfTile(install.Read, "Metadata/Terrain/Test/Blocker.tdt", model);
+        Assert.Contains("blend Opaque (last graph's: AlphaBlendNoGI)", dump, StringComparison.Ordinal);
+
+        // THE MATERIAL'S OWN WORD STANDS EITHER WAY.
+        install.Files["art/blocker.mat"] = Encoding.UTF8.GetBytes(
+            """{"version":4,"defaultgraph":{"overriden_blend_mode":"AlphaTestWithShadow"},"graphinstances":[{"parent":"Metadata/Materials/VertexColourToAlbedo.fxgraph"},{"parent":"Metadata/Effects/Graphs/General/ForceAlphaBlendNoGI.fxgraph"}]}""");
+        MonsterModel own = MonsterModels.OfFiles(install.Read, ["art/blocker.fmt"]);
+        Assert.Equal(["AlphaTestWithShadow"], own.Modes);
+        Assert.Equal(["AlphaTestWithShadow"], own.LastModes);
+    }
+
     /// <summary>The skin still wins wherever there is one, so no monster changes.</summary>
     [Fact]
     public void ANDASkinStillWinsOverAPropWhereTheChainNamesBoth()

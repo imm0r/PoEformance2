@@ -532,6 +532,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             RoomDoodads = _tileBook is { } tiles
                 ? tiles.Doodads == RoomModels.UsualDoodads ? 0 : tiles.Doodads
                 : basis.RoomDoodads,
+            RoomTools = _tileBook?.Tools ?? basis.RoomTools,
             EffectColumns = _effectBook?.Columns is { Count: > 0 } effectColumns
                 ? effectColumns
                 : basis.EffectColumns,
@@ -550,6 +551,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             ModelOutlineWidth = _monsterBook?.Model?.OutlineWidth ?? basis.ModelOutlineWidth,
             ModelLight = _monsterBook?.Model?.Light ?? basis.ModelLight,
             ModelLightTarget = _monsterBook?.Model?.LightTarget ?? basis.ModelLightTarget,
+            ModelFlatLight = _modelWants.ModelFlatLight,
+            ModelLastBlend = _modelWants.ModelLastBlend,
             ShowProjectiles = _projectiles.Enabled,
             ProjectileTrails = _projectiles.ShowTrails,
             ProjectilePaths = _projectiles.ShowPaths,
@@ -771,6 +774,43 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         if (_modelWants.ModelLightTarget > 0f)
         {
             pane.LightTarget = _modelWants.ModelLightTarget;
+        }
+
+        // ONE CHOICE FOR EVERY BOOK: a press in one pane is carried to the others and kept.
+        pane.FlatLight = _modelWants.ModelFlatLight;
+        pane.FlatLightChanged = flat =>
+        {
+            _modelWants = _modelWants with { ModelFlatLight = flat };
+            foreach (MonsterPortrait other in Panes())
+            {
+                other.FlatLight = flat;
+            }
+
+            SettingsChanged?.Invoke();
+        };
+
+        pane.LastBlend = _modelWants.ModelLastBlend;
+        pane.LastBlendChanged = last =>
+        {
+            _modelWants = _modelWants with { ModelLastBlend = last };
+            foreach (MonsterPortrait other in Panes())
+            {
+                other.LastBlend = last;
+            }
+
+            SettingsChanged?.Invoke();
+        };
+    }
+
+    /// <summary>Every book's model pane that is attached.</summary>
+    private IEnumerable<MonsterPortrait> Panes()
+    {
+        foreach (MonsterPortrait? one in (MonsterPortrait?[])[_monsterBook?.Model, _itemBook?.Model, _tileBook?.Model, _effectBook?.Model])
+        {
+            if (one is not null)
+            {
+                yield return one;
+            }
         }
     }
 
@@ -1136,6 +1176,57 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     }
 
     private IReadOnlyDictionary<string, byte> _laidHere = new Dictionary<string, byte>();
+
+    /// <summary>The place the tile book picked for a room, outlined on the large map - see <see cref="RoomGhost"/>.</summary>
+    private RoomGhost? _roomGhost;
+
+    /// <summary>
+    /// Outlines the room candidate the tile book picked, on the large map, with the room's name in the middle.
+    /// </summary>
+    /// <remarks>
+    /// THE FOUR CORNERS OF ITS FOOTPRINT, each at the ground's height under it like every other
+    /// marker, joined - the map is isometric, so the footprint is a rhombus and nothing simpler.
+    /// Only on the grid it was found on: a new area drops it without being told.
+    /// </remarks>
+    private void RoomGhostOnMap(ImDrawListPtr draw, MapView map, WorldEntity player)
+    {
+        if (_roomGhost is not { } ghost
+            || !map.IsLargeMap
+            || !ReferenceEquals(_snapshot.Terrain, ghost.Grid))
+        {
+            return;
+        }
+
+        RoomCandidate where = ghost.Where;
+        const int Cells = TerrainGrid.CellsPerTile;
+        Span<Vector2> corners = stackalloc Vector2[4];
+        for (var one = 0; one < 4; one++)
+        {
+            int cellX = (where.X + (one is 1 or 2 ? where.Width : 0)) * Cells;
+            int cellY = (where.Y + (one >= 2 ? where.Height : 0)) * Cells;
+            corners[one] = map.Project(
+                cellX * MapView.WorldToGrid,
+                cellY * MapView.WorldToGrid,
+                ghost.Grid.HeightAt(Math.Max(0, cellX - 1), Math.Max(0, cellY - 1)),
+                player.WorldX,
+                player.WorldY,
+                player.TerrainHeight);
+        }
+
+        uint colour = Style.Colour(StyleCatalogue.Keys.Room);
+        float width = Math.Max(2f, Style.Width(StyleCatalogue.Keys.Room, 2f));
+        for (var one = 0; one < 4; one++)
+        {
+            draw.AddLine(corners[one], corners[(one + 1) & 3], colour, width);
+        }
+
+        Vector2 middle = (corners[0] + corners[1] + corners[2] + corners[3]) * 0.25f;
+        string name = TerrainRooms.NameFor(ghost.Room);
+        Vector2 size = ImGui.CalcTextSize(name);
+        Vector2 at = middle - (size * 0.5f);
+        draw.AddRectFilled(at - new Vector2(3f, 1f), at + size + new Vector2(3f, 1f), 0xB4_1A1614, 3f);
+        draw.AddText(at, colour, name);
+    }
 
     /// <summary>
     /// The files the current area loaded, by path - a new list per area. Where the tile book finds
@@ -2864,7 +2955,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         int modelSize = PictureLadder.Usual,
         IReadOnlyDictionary<string, int>? columnWidths = null,
         IReadOnlyDictionary<string, double>? panes = null,
-        int roomDoodads = 0)
+        int roomDoodads = 0,
+        bool roomTools = false)
     {
         // ONE INDEX OF WHICH TILESETS PLACE WHICH TILE, built off the frame on first ask: the pane's
         // tileset choice and the dump both read it, and building it twice would read every tileset twice.
@@ -2877,6 +2969,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Clocks = new TileClockCatalog(readFile, () => TileFiles),
             Laid = LaidHere,
             Doodads = roomDoodads,
+            Tools = roomTools,
+            Terrain = () => _snapshot.Terrain as TerrainGrid,
+            Read = readFile,
+            Ghost = ghost => _roomGhost = ghost,
             Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize)
             {
                 Load = static (read, _, key, _) => TileBookWindow.Load(read, key),
@@ -5146,6 +5242,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 _poi.PickedRooms = _rooms.Picked;
             }
         }
+
+        RoomGhostOnMap(draw, map, player);
 
         // Over the entity dots: a landmark is what the map is being consulted for, so it wins
         // when the two land on the same pixel.

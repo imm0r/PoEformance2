@@ -1,0 +1,13 @@
+{
+    "version": 3,
+    "nodes": [
+        {
+            "type": "NoOutline",
+            "index": 0,
+            "ui_position": [
+                1130.0,
+                -339.0
+            ]
+        }
+    ]
+}

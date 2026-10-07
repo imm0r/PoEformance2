@@ -225,7 +225,7 @@ public sealed class ShadeProgram
             "SampleTexture", "SampleInputTexture", "SampleInputTextureLod", "SampleInputTriplanar",
             "SampleTriplanar", "SampleTexture2", "SampleTextureAtlas2", "SampleTextureLod", "SampleDispersedTexture",
             "MuddleTex", "MuddleTexFromInput", "MuddleTex2", "Muddle", "MuddleInput", "FromVertexVariance",
-            "RGBToTbn", "ScaleUVMaya", "HardLightBlend", "Sine", "RotateUVOld",
+            "RGBToTbn", "NormalTexToTbn", "NormalTexToTbnInput", "ScaleUVMaya", "HardLightBlend", "Sine", "RotateUVOld",
             "FromVertexNormal", "FromVertexWorldPos", "FromVertexLocalPosition", "InputVertexPosition", "InputVertexNormal", "InputVertexColor",
             "FromVertexColor", "Time",
             "ModelOrigin", "GroundScroll", "Transform", "LookUpTexture",
@@ -254,11 +254,13 @@ public sealed class ShadeProgram
     private readonly int[] _constantAt;
     private readonly Vector4[] _constants;
     private readonly int _result;
+    private readonly int _specular;
+    private readonly int _gloss;
     private readonly int[] _sampleTexture;
     private readonly Mipmaps?[] _sheets;
 
     private ShadeProgram(
-        Step[] steps, int[] constantAt, Vector4[] constants, int registers, int result,
+        Step[] steps, int[] constantAt, Vector4[] constants, int registers, int result, int specular, int gloss,
         ShadeTexture[] textures, int[] sampleTexture, int plain, IReadOnlyList<string> graphs, Mipmaps?[] sheets, bool hasAlpha)
     {
         HasAlpha = hasAlpha;
@@ -267,6 +269,8 @@ public sealed class ShadeProgram
         _constants = constants;
         Registers = registers;
         _result = result;
+        _specular = specular;
+        _gloss = gloss;
         Textures = textures;
         _sampleTexture = sampleTexture;
         Plain = plain;
@@ -275,7 +279,7 @@ public sealed class ShadeProgram
         UsesNormal = result == Normal || steps.Any(one => one.Reads(Normal));
         UsesVertexNormal = result == VertexNormal || steps.Any(one => one.Reads(VertexNormal));
         UsesVertexColour = result == VertexColour || steps.Any(one => one.Reads(VertexColour));
-        UsesTime = result == Clock || steps.Any(one => one.Reads(Clock));
+        UsesTime = result == Clock || specular == Clock || gloss == Clock || steps.Any(one => one.Reads(Clock));
     }
 
     internal enum Op : byte
@@ -393,6 +397,26 @@ public sealed class ShadeProgram
 
     /// <summary>Whether a run reads the game's clock - then the picture changes as it runs, and is redrawn as an animation is.</summary>
     public bool UsesTime { get; }
+
+    /// <summary>Whether a run also leaves the specular colour the graphs wrote - see <see cref="Glossy"/>.</summary>
+    public bool HasSpecular => _specular >= 0;
+
+    /// <summary>Whether a run also leaves the glossiness the graphs wrote, beside the specular colour.</summary>
+    public bool HasGloss => _gloss >= 0;
+
+    /// <summary>
+    /// The same colour with the glossiness worked out too, for the game's own lighting; null where it is this program.
+    /// </summary>
+    /// <remarks>
+    /// TWO PROGRAMS, BECAUSE THE GLOSS COSTS A TEXTURE READ. SpecGlossSpecMaskOpaqueBN and
+    /// DielectricSpecGlossBN take their glossiness from the w of a second texture, the normal map,
+    /// which nothing else on the way to the colour reads. The flat lighting needs the specular
+    /// colour and not the gloss, so this program leaves the gloss out and the one here carries it:
+    /// the picture pays for the read only where it is lit the game's way. Set on the compiled
+    /// program and bound on its own: <see cref="With"/> does not carry it, since its textures are
+    /// not this program's.
+    /// </remarks>
+    public ShadeProgram? Glossy { get; private set; }
 
     /// <summary>
     /// Whether the graphs set the colour's alpha, which a cut-out shape is then cut on instead of its texture's.
@@ -587,12 +611,29 @@ public sealed class ShadeProgram
             return new ShadeCompile(null, skipped);
         }
 
+        // THE SPECULAR COLOUR AND THE GLOSS, where the graphs wrote them whole: what a metal's colour
+        // is, its albedo being black - see Glossy. Neither starts set, since the lighting models
+        // start them differently (see the state above), so one no graph wrote is not there.
+        int specular = state.TryGetValue("SpecularColor", out Held shine) && (shine.Unset & 0b0111) == 0 ? shine.Register : -1;
+        int gloss = specular >= 0 && state.TryGetValue("Glossiness", out Held smooth) && (smooth.Unset & 0b0001) == 0 ? smooth.Register : -1;
+
         // THE COLOUR'S W IS ITS ALPHA where the graphs set it - a texture's own, or a constant's - and
-        // the alpha test cuts on it: see HasAlpha.
-        ShadeProgram? program = Finish(build, albedo.Register, graphs, albedo.Alpha && (albedo.Unset & 0b1000) == 0);
+        // the alpha test cuts on it: see HasAlpha. A colour that fits only without the specular still
+        // draws, as it did before the specular was carried.
+        //
+        // A PLAIN TEXTURE STAYS PLAIN only where the flat lighting would add nothing to it - no
+        // specular, or one no brighter than the game's own dielectric constant - and the glossy
+        // program is never plain, since the gloss is not in the texture.
+        bool cutsOnAlpha = albedo.Alpha && (albedo.Unset & 0b1000) == 0;
+        ShadeProgram? program = (specular >= 0 ? Finish(build, albedo.Register, specular, -1, graphs, cutsOnAlpha, Faint(build, specular)) : null)
+            ?? Finish(build, albedo.Register, -1, -1, graphs, cutsOnAlpha, plainable: true);
         if (program is null)
         {
             skipped.Add($"more than {MostRegisters} registers in the colour");
+        }
+        else if (gloss >= 0 && program.HasSpecular)
+        {
+            program.Glossy = Finish(build, albedo.Register, specular, gloss, graphs, cutsOnAlpha, plainable: false);
         }
 
         return new ShadeCompile(program, skipped);
@@ -608,8 +649,9 @@ public sealed class ShadeProgram
             bound[one] = sheets[one];
         }
 
+        // NOT THE GLOSSY ONE: it reads a texture this does not, and is bound on its own - see Glossy.
         return new ShadeProgram(
-            _steps, _constantAt, _constants, Registers, _result,
+            _steps, _constantAt, _constants, Registers, _result, _specular, _gloss,
             [.. Textures], _sampleTexture, Plain, Graphs, bound, HasAlpha);
     }
 
@@ -649,6 +691,15 @@ public sealed class ShadeProgram
     internal Vector3 Colour(
         Span<Vector4> registers, Vector2 coordinates, Vector3 position, Vector3 normal, ReadOnlySpan<float> levels,
         out float alpha, Vector4 vertexColour = default)
+        => Colour(registers, coordinates, position, normal, levels, out alpha, out _, out _, vertexColour);
+
+    /// <summary>
+    /// The colour at one pixel, its alpha, and the specular colour and gloss the graphs left - linear,
+    /// nought where <see cref="HasSpecular"/> or <see cref="HasGloss"/> says there are none.
+    /// </summary>
+    internal Vector3 Colour(
+        Span<Vector4> registers, Vector2 coordinates, Vector3 position, Vector3 normal, ReadOnlySpan<float> levels,
+        out float alpha, out Vector3 specular, out float gloss, Vector4 vertexColour = default)
     {
         registers[Coordinates] = new Vector4(coordinates, 0f, 0f);
         registers[Position] = new Vector4(position, 0f);
@@ -671,6 +722,8 @@ public sealed class ShadeProgram
 
         Vector4 colour = registers[_result];
         alpha = colour.W;
+        specular = _specular >= 0 ? new Vector3(registers[_specular].X, registers[_specular].Y, registers[_specular].Z) : default;
+        gloss = _gloss >= 0 ? registers[_gloss].X : 0f;
         return new Vector3(Srgb(colour.X), Srgb(colour.Y), Srgb(colour.Z));
     }
 
@@ -1012,11 +1065,36 @@ public sealed class ShadeProgram
     /// nothing. Walking back from the colour keeps exactly what it reads, and the textures only the
     /// dropped steps read are never named, so never loaded.
     /// </remarks>
-    private static ShadeProgram? Finish(Builder build, int result, List<string> graphs, bool hasAlpha)
+    /// <summary>
+    /// Whether a specular colour is a constant no brighter than a dielectric's, which the flat lighting adds nothing for.
+    /// </summary>
+    /// <remarks>
+    /// 0.04 IS THE GAME'S OWN NUMBER: DielectricSpecGlossBN writes it as its specular colour, and
+    /// SpecGlossSpecMaskOpaqueBN mixes from it to the texture's colour by the specular mask.
+    /// </remarks>
+    private static bool Faint(Builder build, int register)
+    {
+        int at = build.ConstantAt.IndexOf(register);
+        if (at < 0)
+        {
+            return false;
+        }
+
+        Vector4 shine = build.Constants[at];
+        return shine.X <= Dielectric && shine.Y <= Dielectric && shine.Z <= Dielectric;
+    }
+
+    /// <summary>The specular colour of every dielectric material the game has - see <see cref="Faint"/>.</summary>
+    internal const float Dielectric = 0.04f;
+
+    private static ShadeProgram? Finish(
+        Builder build, int result, int specular, int gloss, List<string> graphs, bool hasAlpha, bool plainable)
     {
         List<Step> steps = build.Steps;
         var live = new bool[build.Next];
         live[result] = true;
+        Live(live, specular);
+        Live(live, gloss);
         var keep = new bool[steps.Count];
         for (int at = steps.Count - 1; at >= 0; at--)
         {
@@ -1114,10 +1192,10 @@ public sealed class ShadeProgram
             return null;
         }
 
-        int plain = build.PlainOf(result);
+        int plain = plainable ? build.PlainOf(result) : -1;
         ShadeTexture[] named = [.. textures];
         return new ShadeProgram(
-            [.. kept], [.. constantAt], [.. constants], next, map[result],
+            [.. kept], [.. constantAt], [.. constants], next, map[result], Mapped(map, specular), Mapped(map, gloss),
             named, [.. sampleTextures], plain >= 0 ? textureMap[plain] : -1, graphs, new Mipmaps?[named.Length], hasAlpha);
     }
 
@@ -1536,9 +1614,11 @@ public sealed class ShadeProgram
 
     // NOT A NUMBER COMES OUT AS NOUGHT rather than as an index nowhere: a graph's square root of a
     // negative, or fmod by nought, is not a number on a graphics card too.
-    private static float Linear(float value) => ToLinear[(int)((Saturated(value) * (Table - 1)) + 0.5f)];
+    /// <summary>An sRGB value, nought to one, as light - by table.</summary>
+    internal static float Linear(float value) => ToLinear[(int)((Saturated(value) * (Table - 1)) + 0.5f)];
 
-    private static float Srgb(float value) => ToSrgb[(int)((Saturated(value) * (Table - 1)) + 0.5f)];
+    /// <summary>Light, nought to one, as an sRGB value - by table.</summary>
+    internal static float Srgb(float value) => ToSrgb[(int)((Saturated(value) * (Table - 1)) + 0.5f)];
 
     private static float[] Tabled(Func<float, float> curve)
     {
@@ -2585,6 +2665,12 @@ public sealed class ShadeProgram
                         ? build.Emit(Op.MultiplyAdd, rgb, build.Constant(new Vector4(2f)), build.Constant(new Vector4(-1f)))
                         : null;
 
+                case "NormalTexToTbn":
+                    return Unpacked(node, build.Constant(new Vector4(Said(node, 0, 1f))));
+
+                case "NormalTexToTbnInput":
+                    return Port(node, "scale") is { } by ? Unpacked(node, by) : null;
+
                 case "ScaleUVMaya":
                     return Scaled(node);
 
@@ -2923,6 +3009,36 @@ public sealed class ShadeProgram
         /// ScaleUVMaya: the coordinates scaled about a pivot given in Maya's texture space, whose v runs the other way.
         /// </summary>
         /// <remarks><c>real_pivot = (pivot.x, 1 - pivot.y); (uv - real_pivot) * scale + real_pivot</c>, the pivot declared "0 0".</remarks>
+        /// <summary>
+        /// NormalTexToTbn and its Input twin: a normal map's two channels as a unit normal in tangent space.
+        /// </summary>
+        /// <remarks>
+        /// THE FRAGMENT'S OWN TWO LINES: <c>xy = (2 * (x, y) - 1) * scale</c>, and z what makes it unit
+        /// length, <c>sqrt(max(1 - dot(xy, xy), 0))</c>. The scale is declared 1 for the uniform.
+        /// </remarks>
+        private int? Unpacked(ShaderNode node, int scale)
+        {
+            if (Port(node, "x") is not { } x || Port(node, "y") is not { } y)
+            {
+                return null;
+            }
+
+            int pair = build.Register();
+            build.Into(pair, x, 0b0001 << 8);
+            build.Into(pair, y, 0b0010 << 8);
+            int flat = build.Emit(
+                Op.Multiply,
+                build.Emit(Op.MultiplyAdd, pair, build.Constant(new Vector4(2f)), build.Constant(new Vector4(-1f))),
+                scale);
+            int rest = build.Emit(
+                Op.Sqrt,
+                build.Emit(Op.Max, build.Emit(Op.OneMinus, build.Emit(Op.Dot, flat, flat, extra: 2)), build.Constant(Vector4.Zero)));
+            int normal = build.Register();
+            build.Into(normal, flat, 0 | (1 << 2) | (0b0011 << 8));
+            build.Into(normal, rest, 0b0100 << 8);
+            return normal;
+        }
+
         private int? Scaled(ShaderNode node)
         {
             if (Port(node, "in_uv") is not { } uv || Port(node, "scale") is not { } scale)

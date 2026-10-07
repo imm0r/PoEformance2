@@ -1,0 +1,74 @@
+version 36
+7
+"Metadata/Terrain/black_inside_wall.gt"
+"Metadata/Terrain/Desert/Maraketh/ThickWall/MarakethRuin_thick_wall.et"
+"diagonal"
+"Metadata/Terrain/Desert/Maraketh/ThinWall/MarakethRuin_thin_wall.et"
+"hallway_shrine"
+"nospawner"
+"Metadata/Terrain/Dungeon/rooms.et"
+9 1
+1 1
+""
+0 1
+k 9 9 0 0 0 7 27 27 27 27 27 27 27 27 1 1 1 1 0 0 0 0 0 0
+0 0 0
+0 0 0
+0 0 0
+7 0 0
+45 80 0 ""
+45 123 0 ""
+-1
+26 137 0 ""
+57 69 3.14159 ""
+-1
+55 104 0 ""
+-1
+-1
+-1
+-1
+""
+k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0
+k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 2 2 0 3 3 1 3 1 3 3 3 1 1 0 1 0 0 0 0 3 0 k 1 1 0 0 2 2 3 3 3 3 1 3 1 3 1 1 1 0 0 0 0 0 3 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0
+k 1 1 0 2 2 0 3 3 1 3 1 3 3 3 1 1 0 1 0 0 0 0 0 0 k 1 1 2 4 0 2 1 3 1 3 3 3 1 3 1 0 0 0 0 0 0 0 0 0 k 1 1 2 2 0 4 1 3 1 3 3 3 1 3 0 1 0 0 0 0 0 0 0 0 k 1 1 0 2 0 2 3 3 1 3 3 3 1 3 1 1 0 0 0 0 0 0 5 0 k 1 1 0 0 2 2 3 3 3 3 1 3 1 3 1 1 1 0 0 0 0 0 3 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0
+k 1 1 2 0 2 0 1 3 3 3 1 3 3 3 1 0 0 1 0 0 0 0 0 0 s s s k 1 1 2 0 2 0 1 3 3 3 1 3 3 3 0 1 1 0 0 0 0 0 5 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0
+k 1 1 2 0 2 0 1 3 3 3 1 3 3 3 1 0 0 1 0 0 0 0 0 0 s s s k 1 1 2 0 2 0 1 3 3 3 1 3 3 3 0 1 1 0 0 0 0 0 6 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0
+k 1 1 2 0 2 0 1 3 3 3 1 3 3 3 1 0 0 1 0 0 0 0 0 0 s s s k 1 1 2 0 2 0 1 3 3 3 1 3 3 3 0 1 1 0 0 0 0 0 5 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0
+k 1 1 2 2 0 0 1 3 1 3 3 3 3 3 1 0 1 1 0 0 0 0 0 0 k 1 1 0 4 2 2 3 3 1 3 1 3 1 3 0 0 0 1 0 0 0 0 0 0 k 1 1 0 2 2 4 3 3 1 3 1 3 1 3 0 0 1 0 0 0 0 0 0 0 k 1 1 0 2 0 2 3 3 1 3 3 3 1 3 0 0 1 1 0 0 0 0 5 0 k 1 1 2 0 0 2 1 3 3 3 3 3 1 3 0 1 1 1 0 0 0 0 3 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0
+k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 2 2 0 0 1 3 1 3 3 3 3 3 1 0 1 1 0 0 0 0 3 0 k 1 1 2 0 0 2 1 3 3 3 3 3 1 3 0 1 1 1 0 0 0 0 3 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0
+k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0 k 1 1 0 0 0 0 3 3 3 3 3 3 3 3 1 1 1 1 0 0 0 0 0 0
+46 155 0 -3.14159 0 0 1 0 0 0 0 1 "Metadata/Terrain/Doodads/Desert/BurialChamber/FloorProps02_24.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+45 50 0 -0 0 0 0 1 0 0 0 1 "Metadata/Terrain/Doodads/Desert/BurialChamber/FloorProps02_24.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+85 103 0 -1.5708 0 0 -0.707107 0.707107 0 0 0 1 "Metadata/Terrain/Doodads/Desert/MarakethRuin/GoddessStatue123_set.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+65 123 0 1.5708 0 0 0.707107 0.707107 0 0 0 1 "Metadata/Terrain/Doodads/Desert/BurialChamber/FloorProps02_10.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+65 134 0 1.5708 0 0 0.707107 0.707107 0 0 0 1 "Metadata/Terrain/Doodads/Desert/BurialChamber/FloorProps02_08.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+61 121 0 2.35619 0 0 0.923878 0.382687 0 0 0 1 "Metadata/Terrain/Doodads/Desert/BurialChamber/BurialDoodads_06.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+71 132 0 -0.261757 0 0 -0.130505 0.991448 0 0 0 1 "Metadata/Terrain/Doodads/Desert/BurialChamber/FloorProps01_05.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+57 127 0 -2.0944 0 0 -0.866027 0.499997 0 0 0 1 "Metadata/Terrain/Doodads/Desert/BurialChamber/BurialDoodads_03.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+63 84 0 2.0944 0 0 0.866026 0.499999 0 0 0 1 "Metadata/Terrain/Doodads/Desert/BurialChamber/FloorProps02_13.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+67 127 0 2.618 0 0 0.965927 0.258815 0 0 0 1 "Metadata/Terrain/Doodads/Desert/BurialChamber/FloorProps02_02.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+58 82 0 -1.30899 0 0 -0.60876 0.793354 0 0 0 1 "Metadata/Terrain/Doodads/Desert/BurialChamber/FloorProps02_03.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+64 77 0 -1.30899 0 0 -0.60876 0.793354 0 0 0 1 "Metadata/Terrain/Doodads/Desert/BurialChamber/BurialDoodads_02.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+53 94 0 -4.94718e-06 0 0 -0 1 0 0 0 1 "Metadata/Terrain/Doodads/Desert/BurialChamber/BurialDoodads_02.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+52 84 0 -1.83259 0 0 -0.793352 0.608763 0 0 0 1 "Metadata/Terrain/Doodads/Desert/BurialChamber/BurialDoodads_07.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+83 76 0 1.5708 0 0 0.707107 0.707107 0 0 0 1.1 "Metadata/Terrain/Doodads/Desert/BurialChamber/FloorProps01_10.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+85 130 0 -1.57077 0 0 -0.707097 0.707117 0 0 0 1.1 "Metadata/Terrain/Doodads/Desert/BurialChamber/FloorProps01_10.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+56 140 0 -0 0 0 0 1 0 0 0 1 "Metadata/Terrain/Doodads/Desert/BurialChamber/FloorProps01_07.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+84 82 0 -1.0472 0 0 -0.5 0.866025 0 0 0 1 "Metadata/Terrain/Doodads/Desert/BurialChamber/FloorProps01_05.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+55 116 0 1.0472 0 0 0.5 0.866025 0 0 0 1 "Metadata/Terrain/Doodads/Desert/BurialChamber/BurialDoodads_09.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+50 108 0 -0 0 0 0 1 0 0 0 1 "Metadata/Terrain/Doodads/Desert/BurialChamber/FloorProps02_02.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+33 64 0 -0 0 0 0 1 0 0 0 1 "Metadata/Terrain/Doodads/Desert/BurialChamber/FloorProps02_09.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+27 137 0 -0 0 0 0 1 0 0 0 1 "Metadata/Terrain/Doodads/Desert/BurialChamber/BurialDoodads_01.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+41 141 0 -0 0 0 0 1 0 0 0 1 "Metadata/Terrain/Doodads/Desert/BurialChamber/BurialDoodads_07.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+23 70 0 -0 0 0 0 1 0 0 0 1 "Metadata/Terrain/Doodads/Desert/BurialChamber/FloorProps02_05.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+21 110 0 -0 0 0 0 1 0 0 0 1 "Metadata/Terrain/Doodads/Desert/BurialChamber/FloorProps02_10.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+46 45 0 -1.57081 0 0 -0.70711 0.707104 0 0 0 1 "Metadata/Terrain/Doodads/Tools/invisible_blocker.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+45 64 0 -1.57081 0 0 -0.70711 0.707104 0 0 0 1 "Metadata/Terrain/Doodads/Tools/invisible_blocker.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+45 142 0 -1.57081 0 0 -0.70711 0.707104 0 0 0 1 "Metadata/Terrain/Doodads/Tools/invisible_blocker.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+46 160 0 -1.57081 0 0 -0.70711 0.707104 0 0 0 1 "Metadata/Terrain/Doodads/Tools/invisible_blocker.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+-1
+-1
+-1
+0
+-1
+0

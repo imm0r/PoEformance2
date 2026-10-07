@@ -177,6 +177,10 @@ public sealed record OverlaySettings(
     // in the code (RoomModels.UsualDoodads) for everybody who never moved the slider.
     [property: JsonPropertyName("roomDoodads")] int RoomDoodads = 0,
 
+    // Whether the tile book's rooms place the level editor's tools - walk blockers and markers the
+    // game does not draw. Off, the usual, hides them. See RoomModels.IsTool.
+    [property: JsonPropertyName("roomTools")] bool RoomTools = false,
+
     // And the effect book's, kept apart for the same reason. See EffectBookWindow.
     [property: JsonPropertyName("effectColumns")] IReadOnlyList<string>? EffectColumns = null,
     [property: JsonPropertyName("effectColumnWidths")] IReadOnlyDictionary<string, int>? EffectColumnWidths = null,
@@ -213,6 +217,16 @@ public sealed record OverlaySettings(
     // is why this one needs no negative. See PictureLight.
     [property: JsonPropertyName("modelLight")] bool ModelLight = true,
     [property: JsonPropertyName("modelLightTarget")] float ModelLightTarget = 0f,
+
+    // Whether the model panes light a specular colour flat rather than the game's way - the
+    // cheap choice where the game's GGX is too slow. Off, the usual, is the game's. One for every
+    // book, since it is the same question in each. See MonsterPortrait.FlatLight.
+    [property: JsonPropertyName("modelFlatLight")] bool ModelFlatLight = false,
+
+    // Whether a material whose graphs name two blend modes is drawn with the last one's rather
+    // than the first's. Off, the usual, is the first - what every picture was drawn with before
+    // the choice existed. One for every book. See MonsterPortrait.LastBlend.
+    [property: JsonPropertyName("modelLastBlend")] bool ModelLastBlend = false,
 
     // Whether the monster book's facet rail has a pane of its own. ON by default, because a rail
     // nobody knows about is a rail nobody opens - and OFF is a real setting because this window is

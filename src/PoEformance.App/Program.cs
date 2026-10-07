@@ -3479,7 +3479,8 @@ internal static class Program
             modelSize: settings.MonsterModelSize,
             columnWidths: settings.TileColumnWidths,
             panes: settings.TilePanes,
-            roomDoodads: settings.RoomDoodads);
+            roomDoodads: settings.RoomDoodads,
+            roomTools: settings.RoomTools);
         overlay.AttachPointsOfInterest(route);
 
         // Before the editor, which is handed this exact instance - and before the layers read

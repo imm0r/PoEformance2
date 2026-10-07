@@ -257,7 +257,7 @@ public static class ModelDump
         // the questions a program's colour turns on are "is this alpha real" and "where does this
         // mask's blue sit", and both are numbers, not a look at the picture.
         seen.Clear();
-        foreach (ShadeProgram? program in model.Shades)
+        foreach (ShadeProgram? program in model.Shades.Concat(model.GlossShades))
         {
             if (program is null)
             {
@@ -298,7 +298,11 @@ public static class ModelDump
                 .Append("	mat ").Append(one < materials.Count && materials[one].Length > 0 ? materials[one] : "-")
                 .Append("	tex ").Append(one < textures.Count && textures[one].Length > 0 ? textures[one] : "-")
                 .Append("	blend ").Append(one < modes.Count && modes[one].Length > 0 ? modes[one] : "-")
-                .Append("	graphs ").AppendLine(one < model.Shades.Count && model.Shades[one] is not null ? "program" : "-");
+                .Append(one < model.LastModes.Count && one < modes.Count && !string.Equals(model.LastModes[one], modes[one], StringComparison.OrdinalIgnoreCase)
+                    ? " (last graph's: " + (model.LastModes[one].Length > 0 ? model.LastModes[one] : "-") + ")"
+                    : string.Empty)
+                .Append("	graphs ").Append(one < model.Shades.Count && model.Shades[one] is not null ? "program" : "-")
+                .AppendLine(one < model.GlossShades.Count && model.GlossShades[one] is { HasGloss: true } ? " · glossy" : string.Empty);
         }
 
         // A ROOM HAS NO GROUND OF ITS OWN - its tiles are chosen when the area is generated.
