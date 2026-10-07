@@ -94,6 +94,13 @@ neutral one and the body in a crouch — and four rules in a row had assumed the
 without ever putting the two numbers side by side. **Print both halves of a comparison before
 theorising about either**, and read the attachment's own file before its bone list.
 
+A room's `.arm` is the same again. Each doodad line carries a counted list of floats that
+neither reference names (poe_data_tools: `floats`, poeformats: `unk7`). It is the doodad's z
+in the area's own frame. Two things in the game settled it: a pot read from memory sits at its
+line's −115, and seepage's offices drew right once every doodad was set at its value rather than
+on the ground. A doodad whose line carries no value stands on the ground. `RoomDoodad.Height`
+holds the value, and the Tile Book's "doodad z" button keeps the two wrong readings for comparison.
+
 ## The two screen-space systems
 
 The game projects to the screen in **two independent ways**, and mixing them up looks

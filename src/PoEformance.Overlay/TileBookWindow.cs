@@ -168,7 +168,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     /// <summary>Whether a laid room's pieces are set at their tiles' own levels rather than fitted to the area's ground - see LaidRoomModels.</summary>
     private bool _atLevel;
 
-    /// <summary>How high doodads with a height in their line are set - see DoodadHeight.</summary>
+    /// <summary>How high doodads with a height in their line are set - see DoodadHeight. Nought is the usual, at the line's height.</summary>
     private DoodadHeight _heights;
 
     /// <summary>Every tile file's identity read for the area in <see cref="_identitiesOf"/> - one read per file across every room searched there.</summary>
@@ -486,16 +486,16 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         ImGui.SameLine();
         if (ImGui.SmallButton(_heights switch
         {
-            DoodadHeight.File => "doodad z: line##roomheights",
+            DoodadHeight.Ground => "doodad z: ground##roomheights",
             DoodadHeight.Added => "doodad z: ground + line##roomheights",
-            _ => "doodad z: ground##roomheights",
+            _ => "doodad z: line##roomheights",
         }))
         {
             _heights = _heights switch
             {
-                DoodadHeight.Ground => DoodadHeight.File,
-                DoodadHeight.File => DoodadHeight.Added,
-                _ => DoodadHeight.Ground,
+                DoodadHeight.File => DoodadHeight.Ground,
+                DoodadHeight.Ground => DoodadHeight.Added,
+                _ => DoodadHeight.File,
             };
             Changed?.Invoke();
         }
@@ -503,10 +503,10 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         if (ImGui.IsItemHovered())
         {
             ImGui.SetTooltip("How high a doodad is set whose line in the room carries a height - a value neither reference names.\n"
+                + "line: at the value itself - the usual, and what the game does: seepage's offices came out right with it.\n"
                 + "ground: on the ground under it, the value ignored, as before.\n"
-                + "line: at the value itself.\n"
                 + "ground + line: at the ground plus the value.\n"
-                + "Doodads whose line carries none stay on the ground. Which the game does: see the \"doodad heights:\" line under a laid room.");
+                + "Doodads whose line carries none stay on the ground. See also the \"doodad heights:\" line under a laid room.");
         }
 
         ImGui.SameLine();

@@ -128,7 +128,7 @@ public static class RoomModels
         int doodads = UsualDoodads,
         bool tools = false,
         ModelProgress? progress = null,
-        DoodadHeight heights = DoodadHeight.Ground)
+        DoodadHeight heights = DoodadHeight.File)
     {
         if (read is null)
         {
@@ -244,7 +244,7 @@ public static class RoomModels
         int doodads,
         bool tools,
         Func<RoomDoodad, Matrix4x4>? beyond,
-        DoodadHeight heights = DoodadHeight.Ground)
+        DoodadHeight heights = DoodadHeight.File)
     {
         var models = new Dictionary<string, MonsterModel>(StringComparer.OrdinalIgnoreCase);
         float size = CellSize;

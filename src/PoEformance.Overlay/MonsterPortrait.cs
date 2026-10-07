@@ -576,10 +576,15 @@ public sealed class MonsterPortrait
     /// Whether materials that ask to blend are drawn translucent - mixed or added - rather than solid.
     /// </summary>
     /// <remarks>
-    /// ON IN THE EFFECT BOOK ONLY. What a blend mode's word means is a rule on words, not a
-    /// measurement - see MaterialBlends - and the monster book exports boss icons from what this
+    /// ON IN THE EFFECT BOOK AND THE TILE BOOK. What a blend mode's word means is a rule on words, not
+    /// a measurement - see MaterialBlends - and the monster book exports boss icons from what this
     /// pane draws: a guess that turned part of a boss see-through would end up in the map's art.
     /// The effect book is where it was asked for, and where a wrong guess costs a look and nothing more.
+    ///
+    /// THE TILE BOOK WAS OFF, and that is why the contact fade changed nothing there: a ground layer's
+    /// fade runs in the translucent pass, against the solid depth under it, and with this off every
+    /// mixed shape was drawn solid. The probe said so in one line - "nothing translucent reached the
+    /// picture" - over a room whose mud is sixty mixed shapes.
     /// </remarks>
     public bool Translucent { get; set; }
 
