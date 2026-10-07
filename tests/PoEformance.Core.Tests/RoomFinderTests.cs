@@ -85,6 +85,119 @@ public class RoomFinderTests
         Assert.Equal(11, search.Candidates[0].Matched);
         Assert.Contains(new RoomCandidate(12, 4, 5, 2, 3, 11, 12), search.Candidates);
         Assert.True(search.Candidates.Count <= RoomFinder.Nearest);
+
+        // AND WHERE IT MISSES: the one corner spoiled, for the map's red dot.
+        int at = search.Candidates.ToList().IndexOf(new RoomCandidate(12, 4, 5, 2, 3, 11, 12));
+        Assert.Equal([(14, 7)], search.Misses[at].Corners);
+    }
+
+    /// <summary>
+    /// Two places fit the ground exactly; the tiles laid under each say which is the room.
+    /// </summary>
+    /// <remarks>
+    /// THE TEMPLE'S CASE, made small: the pattern pressed twice into the wall, once mirrored and turned
+    /// a quarter at (12, 4), once as written at (16, 1). Under the first every slot's cell holds a
+    /// tile whose sizes, edges and grounds are what that slot asks for; under the second the tiles
+    /// carry an edge type the room never names. The cells are worked out here by hand: turned that
+    /// way, slot (c, l) falls on cell (13 - l, 6 - c); as written, on (16 + c, 1 + l).
+    /// </remarks>
+    [Fact]
+    public void ANDWhereTwoPlacesFitTheGroundTheTilesLaidSayWhichIsTheRoom()
+    {
+        (TerrainGroundTypes ground, _) = Area(withRoom: true, decoy: true);
+        RoomLayout room = RoomLayout.Parse(Room(Pattern, 3, 2));
+
+        var paths = new List<string>();
+        var identities = new Dictionary<string, TileIdentity>(StringComparer.Ordinal);
+        var ids = new int[TilesX * TilesY];
+        Array.Fill(ids, -1);
+        for (var line = 0; line < 2; line++)
+        {
+            for (var column = 0; column < 3; column++)
+            {
+                IReadOnlyList<string> grounds = Grounds(column, line);
+                Lay(paths, identities, ids, 13 - line, 6 - column, new TileIdentity(1, 1, string.Empty, ["", "", "", ""], grounds));
+                Lay(paths, identities, ids, 16 + column, 1 + line, new TileIdentity(1, 1, string.Empty, ["Metadata/Terrain/Test/cliff.et", "", "", ""], grounds));
+            }
+        }
+
+        TerrainTiles laid = Laid(paths, ids);
+        RoomSearch search = RoomFinder.Find(room, ground, TilesX, TilesY, laid, path => identities.GetValueOrDefault(path));
+
+        Assert.True(search.TileChecked);
+        Assert.Equal(2, search.Candidates.Count);
+        Assert.True(search.Candidates.All(one => one.Exact));
+        RoomCandidate first = search.Candidates[0];
+        Assert.Equal((12, 4, 5), (first.X, first.Y, first.Turn));
+        Assert.Equal((6, 6), (first.TilesAgree, first.Tiles));
+        Assert.Equal((16, 1, 0), (search.Candidates[1].X, search.Candidates[1].Y, search.Candidates[1].Turn));
+        Assert.Equal((0, 6), (search.Candidates[1].TilesAgree, search.Candidates[1].Tiles));
+
+        // The map's orange rings: every tile of the decoy, none of the room.
+        Assert.Empty(search.Misses[0].Tiles);
+        Assert.Equal(6, search.Misses[1].Tiles.Count);
+        Assert.Contains((16, 1), search.Misses[1].Tiles);
+    }
+
+    /// <summary>
+    /// A slot bigger than a tile, left out of the ground's stamp, is checked against the tile laid where it falls - either way round.
+    /// </summary>
+    [Fact]
+    public void ABIGSlotLeftOutOfTheGroundIsCheckedAgainstTheTileLaidThere()
+    {
+        (TerrainGroundTypes ground, _) = Area(withRoom: true);
+        string text = Room(Pattern, 3, 2);
+        int first = text.IndexOf("k 1 1 ", StringComparison.Ordinal);
+        RoomLayout room = RoomLayout.Parse(string.Concat(text.AsSpan(0, first), "k 2 1 ", text.AsSpan(first + 6)));
+        Assert.Equal((2, 1), (room.SlotAt(0, 0).Width, room.SlotAt(0, 0).Height));
+
+        var paths = new List<string>();
+        var identities = new Dictionary<string, TileIdentity>(StringComparer.Ordinal);
+        var ids = new int[TilesX * TilesY];
+        Array.Fill(ids, -1);
+        for (var line = 0; line < 2; line++)
+        {
+            for (var column = 0; column < 3; column++)
+            {
+                // Laid turned, so the two by one tile reads one by two - which must still agree.
+                int height = column == 0 && line == 0 ? 2 : 1;
+                Lay(paths, identities, ids, 13 - line, 6 - column, new TileIdentity(1, height, string.Empty, ["", "", "", ""], Grounds(column, line)));
+            }
+        }
+
+        RoomSearch search = RoomFinder.Find(room, ground, TilesX, TilesY, Laid(paths, ids), path => identities.GetValueOrDefault(path));
+
+        Assert.Equal(1, search.Left);
+        RoomCandidate found = Assert.Single(search.Candidates);
+        Assert.Equal((12, 4, 5), (found.X, found.Y, found.Turn));
+        Assert.Equal((1, 1), (found.BigAgree, found.Big));
+        Assert.Equal((6, 6), (found.TilesAgree, found.Tiles));
+    }
+
+    /// <summary>The ground types at one slot's four corners, down-left round to up-left, by name.</summary>
+    private static string[] Grounds(int column, int line)
+        => [Name(Pattern[column, line]), Name(Pattern[column + 1, line]), Name(Pattern[column + 1, line + 1]), Name(Pattern[column, line + 1])];
+
+    private static string Name(int type) => type switch
+    {
+        1 => WallType,
+        2 => FloorType,
+        _ => string.Empty,
+    };
+
+    private static void Lay(List<string> paths, Dictionary<string, TileIdentity> identities, int[] ids, int x, int y, TileIdentity identity)
+    {
+        string path = string.Create(CultureInfo.InvariantCulture, $"Metadata/Terrain/Test/tile_{x}_{y}.tdt");
+        ids[(y * TilesX) + x] = paths.Count;
+        paths.Add(path);
+        identities[path] = identity;
+    }
+
+    private static TerrainTiles Laid(List<string> paths, int[] ids)
+    {
+        var placements = new sbyte[ids.Length];
+        Array.Fill(placements, (sbyte)-1);
+        return new TerrainTiles(paths, ids, new byte[ids.Length], new byte[ids.Length], placements, TilesX, TilesY);
     }
 
     [Fact]
@@ -221,7 +334,7 @@ public class RoomFinderTests
     /// Floor and walkable on the left, wall on the right, and - where asked - the pattern pressed into
     /// the wall at tile (12, 4), mirrored and then turned a quarter: (u, v) goes to (3 - u, v), then to (2 - v, 3 - u).
     /// </summary>
-    private static (TerrainGroundTypes Ground, TerrainGrid Walkable) Area(bool withRoom, bool spoil = false)
+    private static (TerrainGroundTypes Ground, TerrainGrid Walkable) Area(bool withRoom, bool spoil = false, bool decoy = false)
     {
         int across = TilesX + 1;
         var corners = new byte[across * (TilesY + 1) * Corner];
@@ -243,6 +356,18 @@ public class RoomFinderTests
                     int x = 12 + (2 - v);
                     int y = 4 + mirroredU;
                     corners[((y * across) + x) * Corner] = (byte)Pattern[u, v];
+                }
+            }
+        }
+
+        if (decoy)
+        {
+            // The pattern again, as written, at (16, 1): corner (u, v) to (16 + u, 1 + v).
+            for (var u = 0; u <= 3; u++)
+            {
+                for (var v = 0; v <= 2; v++)
+                {
+                    corners[(((1 + v) * across) + 16 + u) * Corner] = (byte)Pattern[u, v];
                 }
             }
         }

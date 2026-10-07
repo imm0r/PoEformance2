@@ -435,7 +435,24 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             Ghost?.Invoke(null);
             int wide = grid.TilesX;
             int tall = grid.TilesY;
-            _searching = Task.Run(() => RoomFinder.Find(RoomLayout.Read(read(room)), ground, wide, tall));
+            TerrainTiles? laid = grid.Tiles;
+            _searching = Task.Run(() =>
+            {
+                // EACH TILE FILE ONCE, its inheritance followed - an area is a few hundred of them.
+                var known = new Dictionary<string, TileIdentity?>(StringComparer.OrdinalIgnoreCase);
+                TileIdentity? Identity(string path)
+                {
+                    if (!known.TryGetValue(path, out TileIdentity? identity))
+                    {
+                        identity = TileIdentity.Of(TileModels.Defined(read, path).Definition);
+                        known[path] = identity;
+                    }
+
+                    return identity;
+                }
+
+                return RoomFinder.Find(RoomLayout.Read(read(room)), ground, wide, tall, laid, Identity);
+            });
         }
 
         if (_found is null && _searching is { IsCompleted: true } done)
@@ -456,8 +473,12 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         }
 
         string left = found.Left > 0
-            ? string.Create(CultureInfo.InvariantCulture, $"; {found.Left} slots bigger than a tile left out")
+            ? string.Create(CultureInfo.InvariantCulture, $"; {found.Left} slots bigger than a tile left out of the ground")
             : string.Empty;
+        if (found.TileChecked)
+        {
+            left += "; ranked by the tiles laid";
+        }
         ImGui.TextDisabled(ImGuiText.Escape(found.Found
             ? string.Create(CultureInfo.InvariantCulture,
                 $"where it lies: {found.Candidates.Count + found.More} place{(found.Candidates.Count + found.More == 1 ? string.Empty : "s")} fit all {found.Corners} corners{left} - pick one to outline it on the large map")
@@ -475,12 +496,26 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             for (var one = 0; one < found.Candidates.Count; one++)
             {
                 RoomCandidate where = found.Candidates[one];
+                string tiles = !found.TileChecked
+                    ? string.Empty
+                    : where.Big > 0
+                        ? string.Create(CultureInfo.InvariantCulture, $"  ·  tiles {where.TilesAgree}/{where.Tiles}, big {where.BigAgree}/{where.Big}")
+                        : string.Create(CultureInfo.InvariantCulture, $"  ·  tiles {where.TilesAgree}/{where.Tiles}");
                 string label = string.Create(CultureInfo.InvariantCulture,
-                    $"tile {where.X}, {where.Y}  ·  {RoomFinder.Said(where.Turn)}  ·  {where.Matched}/{where.Corners} corners##where{one}");
+                    $"tile {where.X}, {where.Y}  ·  {RoomFinder.Said(where.Turn)}  ·  {where.Matched}/{where.Corners} corners{tiles}##where{one}");
                 if (ImGui.Selectable(label, _ghosted == one))
                 {
                     _ghosted = _ghosted == one ? -1 : one;
-                    Ghost?.Invoke(_ghosted >= 0 ? new RoomGhost(grid, room, where) : null);
+                    RoomMisses misses = one < found.Misses.Count ? found.Misses[one] : RoomMisses.None;
+                    Ghost?.Invoke(_ghosted >= 0 ? new RoomGhost(grid, room, where, misses) : null);
+                }
+
+                if (ImGui.IsItemHovered())
+                {
+                    ImGui.SetTooltip("Corners: the room's ground types against the ground laid at every tile corner.\n"
+                        + "Tiles: each of the room's slots against the tile laid where it falls - size, tag, edge and ground types, whichever way round.\n"
+                        + "Big: the slots bigger than one tile, which the ground leaves out and which make a room this room.\n"
+                        + "On the map, red dots are corners that disagree and orange rings tiles that do.");
                 }
             }
 

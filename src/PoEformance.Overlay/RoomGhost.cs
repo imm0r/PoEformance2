@@ -13,4 +13,5 @@ namespace PoEformance.Overlay;
 /// <param name="Grid">The area it was found in, compared by reference.</param>
 /// <param name="Room">The room's file, for the label.</param>
 /// <param name="Where">The candidate.</param>
-public sealed record RoomGhost(TerrainGrid Grid, string Room, RoomCandidate Where);
+/// <param name="Misses">Where it parts with the area - corners whose ground and tiles whose definition are not the room's.</param>
+public sealed record RoomGhost(TerrainGrid Grid, string Room, RoomCandidate Where, RoomMisses Misses);

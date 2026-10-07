@@ -3,6 +3,7 @@ using System.Numerics;
 using System.Text;
 using PoEformance.Features;
 using PoEformance.Game.Files;
+using PoEformance.Game.World;
 
 namespace PoEformance.Core.Tests;
 
@@ -22,11 +23,11 @@ public class TileFilesTests
 {
     /// <summary>A version 7 definition: a string table, then the references and the size.</summary>
     private static byte[] Tdt(string inherits = "", string template = "Art/Models/Terrain/Test/Arena.tgt",
-        int width = 2, int height = 1, int version = 7, bool grounds = false)
+        int width = 2, int height = 1, int version = 7, bool grounds = false, string edge = "edge")
     {
         // THE TABLE STARTS WITH AN EMPTY STRING, so offset zero means "nothing" the way the game's
         // own files use it, and every other offset lands where a string begins.
-        string[] strings = ["", inherits, template, "arena_tag", "edge", "Metadata/Terrain/Test/sand.gt", "Metadata/Terrain/Test/rock.gt"];
+        string[] strings = ["", inherits, template, "arena_tag", edge, "Metadata/Terrain/Test/sand.gt", "Metadata/Terrain/Test/rock.gt"];
         var starts = new uint[strings.Length];
         var table = new List<byte>();
         for (var one = 0; one < strings.Length; one++)
@@ -475,6 +476,27 @@ public class TileFilesTests
         Assert.Contains("=== .mat Art/Textures/Wall.mat", dump, StringComparison.Ordinal);
         Assert.Contains("=== texture Art/Textures/blacknofog.dds", dump, StringComparison.Ordinal);
         Assert.Contains("tex Art/Textures/blacknofog.dds", dump, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// A definition's four side edge types are read, down to left, and a string that is not an .et reads as none.
+    /// </summary>
+    [Fact]
+    public void ADEFINITIONSEdgeTypesAreReadAndAnythingButAnEtIsNone()
+    {
+        TileDefinition walled = TileDefinition.Read(Tdt(edge: "Metadata/Terrain/Test/wall.et", grounds: true));
+        Assert.True(walled.Ready, walled.Why);
+        Assert.Equal(["Metadata/Terrain/Test/wall.et", "Metadata/Terrain/Test/wall.et", "Metadata/Terrain/Test/wall.et", "Metadata/Terrain/Test/wall.et"], walled.Edges);
+        Assert.Equal(2, walled.Width);
+
+        // THE SAME FILE WITH A WORD WHERE THE EDGE GOES, which is not a type.
+        Assert.All(TileDefinition.Read(Tdt(grounds: true)).Edges, one => Assert.Equal(string.Empty, one));
+
+        // AND THE IDENTITY A ROOM'S SLOT IS CHECKED AGAINST.
+        TileIdentity? identity = TileIdentity.Of(walled);
+        Assert.NotNull(identity);
+        Assert.Equal((2, 1, "arena_tag"), (identity.Width, identity.Height, identity.Tag));
+        Assert.Null(TileIdentity.Of(TileDefinition.Read(Tdt(inherits: "Metadata/Terrain/Test/Arena.tdt"))));
     }
 
     /// <summary>
