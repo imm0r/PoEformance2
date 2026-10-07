@@ -1,0 +1,1424 @@
+{
+    "version": 6,
+    "shader_group": [
+        "Material"
+    ],
+    "nodes": [
+        {
+            "type": "InputUV",
+            "index": 0,
+            "stage": "UVSetup",
+            "ui_position": [
+                -2863.333740234375,
+                81.66670227050781
+            ]
+        },
+        {
+            "type": "SampleTexture",
+            "index": 0,
+            "parameters": [
+                {
+                    "path": "Art/particles/distortion/supercaustics_seamless_BC1.dds",
+                    "srgb": false
+                },
+                {}
+            ],
+            "custom_parameter": "Flowmap",
+            "ui_position": [
+                -2598.50048828125,
+                168.16668701171876
+            ]
+        },
+        {
+            "type": "CoordsToFloat2",
+            "index": 0,
+            "ui_position": [
+                -2305.0,
+                250.66677856445313
+            ]
+        },
+        {
+            "type": "ConstantFloat2",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": [
+                        0.5,
+                        0.5
+                    ]
+                }
+            ],
+            "ui_position": [
+                -2358.341552734375,
+                444.3294372558594
+            ]
+        },
+        {
+            "type": "Subtract2",
+            "index": 0,
+            "ui_position": [
+                -2037.4853515625,
+                269.7580261230469
+            ]
+        },
+        {
+            "type": "MultiplyConst2",
+            "index": 2,
+            "parameters": [
+                {
+                    "value": 1.0
+                }
+            ],
+            "ui_position": [
+                -1760.3421630859376,
+                314.75787353515627
+            ]
+        },
+        {
+            "type": "MultiplyConst",
+            "index": 2,
+            "parameters": [
+                {
+                    "value": 1.0,
+                    "custom_range": [
+                        -1.0,
+                        1.0
+                    ]
+                }
+            ],
+            "custom_parameter": "Flip Red? -1 or 1",
+            "ui_position": [
+                -1304.877197265625,
+                215.45223999023438
+            ]
+        },
+        {
+            "type": "MultiplyConst2",
+            "index": 1,
+            "parameters": [
+                {
+                    "value": 0.5
+                }
+            ],
+            "custom_parameter": "Flowmap Intensity",
+            "ui_position": [
+                -862.889404296875,
+                201.97230529785157
+            ]
+        },
+        {
+            "type": "Time",
+            "index": 0,
+            "ui_position": [
+                -2811.864990234375,
+                846.6627197265625
+            ]
+        },
+        {
+            "type": "MultiplyConst",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": 1.0
+                }
+            ],
+            "custom_parameter": "Timescale",
+            "ui_position": [
+                -2571.937255859375,
+                842.452392578125
+            ]
+        },
+        {
+            "type": "MultiplyConst2",
+            "index": 4,
+            "parameters": [
+                {
+                    "value": 1.0
+                }
+            ],
+            "custom_parameter": "Noise Tiling",
+            "ui_position": [
+                -3087.00537109375,
+                427.6388854980469
+            ]
+        },
+        {
+            "type": "MultiplyConst2",
+            "index": 3,
+            "parameters": [
+                {
+                    "value": 0.33180001378059389
+                }
+            ],
+            "custom_parameter": "Noise Flow Distortion",
+            "ui_position": [
+                -3538.557373046875,
+                568.3051147460938
+            ]
+        },
+        {
+            "type": "Add2",
+            "index": 4,
+            "ui_position": [
+                -3145.72900390625,
+                614.9464721679688
+            ]
+        },
+        {
+            "type": "SampleTexture",
+            "index": 1,
+            "parameters": [
+                {
+                    "path": "Art/particles/noises/metal_grain_tile_BC4.dds",
+                    "srgb": false
+                },
+                {}
+            ],
+            "custom_parameter": "Blend Noise",
+            "ui_position": [
+                -3208.2314453125,
+                1000.873046875
+            ]
+        },
+        {
+            "type": "MultiplyConst",
+            "index": 3,
+            "parameters": [
+                {
+                    "value": 1.0
+                }
+            ],
+            "custom_parameter": "Noise Strength",
+            "ui_position": [
+                -2588.3896484375,
+                1013.0753784179688
+            ]
+        },
+        {
+            "type": "Add",
+            "index": 3,
+            "ui_position": [
+                -2250.9091796875,
+                900.5161743164063
+            ]
+        },
+        {
+            "type": "Frac",
+            "index": 0,
+            "ui_position": [
+                -1539.60400390625,
+                823.3690795898438
+            ]
+        },
+        {
+            "type": "Multiply2",
+            "index": 0,
+            "ui_position": [
+                -367.0322570800781,
+                353.7580261230469
+            ]
+        },
+        {
+            "type": "Add2",
+            "index": 0,
+            "ui_position": [
+                14.61923599243164,
+                146.02378845214845
+            ]
+        },
+        {
+            "type": "ConstantFloat",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": 0.5
+                }
+            ],
+            "ui_position": [
+                -2615.576416015625,
+                1163.42919921875
+            ]
+        },
+        {
+            "type": "Add",
+            "index": 0,
+            "ui_position": [
+                -2201.017333984375,
+                1086.4979248046876
+            ]
+        },
+        {
+            "type": "Frac",
+            "index": 1,
+            "ui_position": [
+                -1497.495849609375,
+                1016.3233642578125
+            ]
+        },
+        {
+            "type": "Multiply2",
+            "index": 1,
+            "ui_position": [
+                -361.50836181640627,
+                481.09173583984377
+            ]
+        },
+        {
+            "type": "Add2",
+            "index": 1,
+            "ui_position": [
+                25.961761474609376,
+                283.6657409667969
+            ]
+        },
+        {
+            "type": "ConstantFloat",
+            "index": 1,
+            "parameters": [
+                {
+                    "value": -0.5
+                }
+            ],
+            "ui_position": [
+                -1105.8021240234376,
+                1403.1075439453126
+            ]
+        },
+        {
+            "type": "Add",
+            "index": 1,
+            "ui_position": [
+                -807.1983642578125,
+                1340.5953369140626
+            ]
+        },
+        {
+            "type": "MultiplyConst",
+            "index": 1,
+            "parameters": [
+                {
+                    "value": 1.0
+                }
+            ],
+            "ui_position": [
+                -570.8424682617188,
+                1370.5087890625
+            ]
+        },
+        {
+            "type": "Abs",
+            "index": 0,
+            "ui_position": [
+                -251.87722778320313,
+                1316.4722900390626
+            ]
+        },
+        {
+            "type": "Lerp2",
+            "index": 0,
+            "ui_position": [
+                323.7890625,
+                200.41287231445313
+            ]
+        },
+        {
+            "type": "ConstantFloat",
+            "index": 2,
+            "parameters": [
+                {
+                    "value": 1.0
+                }
+            ],
+            "ui_position": [
+                -2614.1875,
+                1325.1951904296876
+            ]
+        },
+        {
+            "type": "Add",
+            "index": 4,
+            "ui_position": [
+                -2177.406005859375,
+                1253.66064453125
+            ]
+        },
+        {
+            "type": "Frac",
+            "index": 2,
+            "ui_position": [
+                -1453.556640625,
+                1206.5482177734376
+            ]
+        },
+        {
+            "type": "Multiply2",
+            "index": 2,
+            "ui_position": [
+                -359.50836181640627,
+                601.0917358398438
+            ]
+        },
+        {
+            "type": "Add2",
+            "index": 2,
+            "ui_position": [
+                31.961761474609376,
+                415.6657409667969
+            ]
+        },
+        {
+            "type": "ConstantFloat",
+            "index": 3,
+            "parameters": [
+                {
+                    "value": -0.5
+                }
+            ],
+            "ui_position": [
+                -1083.3021240234376,
+                1599.3575439453126
+            ]
+        },
+        {
+            "type": "Add",
+            "index": 5,
+            "ui_position": [
+                -783.5619506835938,
+                1544.3450927734376
+            ]
+        },
+        {
+            "type": "MultiplyConst",
+            "index": 4,
+            "parameters": [
+                {
+                    "value": 1.0
+                }
+            ],
+            "ui_position": [
+                -563.7592163085938,
+                1558.0086669921876
+            ]
+        },
+        {
+            "type": "Abs",
+            "index": 1,
+            "ui_position": [
+                -217.7105255126953,
+                1513.13916015625
+            ]
+        },
+        {
+            "type": "Lerp2",
+            "index": 1,
+            "ui_position": [
+                497.4197998046875,
+                388.4088439941406
+            ]
+        },
+        {
+            "type": "ConstantFloat",
+            "index": 4,
+            "parameters": [
+                {
+                    "value": 2.0
+                }
+            ],
+            "ui_position": [
+                -2566.965576171875,
+                1480.0562744140626
+            ]
+        },
+        {
+            "type": "Add",
+            "index": 6,
+            "ui_position": [
+                -2153.1005859375,
+                1425.466064453125
+            ]
+        },
+        {
+            "type": "Frac",
+            "index": 3,
+            "ui_position": [
+                -1428.0010986328126,
+                1392.1036376953126
+            ]
+        },
+        {
+            "type": "Multiply2",
+            "index": 3,
+            "ui_position": [
+                -353.50836181640627,
+                741.0917358398438
+            ]
+        },
+        {
+            "type": "Add2",
+            "index": 3,
+            "ui_position": [
+                31.961761474609376,
+                543.665771484375
+            ]
+        },
+        {
+            "type": "ConstantFloat",
+            "index": 5,
+            "parameters": [
+                {
+                    "value": -0.5
+                }
+            ],
+            "ui_position": [
+                -1077.0521240234376,
+                1771.8575439453126
+            ]
+        },
+        {
+            "type": "Add",
+            "index": 7,
+            "ui_position": [
+                -777.3119506835938,
+                1716.8450927734376
+            ]
+        },
+        {
+            "type": "MultiplyConst",
+            "index": 5,
+            "parameters": [
+                {
+                    "value": 1.0
+                }
+            ],
+            "ui_position": [
+                -557.7592163085938,
+                1730.5086669921876
+            ]
+        },
+        {
+            "type": "Abs",
+            "index": 2,
+            "ui_position": [
+                -211.4605255126953,
+                1685.63916015625
+            ]
+        },
+        {
+            "type": "Lerp2",
+            "index": 2,
+            "ui_position": [
+                590.9197998046875,
+                575.3255004882813
+            ]
+        },
+        {
+            "type": "UV",
+            "index": 0,
+            "stage": "UVSetup",
+            "ui_position": [
+                905.0,
+                29.0
+            ]
+        },
+        {
+            "type": "InputEmissiveColor",
+            "index": 0,
+            "stage": "UVSetup",
+            "ui_position": [
+                -2863.333740234375,
+                81.66670227050781
+            ]
+        },
+        {
+            "type": "EmissiveColor",
+            "index": 0,
+            "stage": "UVSetup",
+            "ui_position": [
+                905.0,
+                29.0
+            ]
+        },
+        {
+            "type": "InputGlossiness",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                1300.0,
+                20.0
+            ]
+        },
+        {
+            "type": "Glossiness",
+            "index": 0,
+            "stage": "Texturing",
+            "ui_position": [
+                1800.0,
+                20.0
+            ]
+        }
+    ],
+    "links": [
+        {
+            "src": {
+                "type": "InputUV",
+                "index": 0,
+                "stage": "UVSetup",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SampleTexture",
+                "index": 0,
+                "variable": "uv"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTexture",
+                "index": 0,
+                "variable": "r"
+            },
+            "dst": {
+                "type": "CoordsToFloat2",
+                "index": 0,
+                "variable": "x"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTexture",
+                "index": 0,
+                "variable": "g"
+            },
+            "dst": {
+                "type": "CoordsToFloat2",
+                "index": 0,
+                "variable": "y"
+            }
+        },
+        {
+            "src": {
+                "type": "CoordsToFloat2",
+                "index": 0,
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "Subtract2",
+                "index": 0,
+                "variable": "a",
+                "swizzle": "x"
+            }
+        },
+        {
+            "src": {
+                "type": "CoordsToFloat2",
+                "index": 0,
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "Subtract2",
+                "index": 0,
+                "variable": "a",
+                "swizzle": "y"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat2",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Subtract2",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Subtract2",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "MultiplyConst2",
+                "index": 2,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst2",
+                "index": 2,
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "MultiplyConst",
+                "index": 2,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "MultiplyConst2",
+                "index": 1,
+                "variable": "a",
+                "swizzle": "x"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst2",
+                "index": 2,
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "MultiplyConst2",
+                "index": 1,
+                "variable": "a",
+                "swizzle": "y"
+            }
+        },
+        {
+            "src": {
+                "type": "Time",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "MultiplyConst",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "InputUV",
+                "index": 0,
+                "stage": "UVSetup",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "MultiplyConst2",
+                "index": 4,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "MultiplyConst2",
+                "index": 3,
+                "variable": "a",
+                "swizzle": "x"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst2",
+                "index": 2,
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "MultiplyConst2",
+                "index": 3,
+                "variable": "a",
+                "swizzle": "y"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst2",
+                "index": 4,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add2",
+                "index": 4,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst2",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add2",
+                "index": 4,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Add2",
+                "index": 4,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SampleTexture",
+                "index": 1,
+                "variable": "uv"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTexture",
+                "index": 1,
+                "variable": "r"
+            },
+            "dst": {
+                "type": "MultiplyConst",
+                "index": 3,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 3,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 3,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Add",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Frac",
+                "index": 0,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst2",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply2",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Frac",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply2",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "InputUV",
+                "index": 0,
+                "stage": "UVSetup",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add2",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply2",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add2",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Add",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Add",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Frac",
+                "index": 1,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst2",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply2",
+                "index": 1,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Frac",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply2",
+                "index": 1,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "InputUV",
+                "index": 0,
+                "stage": "UVSetup",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add2",
+                "index": 1,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply2",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add2",
+                "index": 1,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Frac",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 1,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 1,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Add",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "MultiplyConst",
+                "index": 1,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Abs",
+                "index": 0,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "Add2",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp2",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Add2",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp2",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Abs",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp2",
+                "index": 0,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "Add",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 4,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 4,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Add",
+                "index": 4,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Frac",
+                "index": 2,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst2",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply2",
+                "index": 2,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Frac",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply2",
+                "index": 2,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "InputUV",
+                "index": 0,
+                "stage": "UVSetup",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add2",
+                "index": 2,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply2",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add2",
+                "index": 2,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Frac",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 5,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 5,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Add",
+                "index": 5,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "MultiplyConst",
+                "index": 4,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst",
+                "index": 4,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Abs",
+                "index": 1,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp2",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp2",
+                "index": 1,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Add2",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp2",
+                "index": 1,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Abs",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp2",
+                "index": 1,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "Add",
+                "index": 4,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 6,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat",
+                "index": 4,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 6,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Add",
+                "index": 6,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Frac",
+                "index": 3,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst2",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply2",
+                "index": 3,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Frac",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply2",
+                "index": 3,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "InputUV",
+                "index": 0,
+                "stage": "UVSetup",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add2",
+                "index": 3,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply2",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add2",
+                "index": 3,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Frac",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 7,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat",
+                "index": 5,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 7,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Add",
+                "index": 7,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "MultiplyConst",
+                "index": 5,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst",
+                "index": 5,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Abs",
+                "index": 2,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp2",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp2",
+                "index": 2,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Add2",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp2",
+                "index": 2,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Abs",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp2",
+                "index": 2,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp2",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "UV",
+                "index": 0,
+                "stage": "UVSetup",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputEmissiveColor",
+                "index": 0,
+                "stage": "UVSetup",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "EmissiveColor",
+                "index": 0,
+                "stage": "UVSetup",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputGlossiness",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Glossiness",
+                "index": 0,
+                "stage": "Texturing",
+                "variable": "input"
+            }
+        }
+    ]
+}

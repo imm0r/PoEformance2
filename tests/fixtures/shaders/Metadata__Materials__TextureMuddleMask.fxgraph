@@ -1,0 +1,163 @@
+{
+    "version": 3,
+    "shader_group": [
+        "Material"
+    ],
+    "nodes": [
+        {
+            "type": "InputUV",
+            "index": 0,
+            "stage": "UVSetup",
+            "ui_position": [
+                294.3330078125,
+                179.5555419921875
+            ]
+        },
+        {
+            "type": "Muddle",
+            "index": 0,
+            "parameters": [
+                {},
+                {},
+                {}
+            ],
+            "custom_parameter": "Muddle_VERT",
+            "ui_position": [
+                823.76220703125,
+                100.364990234375
+            ]
+        },
+        {
+            "type": "SampleTexture",
+            "index": 0,
+            "parameters": [
+                {
+                    "format": "DXT1",
+                    "srgb": false
+                },
+                {}
+            ],
+            "custom_parameter": "MuddleMask",
+            "ui_position": [
+                510.0,
+                397.0
+            ]
+        },
+        {
+            "type": "Luminance",
+            "index": 0,
+            "ui_position": [
+                836.0,
+                300.0
+            ]
+        },
+        {
+            "type": "Lerp2",
+            "index": 0,
+            "ui_position": [
+                1301.0,
+                180.0
+            ]
+        },
+        {
+            "type": "UV",
+            "index": 0,
+            "stage": "UVSetup",
+            "ui_position": [
+                1630.76171875,
+                187.1428680419922
+            ]
+        }
+    ],
+    "links": [
+        {
+            "src": {
+                "type": "InputUV",
+                "index": 0,
+                "stage": "UVSetup",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Muddle",
+                "index": 0,
+                "variable": "in_uv"
+            }
+        },
+        {
+            "src": {
+                "type": "InputUV",
+                "index": 0,
+                "stage": "UVSetup",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SampleTexture",
+                "index": 0,
+                "variable": "uv"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleTexture",
+                "index": 0,
+                "variable": "rgba",
+                "swizzle": "xyz"
+            },
+            "dst": {
+                "type": "Luminance",
+                "index": 0,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputUV",
+                "index": 0,
+                "stage": "UVSetup",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp2",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Muddle",
+                "index": 0,
+                "variable": "out_uv"
+            },
+            "dst": {
+                "type": "Lerp2",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Luminance",
+                "index": 0,
+                "variable": "lum"
+            },
+            "dst": {
+                "type": "Lerp2",
+                "index": 0,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp2",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "UV",
+                "index": 0,
+                "stage": "UVSetup",
+                "variable": "input"
+            }
+        }
+    ]
+}
