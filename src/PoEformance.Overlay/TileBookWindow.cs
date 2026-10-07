@@ -206,6 +206,23 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         set => _anywhere = value;
     }
 
+    /// <summary>Whether every room the area loaded is outlined on the large map at once, as the box has it - what the settings keep. See AreaRooms.</summary>
+    public bool RoomsOnMap
+    {
+        get => _roomsOnMap;
+        set => _roomsOnMap = value;
+    }
+
+    private bool _roomsOnMap;
+
+    /// <summary>The area's rooms searched and arranged, for the header's line - the overlay asks it every frame while the box is ticked. Null leaves the box out.</summary>
+    public AreaRooms? AllRooms { get; init; }
+
+    /// <summary>The header's line about the arrangement and its hover, made once per arrangement.</summary>
+    private RoomArrangement? _roomsSaidOf;
+    private string _roomsSaid = string.Empty;
+    private string _roomsDetail = string.Empty;
+
     /// <inheritdoc/>
     protected override string Caption => "Search for any terrain tile or room";
 
@@ -265,6 +282,8 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             Toggle(HereField, TileBook.Here);
         }
 
+        RoomsOnMapBox();
+
         if (Clocks is { Reading: true } clocking)
         {
             (int done, int of) = clocking.Progress;
@@ -288,6 +307,76 @@ public sealed class TileBookWindow : BookWindow<TileBook>
                 ImGui.SetTooltip("Reading every tile and room of this area the way the pane does, to fill the \"needs\" column:"
                     + " what each one's shader graphs leave out. Search it with needs:InputVertexColor.");
             }
+        }
+    }
+
+    /// <summary>
+    /// The "rooms on map" box, and while it is ticked how far the search is or what it drew.
+    /// </summary>
+    private void RoomsOnMapBox()
+    {
+        if (AllRooms is not { } rooms)
+        {
+            return;
+        }
+
+        ImGui.SameLine();
+        if (ImGui.Checkbox("rooms on map##roomsonmap", ref _roomsOnMap))
+        {
+            Changed?.Invoke();
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("Every room this area loaded, outlined on the large map with its name - each where its search ranks it first,"
+                + " the surest first, unless a surer room already holds one of its tiles: then the next place on its own list that is free.\n"
+                + "Searched off the frame, one room at a time, whenever the area or its rooms change.");
+        }
+
+        if (!_roomsOnMap)
+        {
+            return;
+        }
+
+        ImGui.SameLine();
+        if (rooms.Running)
+        {
+            (int done, int of) = rooms.Progress;
+            ImGui.TextDisabled(string.Create(CultureInfo.InvariantCulture, $"rooms: {done} of {of} searched"));
+            return;
+        }
+
+        if (rooms.Last is not { } arranged)
+        {
+            ImGui.TextDisabled("rooms: open a map to start");
+            return;
+        }
+
+        if (!ReferenceEquals(arranged, _roomsSaidOf))
+        {
+            _roomsSaidOf = arranged;
+            int moved = arranged.Laid.Count(one => one.Rank > 0);
+            _roomsSaid = string.Create(CultureInfo.InvariantCulture, $"rooms: {arranged.Laid.Count} drawn")
+                + (moved > 0 ? string.Create(CultureInfo.InvariantCulture, $", {moved} off their first place") : string.Empty)
+                + (arranged.Crowded.Count > 0 ? string.Create(CultureInfo.InvariantCulture, $", {arranged.Crowded.Count} with no free place") : string.Empty)
+                + (arranged.Unfound.Count > 0 ? string.Create(CultureInfo.InvariantCulture, $", {arranged.Unfound.Count} not found") : string.Empty);
+            var lines = new List<string>(arranged.Laid.Count + arranged.Crowded.Count + arranged.Unfound.Count);
+            foreach (RoomLaid one in arranged.Laid)
+            {
+                lines.Add(string.Create(CultureInfo.InvariantCulture,
+                    $"{TerrainRooms.NameFor(one.Room)}: tile {one.Where.X}, {one.Where.Y}, {RoomFinder.Said(one.Where.Turn)}, {one.Beside}% beside the joins")
+                    + (one.Rank > 0 ? string.Create(CultureInfo.InvariantCulture, $" - row {one.Rank + 1} of its list, the ones above it taken") : string.Empty));
+            }
+
+            lines.AddRange(arranged.Crowded.Select(one => TerrainRooms.NameFor(one) + ": every place on its list covers a tile a surer room holds"));
+            lines.AddRange(arranged.Unfound.Select(one => TerrainRooms.NameFor(one) + ": its search found nothing"));
+            _roomsDetail = string.Join('\n', lines);
+        }
+
+        ImGui.TextDisabled(_roomsSaid);
+        if (ImGui.IsItemHovered() && _roomsDetail.Length > 0)
+        {
+            ImGui.SetTooltip(ImGuiText.Escape(_roomsDetail));
         }
     }
 
@@ -884,14 +973,8 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         }
     }
 
-    /// <summary>
-    /// How much of a candidate's corners and tiles agree that no join explains, as a whole percentage rounded down - 100 where every miss is a join's.
-    /// </summary>
-    private static int Beside(RoomCandidate where, RoomMisses misses)
-    {
-        int beside = where.Corners + where.Tiles - misses.Openings.Count - misses.Caps.Count - misses.JoinCorners.Count;
-        return beside > 0 ? (beside - misses.Elsewhere) * 100 / beside : 100;
-    }
+    /// <summary>How much of a candidate's corners and tiles agree that no join explains - see RoomArrangement.Beside.</summary>
+    private static int Beside(RoomCandidate where, RoomMisses misses) => RoomArrangement.Beside(where, misses);
 
     /// <summary>How much of a candidate's corners agree, as a whole percentage, rounded down so nothing short of all reads 100.</summary>
     private static int Share(RoomCandidate where) => where.Corners > 0 ? where.Matched * 100 / where.Corners : 0;

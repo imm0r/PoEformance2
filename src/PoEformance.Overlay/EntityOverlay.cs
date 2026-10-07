@@ -534,6 +534,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 : basis.RoomDoodads,
             RoomTools = _tileBook?.Tools ?? basis.RoomTools,
             RoomAnywhere = _tileBook?.Anywhere ?? basis.RoomAnywhere,
+            RoomsOnMap = _tileBook?.RoomsOnMap ?? basis.RoomsOnMap,
             EffectColumns = _effectBook?.Columns is { Count: > 0 } effectColumns
                 ? effectColumns
                 : basis.EffectColumns,
@@ -1168,6 +1169,86 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// <summary>The place the tile book picked for a room, outlined on the large map - see <see cref="RoomGhost"/>.</summary>
     private RoomGhost? _roomGhost;
 
+    /// <summary>Every room of the area searched and arranged, for the large map to outline all at once - see <see cref="AreaRooms"/>. Null without an install.</summary>
+    private AreaRooms? _areaRooms;
+
+    /// <summary>The area's rooms, by file, made again only when the tile book's "here" list is a new one.</summary>
+    private string[] AreaRoomFiles()
+    {
+        IReadOnlyDictionary<string, int> here = TilesHere();
+        if (!ReferenceEquals(here, _roomFilesOf))
+        {
+            _roomFilesOf = here;
+            _roomFiles = [.. here.Keys.Where(TileBook.IsRoom).Order(StringComparer.OrdinalIgnoreCase)];
+        }
+
+        return _roomFiles;
+    }
+
+    private IReadOnlyDictionary<string, int>? _roomFilesOf;
+    private string[] _roomFiles = [];
+
+    /// <summary>
+    /// Every room the area loaded, outlined on the large map with its name, where the tile book's option asks for it - see <see cref="AreaRooms"/>.
+    /// </summary>
+    /// <remarks>
+    /// ASKED FOR ON ANY MAP, DRAWN ON THE LARGE ONE: the search starts while the minimap is up, so the
+    /// rooms are there by the time the large map is opened. Outline and name only - the misses a picked
+    /// room shows (RoomGhostOnMap) would be twenty rooms' worth of dots - and a touch thinner than the
+    /// picked one, which is drawn over it.
+    /// </remarks>
+    private void AllRoomsOnMap(ImDrawListPtr draw, MapView map, WorldEntity player)
+    {
+        if (_areaRooms is null || _tileBook is not { RoomsOnMap: true } || _snapshot.Terrain is not TerrainGrid grid)
+        {
+            return;
+        }
+
+        RoomArrangement? arranged = _areaRooms.Arranged(grid, AreaRoomFiles());
+        if (arranged is null || !map.IsLargeMap)
+        {
+            return;
+        }
+
+        uint colour = Style.Colour(StyleCatalogue.Keys.Room);
+        float width = Math.Max(1.5f, Style.Width(StyleCatalogue.Keys.Room, 2f) * 0.75f);
+        Span<Vector2> corners = stackalloc Vector2[4];
+        foreach (RoomLaid room in arranged.Laid)
+        {
+            Outlined(draw, map, player, grid, room.Where, colour, width, corners);
+            Labelled(draw, corners, room.Room, colour);
+        }
+    }
+
+    /// <summary>A room's footprint outlined at the ground's height - the map is isometric, so a rhombus - its four corners on screen left in <paramref name="corners"/>.</summary>
+    private static void Outlined(
+        ImDrawListPtr draw, MapView map, WorldEntity player, TerrainGrid grid, RoomCandidate where, uint colour, float width, Span<Vector2> corners)
+    {
+        const int Cells = TerrainGrid.CellsPerTile;
+        for (var one = 0; one < 4; one++)
+        {
+            int cellX = (where.X + (one is 1 or 2 ? where.Width : 0)) * Cells;
+            int cellY = (where.Y + (one >= 2 ? where.Height : 0)) * Cells;
+            corners[one] = Grounded(grid, map, player, cellX, cellY);
+        }
+
+        for (var one = 0; one < 4; one++)
+        {
+            draw.AddLine(corners[one], corners[(one + 1) & 3], colour, width);
+        }
+    }
+
+    /// <summary>A room's name on a plate in the middle of its outline.</summary>
+    private static void Labelled(ImDrawListPtr draw, ReadOnlySpan<Vector2> corners, string room, uint colour)
+    {
+        Vector2 middle = (corners[0] + corners[1] + corners[2] + corners[3]) * 0.25f;
+        string name = TerrainRooms.NameFor(room);
+        Vector2 size = ImGui.CalcTextSize(name);
+        Vector2 at = middle - (size * 0.5f);
+        draw.AddRectFilled(at - new Vector2(3f, 1f), at + size + new Vector2(3f, 1f), 0xB4_1A1614, 3f);
+        draw.AddText(at, colour, name);
+    }
+
     /// <summary>The tile the player stands on, for the tile book's "around you" row, or null.</summary>
     private (int X, int Y)? PlayerTile()
         => _snapshot.Player is WorldEntity player
@@ -1201,22 +1282,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             return;
         }
 
-        RoomCandidate where = ghost.Where;
         const int Cells = TerrainGrid.CellsPerTile;
         Span<Vector2> corners = stackalloc Vector2[4];
-        for (var one = 0; one < 4; one++)
-        {
-            int cellX = (where.X + (one is 1 or 2 ? where.Width : 0)) * Cells;
-            int cellY = (where.Y + (one >= 2 ? where.Height : 0)) * Cells;
-            corners[one] = Grounded(ghost.Grid, map, player, cellX, cellY);
-        }
-
         uint colour = Style.Colour(StyleCatalogue.Keys.Room);
         float width = Math.Max(2f, Style.Width(StyleCatalogue.Keys.Room, 2f));
-        for (var one = 0; one < 4; one++)
-        {
-            draw.AddLine(corners[one], corners[(one + 1) & 3], colour, width);
-        }
+        Outlined(draw, map, player, ghost.Grid, ghost.Where, colour, width, corners);
 
         // WHERE IT PARTS WITH THE AREA: a red dot on each corner whose ground is not the room's, an
         // orange ring on each tile whose definition is not what its slot asks for - and those a join
@@ -1252,12 +1322,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             draw.AddCircleFilled(cap, 1.75f, Joined);
         }
 
-        Vector2 middle = (corners[0] + corners[1] + corners[2] + corners[3]) * 0.25f;
-        string name = TerrainRooms.NameFor(ghost.Room);
-        Vector2 size = ImGui.CalcTextSize(name);
-        Vector2 at = middle - (size * 0.5f);
-        draw.AddRectFilled(at - new Vector2(3f, 1f), at + size + new Vector2(3f, 1f), 0xB4_1A1614, 3f);
-        draw.AddText(at, colour, name);
+        Labelled(draw, corners, ghost.Room, colour);
     }
 
     /// <summary>
@@ -2989,13 +3054,17 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         IReadOnlyDictionary<string, double>? panes = null,
         int roomDoodads = 0,
         bool roomTools = false,
-        bool roomAnywhere = false)
+        bool roomAnywhere = false,
+        bool roomsOnMap = false)
     {
         // ONE INDEX OF WHICH TILESETS PLACE WHICH TILE, built off the frame on first ask: the pane's
         // tileset choice and the dump both read it, and building it twice would read every tileset twice.
         var catalog = new TilesetCatalog(readFile, () => TileSets);
+        _areaRooms = readFile is null ? null : new AreaRooms(readFile);
         var window = new TileBookWindow(() => TileFiles, TilesHere)
         {
+            AllRooms = _areaRooms,
+            RoomsOnMap = roomsOnMap,
             Changed = () => SettingsChanged?.Invoke(),
             Tilesets = catalog,
             Needs = new AreaNeeds(readFile, catalog),
@@ -5282,6 +5351,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             }
         }
 
+        AllRoomsOnMap(draw, map, player);
         RoomGhostOnMap(draw, map, player);
 
         // Over the entity dots: a landmark is what the map is being consulted for, so it wins

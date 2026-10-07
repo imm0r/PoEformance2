@@ -3481,7 +3481,8 @@ internal static class Program
             panes: settings.TilePanes,
             roomDoodads: settings.RoomDoodads,
             roomTools: settings.RoomTools,
-            roomAnywhere: settings.RoomAnywhere);
+            roomAnywhere: settings.RoomAnywhere,
+            roomsOnMap: settings.RoomsOnMap);
         overlay.AttachPointsOfInterest(route);
 
         // Before the editor, which is handed this exact instance - and before the layers read

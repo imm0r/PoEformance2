@@ -185,6 +185,10 @@ public sealed record OverlaySettings(
     // usual, leaves out the void past the map's edge; on finds a room of pure scenery. See RoomFinder.
     [property: JsonPropertyName("roomAnywhere")] bool RoomAnywhere = false,
 
+    // Whether every room the area loaded is outlined on the large map at once, each where its search
+    // ranks it first unless a surer room holds that spot. Off, the usual. See AreaRooms.
+    [property: JsonPropertyName("roomsOnMap")] bool RoomsOnMap = false,
+
     // And the effect book's, kept apart for the same reason. See EffectBookWindow.
     [property: JsonPropertyName("effectColumns")] IReadOnlyList<string>? EffectColumns = null,
     [property: JsonPropertyName("effectColumnWidths")] IReadOnlyDictionary<string, int>? EffectColumnWidths = null,
