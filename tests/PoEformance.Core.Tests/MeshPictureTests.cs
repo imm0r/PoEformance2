@@ -707,6 +707,161 @@ public class MeshPictureTests
         Assert.True(Channel(picture, 0) > 50, $"the red behind should show: {Channel(picture, 0)}");
     }
 
+    /// <summary>
+    /// A canvas that keeps its still part draws what a plain one draws - ties in depth included.
+    /// </summary>
+    /// <remarks>
+    /// THE TIES ARE THE POINT. Drawn in one pass, a pixel two coplanar shapes share goes to the one
+    /// first in the mesh; split into a still pass and a clock pass, the clock's shape comes second
+    /// whatever its place - so shape 0, the clock's, has to win against shape 1 on its place in the
+    /// mesh, and shape 3, the clock's again, has to lose to shape 2. A split that let the still pass
+    /// win every tie, or the clock's, would differ here.
+    /// </remarks>
+    [Fact]
+    public void AKeepingCanvasDrawsWhatAPlainOneDrawsTiesIncluded()
+    {
+        SkinnedMesh mesh = Coplanar();
+        ShadeProgram?[] shades = [Clocked(), Constant(0.8f, 0.1f, 0.1f), Constant(0.1f, 0.7f, 0.1f), Clocked()];
+
+        byte[] plain = [.. MeshPicture.Of(mesh, new MeshPicture.Canvas(96) { Time = 0.25f }, 0.3f, 0.5f, shades: shades).Rgba];
+        var keeping = new MeshPicture.Canvas(96) { Keeps = true, Time = 0.25f };
+        byte[] kept = [.. MeshPicture.Of(mesh, keeping, 0.3f, 0.5f, shades: shades).Rgba];
+
+        Assert.Equal(0, Differing(plain, kept));
+
+        // And the red of shape 1, which a still pass drawn first would have let through, is nowhere -
+        // while the green of shape 2, which wins its own tie, is there.
+        Assert.Equal(0, Leaning(plain, 0, 1));
+        Assert.True(Leaning(plain, 1, 0) > 0, "shape 2 wins the tie with shape 3, which comes after it");
+    }
+
+    /// <summary>Drawn again at a new time, a kept canvas makes the picture a whole drawing at that time makes, to the byte.</summary>
+    [Fact]
+    public void ANDDrawnAgainItIsTheWholeDrawingAtTheNewTime()
+    {
+        SkinnedMesh mesh = Coplanar();
+        ShadeProgram?[] shades = [Clocked(), Constant(0.8f, 0.1f, 0.1f), Constant(0.1f, 0.7f, 0.1f), Clocked()];
+        var keeping = new MeshPicture.Canvas(96) { Keeps = true, Time = 0.25f };
+        byte[] before = [.. MeshPicture.Of(mesh, keeping, 0.3f, 0.5f, shades: shades).Rgba];
+
+        byte[] last = [];
+        foreach (float time in new[] { 0.75f, 0.5f, 0.25f })
+        {
+            keeping.Time = time;
+            Assert.True(MeshPicture.Again(keeping, out GamePicture again));
+            byte[] whole = MeshPicture.Of(mesh, new MeshPicture.Canvas(96) { Time = time }, 0.3f, 0.5f, shades: shades).Rgba;
+            Assert.Equal(0, Differing(whole, again.Rgba));
+            last = [.. again.Rgba];
+        }
+
+        // Back at the first time, the first picture - and the clock did change it in between.
+        Assert.Equal(0, Differing(before, last));
+        keeping.Time = 0.75f;
+        Assert.True(MeshPicture.Again(keeping, out GamePicture later));
+        Assert.True(Differing(before, later.Rgba) > 0, "the clock's shapes are drawn at the new time");
+    }
+
+    /// <summary>A translucent shape over the clock's is laid over it again, from the kept part, exactly as a whole drawing lays it.</summary>
+    [Fact]
+    public void ANDATranslucentShapeOverTheClocksIsLaidOverItAgain()
+    {
+        SkinnedMesh mesh = Coplanar();
+        ShadeProgram?[] shades = [Clocked(), Constant(0.8f, 0.1f, 0.1f), null, Clocked()];
+        Mipmaps?[] skins = [null, null, Sheet(0, 0, 220, alpha: 120), null];
+        // Shape 3, coplanar with the translucent one, is not drawn - so the blue lies over shape 0's grey.
+        MaterialBlend[] blends = [MaterialBlend.Opaque, MaterialBlend.Opaque, MaterialBlend.Alpha, MaterialBlend.ShadowOnly];
+        var keeping = new MeshPicture.Canvas(96) { Keeps = true, Time = 0.25f };
+        MeshPicture.Of(mesh, keeping, 0.3f, 0.5f, skins: skins, blends: blends, shades: shades);
+
+        keeping.Time = 0.75f;
+        Assert.True(MeshPicture.Again(keeping, out GamePicture again));
+        byte[] whole = MeshPicture.Of(mesh, new MeshPicture.Canvas(96) { Time = 0.75f }, 0.3f, 0.5f, skins: skins, blends: blends, shades: shades).Rgba;
+
+        Assert.Equal(0, Differing(whole, again.Rgba));
+        Assert.True(Leaning(whole, 2, 0) > 0, "the blue is laid over the clock's grey");
+    }
+
+    /// <summary>A canvas has something to draw again only where it keeps, and its last drawing read the clock.</summary>
+    [Fact]
+    public void ONLYAKeepingCanvasLastDrawnWithTheClockDrawsAgain()
+    {
+        SkinnedMesh mesh = Coplanar();
+        ShadeProgram?[] clocked = [Clocked(), Constant(0.8f, 0.1f, 0.1f), Constant(0.1f, 0.7f, 0.1f), Clocked()];
+        ShadeProgram?[] still = [Constant(0.2f, 0.2f, 0.2f), Constant(0.8f, 0.1f, 0.1f), Constant(0.1f, 0.7f, 0.1f), null];
+
+        var plain = new MeshPicture.Canvas(64);
+        MeshPicture.Of(mesh, plain, shades: clocked);
+        Assert.False(MeshPicture.Again(plain, out _));
+
+        var keeping = new MeshPicture.Canvas(64) { Keeps = true };
+        Assert.False(MeshPicture.Again(keeping, out _));
+        MeshPicture.Of(mesh, keeping, shades: clocked);
+        Assert.True(MeshPicture.Again(keeping, out _));
+        MeshPicture.Of(mesh, keeping, shades: still);
+        Assert.False(MeshPicture.Again(keeping, out _));
+    }
+
+    /// <summary>
+    /// Four coordinated shapes: two identical quads on one plane, then two identical smaller ones on a
+    /// nearer plane - every pixel of each pair a tie in depth.
+    /// </summary>
+    private static SkinnedMesh Coplanar()
+    {
+        var places = new List<Vector3>();
+        var indices = new List<int>();
+        void Square(float half, float y)
+        {
+            int at = places.Count;
+            places.Add(new Vector3(-half, y, -half));
+            places.Add(new Vector3(half, y, -half));
+            places.Add(new Vector3(half, y + 3f, half));
+            places.Add(new Vector3(-half, y + 3f, half));
+            indices.AddRange([at, at + 1, at + 2, at, at + 2, at + 3]);
+        }
+
+        Square(10f, -9f);
+        Square(10f, -9f);
+        Square(5f, 6f);
+        Square(5f, 6f);
+        SkinnedMesh bare = Built(places, indices, Least, Most);
+        var spots = new Vector2[bare.Positions.Length];
+        Array.Fill(spots, new Vector2(0.5f, 0.5f));
+        MeshShape[] shapes = [new MeshShape("A", 0, 6), new MeshShape("B", 6, 6), new MeshShape("C", 12, 6), new MeshShape("D", 18, 6)];
+        return SkinnedMesh.Of(bare.Positions, bare.Normals, bare.Indices, Least, Most, spots, shapes);
+    }
+
+    /// <summary>A program whose colour is the clock: grey, as bright as the time is in seconds.</summary>
+    private static ShadeProgram Clocked()
+    {
+        ShaderGraph graph = ShaderGraph.Read(System.Text.Encoding.UTF8.GetBytes(
+            """
+            {"nodes":[
+              {"type":"Time","index":0},
+              {"type":"AlbedoColor","index":0,"stage":"Texturing_Init"}],
+             "links":[
+              {"src":{"type":"Time","index":0,"variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"xyz"}}]}
+            """));
+        ShadeCompile compiled = ShadeProgram.Compile([(new ShaderInstance("Metadata/Test.fxgraph", new Dictionary<string, ShaderValue[]>()), graph)]);
+        Assert.NotNull(compiled.Program);
+        Assert.True(compiled.Program.UsesTime);
+        return compiled.Program;
+    }
+
+    /// <summary>How many drawn pixels lean clearly towards one channel over another - red over green, say.</summary>
+    private static int Leaning(byte[] rgba, int towards, int over)
+    {
+        var count = 0;
+        for (var at = 0; at < rgba.Length; at += 4)
+        {
+            if (rgba[at + 3] > 0 && rgba[at + towards] > rgba[at + over] + 40)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
     /// <summary>A program whose colour is one constant, in linear light, bound to nothing - it reads no texture.</summary>
     private static ShadeProgram Constant(float r, float g, float b)
     {
