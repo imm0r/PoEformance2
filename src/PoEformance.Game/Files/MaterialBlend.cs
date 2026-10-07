@@ -6,7 +6,9 @@ public enum MaterialBlend : byte
     /// <summary>Covers what is behind it - every material the game does not say otherwise about.</summary>
     Opaque,
 
-    /// <summary>Mixed with what is behind it by the texture's own alpha.</summary>
+    /// <summary>
+    /// Mixed with what is behind it: by its shade program's alpha where its graphs set one - a ground layer fading by the depth behind it - and by its texture's own alpha where they do not.
+    /// </summary>
     Alpha,
 
     /// <summary>Added to what is behind it - glow, fire, lightning.</summary>

@@ -1,0 +1,7 @@
+{
+    "version": 3,
+    "shader_group": [
+        "Material"
+    ],
+    "effect_order": 0
+}

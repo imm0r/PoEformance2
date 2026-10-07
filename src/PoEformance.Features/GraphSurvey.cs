@@ -31,6 +31,12 @@ namespace PoEformance.Features;
 /// it holds depends on how a graph wires it. So beside the survey goes one graph per such item,
 /// whole, with a material naming it - the graph most held-back terrain materials name, where any
 /// does - which is what deciding one needs to read.
+///
+/// AND HOW OFTEN THE BLEND RULE MATTERS. Where two of a material's graphs name a blend mode, nothing
+/// says which stands, and the picture can be drawn either way ("blend: first" or "last" - see
+/// MonsterModel.LastModes). Every material's two answers are worked out by the picture's own walk
+/// (MonsterModels.Paints.Modes) and counted where they differ - by name, and by what is drawn - so
+/// whether the switch is worth keeping is a number rather than a feeling.
 /// </remarks>
 public static class GraphSurvey
 {
@@ -58,6 +64,9 @@ public static class GraphSurvey
     /// <summary>How often progress is reported, in materials.</summary>
     private const int ProgressEvery = 2000;
 
+    /// <summary>Most pairs of disagreeing blend modes listed.</summary>
+    private const int MostPairs = 30;
+
     /// <summary>
     /// Reads every material and writes the survey. Never throws on a file that will not read: it is counted.
     /// </summary>
@@ -82,6 +91,8 @@ public static class GraphSurvey
         var blocked = new List<(string[] Missing, string Folder)>();
         var vertex = new Dictionary<string, Dictionary<string, Example>>(StringComparer.Ordinal);
         int unreadable = 0, ungraphed = 0, colourless = 0, evaluated = 0;
+        var paints = new MonsterModels.Paints();
+        var rule = new BlendRule();
 
         for (var at = 0; at < ordered.Count; at++)
         {
@@ -97,6 +108,13 @@ public static class GraphSurvey
                 unreadable++;
                 continue;
             }
+
+            // THE MATERIAL HANDED OVER ALREADY READ, so the blend walk reads only its graphs - and taken
+            // back after, since the walk keeps its answer and a survey reads every material once.
+            string bare = MaterialFile.Bare(material);
+            paints.Files[bare] = MaterialFile.Read(content);
+            rule.Count(material, paints.Modes(read, material));
+            paints.Files.Remove(bare);
 
             IReadOnlyList<ShaderInstance> chain = ShaderGraph.Instances(content);
             if (chain.Count == 0)
@@ -164,12 +182,83 @@ public static class GraphSurvey
         Greedy(blocked, evaluated, coloured, said);
         LeftOut(graphs, used, said);
         Stages(graphs, used, said);
+        rule.Say(said);
         if (examples is not null)
         {
             Examples(vertex, read, examples);
         }
 
         return said.ToString();
+    }
+
+    /// <summary>
+    /// Where a material's graphs name two blend modes that differ: how many, which pairs, and whether what is drawn differs by which stands.
+    /// </summary>
+    private sealed class BlendRule
+    {
+        private readonly Dictionary<(string First, string Last), (int Count, string Example)> _pairs = [];
+
+        private int _named;
+        private int _differ;
+        private int _drawn;
+
+        public void Count(string material, (string First, string Last) modes)
+        {
+            if (modes.First.Length == 0 && modes.Last.Length == 0)
+            {
+                return;
+            }
+
+            _named++;
+            if (string.Equals(modes.First, modes.Last, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            _differ++;
+            _drawn += MaterialBlends.Of(modes.First) != MaterialBlends.Of(modes.Last) ? 1 : 0;
+            (int count, string example) = _pairs.GetValueOrDefault(modes, (0, material));
+            _pairs[modes] = (count + 1, example);
+        }
+
+        public void Say(StringBuilder said)
+        {
+            said.AppendLine().AppendLine("=== the blend rule: where two of a material's graphs name a blend mode, which stands")
+                .Append("  ").Append(Say(_named)).Append(" materials name a blend mode; ").Append(Say(_differ))
+                .Append(" name two that differ, and for ").Append(Say(_drawn)).AppendLine(" of those what is drawn differs by which one stands");
+            if (_pairs.Count == 0)
+            {
+                return;
+            }
+
+            said.AppendLine("  first → last · drawn first / last · materials · one of them");
+            foreach (((string first, string last), (int count, string example)) in _pairs
+                .OrderByDescending(one => one.Value.Count)
+                .ThenBy(one => one.Key.First, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(one => one.Key.Last, StringComparer.OrdinalIgnoreCase)
+                .Take(MostPairs))
+            {
+                said.Append("    ").Append(first.Length > 0 ? first : "-").Append(" → ").Append(last.Length > 0 ? last : "-")
+                    .Append(" · ").Append(Drawn(MaterialBlends.Of(first))).Append(" / ").Append(Drawn(MaterialBlends.Of(last)))
+                    .Append(" · ").Append(Say(count)).Append(" · ").AppendLine(example);
+            }
+
+            if (_pairs.Count > MostPairs)
+            {
+                said.Append("    ").Append(Say(_pairs.Count - MostPairs)).AppendLine(" more pairs, each named by fewer");
+            }
+        }
+
+        private static string Drawn(MaterialBlend blend) => blend switch
+        {
+            MaterialBlend.Alpha => "mixed",
+            MaterialBlend.Additive => "added",
+            MaterialBlend.Cutout => "cut out",
+            MaterialBlend.ShadowOnly => "shadow only",
+            _ => "opaque",
+        };
+
+        private static string Say(int number) => number.ToString("N0", CultureInfo.InvariantCulture);
     }
 
     /// <summary>Whether an item is something a graph reads from the vertex side.</summary>

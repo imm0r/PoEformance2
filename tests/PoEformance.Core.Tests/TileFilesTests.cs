@@ -560,7 +560,7 @@ public class TileFilesTests
             """
             {"graphinstances":[
               {"parent":"Metadata/Ledge.fxgraph","custom_parameters":[{"name":"Meshmap","parameters":[{"path":"Art/Textures/floor.dds","srgb":false}]}]},
-              {"parent":"Metadata/Effects/Graphs/General/MaskedContactFade.fxgraph"}]}
+              {"parent":"Metadata/Effects/Graphs/General/Breach.fxgraph"}]}
             """);
         files["Metadata/Ledge.fxgraph"] = Encoding.UTF8.GetBytes(
             """
@@ -578,22 +578,22 @@ public class TileFilesTests
               {"src":{"type":"SampleTexture","index":6,"variable":"rgba","swizzle":"y"},"dst":{"type":"Lerp3","index":0,"variable":"alpha"}},
               {"src":{"type":"Lerp3","index":0,"variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing","variable":"input"}}]}
             """);
-        files["Metadata/Effects/Graphs/General/MaskedContactFade.fxgraph"] = Encoding.UTF8.GetBytes(
+        files["Metadata/Effects/Graphs/General/Breach.fxgraph"] = Encoding.UTF8.GetBytes(
             """
             {"nodes":[
               {"type":"InputAlbedoColor","index":0,"stage":"PreLighting"},
-              {"type":"MaskedContactFade","index":0},
+              {"type":"BreachMinSphereDist","index":0},
               {"type":"AlbedoColor","index":0,"stage":"PreLighting"}],
              "links":[
-              {"src":{"type":"InputAlbedoColor","index":0,"stage":"PreLighting","variable":"output"},"dst":{"type":"MaskedContactFade","index":0,"variable":"in_albedo"}},
-              {"src":{"type":"MaskedContactFade","index":0,"variable":"out_albedo"},"dst":{"type":"AlbedoColor","index":0,"stage":"PreLighting","variable":"input"}}]}
+              {"src":{"type":"InputAlbedoColor","index":0,"stage":"PreLighting","variable":"output"},"dst":{"type":"BreachMinSphereDist","index":0,"variable":"world_pos"}},
+              {"src":{"type":"BreachMinSphereDist","index":0,"variable":"dist"},"dst":{"type":"AlbedoColor","index":0,"stage":"PreLighting","variable":"input"}}]}
             """);
 
         MonsterModel model = TileModels.Of(path => files.GetValueOrDefault(path), "Metadata/Terrain/Test/Arena.tdt", ground: false, shaded: true);
 
         Assert.True(model.Ready, model.Why);
         Assert.Equal(1, model.ShadedBy);
-        Assert.Equal(["MaskedContactFade in MaskedContactFade"], model.Unshaded);
+        Assert.Equal(["BreachMinSphereDist in Breach"], model.Unshaded);
 
         // c1r1 is "wall, floor" and c2r1 "floor, floor": the floor's three shapes run the program.
         Assert.Null(model.Shades[0]);
@@ -614,12 +614,12 @@ public class TileFilesTests
         // path that will not load says so rather than nothing.
         IReadOnlyDictionary<string, string> needs = AreaNeeds.Of(
             path => files.GetValueOrDefault(path), ["Metadata/Terrain/Test/Arena.tdt", "Metadata/Terrain/Test/Gone.tdt"], string.Empty, null).Needs;
-        Assert.Equal("MaskedContactFade in MaskedContactFade", needs["Metadata/Terrain/Test/Arena.tdt"]);
+        Assert.Equal("BreachMinSphereDist in Breach", needs["Metadata/Terrain/Test/Arena.tdt"]);
         Assert.StartsWith("did not load:", needs["Metadata/Terrain/Test/Gone.tdt"], StringComparison.Ordinal);
 
-        // SEARCHABLE AS A COLUMN: needs:MaskedContactFade finds the tile, and a tile the needs do not name is not found.
+        // SEARCHABLE AS A COLUMN: needs:BreachMinSphereDist finds the tile, and a tile the needs do not name is not found.
         TileBook book = TileBook.Of(["Metadata/Terrain/Test/Arena.tdt", "Metadata/Terrain/Test/Other.tdt"], new Dictionary<string, int> { ["Metadata/Terrain/Test/Arena.tdt"] = 1 }, needs);
-        RowSet? found = book.Matching(ColumnQuery.Parse("needs:MaskedContactFade").Term, out string why);
+        RowSet? found = book.Matching(ColumnQuery.Parse("needs:BreachMinSphereDist").Term, out string why);
         Assert.True(found is not null, why);
         var rows = new List<int>();
         found!.CopyTo(rows);
