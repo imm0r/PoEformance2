@@ -345,8 +345,11 @@ public sealed class MonsterPortrait
     /// <summary>The picture the clock last asked for, while it is being drawn - see <see cref="ClockBehind"/>.</summary>
     private Task<ClockPicture>? _clockDrawing;
 
-    /// <summary>The clock's own canvas: a drawing behind the frame never shares the frame's.</summary>
+    /// <summary>The clock's own canvas: a drawing behind the frame never shares the frame's. It keeps its still part - see MeshPicture.Again.</summary>
     private MeshPicture.Canvas? _clockCanvas;
+
+    /// <summary>What the clock's canvas was last asked to draw with, the time aside.</summary>
+    private ClockKey? _clockKey;
 
     /// <summary>
     /// How many pictures the frame has drawn. A clock drawing asked for before the latest is not shown -
@@ -2420,6 +2423,11 @@ public sealed class MonsterPortrait
     /// pace. Behind the frame it costs the picture its rate and nothing else: the overlay stays at
     /// its own, and the picture moves on as fast as the tile can be drawn.
     ///
+    /// AND ONLY THE CLOCK'S PART, where nothing but the time moved since the clock's canvas was last
+    /// drawn whole: breach_boss_01 still came out at two pictures a second behind the frame, because
+    /// every tick drew all of its thousand shapes for the sake of two. The canvas keeps the rest -
+    /// see MeshPicture.Again - so a tick costs what the clock's own triangles cost.
+    ///
     /// ONE AT A TIME, because the canvas is the drawing's until its picture has been uploaded - the
     /// next is asked for on the first frame after that. Everything the drawing reads is taken here,
     /// on the frame: the model and its programs are never changed once loaded, and the blends are
@@ -2434,7 +2442,7 @@ public sealed class MonsterPortrait
 
         if (_clockCanvas is not { } canvas || canvas.Size != size)
         {
-            canvas = new MeshPicture.Canvas(size);
+            canvas = new MeshPicture.Canvas(size) { Keeps = true };
             _clockCanvas = canvas;
         }
 
@@ -2450,11 +2458,20 @@ public sealed class MonsterPortrait
         IReadOnlyList<MaterialBlend>? blends = Blends();
         IReadOnlyList<ShadeProgram?>? shades = Shaded ? model.Shades : null;
         int drawing = _drawing;
+
+        // AGAIN, NOT WHOLE, where nothing but the time moved since the canvas was last drawn whole:
+        // only the triangles that read the clock are drawn - see MeshPicture.Again. Grey is laid on
+        // after, so it is not part of what has to match.
+        var key = new ClockKey(model, turn, tilt, zoom, pan, ink, size, blends, shades);
+        bool again = key == _clockKey;
+        _clockKey = key;
         _clockDrawing = Task.Run(() =>
         {
             try
             {
-                GamePicture drawn = MeshPicture.Of(model.Mesh, canvas, turn, tilt, ink, model.Skin, zoom, pan, model.Skins, blends, shades);
+                GamePicture drawn = again && MeshPicture.Again(canvas, out GamePicture redrawn)
+                    ? redrawn
+                    : MeshPicture.Of(model.Mesh, canvas, turn, tilt, ink, model.Skin, zoom, pan, model.Skins, blends, shades);
                 if (!drawn.Ready)
                 {
                     return new ClockPicture(drawn, model, size, drawing, "the model drew nothing");
@@ -2473,6 +2490,12 @@ public sealed class MonsterPortrait
             }
         });
     }
+
+    /// <summary>Everything a picture on the clock's canvas was drawn with but the time - see <see cref="ClockBehind"/>.</summary>
+    /// <remarks>The lists compare by reference: the model's are made once, and the blends once per model.</remarks>
+    private sealed record ClockKey(
+        MonsterModel Model, float Turn, float Tilt, float Zoom, Vector2 Pan, Vector3 Ink, int Size,
+        IReadOnlyList<MaterialBlend>? Blends, IReadOnlyList<ShadeProgram?>? Shades);
 
     /// <summary>A picture the clock asked for, and what it was asked for with - see <see cref="ClockLanded"/>.</summary>
     /// <param name="Picture">The pixels, on the clock's own canvas.</param>
