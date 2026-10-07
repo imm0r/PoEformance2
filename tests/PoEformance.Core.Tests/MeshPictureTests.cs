@@ -464,6 +464,59 @@ public class MeshPictureTests
         }
     }
 
+    /// <summary>
+    /// A mesh big enough to be worked out in slices draws on any number of threads what one thread draws.
+    /// </summary>
+    /// <remarks>
+    /// THE SLICES AND THE BINS, both: the vertices and the triangles' rows and levels are worked out
+    /// in slices only past tens of thousands of them, so the small meshes above never reach that code,
+    /// and the bins are what every band walks. A grid of 50,000 triangles, half of them shaded, crossing
+    /// every band.
+    /// </remarks>
+    [Fact]
+    public void ABigMeshDrawsTheSamePictureOnAnyNumberOfThreads()
+    {
+        var places = new List<Vector3>();
+        var indices = new List<int>();
+        const int Across = 158;
+        for (var y = 0; y < Across; y++)
+        {
+            for (var x = 0; x < Across; x++)
+            {
+                int at = places.Count;
+                float x0 = (x * 20f / Across) - 10f;
+                float z0 = (y * 20f / Across) - 10f;
+                float step = 20f / Across;
+                float h = MathF.Sin(x * 0.2f) * MathF.Cos(y * 0.15f) * 3f;
+                places.Add(new Vector3(x0, h, z0));
+                places.Add(new Vector3(x0 + step, h + 0.1f, z0));
+                places.Add(new Vector3(x0 + step, h, z0 + step));
+                places.Add(new Vector3(x0, h - 0.1f, z0 + step));
+                indices.AddRange([at, at + 1, at + 2, at, at + 2, at + 3]);
+            }
+        }
+
+        SkinnedMesh bare = Built(places, indices, new Vector3(-10f, -4f, -10f), new Vector3(10f, 4f, 10f));
+        var spots = new Vector2[bare.Positions.Length];
+        for (var one = 0; one < spots.Length; one++)
+        {
+            spots[one] = new Vector2(one % 4 is 1 or 2 ? 1f : 0f, one % 4 >= 2 ? 1f : 0f);
+        }
+
+        int half = indices.Count / 2 / 3 * 3;
+        MeshShape[] shapes = [new MeshShape("Skinned", 0, half), new MeshShape("Shaded", half, indices.Count - half)];
+        SkinnedMesh mesh = SkinnedMesh.Of(bare.Positions, bare.Normals, bare.Indices, new Vector3(-10f, -4f, -10f), new Vector3(10f, 4f, 10f), spots, shapes);
+        Assert.True(mesh.Indices.Length / 3 > 40_000);
+
+        Mipmaps?[] skins = [Checkered(64), null];
+        ShadeProgram?[] shades = [null, Constant(0.3f, 0.5f, 0.2f)];
+        byte[] alone = [.. MeshPicture.Of(mesh, new MeshPicture.Canvas(160, 1), 0.5f, 0.7f, skins: skins, shades: shades).Rgba];
+        byte[] shared = MeshPicture.Of(mesh, new MeshPicture.Canvas(160, 4), 0.5f, 0.7f, skins: skins, shades: shades).Rgba;
+
+        Assert.Equal(0, Differing(alone, shared));
+        Assert.True(alone.Where((_, at) => at % 4 == 3).Count(alpha => alpha > 0) > 1000, "the grid fills a good part of the picture");
+    }
+
     /// <summary>No canvas is a mistake in the caller, not a picture of nothing.</summary>
     [Fact]
     public void DrawingWithoutACanvasSaysSo()
