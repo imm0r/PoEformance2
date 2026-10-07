@@ -1180,6 +1180,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// <summary>The place the tile book picked for a room, outlined on the large map - see <see cref="RoomGhost"/>.</summary>
     private RoomGhost? _roomGhost;
 
+    /// <summary>The tile the player stands on, for the tile book's "around you" row, or null.</summary>
+    private (int X, int Y)? PlayerTile()
+        => _snapshot.Player is WorldEntity player
+            ? ((int)(player.WorldX / MapView.WorldToGrid) / TerrainGrid.CellsPerTile, (int)(player.WorldY / MapView.WorldToGrid) / TerrainGrid.CellsPerTile)
+            : null;
+
     /// <summary>A grid cell on the large map at the ground's height under it.</summary>
     private static Vector2 Grounded(TerrainGrid grid, MapView map, WorldEntity player, int cellX, int cellY)
         => map.Project(
@@ -2989,6 +2995,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Terrain = () => _snapshot.Terrain as TerrainGrid,
             Read = readFile,
             Ghost = ghost => _roomGhost = ghost,
+            Here = PlayerTile,
             Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize)
             {
                 Load = static (read, _, key, _) => TileBookWindow.Load(read, key),

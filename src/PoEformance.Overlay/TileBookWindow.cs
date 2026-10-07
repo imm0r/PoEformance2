@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.Versioning;
@@ -142,12 +143,34 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     /// <summary>Told which candidate the large map should outline, or null for none.</summary>
     public Action<RoomGhost?>? Ghost { get; init; }
 
+    /// <summary>The tile the player stands on, for the "around you" row. Null leaves the row out.</summary>
+    public Func<(int X, int Y)?>? Here { get; init; }
+
     /// <summary>The search running or run for <see cref="_searchedFor"/> in <see cref="_searchedIn"/>.</summary>
     private Task<RoomSearch>? _searching;
     private RoomSearch? _found;
+
+    /// <summary>The rows of <see cref="_found"/> in words, made once per search rather than once per frame.</summary>
+    private string[] _rows = [];
     private string _searchedFor = string.Empty;
     private TerrainGrid? _searchedIn;
+
+    /// <summary>Which row the map outlines: a candidate's index, <see cref="GhostAround"/>, or -1 for none.</summary>
     private int _ghosted = -1;
+
+    /// <summary>The "around you" row's value of <see cref="_ghosted"/>.</summary>
+    private const int GhostAround = -2;
+
+    /// <summary>Every tile file's identity read for the area in <see cref="_identitiesOf"/> - one read per file across every room searched there.</summary>
+    private ConcurrentDictionary<string, TileIdentity?> _identities = new(StringComparer.OrdinalIgnoreCase);
+    private TerrainGrid? _identitiesOf;
+
+    /// <summary>The "around you" probe running, and the search it belongs to - one at a time.</summary>
+    private (Task<RoomPlace?> Task, RoomSearch For)? _probing;
+    private RoomPlace? _around;
+    private string _aroundRow = string.Empty;
+    private RoomSearch? _probedIn;
+    private (int X, int Y) _probedAt = (-1, -1);
 
     /// <summary>Whether a room places the level editor's tools, as the box has it - what the settings keep.</summary>
     public bool Tools
@@ -426,38 +449,40 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             return;
         }
 
+        if (!ReferenceEquals(grid, _identitiesOf))
+        {
+            _identitiesOf = grid;
+            _identities = new ConcurrentDictionary<string, TileIdentity?>(StringComparer.OrdinalIgnoreCase);
+        }
+
         if (!ReferenceEquals(grid, _searchedIn) || !string.Equals(room, _searchedFor, StringComparison.Ordinal))
         {
             _searchedIn = grid;
             _searchedFor = room;
             _found = null;
             _ghosted = -1;
+            _around = null;
+            _probedIn = null;
+            _probedAt = (-1, -1);
             Ghost?.Invoke(null);
             int wide = grid.TilesX;
             int tall = grid.TilesY;
             TerrainTiles? laid = grid.Tiles;
-            _searching = Task.Run(() =>
-            {
-                // EACH TILE FILE ONCE, its inheritance followed - an area is a few hundred of them.
-                var known = new Dictionary<string, TileIdentity?>(StringComparer.OrdinalIgnoreCase);
-                TileIdentity? Identity(string path)
-                {
-                    if (!known.TryGetValue(path, out TileIdentity? identity))
-                    {
-                        identity = TileIdentity.Of(TileModels.Defined(read, path).Definition);
-                        known[path] = identity;
-                    }
 
-                    return identity;
-                }
-
-                return RoomFinder.Find(RoomLayout.Read(read(room)), ground, wide, tall, laid, Identity);
-            });
+            // EACH TILE FILE ONCE PER AREA, its inheritance followed, whichever room's search reads it first.
+            ConcurrentDictionary<string, TileIdentity?> known = _identities;
+            TileIdentity? Identity(string path) => known.GetOrAdd(path, one => TileIdentity.Of(TileModels.Defined(read, one).Definition));
+            _searching = Task.Run(() => RoomFinder.Find(RoomLayout.Read(read(room)), ground, wide, tall, laid, Identity));
         }
 
         if (_found is null && _searching is { IsCompleted: true } done)
         {
             _found = done.IsCompletedSuccessfully ? done.Result : RoomSearch.Not($"the search failed: {done.Exception?.GetBaseException().Message}");
+            _rows = new string[_found.Candidates.Count];
+            for (var one = 0; one < _rows.Length; one++)
+            {
+                _rows[one] = Said(_found.Candidates[one], _found.TileChecked) + string.Create(CultureInfo.InvariantCulture, $"##where{one}");
+            }
         }
 
         if (_found is not { } found)
@@ -490,9 +515,11 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         int best = found.Candidates.Count > 0 ? Share(found.Candidates[0]) : 0;
         ImGui.TextDisabled(ImGuiText.Escape(found.Found
             ? string.Create(CultureInfo.InvariantCulture,
-                $"where it lies: {found.Candidates.Count + found.More} place{(found.Candidates.Count + found.More == 1 ? string.Empty : "s")} fit all {found.Corners} corners{left} - pick one to outline it on the large map")
+                $"where it lies: {found.Fits} place{(found.Fits == 1 ? string.Empty : "s")} fit all {found.Corners} corners{left} - pick one to outline it on the large map")
             : string.Create(CultureInfo.InvariantCulture,
                 $"where it lies: nowhere fits all {found.Corners} corners{left}; the nearest agrees on {best}% - pick one to see where it parts:")));
+
+        Around(grid, room, found);
 
         float rows = Math.Min(found.Candidates.Count, 6);
         if (rows == 0)
@@ -505,14 +532,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             for (var one = 0; one < found.Candidates.Count; one++)
             {
                 RoomCandidate where = found.Candidates[one];
-                string tiles = !found.TileChecked
-                    ? string.Empty
-                    : where.Big > 0
-                        ? string.Create(CultureInfo.InvariantCulture, $"  ·  tiles {where.TilesAgree}/{where.Tiles}, big {where.BigAgree}/{where.Big}")
-                        : string.Create(CultureInfo.InvariantCulture, $"  ·  tiles {where.TilesAgree}/{where.Tiles}");
-                string label = string.Create(CultureInfo.InvariantCulture,
-                    $"tile {where.X}, {where.Y}  ·  {RoomFinder.Said(where.Turn)}  ·  {where.Matched}/{where.Corners} corners ({Share(where)}%){tiles}##where{one}");
-                if (ImGui.Selectable(label, _ghosted == one))
+                if (ImGui.Selectable(one < _rows.Length ? _rows[one] : "##where", _ghosted == one))
                 {
                     _ghosted = _ghosted == one ? -1 : one;
                     RoomMisses misses = one < found.Misses.Count ? found.Misses[one] : RoomMisses.None;
@@ -521,20 +541,92 @@ public sealed class TileBookWindow : BookWindow<TileBook>
 
                 if (ImGui.IsItemHovered())
                 {
-                    ImGui.SetTooltip("Corners: the room's ground types against the ground laid at every tile corner.\n"
-                        + "Tiles: each of the room's slots against the tile laid where it falls - size, tag, edge and ground types, whichever way round.\n"
-                        + "Big: the slots bigger than one tile, which the ground leaves out and which make a room this room.\n"
-                        + "On the map, red dots are corners that disagree and orange rings tiles that do.");
+                    ImGui.SetTooltip(RowSaid);
                 }
             }
 
             if (found.More > 0)
             {
-                ImGui.TextDisabled(string.Create(CultureInfo.InvariantCulture, $"{found.More} more not listed"));
+                ImGui.TextDisabled(string.Create(CultureInfo.InvariantCulture, $"{found.More} more that fit all corners, not listed"));
             }
         }
 
         ImGui.EndChild();
+    }
+
+    /// <summary>What a candidate row's figures mean.</summary>
+    private const string RowSaid = "Corners: the room's ground types against the ground laid at every tile corner.\n"
+        + "Tiles: each of the room's slots against the tile laid where it falls - size, tag, edge and ground types, whichever way round.\n"
+        + "Big: the slots bigger than one tile, which the ground leaves out and which make a room this room.\n"
+        + "Places that fit every corner are ranked by their tiles.\n"
+        + "On the map, red dots are corners that disagree and orange rings tiles that do.";
+
+    /// <summary>A candidate in a row's words.</summary>
+    private static string Said(RoomCandidate where, bool tileChecked)
+    {
+        string tiles = !tileChecked
+            ? string.Empty
+            : where.Big > 0
+                ? string.Create(CultureInfo.InvariantCulture, $"  ·  tiles {where.TilesAgree}/{where.Tiles}, big {where.BigAgree}/{where.Big}")
+                : string.Create(CultureInfo.InvariantCulture, $"  ·  tiles {where.TilesAgree}/{where.Tiles}");
+        return string.Create(CultureInfo.InvariantCulture,
+            $"tile {where.X}, {where.Y}  ·  {RoomFinder.Said(where.Turn)}  ·  {where.Matched}/{where.Corners} corners ({Share(where)}%){tiles}");
+    }
+
+    /// <summary>
+    /// The "around you" row: the room laid its best way over the tile the player stands on, whether or not that made the list.
+    /// </summary>
+    /// <remarks>
+    /// BOTH HALVES OF THE COMPARISON. Standing in a room, a person knows where it is; this says how the
+    /// room's own corners and slots meet what the area laid there, so a list that ranks somewhere else
+    /// first shows by how much and where - pick the row and the map marks it. Worked out off the frame
+    /// whenever the player reaches another tile, one probe at a time.
+    /// </remarks>
+    private void Around(TerrainGrid grid, string room, RoomSearch found)
+    {
+        if (Here is null)
+        {
+            return;
+        }
+
+        if (_probing is { Task.IsCompleted: true } done)
+        {
+            _probing = null;
+            if (ReferenceEquals(done.For, found))
+            {
+                _around = done.Task.IsCompletedSuccessfully ? done.Task.Result : null;
+                _aroundRow = _around is { } scored ? "around you: " + Said(scored.Where, found.TileChecked) + "##wherearound" : string.Empty;
+                if (_ghosted == GhostAround)
+                {
+                    Ghost?.Invoke(_around is { } moved ? new RoomGhost(grid, room, moved.Where, moved.Misses) : null);
+                }
+            }
+        }
+
+        if (_probing is null && Here() is { } here && (here != _probedAt || !ReferenceEquals(found, _probedIn)))
+        {
+            _probedAt = here;
+            _probedIn = found;
+            _probing = (Task.Run(() => found.Around(here.X, here.Y)), found);
+        }
+
+        if (_around is not { } around)
+        {
+            return;
+        }
+
+        if (ImGui.Selectable(_aroundRow, _ghosted == GhostAround))
+        {
+            _ghosted = _ghosted == GhostAround ? -1 : GhostAround;
+            Ghost?.Invoke(_ghosted == GhostAround ? new RoomGhost(grid, room, around.Where, around.Misses) : null);
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("The room laid its best way over the tile you stand on - most tiles agreeing, then most corners -"
+                + " whether or not that made the list below. Standing in the room, this is where it is: what it scores here"
+                + " against the list's first row says whether the search can tell it apart.\n" + RowSaid);
+        }
     }
 
     /// <summary>How much of a candidate's corners agree, as a whole percentage, rounded down so nothing short of all reads 100.</summary>
