@@ -55,6 +55,9 @@ public sealed class TerrainTiles
     /// <summary>Tiles down.</summary>
     public int Height { get; }
 
+    /// <summary>The path ids row by row, for a scan that has already kept itself inside the area - see RoomPlacements.</summary>
+    internal int[] Ids => _ids;
+
     /// <summary>The path id of the tile at a column and row, or -1 outside the area or where it names none.</summary>
     public int IdAt(int x, int y) => (uint)x < (uint)Width && (uint)y < (uint)Height ? _ids[(y * Width) + x] : -1;
 

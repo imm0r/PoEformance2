@@ -533,6 +533,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 ? tiles.Doodads == RoomModels.UsualDoodads ? 0 : tiles.Doodads
                 : basis.RoomDoodads,
             RoomTools = _tileBook?.Tools ?? basis.RoomTools,
+            RoomAnywhere = _tileBook?.Anywhere ?? basis.RoomAnywhere,
             EffectColumns = _effectBook?.Columns is { Count: > 0 } effectColumns
                 ? effectColumns
                 : basis.EffectColumns,
@@ -2978,7 +2979,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         IReadOnlyDictionary<string, int>? columnWidths = null,
         IReadOnlyDictionary<string, double>? panes = null,
         int roomDoodads = 0,
-        bool roomTools = false)
+        bool roomTools = false,
+        bool roomAnywhere = false)
     {
         // ONE INDEX OF WHICH TILESETS PLACE WHICH TILE, built off the frame on first ask: the pane's
         // tileset choice and the dump both read it, and building it twice would read every tileset twice.
@@ -2992,6 +2994,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Laid = LaidHere,
             Doodads = roomDoodads,
             Tools = roomTools,
+            Anywhere = roomAnywhere,
             Terrain = () => _snapshot.Terrain as TerrainGrid,
             Read = readFile,
             Ghost = ghost => _roomGhost = ghost,

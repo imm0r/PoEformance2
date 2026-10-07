@@ -134,18 +134,80 @@ public class RoomFinderTests
         RoomSearch search = RoomFinder.Find(room, ground, TilesX, TilesY, laid, path => identities.GetValueOrDefault(path));
 
         Assert.True(search.TileChecked);
-        Assert.Equal(2, search.Candidates.Count);
-        Assert.True(search.Candidates.All(one => one.Exact));
+        Assert.Equal(2, search.Fits);
         RoomCandidate first = search.Candidates[0];
+        Assert.True(first.Exact);
         Assert.Equal((12, 4, 5), (first.X, first.Y, first.Turn));
         Assert.Equal((6, 6), (first.TilesAgree, first.Tiles));
-        Assert.Equal((16, 1, 0), (search.Candidates[1].X, search.Candidates[1].Y, search.Candidates[1].Turn));
-        Assert.Equal((0, 6), (search.Candidates[1].TilesAgree, search.Candidates[1].Tiles));
+
+        // The decoy is listed too, below every place any tile agrees with, with all its corners and none of its tiles.
+        int decoy = search.Candidates.ToList().FindIndex(one => (one.X, one.Y, one.Turn) == (16, 1, 0));
+        Assert.True(decoy > 0);
+        Assert.True(search.Candidates[decoy].Exact);
+        Assert.Equal((0, 6), (search.Candidates[decoy].TilesAgree, search.Candidates[decoy].Tiles));
 
         // The map's orange rings: every tile of the decoy, none of the room.
         Assert.Empty(search.Misses[0].Tiles);
-        Assert.Equal(6, search.Misses[1].Tiles.Count);
-        Assert.Contains((16, 1), search.Misses[1].Tiles);
+        Assert.Equal(6, search.Misses[decoy].Tiles.Count);
+        Assert.Contains((16, 1), search.Misses[decoy].Tiles);
+    }
+
+    /// <summary>
+    /// The room misses a corner where it lies and a decoy fits every one; the tiles still rank the room first.
+    /// </summary>
+    /// <remarks>
+    /// SEEPAGE'S BOSS ARENA, made small. Where it stands it agreed on 208 of 218 corners and 191 of 205
+    /// tiles - the misses all along the side it joins the map by - while the void fitted every corner
+    /// with 150 tiles. A list that put every corner first listed only the void.
+    /// </remarks>
+    [Fact]
+    public void AROOMMissingACornerWhereItLiesStillOutranksADecoyThatFitsEveryCorner()
+    {
+        (TerrainGroundTypes ground, _) = Area(withRoom: true, spoil: true, decoy: true);
+        (TerrainTiles laid, Dictionary<string, TileIdentity> identities) = RoomAndDecoyTiles();
+
+        RoomSearch search = RoomFinder.Find(RoomLayout.Parse(Room(Pattern, 3, 2)), ground, TilesX, TilesY, laid, path => identities.GetValueOrDefault(path));
+
+        RoomCandidate first = search.Candidates[0];
+        Assert.Equal((12, 4, 5), (first.X, first.Y, first.Turn));
+        Assert.Equal((11, 12, 6, 6), (first.Matched, first.Corners, first.TilesAgree, first.Tiles));
+        Assert.Equal([(14, 7)], search.Misses[0].Corners);
+        Assert.Equal(1, search.Fits);
+        Assert.Contains(search.Candidates, one => (one.X, one.Y, one.Turn) == (16, 1, 0) && one.Exact && one.TilesAgree == 0);
+    }
+
+    /// <summary>
+    /// Over walkable ground only, a placement covering none is left out - the room of pure scenery among them, which is why it is a choice.
+    /// </summary>
+    /// <remarks>
+    /// The test area's room is pressed into the wall, right of the walkable floor: asked for walkable
+    /// ground only, the search leaves it out and lists only places reaching the floor; asked for
+    /// anywhere, or given a mask with no walkable tile at all, it finds the room.
+    /// </remarks>
+    [Fact]
+    public void OVERWALKABLEGROUNDOnlyAPlaceCoveringNoneIsLeftOut()
+    {
+        (TerrainGroundTypes ground, TerrainGrid walkable) = Area(withRoom: true, decoy: true);
+        (TerrainTiles laid, Dictionary<string, TileIdentity> identities) = RoomAndDecoyTiles();
+        RoomLayout room = RoomLayout.Parse(Room(Pattern, 3, 2));
+        bool[] mask = walkable.WalkableTileMask();
+        Assert.True(mask[(4 * TilesX) + Floor - 1]);
+        Assert.False(mask[(4 * TilesX) + Floor]);
+
+        RoomSearch standing = RoomFinder.Find(room, ground, TilesX, TilesY, laid, path => identities.GetValueOrDefault(path), walkable: mask);
+
+        Assert.True(standing.Standing);
+        Assert.NotEmpty(standing.Candidates);
+        Assert.All(standing.Candidates, one => Assert.True(one.X < Floor, $"{one} covers no walkable tile"));
+        Assert.Equal(0, standing.Fits);
+
+        RoomSearch anywhere = RoomFinder.Find(room, ground, TilesX, TilesY, laid, path => identities.GetValueOrDefault(path));
+        Assert.False(anywhere.Standing);
+        Assert.Equal((12, 4, 5), (anywhere.Candidates[0].X, anywhere.Candidates[0].Y, anywhere.Candidates[0].Turn));
+
+        RoomSearch nowhere = RoomFinder.Find(room, ground, TilesX, TilesY, laid, path => identities.GetValueOrDefault(path), walkable: new bool[TilesX * TilesY]);
+        Assert.False(nowhere.Standing);
+        Assert.Equal(anywhere.Candidates, nowhere.Candidates);
     }
 
     /// <summary>
@@ -250,7 +312,8 @@ public class RoomFinderTests
         RoomSearch search = RoomFinder.Find(room, ground, TilesX, TilesY, Laid(paths, ids), path => identities.GetValueOrDefault(path));
 
         Assert.Equal(1, search.Left);
-        RoomCandidate found = Assert.Single(search.Candidates);
+        Assert.Equal(1, search.Fits);
+        RoomCandidate found = search.Candidates[0];
         Assert.Equal((12, 4, 5), (found.X, found.Y, found.Turn));
         Assert.Equal((1, 1), (found.BigAgree, found.Big));
         Assert.Equal((6, 6), (found.TilesAgree, found.Tiles));
