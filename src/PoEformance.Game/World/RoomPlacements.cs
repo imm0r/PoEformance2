@@ -50,6 +50,9 @@ internal sealed class RoomPlacements
     /// <summary>Per turn, each slot's cell within the footprint.</summary>
     private readonly (int X, int Y)[][] _cellXy = new (int, int)[8][];
 
+    /// <summary>Per turn, each slot's cell as an offset into the tiles' ids from the placement's corner.</summary>
+    private readonly int[][] _cellAt = new int[8][];
+
     /// <summary>Per slot, what it asks for - one instance per kind of slot.</summary>
     private readonly Wanted[] _slotWants = [];
 
@@ -157,12 +160,15 @@ internal sealed class RoomPlacements
         for (var turn = 0; turn < 8; turn++)
         {
             var cells = new (int, int)[slots.Count];
+            var offsets = new int[slots.Count];
             for (var one = 0; one < slots.Count; one++)
             {
                 cells[one] = RoomFinder.CellOf(slots[one].Column, slots[one].Line, room.Width, room.Height, turn);
+                offsets[one] = (cells[one].Item2 * tilesX) + cells[one].Item1;
             }
 
             _cellXy[turn] = cells;
+            _cellAt[turn] = offsets;
         }
     }
 
@@ -195,6 +201,7 @@ internal sealed class RoomPlacements
     /// <summary>
     /// The placement's slots against the tiles laid under them; false, and the counts unfinished, as soon as fewer than <paramref name="least"/> could agree.
     /// </summary>
+    /// <remarks>The placement must lie inside the area, as every one the search and the probe try does: the ids are read without a bounds check of their own.</remarks>
     public bool Tiles(int x, int y, int turn, int least, out int tiles, out int agree, out int big, out int bigAgree)
     {
         tiles = agree = big = bigAgree = 0;
@@ -203,8 +210,10 @@ internal sealed class RoomPlacements
             return least <= 0;
         }
 
-        (int X, int Y)[] cells = _cellXy[turn];
-        int count = cells.Length;
+        int[] offsets = _cellAt[turn];
+        int[] ids = _tiles.Ids;
+        int at = (y * _tilesX) + x;
+        int count = offsets.Length;
         int files = _laid.Length;
         for (var one = 0; one < count; one++)
         {
@@ -213,7 +222,7 @@ internal sealed class RoomPlacements
                 return false;
             }
 
-            int id = _tiles.IdAt(x + cells[one].X, y + cells[one].Y);
+            int id = ids[at + offsets[one]];
             if ((uint)id >= (uint)files)
             {
                 continue;
@@ -302,9 +311,8 @@ internal sealed class RoomPlacements
     /// The best placement whose footprint covers a tile - most tiles agreeing, then most corners, the earliest on a tie - or null.
     /// </summary>
     /// <remarks>
-    /// TILES FIRST HERE, where the list ranks corners first: this is the probe for a room whose place
-    /// is known, and the tile check is the one with no convention in it - unordered sizes, sets of
-    /// edges and grounds - so it is the fairer judge of which placement under a person is the room.
+    /// THE LIST'S OWN ORDER, over the placements that cover one tile: whatever the list ranks first
+    /// elsewhere, this is what the same yardstick says about the place a person knows the room to be.
     /// </remarks>
     public RoomPlace? Around(int tileX, int tileY)
     {

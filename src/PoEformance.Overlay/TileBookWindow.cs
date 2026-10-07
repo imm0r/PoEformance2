@@ -172,11 +172,22 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     private RoomSearch? _probedIn;
     private (int X, int Y) _probedAt = (-1, -1);
 
+    /// <summary>Whether the room search lists places covering no walkable ground too, and whether the search in hand did.</summary>
+    private bool _anywhere;
+    private bool _searchedAnywhere;
+
     /// <summary>Whether a room places the level editor's tools, as the box has it - what the settings keep.</summary>
     public bool Tools
     {
         get => _tools;
         set => _tools = value;
+    }
+
+    /// <summary>Whether the room search lists places covering no walkable ground too, as the box has it - what the settings keep.</summary>
+    public bool Anywhere
+    {
+        get => _anywhere;
+        set => _anywhere = value;
     }
 
     /// <inheritdoc/>
@@ -432,13 +443,13 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     }
 
     /// <summary>
-    /// Where in the current area a room it loaded was laid: found by its ground, listed, and outlined on the large map when picked.
+    /// Where in the current area a room it loaded was laid: found by its tiles and ground, listed, and outlined on the large map when picked.
     /// </summary>
     /// <remarks>
-    /// OFF THE FRAME, once per room and area: the search tries the room eight ways round at every
-    /// tile corner of the area, which is cheap per try and not per frame. A room found in several
-    /// places lists them all - the map is where a person tells them apart - and one found nowhere
-    /// exactly lists the nearest with how many corners they miss by. See RoomFinder.
+    /// OFF THE FRAME, once per room, area and choice of ground: the search tries the room eight ways
+    /// round at every tile corner of the area, which is cheap per try and not per frame. The list is
+    /// best first, with what each place agrees on - the map is where a person tells them apart. See
+    /// RoomFinder.
     /// </remarks>
     private void Whereabouts(string room)
     {
@@ -455,10 +466,25 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             _identities = new ConcurrentDictionary<string, TileIdentity?>(StringComparer.OrdinalIgnoreCase);
         }
 
-        if (!ReferenceEquals(grid, _searchedIn) || !string.Equals(room, _searchedFor, StringComparison.Ordinal))
+        if (ImGui.Checkbox("anywhere##roomanywhere", ref _anywhere))
+        {
+            Changed?.Invoke();
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("Off, the usual: only places whose footprint covers ground somebody can stand on are listed -"
+                + " the void past the map's edge fits a room's rim hundreds of times over.\n"
+                + "On: every place, for a room of pure scenery that covers no walkable ground.");
+        }
+
+        ImGui.SameLine();
+
+        if (!ReferenceEquals(grid, _searchedIn) || !string.Equals(room, _searchedFor, StringComparison.Ordinal) || _anywhere != _searchedAnywhere)
         {
             _searchedIn = grid;
             _searchedFor = room;
+            _searchedAnywhere = _anywhere;
             _found = null;
             _ghosted = -1;
             _around = null;
@@ -472,7 +498,9 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             // EACH TILE FILE ONCE PER AREA, its inheritance followed, whichever room's search reads it first.
             ConcurrentDictionary<string, TileIdentity?> known = _identities;
             TileIdentity? Identity(string path) => known.GetOrAdd(path, one => TileIdentity.Of(TileModels.Defined(read, one).Definition));
-            _searching = Task.Run(() => RoomFinder.Find(RoomLayout.Read(read(room)), ground, wide, tall, laid, Identity));
+            bool anywhere = _anywhere;
+            _searching = Task.Run(() => RoomFinder.Find(
+                RoomLayout.Read(read(room)), ground, wide, tall, laid, Identity, walkable: anywhere ? null : grid.WalkableTileMask()));
         }
 
         if (_found is null && _searching is { IsCompleted: true } done)
@@ -505,19 +533,19 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             left += string.Create(CultureInfo.InvariantCulture, $"; {found.Free} corners the room leaves unnamed are free");
         }
 
-        if (found.TileChecked)
-        {
-            left += "; ranked by the tiles laid";
-        }
+        string standing = found.Standing ? " over walkable ground" : string.Empty;
 
         // THE BEST SHARE SAID OUTRIGHT where nothing fits: a "nearest" agreeing on under half its
         // corners is no place at all, and the outline would otherwise read as a claim.
         int best = found.Candidates.Count > 0 ? Share(found.Candidates[0]) : 0;
-        ImGui.TextDisabled(ImGuiText.Escape(found.Found
+        ImGui.TextDisabled(ImGuiText.Escape(found.TileChecked
             ? string.Create(CultureInfo.InvariantCulture,
-                $"where it lies: {found.Fits} place{(found.Fits == 1 ? string.Empty : "s")} fit all {found.Corners} corners{left} - pick one to outline it on the large map")
-            : string.Create(CultureInfo.InvariantCulture,
-                $"where it lies: nowhere fits all {found.Corners} corners{left}; the nearest agrees on {best}% - pick one to see where it parts:")));
+                $"where it lies: places{standing} ranked by the tiles laid, then the corners - {found.Fits} fit all {found.Corners} corners{left}; pick one to outline it on the large map")
+            : found.Found
+                ? string.Create(CultureInfo.InvariantCulture,
+                    $"where it lies: {found.Fits} place{(found.Fits == 1 ? string.Empty : "s")}{standing} fit all {found.Corners} corners{left} - pick one to outline it on the large map")
+                : string.Create(CultureInfo.InvariantCulture,
+                    $"where it lies: nowhere{standing} fits all {found.Corners} corners{left}; the nearest agrees on {best}% - pick one to see where it parts:")));
 
         Around(grid, room, found);
 
@@ -558,7 +586,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     private const string RowSaid = "Corners: the room's ground types against the ground laid at every tile corner.\n"
         + "Tiles: each of the room's slots against the tile laid where it falls - size, tag, edge and ground types, whichever way round.\n"
         + "Big: the slots bigger than one tile, which the ground leaves out and which make a room this room.\n"
-        + "Places that fit every corner are ranked by their tiles.\n"
+        + "Places are ranked by their tiles, then their corners: where a room lies, the area lays its own tiles along the sides it joins the map by.\n"
         + "On the map, red dots are corners that disagree and orange rings tiles that do.";
 
     /// <summary>A candidate in a row's words.</summary>

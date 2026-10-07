@@ -181,6 +181,10 @@ public sealed record OverlaySettings(
     // game does not draw. Off, the usual, hides them. See RoomModels.IsTool.
     [property: JsonPropertyName("roomTools")] bool RoomTools = false,
 
+    // Whether the tile book's room search also lists places covering no walkable ground. Off, the
+    // usual, leaves out the void past the map's edge; on finds a room of pure scenery. See RoomFinder.
+    [property: JsonPropertyName("roomAnywhere")] bool RoomAnywhere = false,
+
     // And the effect book's, kept apart for the same reason. See EffectBookWindow.
     [property: JsonPropertyName("effectColumns")] IReadOnlyList<string>? EffectColumns = null,
     [property: JsonPropertyName("effectColumnWidths")] IReadOnlyDictionary<string, int>? EffectColumnWidths = null,

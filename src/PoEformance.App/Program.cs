@@ -3480,7 +3480,8 @@ internal static class Program
             columnWidths: settings.TileColumnWidths,
             panes: settings.TilePanes,
             roomDoodads: settings.RoomDoodads,
-            roomTools: settings.RoomTools);
+            roomTools: settings.RoomTools,
+            roomAnywhere: settings.RoomAnywhere);
         overlay.AttachPointsOfInterest(route);
 
         // Before the editor, which is handed this exact instance - and before the layers read
