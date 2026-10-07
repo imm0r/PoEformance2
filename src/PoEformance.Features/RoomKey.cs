@@ -13,8 +13,12 @@ namespace PoEformance.Features;
 /// <param name="Path">The room's <c>.arm</c>.</param>
 /// <param name="Doodads">Most doodads placed - see <see cref="RoomModels.UsualDoodads"/>.</param>
 /// <param name="Tools">Whether the level editor's tools are placed too - see <see cref="RoomModels.IsTool"/>.</param>
-public readonly record struct RoomKey(string Path, int Doodads = RoomModels.UsualDoodads, bool Tools = false)
+/// <param name="Laid">Where the room is drawn as the area laid it - "x,y,turn,area" - or empty for the room as its file has it; see LaidRoomModels.</param>
+public readonly record struct RoomKey(string Path, int Doodads = RoomModels.UsualDoodads, bool Tools = false, string Laid = "")
 {
+    /// <summary>What starts the word naming the place the room is laid at.</summary>
+    public const string LaidWord = "laid=";
+
     /// <summary>What starts the word naming the cap; its number follows.</summary>
     public const string DoodadsWord = "doodads=";
 
@@ -24,18 +28,46 @@ public readonly record struct RoomKey(string Path, int Doodads = RoomModels.Usua
     /// <summary>The key as a string - the bare path at the usual choices.</summary>
     public override string ToString()
     {
-        if (Doodads == RoomModels.UsualDoodads && !Tools)
+        if (Doodads == RoomModels.UsualDoodads && !Tools && Laid.Length == 0)
         {
             return Path;
         }
 
-        string doodads = Doodads == RoomModels.UsualDoodads
-            ? string.Empty
-            : string.Create(CultureInfo.InvariantCulture, $"{DoodadsWord}{Doodads}");
-        string tools = Tools ? ToolsWord : string.Empty;
-        string between = doodads.Length > 0 && tools.Length > 0 ? TileKey.WordMark.ToString() : string.Empty;
-        return string.Concat(Path, TileKey.Mark.ToString(), doodads, between, tools);
+        var words = new List<string>(3);
+        if (Doodads != RoomModels.UsualDoodads)
+        {
+            words.Add(string.Create(CultureInfo.InvariantCulture, $"{DoodadsWord}{Doodads}"));
+        }
+
+        if (Tools)
+        {
+            words.Add(ToolsWord);
+        }
+
+        if (Laid.Length > 0)
+        {
+            words.Add(LaidWord + Laid);
+        }
+
+        return string.Concat(Path, TileKey.Mark.ToString(), string.Join(TileKey.WordMark, words));
     }
+
+    /// <summary>The place the room is laid at, read out of <see cref="Laid"/> - false where it names none or does not read.</summary>
+    public bool TryLaid(out int x, out int y, out int turn, out int area)
+    {
+        x = y = turn = area = 0;
+        string[] parts = Laid.Split(',');
+        return parts.Length == 4
+            && int.TryParse(parts[0], NumberStyles.None, CultureInfo.InvariantCulture, out x)
+            && int.TryParse(parts[1], NumberStyles.None, CultureInfo.InvariantCulture, out y)
+            && int.TryParse(parts[2], NumberStyles.None, CultureInfo.InvariantCulture, out turn)
+            && turn is >= 0 and < 8
+            && int.TryParse(parts[3], NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out area);
+    }
+
+    /// <summary>A place written the way <see cref="Laid"/> holds it.</summary>
+    public static string LaidAt(int x, int y, int turn, int area)
+        => string.Create(CultureInfo.InvariantCulture, $"{x},{y},{turn},{area}");
 
     /// <summary>A key read back. A cap outside the slider's ends, or a word this does not know, leaves the usual.</summary>
     public static RoomKey Read(string key)
@@ -49,6 +81,7 @@ public readonly record struct RoomKey(string Path, int Doodads = RoomModels.Usua
 
         int doodads = RoomModels.UsualDoodads;
         var tools = false;
+        string laid = string.Empty;
         ReadOnlySpan<char> words = key.AsSpan(mark + 1);
         foreach (Range one in words.Split(TileKey.WordMark))
         {
@@ -63,8 +96,13 @@ public readonly record struct RoomKey(string Path, int Doodads = RoomModels.Usua
             {
                 tools = true;
             }
+            else if (word.StartsWith(LaidWord, StringComparison.Ordinal))
+            {
+                laid = word[LaidWord.Length..].ToString();
+            }
         }
 
-        return new RoomKey(key[..mark], doodads, tools);
+        RoomKey read = new(key[..mark], doodads, tools, laid);
+        return read.Laid.Length == 0 || read.TryLaid(out _, out _, out _, out _) ? read : read with { Laid = string.Empty };
     }
 }

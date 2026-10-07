@@ -317,6 +317,17 @@ public class RoomLayoutTests
         Assert.Equal(new RoomKey(path, 800, Tools: true), RoomKey.Read(path + "|doodads=800+tools"));
         Assert.Equal(new RoomKey(path, Tools: true), RoomKey.Read(path + "|tools"));
         Assert.False(RoomKey.Read(path + "|doodads=800").Tools);
+
+        // AND THE PLACE IT IS LAID AT, read back whole - and one that does not read is dropped, not half-kept.
+        string laid = RoomKey.LaidAt(13, 21, 7, -12345);
+        var key = new RoomKey(path, 800, Tools: true, Laid: laid);
+        Assert.Equal(path + "|doodads=800+tools+laid=13,21,7,-12345", key.ToString());
+        Assert.Equal(key, RoomKey.Read(key.ToString()));
+        Assert.True(RoomKey.Read(key.ToString()).TryLaid(out int x, out int y, out int turn, out int area));
+        Assert.Equal((13, 21, 7, -12345), (x, y, turn, area));
+        Assert.Equal(string.Empty, RoomKey.Read(path + "|laid=13,21,9,5").Laid);
+        Assert.Equal(string.Empty, RoomKey.Read(path + "|laid=nowhere").Laid);
+        Assert.False(new RoomKey(path).TryLaid(out _, out _, out _, out _));
     }
 
     /// <summary>

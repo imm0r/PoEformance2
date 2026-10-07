@@ -105,6 +105,38 @@ public static class TileModels
             return MonsterModel.None with { Why = "no tile to read" };
         }
 
+        return Built(read, path, ground, walls, shaded, swaps, tileset, laid, paints: null, apart: false).Model;
+    }
+
+    /// <summary>
+    /// One tile as a room laid from the area's own tiles takes it: the props painted, the ground apart and unturned, and the template's size.
+    /// </summary>
+    /// <remarks>
+    /// THE GROUND APART because the room needs it twice: drawn, and asked how high it is at a point,
+    /// which is how the room sets each piece on the area's own ground. The props come back as
+    /// MonsterModel.None where the tile is ground and nothing else - a floor tile - with its ground
+    /// still given. One paint cache for every tile of a room, as a room's doodads share one.
+    /// </remarks>
+    internal static (MonsterModel Props, SkinnedMesh Ground, int Width, int Height) Apart(
+        Func<string, byte[]?> read, string path, bool walls, MonsterModels.Paints paints)
+    {
+        (MonsterModel model, SkinnedMesh ground, int wide, int tall) = Built(read, path, true, walls, false, null, string.Empty, default, paints, apart: true);
+        return (model, ground, wide, tall);
+    }
+
+    /// <summary>The walk behind <see cref="Of"/> and <see cref="Apart"/>.</summary>
+    private static (MonsterModel Model, SkinnedMesh Ground, int Width, int Height) Built(
+        Func<string, byte[]?> read,
+        string path,
+        bool ground,
+        bool walls,
+        bool shaded,
+        IReadOnlyDictionary<string, string>? swaps,
+        string tileset,
+        TileOrientation laid,
+        MonsterModels.Paints? paints,
+        bool apart)
+    {
         long bytes = 0;
         var files = 0;
         byte[]? Counted(string one)
@@ -122,13 +154,16 @@ public static class TileModels
         (TileDefinition definition, string why) = Defined(Counted, path);
         if (!definition.Ready || definition.Templates.Count == 0)
         {
-            return MonsterModel.None with
+            return (MonsterModel.None with
             {
                 Why = why.Length > 0 ? why : $"the tile names no template: {path}",
                 Bytes = bytes,
                 Files = files,
-            };
+            }, SkinnedMesh.None, 0, 0);
         }
+
+        int wide = 0;
+        int tall = 0;
 
         var joins = new List<MeshJoin>();
         var grounds = new List<MeshJoin>();
@@ -153,6 +188,9 @@ public static class TileModels
                 said.Add($"the template says {layout.Width}x{layout.Height} sub-tiles: {template}");
                 continue;
             }
+
+            wide = Math.Max(wide, layout.Width);
+            tall = Math.Max(tall, layout.Height);
 
             for (var y = 1; y <= layout.Height; y++)
             {
@@ -189,17 +227,28 @@ public static class TileModels
         }
 
         // THE GROUND AFTER THE PROPS, so the props' shapes keep the numbers the runs gave them and
-        // every ground shape comes after - unnamed, and so unpainted.
-        joins.AddRange(grounds);
+        // every ground shape comes after - unnamed, and so unpainted. Or apart, where asked.
+        SkinnedMesh groundApart = SkinnedMesh.None;
+        if (apart)
+        {
+            groundApart = SkinnedMesh.Joined(grounds);
+        }
+        else
+        {
+            joins.AddRange(grounds);
+        }
+
         SkinnedMesh joined = Numbered(SkinnedMesh.Joined(joins));
         if (!joined.Ready)
         {
-            return MonsterModel.None with
+            return (MonsterModel.None with
             {
-                Why = said.Count > 0 ? said[0] : $"the tile's sub-tiles hold no geometry: {path}",
+                Why = apart && groundApart.Ready
+                    ? $"the tile is ground and nothing else: {path}"
+                    : said.Count > 0 ? said[0] : $"the tile's sub-tiles hold no geometry: {path}",
                 Bytes = bytes,
                 Files = files,
-            };
+            }, groundApart, wide, tall);
         }
 
         // A WALK THAT DID NOT END AT THE END OF THE FILE IS SAID, not hidden: the props drew because
@@ -214,7 +263,7 @@ public static class TileModels
         // most of what a tile costs to open - and Bytes promises to include them. Handed the bare
         // reader, Worn's .mat and .dds reads went uncounted and the line under the picture said
         // a tile was a few kilobytes of geometry.
-        var paints = new MonsterModels.Paints();
+        paints ??= new MonsterModels.Paints();
         MonsterModel model = MonsterModels.Worn(Counted, joined, named, paintTheRest: false, path, move, paints) with
         {
             Bytes = bytes,
@@ -229,7 +278,7 @@ public static class TileModels
         // THE WALLS GO BEFORE THE GRAPHS ARE READ, so a material only the walls wear is not compiled
         // for nothing.
         model = walls ? model : Unwalled(model);
-        return shaded ? MonsterModels.Shaded(Counted, model, paints) : model;
+        return (shaded ? MonsterModels.Shaded(Counted, model, paints) : model, groundApart, wide, tall);
     }
 
     /// <summary>

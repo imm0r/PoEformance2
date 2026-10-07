@@ -164,19 +164,86 @@ public static class RoomModels
             return MonsterModel.None with { Why = $"the room places no doodads: {path}", Bytes = bytes, Files = files };
         }
 
-        // ONE LOAD PER MODEL, keyed by its file: a room places the same tree or rock dozens of times.
-        // AND ONE TEXTURE CACHE FOR ALL OF THEM, because two different doodads sharing a material -
-        // the rock and the stump on one sheet - are one decode and one upload, not one each.
-        var models = new Dictionary<string, MonsterModel>(StringComparer.OrdinalIgnoreCase);
         var paints = new MonsterModels.Paints();
-        var joins = new List<MeshJoin>();
-        var skins = new List<Mipmaps?>();
-        var modes = new List<string>();
-        var lastModes = new List<string>();
-        var wearing = new List<string>();
-        var textures = new List<string>();
+        var pile = new ModelPile();
+        Doodads laid = Lay(room, Counted, paints, pile, doodads, tools, beyond: null);
+
+        SkinnedMesh joined = SkinnedMesh.Joined(pile.Joins);
+        if (!joined.Ready)
+        {
+            return MonsterModel.None with
+            {
+                Why = laid.FirstMissing.Length > 0
+                    ? $"none of the room's doodads drew; the first: {laid.FirstMissing}"
+                    : laid.Hidden > 0 && laid.Placed == 0
+                        ? $"the room places only the level editor's tools, which are hidden: {path}"
+                        : $"the room's doodads hold no geometry: {path}",
+                Bytes = bytes,
+                Files = files,
+            };
+        }
+
+        var said = new List<string> { SpreadOf(room).Say };
+        said.AddRange(laid.Said());
+        MonsterModel model = Piled(joined, pile, path, laid.Models) with
+        {
+            Parts = laid.Placed,
+            Bytes = bytes,
+            Files = files,
+            Move = string.Join("; ", said),
+        };
+
+        // THE GRAPHS ONCE, OVER THE JOINED ROOM: every doodad's materials are in the one list, and a
+        // material two doodads share is compiled once through the shared cache.
+        return shaded ? MonsterModels.Shaded(Counted, model, paints) : model;
+    }
+
+    /// <summary>What laying a room's doodads came to.</summary>
+    internal sealed record Doodads(
+        int Placed, int Missing, int Capped, int Hidden, string FirstMissing, int Most, long MostTriangles, IReadOnlyCollection<MonsterModel> Models)
+    {
+        /// <summary>The lines under the picture about what did not draw, and why.</summary>
+        public IEnumerable<string> Said()
+        {
+            if (Missing > 0)
+            {
+                yield return string.Create(CultureInfo.InvariantCulture, $"{Missing} doodads did not draw; the first: {FirstMissing}");
+            }
+
+            if (Hidden > 0)
+            {
+                yield return string.Create(CultureInfo.InvariantCulture,
+                    $"{Hidden} of the level editor's tools hidden - walk blockers and markers the game does not draw; \"tools\" shows them");
+            }
+
+            if (Capped > 0)
+            {
+                yield return string.Create(CultureInfo.InvariantCulture,
+                    $"{Capped} more left out to keep it turnable - {Most} doodads or {MostTriangles} triangles; the doodads slider raises it");
+            }
+        }
+    }
+
+    /// <summary>
+    /// A room's doodads laid into a pile, each where the room puts it and then by <paramref name="beyond"/> - the room as laid in an area - or nowhere further.
+    /// </summary>
+    /// <remarks>
+    /// ONE LOAD PER MODEL, keyed by its file: a room places the same tree or rock dozens of times. AND
+    /// ONE TEXTURE CACHE FOR ALL OF THEM, because two different doodads sharing a material - the rock
+    /// and the stump on one sheet - are one decode and one upload, not one each.
+    /// </remarks>
+    internal static Doodads Lay(
+        RoomLayout room,
+        Func<string, byte[]?> counted,
+        MonsterModels.Paints paints,
+        ModelPile pile,
+        int doodads,
+        bool tools,
+        Func<RoomDoodad, Matrix4x4>? beyond)
+    {
+        var models = new Dictionary<string, MonsterModel>(StringComparer.OrdinalIgnoreCase);
         float size = CellSize;
-        var triangles = 0;
+        long triangles = 0;
         int placed = 0, missing = 0, capped = 0, hidden = 0;
         int mostDoodads = doodads > 0 ? doodads : UsualDoodads;
         long mostTriangles = (long)mostDoodads * TrianglesPerDoodad;
@@ -197,7 +264,7 @@ public static class RoomModels
 
             if (!models.TryGetValue(one.Ao, out MonsterModel? model))
             {
-                model = MonsterModels.OfFiles(Counted, [one.Ao], wearing: true, paints);
+                model = MonsterModels.OfFiles(counted, [one.Ao], wearing: true, paints);
                 models[one.Ao] = model;
             }
 
@@ -222,79 +289,38 @@ public static class RoomModels
             Matrix4x4 place = Matrix4x4.CreateScale(scale)
                 * Matrix4x4.CreateRotationZ(one.Turn)
                 * Matrix4x4.CreateTranslation(one.X * size, one.Y * size, 0f);
-            joins.Add(new MeshJoin(model.Mesh, null, null, place));
-
-            // ONE SKIN PER SHAPE, in the order the join lays the shapes down - the model's own list,
-            // or its single skin repeated where it never had a list.
-            for (var shape = 0; shape < model.Mesh.Shapes.Count; shape++)
+            if (beyond is not null)
             {
-                skins.Add(shape < model.Skins.Count ? model.Skins[shape] : model.Skin);
-                modes.Add(shape < model.Modes.Count ? model.Modes[shape] : string.Empty);
-                lastModes.Add(shape < model.LastModes.Count ? model.LastModes[shape] : modes[^1]);
-                wearing.Add(shape < model.ShapeMaterials.Count ? model.ShapeMaterials[shape] : string.Empty);
-                textures.Add(shape < model.ShapeTextures.Count ? model.ShapeTextures[shape] : string.Empty);
+                place *= beyond(one);
             }
 
+            pile.Add(model, place);
             triangles += model.Mesh.Triangles;
             placed++;
         }
 
-        SkinnedMesh joined = SkinnedMesh.Joined(joins);
-        if (!joined.Ready)
-        {
-            return MonsterModel.None with
-            {
-                Why = firstMissing.Length > 0
-                    ? $"none of the room's doodads drew; the first: {firstMissing}"
-                    : hidden > 0 && placed == 0
-                        ? $"the room places only the level editor's tools, which are hidden: {path}"
-                        : $"the room's doodads hold no geometry: {path}",
-                Bytes = bytes,
-                Files = files,
-            };
-        }
+        return new Doodads(placed, missing, capped, hidden, firstMissing, mostDoodads, mostTriangles, models.Values);
+    }
 
-        var said = new List<string> { SpreadOf(room).Say };
-        if (missing > 0)
+    /// <summary>A pile joined into a room's model, with the shaders and meshes of the models in it.</summary>
+    internal static MonsterModel Piled(SkinnedMesh joined, ModelPile pile, string path, IEnumerable<MonsterModel> models)
+    {
+        MonsterModel[] all = [.. models];
+        return new MonsterModel(joined, pile.Skins.FirstOrDefault(one => one is not null), path, string.Empty, string.Empty)
         {
-            said.Add(string.Create(CultureInfo.InvariantCulture, $"{missing} doodads did not draw; the first: {firstMissing}"));
-        }
-
-        if (hidden > 0)
-        {
-            said.Add(string.Create(CultureInfo.InvariantCulture,
-                $"{hidden} of the level editor's tools hidden - walk blockers and markers the game does not draw; \"tools\" shows them"));
-        }
-
-        if (capped > 0)
-        {
-            said.Add(string.Create(CultureInfo.InvariantCulture,
-                $"{capped} more left out to keep it turnable - {mostDoodads} doodads or {mostTriangles} triangles; the doodads slider raises it"));
-        }
-
-        var laid = new MonsterModel(joined, skins.FirstOrDefault(one => one is not null), path, string.Empty, string.Empty)
-        {
-            Skins = skins,
-            Modes = modes,
-            LastModes = lastModes,
-            ShapeMaterials = wearing,
+            Skins = pile.Skins,
+            Modes = pile.Modes,
+            LastModes = pile.LastModes,
+            ShapeMaterials = pile.Wearing,
 
             // CARRIED LIKE THE MATERIALS, so the dump's "tex" column names each doodad's colour map;
             // left out, every room shape read "tex -" whether it was textured or not.
-            ShapeTextures = textures,
+            ShapeTextures = pile.Textures,
             BodyLeast = joined.Least,
             BodyMost = joined.Most,
-            Parts = placed,
             Kind = ModelKind.Room,
-            Bytes = bytes,
-            Files = files,
-            Move = string.Join("; ", said),
-            Shaders = [.. models.Values.SelectMany(one => one.Shaders).Distinct(StringComparer.OrdinalIgnoreCase)],
-            Meshes = [.. models.Values.Where(one => one.Ready).Select(one => new MeshNamed(one.Mesh_, one.BodyFacts)).Distinct()],
+            Shaders = [.. all.SelectMany(one => one.Shaders).Distinct(StringComparer.OrdinalIgnoreCase)],
+            Meshes = [.. all.Where(one => one.Ready).Select(one => new MeshNamed(one.Mesh_, one.BodyFacts)).Distinct()],
         };
-
-        // THE GRAPHS ONCE, OVER THE JOINED ROOM: every doodad's materials are in the one list, and a
-        // material two doodads share is compiled once through the shared cache.
-        return shaded ? MonsterModels.Shaded(Counted, laid, paints) : laid;
     }
 }
