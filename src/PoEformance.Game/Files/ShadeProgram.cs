@@ -74,6 +74,17 @@ public sealed record ShadeCompile(ShadeProgram? Program, IReadOnlyList<string> S
 /// CombineTbnNormals whose two scales (default 1) are both left out, which as nought would flatten
 /// every normal map in the game. For most parameters the default is nought, and nothing changes.
 ///
+/// AN IN-PORT LEFT UNLINKED READS NOUGHT. The fragment language declares no default for an in-port -
+/// If's five are bare <c>in float</c> - so whatever the engine hands an unlinked one, it hands every
+/// port of that type alike, and the game's own graphs say what that is. TwoMaterialVertexBlend picks
+/// one vertex colour channel by its <c>Set_VertexChannel</c> parameter, declared 1 to 4, through
+/// three If nodes that each link only some of their branches: only with nought on the unlinked ones
+/// does 1 pick x, 2 y, 3 z and 4 w - with anything else the parameter mixes channels, or picks w
+/// whatever it says. MASK_TextureStatic leaves TileGroundUVs' <c>bool scroll</c> unlinked, and a
+/// static mask that scrolled would not be one. A texture port is not a value and stays refused
+/// unlinked; a node with nothing linked into it at all is another question, and a writer like that
+/// is still taken to write nothing (see Fed).
+///
 /// ONLY THE COLOUR'S XYZ IS DRAWN - the renderer runs a program on opaque triangles alone and takes
 /// three components - so a colour's w is compiled apart from its xyz: where the w cannot be (a
 /// soft particle's fade by the depth behind it) the colour stands and its w is marked unset, and a
@@ -1857,7 +1868,8 @@ public sealed class ShadeProgram
             }
         }
 
-        /// <summary>The register holding what arrives on one port, or null.</summary>
+        /// <summary>The register holding what arrives on one port - nought where nothing is linked to it - or null.</summary>
+        /// <remarks>See the class remarks for why an unlinked port reads nought.</remarks>
         public int? Port(ShaderNode node, string port)
         {
             var links = new List<ShaderLink>();
@@ -1869,7 +1881,7 @@ public sealed class ShadeProgram
                 }
             }
 
-            return links.Count == 0 ? Fail($"{node.Type} with nothing on {port}") : Assembled(node, port, links, -1);
+            return links.Count == 0 ? build.Constant(Vector4.Zero) : Assembled(node, port, links, -1);
         }
 
         /// <summary>
@@ -2949,11 +2961,16 @@ public sealed class ShadeProgram
             return said;
         }
 
-        /// <summary>A one-input node's input, whatever its port is called - there is only the one.</summary>
+        /// <summary>A one-input node's input, whatever its port is called - there is only the one, and nought where it is unlinked.</summary>
         private int? Single(ShaderNode node)
         {
             string[] ports = [.. lookup.Into(node).Select(one => one.Target.Variable).Distinct(StringComparer.Ordinal)];
-            return ports.Length == 1 ? Port(node, ports[0]) : Fail($"{node.Type} with {ports.Length} inputs");
+            return ports.Length switch
+            {
+                0 => build.Constant(Vector4.Zero),
+                1 => Port(node, ports[0]),
+                _ => Fail($"{node.Type} with {ports.Length} inputs"),
+            };
         }
 
         /// <summary>The texture an InputTexture hands a node through its texture port - <c>in_texture</c>, or <c>tex</c> on the dispersed read.</summary>

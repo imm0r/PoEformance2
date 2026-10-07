@@ -435,6 +435,35 @@ public class MeshPictureTests
         Assert.Equal(64, new MeshPicture.Canvas(8, 1000).Threads);
     }
 
+    /// <summary>Two canvases drawn at once draw what each draws alone - the frame and the clock's drawing behind it.</summary>
+    /// <remarks>
+    /// WHAT THE PORTRAIT'S CLOCK RESTS ON: a picture the clock asks for is drawn on a task into a
+    /// canvas of its own while the frame may draw into its canvas, from the same mesh and skin. A
+    /// drawing that shared anything but what it only reads would show here as pixels that differ.
+    /// </remarks>
+    [Fact]
+    public void TwoCanvasesDrawnAtOnceDrawWhatEachDrawsAlone()
+    {
+        Mipmaps skin = Checkered(64);
+        SkinnedMesh mesh = Papered();
+        byte[] first = [.. MeshPicture.Of(mesh, new MeshPicture.Canvas(96), 0.5f, 0.4f, skin: skin).Rgba];
+        byte[] second = [.. MeshPicture.Of(mesh, new MeshPicture.Canvas(96), -0.8f, 0.1f, skin: skin).Rgba];
+
+        var frame = new MeshPicture.Canvas(96);
+        var behind = new MeshPicture.Canvas(96);
+        for (var round = 0; round < 16; round++)
+        {
+            GamePicture drawn = default;
+            GamePicture clocked = default;
+            Parallel.Invoke(
+                () => drawn = MeshPicture.Of(mesh, frame, 0.5f, 0.4f, skin: skin),
+                () => clocked = MeshPicture.Of(mesh, behind, -0.8f, 0.1f, skin: skin));
+
+            Assert.Equal(0, Differing(first, drawn.Rgba));
+            Assert.Equal(0, Differing(second, clocked.Rgba));
+        }
+    }
+
     /// <summary>No canvas is a mistake in the caller, not a picture of nothing.</summary>
     [Fact]
     public void DrawingWithoutACanvasSaysSo()

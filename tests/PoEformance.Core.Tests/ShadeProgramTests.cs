@@ -450,6 +450,126 @@ public class ShadeProgramTests
             0.9f, 0.2f, 0.4f);
     }
 
+    /// <summary>An If branch nothing is linked to reads nought - the engine's value for an unlinked in-port.</summary>
+    [Fact]
+    public void ANIFBranchLeftUnlinkedReadsNought()
+    {
+        // If 0 links only equals and stands greater; If 1 links only greater and stands lesser; If 2
+        // links nothing but a and b, which are equal.
+        AssertColour(Coordinates(
+            """
+              {"type":"ConstantFloat","index":0,"parameters":[{"value":0.7}]},
+              {"type":"ConstantFloat","index":1,"parameters":[{"value":0.3}]},
+              {"type":"ConstantFloat","index":2,"parameters":[{"value":0.5}]},
+              {"type":"ConstantFloat","index":3,"parameters":[{"value":0.9}]},
+              {"type":"If","index":0},
+              {"type":"If","index":1},
+              {"type":"If","index":2},
+            """,
+            """
+              {"src":{"type":"ConstantFloat","index":0,"variable":"output"},"dst":{"type":"If","index":0,"variable":"a"}},
+              {"src":{"type":"ConstantFloat","index":2,"variable":"output"},"dst":{"type":"If","index":0,"variable":"b"}},
+              {"src":{"type":"ConstantFloat","index":3,"variable":"output"},"dst":{"type":"If","index":0,"variable":"equals"}},
+              {"src":{"type":"ConstantFloat","index":1,"variable":"output"},"dst":{"type":"If","index":1,"variable":"a"}},
+              {"src":{"type":"ConstantFloat","index":2,"variable":"output"},"dst":{"type":"If","index":1,"variable":"b"}},
+              {"src":{"type":"ConstantFloat","index":3,"variable":"output"},"dst":{"type":"If","index":1,"variable":"greater"}},
+              {"src":{"type":"ConstantFloat","index":2,"variable":"output"},"dst":{"type":"If","index":2,"variable":"a"}},
+              {"src":{"type":"ConstantFloat","index":2,"variable":"output"},"dst":{"type":"If","index":2,"variable":"b"}},
+            """,
+            "If"),
+            0f, 0f, 0f);
+    }
+
+    /// <summary>
+    /// TwoMaterialVertexBlend's channel picker, its nodes and links exactly as the game's file holds
+    /// them: Set_VertexChannel 1 to 4 picks the vertex colour's x, y, z or w - which it does only
+    /// with nought on the branches its three If nodes leave unlinked.
+    /// </summary>
+    /// <remarks>
+    /// The proof that an unlinked port reads nought, as the game's own graph gives it: with one on
+    /// them every channel would pick w, and with anything between the channels would mix. The vertex
+    /// colour is a constant here, so that what is picked shows in the colour.
+    /// </remarks>
+    [Theory]
+    [InlineData(1f, 0.1f)]
+    [InlineData(2f, 0.3f)]
+    [InlineData(3f, 0.6f)]
+    [InlineData(4f, 0.9f)]
+    public void TWOMATERIALVERTEXBLENDPicksTheVertexChannelItsParameterNames(float channel, float picked)
+    {
+        string[] picker = ["ConstantFloat#5", "Round#1", "One#0", "Two#0", "Add#0", "If#0", "If#1", "If#3", "OneMinus#0", "Lerp#4", "Lerp#5", "Lerp#6"];
+        static string Key(System.Text.Json.Nodes.JsonNode end) => $"{end["type"]}#{end["index"]}";
+
+        var file = System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllText(Fixture("Metadata/Materials/Environment/TwoMaterialVertexBlend.fxgraph")))!;
+        var nodes = new System.Text.Json.Nodes.JsonArray();
+        foreach (System.Text.Json.Nodes.JsonNode? node in file["nodes"]!.AsArray())
+        {
+            if (picker.Contains(Key(node!)))
+            {
+                nodes.Add(node!.DeepClone());
+            }
+        }
+
+        var links = new System.Text.Json.Nodes.JsonArray();
+        foreach (System.Text.Json.Nodes.JsonNode? link in file["links"]!.AsArray())
+        {
+            if (!picker.Contains(Key(link!["dst"]!)))
+            {
+                continue;
+            }
+
+            System.Text.Json.Nodes.JsonNode kept = link.DeepClone();
+            if ((string?)kept["src"]!["type"] == "FromVertexColor")
+            {
+                kept["src"]!["type"] = "ConstantFloat4";
+            }
+
+            links.Add(kept);
+        }
+
+        Assert.Equal(picker.Length, nodes.Count);
+        Assert.Equal(22, links.Count);
+        nodes.Add(System.Text.Json.Nodes.JsonNode.Parse("""{"type":"ConstantFloat4","index":0,"parameters":[{"value":[0.1,0.3,0.6,0.9]}]}"""));
+        nodes.Add(System.Text.Json.Nodes.JsonNode.Parse("""{"type":"CoordsToFloat3","index":0}"""));
+        nodes.Add(System.Text.Json.Nodes.JsonNode.Parse(Albedo));
+        foreach (string axis in new[] { "x", "y", "z" })
+        {
+            links.Add(System.Text.Json.Nodes.JsonNode.Parse(
+                $$$"""{"src":{"type":"Lerp","index":5,"variable":"output"},"dst":{"type":"CoordsToFloat3","index":0,"variable":"{{{axis}}}"}}"""));
+        }
+
+        links.Add(System.Text.Json.Nodes.JsonNode.Parse(
+            """{"src":{"type":"CoordsToFloat3","index":0,"variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"xyz"}}"""));
+        string graph = new System.Text.Json.Nodes.JsonObject { ["nodes"] = nodes, ["links"] = links }.ToJsonString();
+
+        ShadeProgram program = Bound(
+            Checked(ShadeProgram.Compile([(Instance(("Set_VertexChannel", [Numbers(channel)])), Graph(graph))])), []);
+        AssertClose(
+            MeshPicture.Of(Quad(), 64, skins: [Sheet(Srgb(picked), Srgb(picked), Srgb(picked))]),
+            MeshPicture.Of(Quad(), 64, shades: [program]));
+    }
+
+    /// <summary>
+    /// The Port tiles' painted wall compiles: TwoMaterialVertexBlend paints the colour, the material
+    /// blend after it reads that colour, and only the height graph is left out.
+    /// </summary>
+    [Fact]
+    public void THEPORTWALLSPAINTEDMATERIALCOMPILES()
+    {
+        ShadeCompile compiled = Real("Art/Models/Terrain/Islands/Tiles/TwilightIsland/Textures/WallVertexPaint/TOC_WallTileVertPaint01c.mat");
+
+        Assert.NotNull(compiled.Program);
+        Assert.Equal(
+            [
+                "Metadata/Materials/Environment/TwoMaterialVertexBlend.fxgraph",
+                "Metadata/Materials/Environment/MaterialBlends/MaterialBlend_2ndMaterialUV.fxgraph",
+                "Metadata/Materials/BentNormals_fromTBN.fxgraph",
+            ],
+            compiled.Program.Graphs);
+        Assert.Equal(["InputVertexUV in MultiplyTexHeight"], compiled.Skipped);
+        Assert.True(compiled.Program.UsesVertexColour);
+    }
+
     /// <summary>
     /// Noise31 and PerlinNoise31 are the declarations' own noises, to the hash - the second Perlin cell lies below nought, where the integer cast wraps.
     /// </summary>
