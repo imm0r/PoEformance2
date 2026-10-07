@@ -357,8 +357,8 @@ public sealed class MonsterPortrait
     /// </summary>
     private int _drawing;
 
-    /// <summary>The model <see cref="_timed"/> was worked out for.</summary>
-    private MonsterModel? _timedOf;
+    /// <summary>The list <see cref="_timed"/> was worked out for.</summary>
+    private IReadOnlyList<ShadeProgram?>? _timedOf;
     private bool _timed;
 
     /// <summary>The greying the shown picture was drawn with - 0 for none. See <see cref="Greyed"/>.</summary>
@@ -638,6 +638,26 @@ public sealed class MonsterPortrait
     /// side effect of a terrain fix. A pane with its own Load reads this to decide what to load.
     /// </remarks>
     public bool Shaded { get; set; }
+
+    /// <summary>
+    /// Whether a specular colour is lit flat - laid onto the albedo - rather than the game's way, by its GGX lobe; see MonsterModel.GlossShades.
+    /// </summary>
+    /// <remarks>
+    /// THE GAME'S WAY BY DEFAULT, flat where that is too slow: the glossy programs read one more
+    /// texture and every pixel of them works out a lobe. Changed by the button beside the rate,
+    /// which tells <see cref="FlatLightChanged"/> so every book follows and the settings keep it.
+    /// </remarks>
+    public bool FlatLight { get; set; }
+
+    /// <summary>Told when the light button is pressed, with the new choice.</summary>
+    public Action<bool>? FlatLightChanged { get; set; }
+
+    /// <summary>The programs the picture is drawn with: none unshaded, else the flat or the glossy list - see <see cref="FlatLight"/>.</summary>
+    private IReadOnlyList<ShadeProgram?>? ShadesOf(MonsterModel model)
+        => !Shaded ? null : FlatLight || model.GlossShades.Count == 0 ? model.Shades : model.GlossShades;
+
+    /// <summary>The list the last picture was drawn with, compared by reference - a press of the light button redraws.</summary>
+    private IReadOnlyList<ShadeProgram?>? _drawnShades;
 
     /// <summary>
     /// Which tilesets place which tile, for a tile's dump to find the areas that use it - see ModelDump.OfTile.
@@ -963,6 +983,7 @@ public sealed class MonsterPortrait
         {
             Rate(draw, corner);
             ClockToggle(corner);
+            LightToggle(corner);
         }
 
         ImGui.SetCursorScreenPos(below);
@@ -1026,6 +1047,45 @@ public sealed class MonsterPortrait
         if (ImGui.SmallButton(_playing ? "Pause##monster-clock" : "Play##monster-clock"))
         {
             _playing = !_playing;
+        }
+    }
+
+    /// <summary>
+    /// The light button beside the rate and the clock's, where the model has a specular colour: the game's light or the flat one.
+    /// </summary>
+    /// <remarks>
+    /// IN THE PICTURE'S CORNER LIKE PAUSE, because it is a question about this picture - why is the
+    /// gold dark, why does this run slowly - and the answer should be a click away from it.
+    /// </remarks>
+    private void LightToggle(Vector2 corner)
+    {
+        if (!HasShine())
+        {
+            return;
+        }
+
+        if (HasClock())
+        {
+            ImGui.SameLine();
+        }
+        else
+        {
+            float inset = ImGui.GetStyle().ItemSpacing.X;
+            ImGui.SetCursorScreenPos(new Vector2(corner.X + (inset * 2f) + ImGui.CalcTextSize(RateRoom).X, corner.Y + inset));
+        }
+
+        if (ImGui.SmallButton(FlatLight ? "flat light##monster-light" : "game light##monster-light"))
+        {
+            FlatLight = !FlatLight;
+            FlatLightChanged?.Invoke(FlatLight);
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("How a specular colour is lit - a metal's albedo is black, and its colour is all specular.\n"
+                + "Game light: the game's GGX lobe for the lamp and its environment term, under an environment as bright as the picture's ambient."
+                + " Reads the gloss texture and works out a lobe per pixel.\n"
+                + "Flat light: what the specular colour has past a dielectric's 0.04 is laid onto the albedo and shaded with it. Cheaper.");
         }
     }
 
@@ -2222,6 +2282,7 @@ public sealed class MonsterPortrait
             // and has to redraw one - without this the switch and the slider do nothing at all
             // until something else moves, which reads as neither working.
             || _drawnGrey != Greyed
+            || !ReferenceEquals(_drawnShades, ShadesOf(_model))
             || (posed && (_drawnFrame != _frame || _drawnAnimation != _chosen));
 
         if (moved)
@@ -2363,17 +2424,39 @@ public sealed class MonsterPortrait
     /// </remarks>
     private bool Ticking => _playing && HasClock();
 
-    /// <summary>Whether a shade program of the model reads <c>Time</c>, drawn shaded. Worked out once per model, since it is asked every frame.</summary>
+    /// <summary>Whether a shade program the picture is drawn with reads <c>Time</c>. Worked out once per list, since it is asked every frame.</summary>
     private bool HasClock()
     {
-        if (!ReferenceEquals(_timedOf, _model))
+        IReadOnlyList<ShadeProgram?>? shades = ShadesOf(_model);
+        if (shades is null)
         {
-            _timedOf = _model;
-            _timed = _model.Shades.Any(one => one is { UsesTime: true });
+            return false;
         }
 
-        return Shaded && _timed;
+        if (!ReferenceEquals(_timedOf, shades))
+        {
+            _timedOf = shades;
+            _timed = shades.Any(one => one is { UsesTime: true });
+        }
+
+        return _timed;
     }
+
+    /// <summary>Whether the model has a specular colour to light at all - the light button is shown only then. Worked out once per model.</summary>
+    private bool HasShine()
+    {
+        if (!ReferenceEquals(_shineOf, _model))
+        {
+            _shineOf = _model;
+            _shine = _model.Shades.Any(one => one is { HasSpecular: true }) || !ReferenceEquals(_model.GlossShades, _model.Shades);
+        }
+
+        return Shaded && _shine;
+    }
+
+    /// <summary>The model <see cref="_shine"/> was worked out for.</summary>
+    private MonsterModel? _shineOf;
+    private bool _shine;
 
     /// <summary>
     /// Takes a picture the clock asked for once it has been drawn, and shows it - unless the frame
@@ -2456,7 +2539,7 @@ public sealed class MonsterPortrait
         Vector3 ink = Ink;
         float grey = Grey ? GreyFactor : float.NaN;
         IReadOnlyList<MaterialBlend>? blends = Blends();
-        IReadOnlyList<ShadeProgram?>? shades = Shaded ? model.Shades : null;
+        IReadOnlyList<ShadeProgram?>? shades = ShadesOf(model);
         int drawing = _drawing;
 
         // AGAIN, NOT WHOLE, where nothing but the time moved since the canvas was last drawn whole:
@@ -2542,6 +2625,7 @@ public sealed class MonsterPortrait
         _drawnAnimation = _chosen;
         _drawnGrey = Greyed;
         _drawnClock = _clock;
+        _drawnShades = ShadesOf(_model);
         _drawing++;
 
         try
@@ -2557,13 +2641,13 @@ public sealed class MonsterPortrait
                 lowest = Lowest(_posed);
                 drawn = MeshPicture.Of(
                     _model.Mesh, Clocked(Canvas(size)), _posed, _posedNormals, _turn, _tilt, Ink,
-                    _model.Skin, _zoom, _pan, _model.Skins, Blends(), Shaded ? _model.Shades : null);
+                    _model.Skin, _zoom, _pan, _model.Skins, Blends(), ShadesOf(_model));
             }
             else
             {
                 lowest = _model.Mesh.Most.Z;
                 drawn = MeshPicture.Of(
-                    _model.Mesh, Clocked(Canvas(size)), _turn, _tilt, Ink, _model.Skin, _zoom, _pan, _model.Skins, Blends(), Shaded ? _model.Shades : null);
+                    _model.Mesh, Clocked(Canvas(size)), _turn, _tilt, Ink, _model.Skin, _zoom, _pan, _model.Skins, Blends(), ShadesOf(_model));
             }
 
             _rate.Redrawn(ImGui.GetTime());
@@ -3079,10 +3163,10 @@ public sealed class MonsterPortrait
             _pose.Move(_model.Mesh, _posed, _posedNormals);
             return MeshPicture.Of(
                 _model.Mesh, Clocked(canvas), _posed, _posedNormals, _turn, _tilt, Ink,
-                _model.Skin, _zoom, _pan, _model.Skins, Blends(), Shaded ? _model.Shades : null);
+                _model.Skin, _zoom, _pan, _model.Skins, Blends(), ShadesOf(_model));
         }
 
-        return MeshPicture.Of(_model.Mesh, Clocked(canvas), _turn, _tilt, Ink, _model.Skin, _zoom, _pan, _model.Skins, Blends(), Shaded ? _model.Shades : null);
+        return MeshPicture.Of(_model.Mesh, Clocked(canvas), _turn, _tilt, Ink, _model.Skin, _zoom, _pan, _model.Skins, Blends(), ShadesOf(_model));
     }
 
     /// <summary>The canvas with the clock the picture is at - the export takes the instant on screen.</summary>

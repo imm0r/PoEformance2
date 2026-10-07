@@ -1,0 +1,1771 @@
+{
+    "version": 3,
+    "overriden_lighting_model": "SpecGlossPbrMaterial",
+    "nodes": [
+        {
+            "type": "InputTbnNormal",
+            "index": 0,
+            "stage": "Texturing_Final",
+            "ui_position": [
+                1073.5281982421876,
+                498.70648193359377
+            ]
+        },
+        {
+            "type": "TbnNormal",
+            "index": 0,
+            "stage": "Texturing_Final",
+            "ui_position": [
+                1573.5281982421876,
+                498.70648193359377
+            ]
+        },
+        {
+            "type": "ConstantBool",
+            "index": 0,
+            "parameters": [
+                {}
+            ],
+            "custom_parameter": "06.2_GradientAffectsAO",
+            "ui_position": [
+                4335.728515625,
+                1721.8902587890626
+            ]
+        },
+        {
+            "type": "ConstantFloat",
+            "index": 3,
+            "parameters": [
+                {}
+            ],
+            "custom_parameter": "02.3_GradientStrength",
+            "ui_position": [
+                2991.40576171875,
+                1683.058837890625
+            ]
+        },
+        {
+            "type": "ConstantFloat",
+            "index": 4,
+            "parameters": [
+                {
+                    "value": 0.5
+                }
+            ],
+            "custom_parameter": "02.2_Gradient",
+            "ui_position": [
+                2245.2822265625,
+                1648.55126953125
+            ]
+        },
+        {
+            "type": "ConstantFloat",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": 5.0
+                }
+            ],
+            "ui_position": [
+                2341.220947265625,
+                1541.8104248046876
+            ]
+        },
+        {
+            "type": "ConstantPixelBool",
+            "index": 0,
+            "parameters": [
+                {}
+            ],
+            "custom_parameter": "03_InvertHeight",
+            "ui_position": [
+                1802.6834716796876,
+                1801.7261962890626
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 4,
+            "parameters": [
+                {
+                    "value": 0.8169000148773193
+                }
+            ],
+            "custom_parameter": "02.1_HeightBlendBias",
+            "ui_position": [
+                1198.23974609375,
+                1814.8724365234376
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": 10.0
+                }
+            ],
+            "custom_parameter": "01_SetHeight",
+            "ui_position": [
+                1189.8978271484376,
+                1627.3851318359376
+            ]
+        },
+        {
+            "type": "ConstantPixel2",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": [
+                        0.0,
+                        0.707099974155426
+                    ]
+                }
+            ],
+            "ui_position": [
+                1194.1143798828126,
+                1704.5950927734376
+            ]
+        },
+        {
+            "type": "FromVertexLocalPosition",
+            "index": 0,
+            "ui_position": [
+                1029.9078369140626,
+                1537.8905029296876
+            ]
+        },
+        {
+            "type": "Negate",
+            "index": 0,
+            "ui_position": [
+                1322.0123291015626,
+                1543.2982177734376
+            ]
+        },
+        {
+            "type": "FitRangeFromInput",
+            "index": 0,
+            "ui_position": [
+                1523.6583251953126,
+                1649.1729736328126
+            ]
+        },
+        {
+            "type": "OneMinus",
+            "index": 0,
+            "ui_position": [
+                1804.444091796875,
+                1627.5216064453126
+            ]
+        },
+        {
+            "type": "Lerp",
+            "index": 1,
+            "ui_position": [
+                2082.88330078125,
+                1712.834716796875
+            ]
+        },
+        {
+            "type": "Saturate",
+            "index": 1,
+            "ui_position": [
+                2450.390380859375,
+                1722.719970703125
+            ]
+        },
+        {
+            "type": "SmoothStep",
+            "index": 0,
+            "ui_position": [
+                2713.03759765625,
+                1583.491943359375
+            ]
+        },
+        {
+            "type": "MultiplyConst",
+            "index": 4,
+            "parameters": [
+                {
+                    "value": 40.0
+                }
+            ],
+            "ui_position": [
+                2968.980224609375,
+                1571.117431640625
+            ]
+        },
+        {
+            "type": "Add",
+            "index": 6,
+            "ui_position": [
+                3306.589599609375,
+                1674.0540771484376
+            ]
+        },
+        {
+            "type": "Multiply",
+            "index": 3,
+            "ui_position": [
+                3506.701171875,
+                1570.798583984375
+            ]
+        },
+        {
+            "type": "Saturate",
+            "index": 4,
+            "ui_position": [
+                3685.510009765625,
+                1579.52392578125
+            ]
+        },
+        {
+            "type": "ConstantFloat",
+            "index": 5,
+            "parameters": [
+                {
+                    "value": -1.0
+                }
+            ],
+            "custom_parameter": "04.2_SubtractGradient",
+            "ui_position": [
+                2959.259765625,
+                1250.77392578125
+            ]
+        },
+        {
+            "type": "ConstantFloat3",
+            "index": 3,
+            "parameters": [
+                {
+                    "value": [
+                        0.0,
+                        0.0,
+                        -1.0
+                    ]
+                }
+            ],
+            "ui_position": [
+                1966.5341796875,
+                1255.4644775390626
+            ]
+        },
+        {
+            "type": "DotProduct3",
+            "index": 2,
+            "ui_position": [
+                2393.043701171875,
+                1229.0697021484376
+            ]
+        },
+        {
+            "type": "ConstantFloat3",
+            "index": 2,
+            "parameters": [
+                {
+                    "value": [
+                        0.0,
+                        5.0,
+                        2.0
+                    ]
+                }
+            ],
+            "ui_position": [
+                1947.070068359375,
+                1007.0717163085938
+            ]
+        },
+        {
+            "type": "DotProduct3",
+            "index": 1,
+            "ui_position": [
+                2389.472412109375,
+                1114.0699462890626
+            ]
+        },
+        {
+            "type": "Add",
+            "index": 3,
+            "ui_position": [
+                2628.056884765625,
+                1141.4801025390626
+            ]
+        },
+        {
+            "type": "OneMinus",
+            "index": 3,
+            "ui_position": [
+                2707.163818359375,
+                1257.5511474609376
+            ]
+        },
+        {
+            "type": "MultiplyConst",
+            "index": 5,
+            "parameters": [
+                {}
+            ],
+            "custom_parameter": "04.1_AddNormalNoise",
+            "ui_position": [
+                2929.749755859375,
+                1075.0989990234376
+            ]
+        },
+        {
+            "type": "Subtract",
+            "index": 0,
+            "ui_position": [
+                3231.5458984375,
+                1162.631103515625
+            ]
+        },
+        {
+            "type": "Saturate",
+            "index": 3,
+            "ui_position": [
+                3413.0107421875,
+                1160.77392578125
+            ]
+        },
+        {
+            "type": "Multiply",
+            "index": 5,
+            "ui_position": [
+                3888.149169921875,
+                1503.4124755859376
+            ]
+        },
+        {
+            "type": "ConstantFloat",
+            "index": 6,
+            "parameters": [
+                {
+                    "value": -1.0
+                }
+            ],
+            "custom_parameter": "05.1_AddNoise",
+            "ui_position": [
+                3545.810791015625,
+                2092.039794921875
+            ]
+        },
+        {
+            "type": "FromVertexLocalPosition",
+            "index": 1,
+            "ui_position": [
+                1656.2884521484376,
+                2091.48828125
+            ]
+        },
+        {
+            "type": "MultiplyConst3",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": 0.12999999523162843
+                }
+            ],
+            "custom_parameter": "05.2_Noise1Size",
+            "ui_position": [
+                1979.014404296875,
+                2020.378662109375
+            ]
+        },
+        {
+            "type": "Noise31",
+            "index": 1,
+            "ui_position": [
+                2369.10546875,
+                2053.287841796875
+            ]
+        },
+        {
+            "type": "MultiplyConst3",
+            "index": 1,
+            "parameters": [
+                {
+                    "value": 4.0
+                }
+            ],
+            "custom_parameter": "05.3_Noise2Size",
+            "ui_position": [
+                1946.105224609375,
+                2154.01513671875
+            ]
+        },
+        {
+            "type": "Noise31",
+            "index": 2,
+            "ui_position": [
+                2368.1962890625,
+                2186.924072265625
+            ]
+        },
+        {
+            "type": "Multiply",
+            "index": 4,
+            "ui_position": [
+                2605.118896484375,
+                2079.9892578125
+            ]
+        },
+        {
+            "type": "MultiplyConst",
+            "index": 7,
+            "parameters": [
+                {
+                    "value": 5.0
+                }
+            ],
+            "ui_position": [
+                3073.960693359375,
+                2071.3330078125
+            ]
+        },
+        {
+            "type": "Subtract",
+            "index": 1,
+            "ui_position": [
+                3828.814453125,
+                1940.3963623046876
+            ]
+        },
+        {
+            "type": "Saturate",
+            "index": 5,
+            "ui_position": [
+                3992.8154296875,
+                1922.3963623046876
+            ]
+        },
+        {
+            "type": "Multiply",
+            "index": 6,
+            "ui_position": [
+                4127.3974609375,
+                1534.75390625
+            ]
+        },
+        {
+            "type": "ConstantFloat2",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": [
+                        0.6571999788284302,
+                        0.4999000132083893
+                    ]
+                }
+            ],
+            "ui_position": [
+                1748.5438232421876,
+                830.7291259765625
+            ]
+        },
+        {
+            "type": "InputIndirectColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                1573.5281982421876,
+                498.70648193359377
+            ]
+        },
+        {
+            "type": "SmoothStep",
+            "index": 1,
+            "ui_position": [
+                2059.705078125,
+                781.491943359375
+            ]
+        },
+        {
+            "type": "OneMinus",
+            "index": 4,
+            "ui_position": [
+                2320.71533203125,
+                782.8181762695313
+            ]
+        },
+        {
+            "type": "MultiplyConst",
+            "index": 9,
+            "parameters": [
+                {
+                    "value": 1.0
+                }
+            ],
+            "custom_parameter": "06.1_AODustStrength",
+            "ui_position": [
+                3793.7841796875,
+                1280.2105712890626
+            ]
+        },
+        {
+            "type": "Add",
+            "index": 7,
+            "ui_position": [
+                4310.47119140625,
+                1540.5540771484376
+            ]
+        },
+        {
+            "type": "Lerp",
+            "index": 2,
+            "ui_position": [
+                4465.25830078125,
+                1425.2806396484376
+            ]
+        },
+        {
+            "type": "Lerp",
+            "index": 3,
+            "ui_position": [
+                4613.9091796875,
+                1530.072998046875
+            ]
+        },
+        {
+            "type": "Saturate",
+            "index": 2,
+            "ui_position": [
+                4796.75537109375,
+                1528.487548828125
+            ]
+        },
+        {
+            "type": "ConstantBool",
+            "index": 1,
+            "parameters": [
+                {}
+            ],
+            "custom_parameter": "07.DustByEnvSettings",
+            "ui_position": [
+                3912.76171875,
+                1108.23095703125
+            ]
+        },
+        {
+            "type": "DustColor",
+            "index": 0,
+            "ui_position": [
+                3926.22265625,
+                572.2311401367188
+            ]
+        },
+        {
+            "type": "AddConst",
+            "index": 0,
+            "parameters": [
+                {}
+            ],
+            "custom_parameter": "Albedo_BlendFade",
+            "ui_position": [
+                3465.167236328125,
+                855.00048828125
+            ]
+        },
+        {
+            "type": "Saturate",
+            "index": 6,
+            "ui_position": [
+                3771.000732421875,
+                856.6666870117188
+            ]
+        },
+        {
+            "type": "ConstantFloat3",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": [
+                        0.2348952740430832,
+                        0.2348952740430832,
+                        0.2348952740430832
+                    ],
+                    "srgb": true
+                }
+            ],
+            "custom_parameter": "Custom_Albedo_Colour",
+            "ui_position": [
+                3207.110107421875,
+                764.0402221679688
+            ]
+        },
+        {
+            "type": "InputAlbedoColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                1573.5281982421876,
+                498.70648193359377
+            ]
+        },
+        {
+            "type": "Add3",
+            "index": 0,
+            "ui_position": [
+                3600.2197265625,
+                688.6324462890625
+            ]
+        },
+        {
+            "type": "Lerp3",
+            "index": 1,
+            "ui_position": [
+                3919.02587890625,
+                740.0000610351563
+            ]
+        },
+        {
+            "type": "Lerp3",
+            "index": 2,
+            "ui_position": [
+                4135.7607421875,
+                747.23095703125
+            ]
+        },
+        {
+            "type": "Lerp3",
+            "index": 0,
+            "ui_position": [
+                4285.8349609375,
+                678.6460571289063
+            ]
+        },
+        {
+            "type": "Saturate3",
+            "index": 0,
+            "ui_position": [
+                4462.5009765625,
+                679.0
+            ]
+        },
+        {
+            "type": "AlbedoColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                4640.6884765625,
+                489.85113525390627
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 6,
+            "parameters": [
+                {
+                    "value": 0.10000000149011612
+                }
+            ],
+            "custom_parameter": "Gloss_constant",
+            "ui_position": [
+                3467.14892578125,
+                963.9276123046875
+            ]
+        },
+        {
+            "type": "InputGlossiness",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                1573.5281982421876,
+                498.70648193359377
+            ]
+        },
+        {
+            "type": "Multiply",
+            "index": 2,
+            "ui_position": [
+                3771.767333984375,
+                986.341552734375
+            ]
+        },
+        {
+            "type": "Lerp",
+            "index": 0,
+            "ui_position": [
+                4083.78662109375,
+                898.2838134765625
+            ]
+        },
+        {
+            "type": "Glossiness",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                4640.6884765625,
+                489.85113525390627
+            ]
+        },
+        {
+            "type": "IndirectColor",
+            "index": 0,
+            "stage": "PreLighting",
+            "ui_position": [
+                4640.6884765625,
+                489.85113525390627
+            ]
+        },
+        {
+            "type": "OutputVertexLocalUV",
+            "index": 0,
+            "ui_position": [
+                1184.85791015625,
+                -352.095458984375
+            ]
+        },
+        {
+            "type": "OutputVertexLocalPosition",
+            "index": 0,
+            "ui_position": [
+                1598.412353515625,
+                -347.80712890625
+            ]
+        }
+    ],
+    "links": [
+        {
+            "src": {
+                "type": "InputTbnNormal",
+                "index": 0,
+                "stage": "Texturing_Final",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "TbnNormal",
+                "index": 0,
+                "stage": "Texturing_Final",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "FromVertexLocalPosition",
+                "index": 0,
+                "variable": "output",
+                "swizzle": "z"
+            },
+            "dst": {
+                "type": "Negate",
+                "index": 0,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 4,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "out_max"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "in_min"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel2",
+                "index": 0,
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "in_max"
+            }
+        },
+        {
+            "src": {
+                "type": "Negate",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "value"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel2",
+                "index": 0,
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "out_min"
+            }
+        },
+        {
+            "src": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "OneMinus",
+                "index": 0,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixelBool",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 1,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "FitRangeFromInput",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 1,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "OneMinus",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 1,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 1,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat",
+                "index": 4,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SmoothStep",
+                "index": 0,
+                "variable": "steepness"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SmoothStep",
+                "index": 0,
+                "variable": "center"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SmoothStep",
+                "index": 0,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "SmoothStep",
+                "index": 0,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "MultiplyConst",
+                "index": 4,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst",
+                "index": 4,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 6,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 6,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Add",
+                "index": 6,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply",
+                "index": 3,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst",
+                "index": 4,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply",
+                "index": 3,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 4,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat3",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "DotProduct3",
+                "index": 2,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "InputTbnNormal",
+                "index": 0,
+                "stage": "Texturing_Final",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "DotProduct3",
+                "index": 2,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat3",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "DotProduct3",
+                "index": 1,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "InputTbnNormal",
+                "index": 0,
+                "stage": "Texturing_Final",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "DotProduct3",
+                "index": 1,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "DotProduct3",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 3,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "DotProduct3",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 3,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Add",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "OneMinus",
+                "index": 3,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "OneMinus",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "MultiplyConst",
+                "index": 5,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat",
+                "index": 5,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Subtract",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst",
+                "index": 5,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Subtract",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Subtract",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 3,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply",
+                "index": 5,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 4,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply",
+                "index": 5,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "FromVertexLocalPosition",
+                "index": 1,
+                "variable": "output",
+                "swizzle": "xyz"
+            },
+            "dst": {
+                "type": "MultiplyConst3",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst3",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Noise31",
+                "index": 1,
+                "variable": "pos"
+            }
+        },
+        {
+            "src": {
+                "type": "FromVertexLocalPosition",
+                "index": 1,
+                "variable": "output",
+                "swizzle": "xyz"
+            },
+            "dst": {
+                "type": "MultiplyConst3",
+                "index": 1,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst3",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Noise31",
+                "index": 2,
+                "variable": "pos"
+            }
+        },
+        {
+            "src": {
+                "type": "Noise31",
+                "index": 2,
+                "variable": "noise"
+            },
+            "dst": {
+                "type": "Multiply",
+                "index": 4,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Noise31",
+                "index": 1,
+                "variable": "noise"
+            },
+            "dst": {
+                "type": "Multiply",
+                "index": 4,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply",
+                "index": 4,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "MultiplyConst",
+                "index": 7,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat",
+                "index": 6,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Subtract",
+                "index": 1,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst",
+                "index": 7,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Subtract",
+                "index": 1,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Subtract",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 5,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 5,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply",
+                "index": 6,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply",
+                "index": 5,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply",
+                "index": 6,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat2",
+                "index": 0,
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "SmoothStep",
+                "index": 1,
+                "variable": "steepness"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat2",
+                "index": 0,
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "SmoothStep",
+                "index": 1,
+                "variable": "center"
+            }
+        },
+        {
+            "src": {
+                "type": "InputIndirectColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "w"
+            },
+            "dst": {
+                "type": "SmoothStep",
+                "index": 1,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "SmoothStep",
+                "index": 1,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "OneMinus",
+                "index": 4,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "OneMinus",
+                "index": 4,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "MultiplyConst",
+                "index": 9,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst",
+                "index": 9,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 7,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply",
+                "index": 6,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add",
+                "index": 7,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 4,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 2,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "Add",
+                "index": 7,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 2,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply",
+                "index": 6,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 2,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantBool",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 3,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 3,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Add",
+                "index": 7,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 3,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 2,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "AddConst",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate",
+                "index": 6,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat3",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Add3",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "InputAlbedoColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "xyz"
+            },
+            "dst": {
+                "type": "Add3",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 6,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 1,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat3",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 1,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Add3",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 1,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantBool",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 2,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "DustColor",
+                "index": 0,
+                "variable": "color",
+                "swizzle": "xyz"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 2,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp3",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 2,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 0,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp3",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "InputAlbedoColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "xyz"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp3",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate3",
+                "index": 0,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate3",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "AlbedoColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input",
+                "swizzle": "xyz"
+            }
+        },
+        {
+            "src": {
+                "type": "InputAlbedoColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "w"
+            },
+            "dst": {
+                "type": "AlbedoColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input",
+                "swizzle": "w"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 6,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply",
+                "index": 2,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "InputGlossiness",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply",
+                "index": 2,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 0,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "InputGlossiness",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Glossiness",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputIndirectColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "xyz"
+            },
+            "dst": {
+                "type": "IndirectColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input",
+                "swizzle": "xyz"
+            }
+        },
+        {
+            "src": {
+                "type": "InputIndirectColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "output",
+                "swizzle": "w"
+            },
+            "dst": {
+                "type": "IndirectColor",
+                "index": 0,
+                "stage": "PreLighting",
+                "variable": "input",
+                "swizzle": "w"
+            }
+        }
+    ],
+    "unused_links": [
+        {
+            "src": {
+                "type": "DustColor",
+                "index": 0,
+                "variable": "color",
+                "swizzle": "w"
+            }
+        }
+    ]
+}

@@ -1635,6 +1635,55 @@ public class MonsterModelTests
         Assert.True(shaded.Files > plain.Files, "the graph's file is counted");
     }
 
+    /// <summary>
+    /// A material drawn as a plain texture is a program all the same where it is lit the game's way: its gloss is not in the texture.
+    /// </summary>
+    /// <remarks>
+    /// DielectricSpecGlossBN's shape, cut down: the colour one plain read, the specular the game's
+    /// 0.04, the gloss a second texture's x. Lit flat the 0.04 adds nothing, so the shape keeps its
+    /// plain skin; lit the game's way it needs the gloss, so the glossy list has its program, bound
+    /// to both textures.
+    /// </remarks>
+    [Fact]
+    public void APLAINMaterialWithAGlossIsAProgramLitTheGamesWay()
+    {
+        var install = Install();
+        install.Files["body.ao"] = Ao(skin: "art/mesh.sm", attach: "art/cannon.ao", skeleton: "art/rig.ast");
+        install.Files["art/cannon.ao"] = Ao(fixture: "art/cannon.fmt");
+        install.Files["art/cannon.fmt"] = Packed.Fmt("art/painted.mat");
+        install.Files["art/painted.mat"] = Encoding.UTF8.GetBytes("""{"graphinstances":[{"parent":"Metadata/Dielectric.fxgraph"}]}""");
+        install.Files["art/skin.dds"] = TileFilesTests.Dds();
+        install.Files["art/gloss.dds"] = TileFilesTests.Dds();
+        install.Files["Metadata/Dielectric.fxgraph"] = Encoding.UTF8.GetBytes(
+            """
+            {"nodes":[
+              {"type":"InputUV","index":0,"stage":"Texturing_Init"},
+              {"type":"SampleTexture","index":0,"parameters":[{"path":"art/skin.dds","srgb":true}]},
+              {"type":"SampleTexture","index":1,"parameters":[{"path":"art/gloss.dds","srgb":false}]},
+              {"type":"ConstantPixel","index":0,"parameters":[{"value":0.03999999910593033}]},
+              {"type":"AlbedoColor","index":0,"stage":"Texturing_Init"},
+              {"type":"SpecularColor","index":0,"stage":"Texturing_Init"},
+              {"type":"Glossiness","index":0,"stage":"Texturing_Init"}],
+             "links":[
+              {"src":{"type":"InputUV","index":0,"stage":"Texturing_Init","variable":"output"},"dst":{"type":"SampleTexture","index":0,"variable":"uv"}},
+              {"src":{"type":"InputUV","index":0,"stage":"Texturing_Init","variable":"output"},"dst":{"type":"SampleTexture","index":1,"variable":"uv"}},
+              {"src":{"type":"SampleTexture","index":0,"variable":"rgba"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input"}},
+              {"src":{"type":"ConstantPixel","index":0,"variable":"output"},"dst":{"type":"SpecularColor","index":0,"stage":"Texturing_Init","variable":"input"}},
+              {"src":{"type":"SampleTexture","index":1,"variable":"rgba","swizzle":"x"},"dst":{"type":"Glossiness","index":0,"stage":"Texturing_Init","variable":"input"}}]}
+            """);
+
+        MonsterModel shaded = MonsterModels.Of(install.Read, Named("body.ao"), shaded: true);
+
+        int prop = shaded.ShapeMaterials.ToList().IndexOf("art/painted.mat");
+        Assert.Null(shaded.Shades[prop]);
+        Assert.NotNull(shaded.Skins[prop]);
+        ShadeProgram glossy = Assert.IsType<ShadeProgram>(shaded.GlossShades[prop]);
+        Assert.True(glossy.Bound);
+        Assert.True(glossy.HasGloss);
+        Assert.Equal(2, glossy.Textures.Count);
+        Assert.Null(shaded.GlossShades[0]);
+    }
+
     /// <summary>The skin still wins wherever there is one, so no monster changes.</summary>
     [Fact]
     public void ANDASkinStillWinsOverAPropWhereTheChainNamesBoth()

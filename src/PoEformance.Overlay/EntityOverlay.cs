@@ -551,6 +551,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             ModelOutlineWidth = _monsterBook?.Model?.OutlineWidth ?? basis.ModelOutlineWidth,
             ModelLight = _monsterBook?.Model?.Light ?? basis.ModelLight,
             ModelLightTarget = _monsterBook?.Model?.LightTarget ?? basis.ModelLightTarget,
+            ModelFlatLight = _modelWants.ModelFlatLight,
             ShowProjectiles = _projectiles.Enabled,
             ProjectileTrails = _projectiles.ShowTrails,
             ProjectilePaths = _projectiles.ShowPaths,
@@ -773,6 +774,22 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         {
             pane.LightTarget = _modelWants.ModelLightTarget;
         }
+
+        // ONE CHOICE FOR EVERY BOOK: a press in one pane is carried to the others and kept.
+        pane.FlatLight = _modelWants.ModelFlatLight;
+        pane.FlatLightChanged = flat =>
+        {
+            _modelWants = _modelWants with { ModelFlatLight = flat };
+            foreach (MonsterPortrait? other in (MonsterPortrait?[])[_monsterBook?.Model, _itemBook?.Model, _tileBook?.Model, _effectBook?.Model])
+            {
+                if (other is not null)
+                {
+                    other.FlatLight = flat;
+                }
+            }
+
+            SettingsChanged?.Invoke();
+        };
     }
 
     /// <summary>

@@ -233,6 +233,8 @@ public class GraphSurveyTests
         Assert.True(ShadeProgram.Knows("RGBToTbn"));
         Assert.True(ShadeProgram.Knows("Muddle"));
         Assert.True(ShadeProgram.Knows("MuddleInput"));
+        Assert.True(ShadeProgram.Knows("NormalTexToTbn"));
+        Assert.True(ShadeProgram.Knows("NormalTexToTbnInput"));
         Assert.True(ShadeProgram.Knows("FromVertexColor"));
         Assert.False(ShadeProgram.Knows("FromVertexLocalUV"));
         Assert.False(ShadeProgram.Knows(string.Empty));

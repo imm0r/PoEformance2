@@ -294,6 +294,17 @@ public sealed record MonsterModel(
     /// </remarks>
     public IReadOnlyList<ShadeProgram?> Shades { get; init; } = [];
 
+    /// <summary>
+    /// Each shape's program lit the game's way, with its glossiness worked out - or null where the shape has none; empty where no material has one.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="Shades"/> LIT FLAT, THESE LIT BY THE GAME'S GGX - see ShadeProgram.Glossy. A shape
+    /// drawn from a plain texture under <see cref="Shades"/> has a program here all the same where
+    /// its graphs give a gloss: the texture is its colour, not its shine. Where a material gives no
+    /// gloss its entry is its flat program, so either list draws every shape.
+    /// </remarks>
+    public IReadOnlyList<ShadeProgram?> GlossShades { get; init; } = [];
+
     /// <summary>How many distinct materials are drawn from their graphs rather than from one texture.</summary>
     public int ShadedBy { get; init; }
 
@@ -442,6 +453,8 @@ public static class MonsterModels
         }
 
         var shades = new ShadeProgram?[count];
+        var glossy = new ShadeProgram?[count];
+        var shines = false;
         Mipmaps?[]? skins = null;
         var drawn = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var clocked = new List<string>();
@@ -463,6 +476,9 @@ public static class MonsterModels
                 }
             }
 
+            // THE GLOSSY PROGRAM WHERE THERE IS ONE, else whatever the flat list draws.
+            glossy[shape] = shade.Glossy ?? shade.Program;
+            shines |= shade.Glossy is not null;
             if (shade.Program is { } program)
             {
                 shades[shape] = program;
@@ -485,6 +501,7 @@ public static class MonsterModels
         return model with
         {
             Shades = shades,
+            GlossShades = shines ? glossy : shades,
             Skins = skins ?? model.Skins,
             ShadedBy = drawn.Count,
             Unshaded = unshaded,
@@ -495,7 +512,11 @@ public static class MonsterModels
     }
 
     /// <summary>What one material's graphs came to: a program, a plain texture, or neither - and what was left out.</summary>
-    internal readonly record struct Shade(ShadeProgram? Program, Mipmaps? Plain, IReadOnlyList<string> Skipped);
+    /// <param name="Program">The program the shape is drawn with lit flat, or null.</param>
+    /// <param name="Plain">The texture the shape is drawn from in its place, or null.</param>
+    /// <param name="Skipped">What was left out.</param>
+    /// <param name="Glossy">The program lit the game's way, or null where it is <paramref name="Program"/> - see ShadeProgram.Glossy.</param>
+    internal readonly record struct Shade(ShadeProgram? Program, Mipmaps? Plain, IReadOnlyList<string> Skipped, ShadeProgram? Glossy = null);
 
     /// <summary>
     /// Gathers the model an <c>.ao</c> describes, whoever named it, or says where the walk stopped.
@@ -2686,11 +2707,31 @@ public static class MonsterModels
                     }
                 }
 
-                shade = Array.Exists(sheets, one => one is null)
-                    ? new Shade(null, null, skipped)
-                    : program.Plain >= 0
-                        ? new Shade(null, sheets[program.Plain], skipped)
-                        : new Shade(program.With(sheets), null, skipped);
+                if (Array.Exists(sheets, one => one is null))
+                {
+                    shade = new Shade(null, null, skipped);
+                }
+                else
+                {
+                    // THE GLOSSY PROGRAM READS ONE MORE TEXTURE - the gloss's - which is fetched here
+                    // and handed over beside the rest; one that does not read leaves it out.
+                    ShadeProgram bound = program.With(sheets);
+                    ShadeProgram? shine = null;
+                    if (program.Glossy is { } glossy)
+                    {
+                        var more = new Mipmaps?[glossy.Textures.Count];
+                        for (var one = 0; one < more.Length; one++)
+                        {
+                            more[one] = Sheet(read, glossy.Textures[one].Path);
+                        }
+
+                        shine = glossy.With(more) is { Bound: true } lit ? lit : null;
+                    }
+
+                    shade = program.Plain >= 0
+                        ? new Shade(null, sheets[program.Plain], skipped, shine)
+                        : new Shade(bound, null, skipped, shine);
+                }
             }
 
             _shades[file] = shade;

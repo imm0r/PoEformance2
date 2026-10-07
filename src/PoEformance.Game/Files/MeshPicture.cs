@@ -872,6 +872,22 @@ public static class MeshPicture
     /// <summary>The rows in one band - see <see cref="InBands"/>.</summary>
     private const int BandRows = 8;
 
+    /// <summary>How much of a colour a face turned from the lamp keeps: the picture's ambient, on the sRGB value.</summary>
+    private const float Ambient = 0.22f;
+
+    /// <summary>
+    /// The ambient as light - the uniform environment the game's specular light is worked out under; see GlossLight.
+    /// </summary>
+    private static readonly float AmbientLight = MathF.Pow((Ambient + 0.055f) / 1.055f, 2.4f);
+
+    /// <summary>The lamp as light: the rest of a face turned full on to it.</summary>
+    private static readonly float LampLight = 1f - AmbientLight;
+
+    /// <summary>
+    /// The way to the eye: nearer is lower depth, and the picture is orthographic, so every pixel looks along the same line.
+    /// </summary>
+    private static readonly Vector3 ToEye = new(0f, 0f, -1f);
+
     /// <summary>How many bands a picture this size is drawn in.</summary>
     private static int Bands(int size) => (size + BandRows - 1) / BandRows;
 
@@ -1262,6 +1278,10 @@ public static class MeshPicture
         private readonly int[] _indices;
         private readonly Vector2[] _coordinates;
         private readonly Vector3 _lamp;
+
+        /// <summary>Halfway between the way to the eye and the way to the lamp, and the Fresnel there - one for the whole picture, see <see cref="Glossed"/>.</summary>
+        private readonly Vector3 _half;
+        private readonly float _fresnel;
         private readonly Vector3 _ink;
         private readonly Mipmaps?[] _palette;
         private readonly int[] _wears;
@@ -1316,6 +1336,8 @@ public static class MeshPicture
             _indices = mesh.Indices;
             _coordinates = mesh.Coordinates;
             _lamp = drawn.Lamp;
+            _half = Vector3.Normalize(ToEye + _lamp);
+            _fresnel = GlossLight.Fresnel(Math.Clamp(Vector3.Dot(ToEye, _half), 0f, 1f));
             _ink = drawn.Ink;
             _palette = drawn.Palette;
             _wears = canvas.Wears;
@@ -1517,6 +1539,8 @@ public static class MeshPicture
                     }
 
                     Vector3 colour = _ink;
+                    Vector3 specular = default;
+                    float gloss = 0f;
                     if (program is not null)
                     {
                         // A CUT-OUT SHAPE IS CUT ON THE ALPHA ITS GRAPHS LEAVE where they set one - the
@@ -1536,6 +1560,8 @@ public static class MeshPicture
                             (first * n0) + (second * n1) + (third * n2),
                             shadeLevels,
                             out float alpha,
+                            out specular,
+                            out gloss,
                             tinted ? (first * v0) + (second * v1) + (third * v2) : default);
                         if (cut && program.HasAlpha && alpha < CutoutAlpha)
                         {
@@ -1582,7 +1608,22 @@ public static class MeshPicture
                     // TWO-SIDED, because the mesh's winding is not established and a single-sided
                     // light leaves whole limbs black where the triangles happen to face away.
                     float lit = MathF.Abs(Vector3.Dot(normal, _lamp));
-                    float shade = 0.22f + (0.78f * lit);
+                    float shade = Ambient + ((1f - Ambient) * lit);
+
+                    // A SPECULAR COLOUR IS LIGHT TOO - a metal's albedo is black and its colour is all
+                    // in it. The glossy program is lit the game's way, the other flat; see Glossed and Flat.
+                    if (program is { HasSpecular: true })
+                    {
+                        if (program.HasGloss)
+                        {
+                            colour = Glossed(colour, shade, normal, specular, gloss);
+                            shade = 1f;
+                        }
+                        else
+                        {
+                            colour = Flat(colour, specular);
+                        }
+                    }
 
                     _pixels[at * 4] = Byte(colour.X * shade);
                     _pixels[(at * 4) + 1] = Byte(colour.Y * shade);
@@ -1591,6 +1632,50 @@ public static class MeshPicture
                 }
             }
         }
+
+        /// <summary>
+        /// One pixel lit the game's way: its colour under the picture's shading, and the specular light of the lamp and the environment on top.
+        /// </summary>
+        /// <remarks>
+        /// THE SHADING IS READ AS LIGHT. The picture lights a colour by <see cref="Ambient"/> plus the
+        /// rest times the lamp's cosine, on the sRGB value; that is the ambient and the lamp as light
+        /// in linear terms, near enough, and the game adds specular light to the diffuse in linear
+        /// terms - so the colour under the shading is taken to linear, the specular is added there,
+        /// and the sum goes back. With no specular the pixel is what it was. The environment is
+        /// <see cref="AmbientLight"/> everywhere and the lamp <see cref="LampLight"/>; see GlossLight.
+        /// </remarks>
+        private Vector3 Glossed(Vector3 colour, float shade, Vector3 normal, Vector3 specular, float gloss)
+        {
+            float toEye = Vector3.Dot(normal, ToEye);
+            if (toEye < 0f)
+            {
+                normal = -normal;
+                toEye = -toEye;
+            }
+
+            float lobe = GlossLight.Lobe(normal, toEye, _lamp, _half, gloss) * LampLight;
+            GlossLight.Environment(toEye, gloss, out float bias, out float scale);
+            float unscaled = (lobe * _fresnel) + (AmbientLight * bias);
+            float scaled = (lobe * (1f - _fresnel)) + (AmbientLight * scale);
+            return new Vector3(
+                ShadeProgram.Srgb(ShadeProgram.Linear(colour.X * shade) + unscaled + (scaled * specular.X)),
+                ShadeProgram.Srgb(ShadeProgram.Linear(colour.Y * shade) + unscaled + (scaled * specular.Y)),
+                ShadeProgram.Srgb(ShadeProgram.Linear(colour.Z * shade) + unscaled + (scaled * specular.Z)));
+        }
+
+        /// <summary>
+        /// One pixel's colour lit flat: its specular colour past a dielectric's laid onto its albedo, both shaded alike.
+        /// </summary>
+        /// <remarks>
+        /// THE CHEAP WAY, AND A DIELECTRIC IS UNCHANGED BY IT: every dielectric the game has writes a
+        /// specular colour of 0.04 (see ShadeProgram.Dielectric), which adds nothing here, while a
+        /// metal - albedo black, specular its colour - shows that colour as a painted surface would.
+        /// No lobe, no environment, no gloss: what is left of the specular is taken for colour.
+        /// </remarks>
+        private static Vector3 Flat(Vector3 colour, Vector3 specular) => new(
+            ShadeProgram.Srgb(ShadeProgram.Linear(colour.X) + MathF.Max(specular.X - ShadeProgram.Dielectric, 0f)),
+            ShadeProgram.Srgb(ShadeProgram.Linear(colour.Y) + MathF.Max(specular.Y - ShadeProgram.Dielectric, 0f)),
+            ShadeProgram.Srgb(ShadeProgram.Linear(colour.Z) + MathF.Max(specular.Z - ShadeProgram.Dielectric, 0f)));
 
         /// <summary>Whether a triangle is drawn in the second pass - mixed or added, not solid or cut out.</summary>
         private static bool Translucent(MaterialBlend blend) => blend is MaterialBlend.Alpha or MaterialBlend.Additive;

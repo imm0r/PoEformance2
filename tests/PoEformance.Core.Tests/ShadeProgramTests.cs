@@ -1398,6 +1398,200 @@ public class ShadeProgramTests
         Assert.True(compiled.Program.UsesTime);
     }
 
+    /// <summary>
+    /// GoldProps, the channel room's black gold: its colour is all specular, and the graphs give both it and the gloss.
+    /// </summary>
+    /// <remarks>
+    /// GoldPropsc.mat from the channel 1open_01 dump. SpecGlossSpecMaskOpaqueBN multiplies the albedo
+    /// by a ConstantPixel left at its declared nought wherever the texture's alpha - its specular
+    /// mask - is one, and lays the texture's colour into the specular there instead. The flat
+    /// program carries the specular and not the gloss, whose texture - the normal map's w - only the
+    /// glossy one reads.
+    /// </remarks>
+    [Fact]
+    public void THEGOLDPROPSMATERIALCarriesItsSpecularAndItsGloss()
+    {
+        ShadeCompile compiled = Real("Art/Textures/Environment/desert/Keth/GoldPropsc.mat");
+
+        Assert.Equal(["DustColor in DustForAOs"], compiled.Skipped);
+        ShadeProgram program = Assert.IsType<ShadeProgram>(compiled.Program);
+        Assert.True(program.HasSpecular);
+        Assert.False(program.HasGloss);
+        Assert.Equal(-1, program.Plain);
+        Assert.DoesNotContain(program.Textures, one => one.Path.EndsWith("GoldProps_normal_DXT5.dds", StringComparison.Ordinal));
+
+        ShadeProgram glossy = Assert.IsType<ShadeProgram>(program.Glossy);
+        Assert.True(glossy.HasGloss);
+        Assert.True(glossy.HasSpecular);
+        Assert.Contains(glossy.Textures, one => one.Path.EndsWith("GoldProps_normal_DXT5.dds", StringComparison.Ordinal));
+        Assert.All(program.Textures, one => Assert.Contains(one, glossy.Textures));
+    }
+
+    /// <summary>
+    /// A metal - albedo black, specular its colour - lit flat shows its specular past a dielectric's as colour, shaded like any other.
+    /// </summary>
+    [Fact]
+    public void AMETALLitFlatShowsItsSpecularAsColour()
+    {
+        ShadeCompile compiled = ShadeProgram.Compile([(Instance(), Graph(Metal))]);
+        Assert.Empty(compiled.Skipped);
+        ShadeProgram program = Assert.IsType<ShadeProgram>(compiled.Program);
+        Assert.True(program.HasSpecular);
+        Assert.False(program.HasGloss);
+
+        AssertClose(
+            MeshPicture.Of(Quad(), 64, skins: [Sheet(Srgb(0.5f - 0.04f), Srgb(0.25f - 0.04f), Srgb(0.125f - 0.04f))]),
+            MeshPicture.Of(Quad(), 64, shades: [program]));
+    }
+
+    /// <summary>
+    /// The same metal lit the game's way is the lamp's GGX lobe and the environment's term, worked out per pixel.
+    /// </summary>
+    /// <remarks>
+    /// THE NUMBERS ARE THE PICTURE'S OWN, written out: the lamp over the viewer's shoulder, the eye
+    /// along the depth, the ambient 0.22 as light for the environment and the rest for the lamp.
+    /// The quad faces the eye, so the lobe and the table are read at a cosine of one - and the
+    /// albedo is black, so nothing of the shading is left but the specular.
+    /// </remarks>
+    [Fact]
+    public void ANDLITTheGamesWayItIsTheLobeAndTheEnvironment()
+    {
+        ShadeProgram glossy = Assert.IsType<ShadeProgram>(ShadeProgram.Compile([(Instance(), Graph(Metal))]).Program?.Glossy);
+        Assert.True(glossy.HasGloss);
+
+        Vector3 lamp = Vector3.Normalize(new Vector3(-0.35f, -0.55f, -0.75f));
+        var eye = new Vector3(0f, 0f, -1f);
+        Vector3 half = Vector3.Normalize(eye + lamp);
+        float fresnel = GlossLight.Fresnel(Vector3.Dot(eye, half));
+        float ambient = MathF.Pow((0.22f + 0.055f) / 1.055f, 2.4f);
+        float lobe = GlossLight.Lobe(eye, 1f, lamp, half, 0.5f) * (1f - ambient);
+        GlossLight.Environment(1f, 0.5f, out float bias, out float scale);
+        float Lit(float specular) => (lobe * fresnel) + (ambient * bias) + (((lobe * (1f - fresnel)) + (ambient * scale)) * specular);
+
+        GamePicture picture = MeshPicture.Of(Quad(), 64, shades: [glossy]);
+        int at = ((32 * 64) + 32) * 4;
+        Assert.Equal(Srgb(Lit(0.5f)), picture.Rgba[at], 2f);
+        Assert.Equal(Srgb(Lit(0.25f)), picture.Rgba[at + 1], 2f);
+        Assert.Equal(Srgb(Lit(0.125f)), picture.Rgba[at + 2], 2f);
+        Assert.True(picture.Rgba[at] > picture.Rgba[at + 1] && picture.Rgba[at + 1] > picture.Rgba[at + 2], "the gold's order survives");
+    }
+
+    /// <summary>
+    /// A dielectric - a plain texture and the game's 0.04 - stays a plain texture, and the flat light leaves it as it was.
+    /// </summary>
+    [Fact]
+    public void ADIELECTRICStaysPlainAndTheFlatLightLeavesItAlone()
+    {
+        string graph = """
+            {"nodes":[
+              {"type":"InputUV","index":0,"stage":"Texturing_Init"},
+              {"type":"SampleTexture","index":0,"parameters":[{"path":"Art/own.dds","srgb":true}]},
+              {"type":"ConstantPixel","index":0,"parameters":[{"value":0.03999999910593033}]},
+              {"type":"AlbedoColor","index":0,"stage":"Texturing_Init"},
+              {"type":"SpecularColor","index":0,"stage":"Texturing_Init"}],
+             "links":[
+              {"src":{"type":"InputUV","index":0,"stage":"Texturing_Init","variable":"output"},"dst":{"type":"SampleTexture","index":0,"variable":"uv"}},
+              {"src":{"type":"SampleTexture","index":0,"variable":"rgba"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input"}},
+              {"src":{"type":"ConstantPixel","index":0,"variable":"output"},"dst":{"type":"SpecularColor","index":0,"stage":"Texturing_Init","variable":"input"}}]}
+            """;
+        ShadeProgram program = Checked(ShadeProgram.Compile([(Instance(), Graph(graph))]));
+        Assert.True(program.HasSpecular);
+        Assert.True(program.Plain >= 0, "a dielectric's specular adds nothing flat, so its texture stays plain");
+        Assert.Null(program.Glossy);
+
+        Mipmaps sheet = Sheet(200, 120, 40);
+        AssertClose(
+            MeshPicture.Of(Quad(), 64, skins: [sheet]),
+            MeshPicture.Of(Quad(), 64, shades: [Bound(program, new Dictionary<string, Mipmaps> { ["Art/own.dds"] = sheet })]));
+    }
+
+    /// <summary>
+    /// The environment table holds what the engine's own check of it integrates: the GGX lobe over the hemisphere, over pi.
+    /// </summary>
+    /// <remarks>
+    /// ComputeEnvironmentGGXNumerical averages <c>GGXSpecular / pi * 2 pi</c> over uniformly drawn
+    /// directions. The table is built by importance sampling instead; here the same integral is
+    /// summed on a plain grid of directions, which shares nothing with that derivation but the lobe,
+    /// at entries' centres so no interpolation stands between them.
+    /// </remarks>
+    [Theory]
+    [InlineData(15, 15)]
+    [InlineData(28, 15)]
+    [InlineData(15, 8)]
+    [InlineData(5, 20)]
+    public void THEENVIRONMENTTableIsWhatTheEnginesOwnCheckIntegrates(int column, int row)
+    {
+        float toEye = (column + 0.5f) / 32f;
+        float gloss = (row + 0.5f) / 32f;
+        var eye = new Vector3(MathF.Sqrt(1f - (toEye * toEye)), 0f, toEye);
+        var normal = Vector3.UnitZ;
+        const int Rings = 1024;
+        const int Around = 512;
+        double bias = 0;
+        double scale = 0;
+        for (var ring = 0; ring < Rings; ring++)
+        {
+            float theta = (ring + 0.5f) / Rings * (MathF.PI / 2f);
+            float area = MathF.Sin(theta) * (MathF.PI / 2f / Rings) * (MathF.Tau / Around);
+            for (var step = 0; step < Around; step++)
+            {
+                float phi = (step + 0.5f) / Around * MathF.Tau;
+                var light = new Vector3(MathF.Sin(theta) * MathF.Cos(phi), MathF.Sin(theta) * MathF.Sin(phi), MathF.Cos(theta));
+                Vector3 half = Vector3.Normalize(eye + light);
+                float lobe = GlossLight.Lobe(normal, toEye, light, half, gloss);
+                float fresnel = GlossLight.Fresnel(Math.Clamp(Vector3.Dot(eye, half), 0f, 1f));
+                bias += lobe * fresnel * area;
+                scale += lobe * (1f - fresnel) * area;
+            }
+        }
+
+        bias /= Math.PI;
+        scale /= Math.PI;
+        GlossLight.Environment(toEye, gloss, out float tabledBias, out float tabledScale);
+        Assert.Equal(scale, tabledScale, 0.02 * scale);
+        Assert.Equal(bias, tabledBias, (0.03 * bias) + 1e-4);
+    }
+
+    /// <summary>
+    /// NormalTexToTbn is the fragment's two lines: <c>xy = (2 * (x, y) - 1) * scale</c>, z what makes it unit length - scale 1 where left out.
+    /// </summary>
+    [Theory]
+    [InlineData("", 1f)]
+    [InlineData(",\"parameters\":[{\"value\":0.5}]", 0.5f)]
+    public void NORMALTEXTOTBNIsTheFragmentsTwoLines(string parameters, float scale)
+    {
+        float x = ((2f * 0.75f) - 1f) * scale;
+        float y = ((2f * 0.6f) - 1f) * scale;
+        AssertColour(
+            Colouring(
+                $$$"""
+                  {"type":"ConstantFloat","index":0,"parameters":[{"value":0.75}]},
+                  {"type":"ConstantFloat","index":1,"parameters":[{"value":0.6}]},
+                  {"type":"NormalTexToTbn","index":0{{{parameters}}}}
+                """,
+                """
+                  {"src":{"type":"ConstantFloat","index":0,"variable":"output"},"dst":{"type":"NormalTexToTbn","index":0,"variable":"x"}},
+                  {"src":{"type":"ConstantFloat","index":1,"variable":"output"},"dst":{"type":"NormalTexToTbn","index":0,"variable":"y"}}
+                """,
+                "NormalTexToTbn", "tbn_normal"),
+            x, y, MathF.Sqrt(1f - (x * x) - (y * y)));
+    }
+
+    /// <summary>A metal: black albedo, a gold-ordered specular colour, and a gloss of one half.</summary>
+    private const string Metal = """
+        {"nodes":[
+          {"type":"ConstantPixel3","index":0,"parameters":[{"value":[0.0,0.0,0.0]}]},
+          {"type":"ConstantPixel3","index":1,"parameters":[{"value":[0.5,0.25,0.125]}]},
+          {"type":"ConstantPixel","index":0,"parameters":[{"value":0.5}]},
+          {"type":"AlbedoColor","index":0,"stage":"Texturing_Init"},
+          {"type":"SpecularColor","index":0,"stage":"Texturing_Init"},
+          {"type":"Glossiness","index":0,"stage":"Texturing_Init"}],
+         "links":[
+          {"src":{"type":"ConstantPixel3","index":0,"variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"xyz"}},
+          {"src":{"type":"ConstantPixel3","index":1,"variable":"output"},"dst":{"type":"SpecularColor","index":0,"stage":"Texturing_Init","variable":"input"}},
+          {"src":{"type":"ConstantPixel","index":0,"variable":"output"},"dst":{"type":"Glossiness","index":0,"stage":"Texturing_Init","variable":"input"}}]}
+        """;
+
     [Fact]
     public void TIMEIsTheClockTheDrawingIsAt()
     {

@@ -218,6 +218,11 @@ public sealed record OverlaySettings(
     [property: JsonPropertyName("modelLight")] bool ModelLight = true,
     [property: JsonPropertyName("modelLightTarget")] float ModelLightTarget = 0f,
 
+    // Whether the model panes light a specular colour flat rather than the game's way - the
+    // cheap choice where the game's GGX is too slow. Off, the usual, is the game's. One for every
+    // book, since it is the same question in each. See MonsterPortrait.FlatLight.
+    [property: JsonPropertyName("modelFlatLight")] bool ModelFlatLight = false,
+
     // Whether the monster book's facet rail has a pane of its own. ON by default, because a rail
     // nobody knows about is a rail nobody opens - and OFF is a real setting because this window is
     // read WHILE PLAYING: three panes wide enough to read is most of a monitor, and the game wants
