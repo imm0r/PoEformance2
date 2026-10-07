@@ -41,13 +41,13 @@ public class GraphSurveyTests
         """
         {"nodes":[
           {"type":"ConstantFloat","index":0,"parameters":[{"value":0.5}]},
-          {"type":"DepthDistance","index":0},
+          {"type":"BreachMinSphereDist","index":0},
           {"type":"NormalTexToTbn","index":0},
           {"type":"TbnNormal","index":0,"stage":"PixelOutput_Calc"},
           {"type":"AlbedoColor","index":0,"stage":"PixelOutput_Calc"}],
          "links":[
-          {"src":{"type":"ConstantFloat","index":0,"variable":"output"},"dst":{"type":"DepthDistance","index":0,"variable":"in_value"}},
-          {"src":{"type":"DepthDistance","index":0,"variable":"out_value"},"dst":{"type":"AlbedoColor","index":0,"stage":"PixelOutput_Calc","variable":"input"}},
+          {"src":{"type":"ConstantFloat","index":0,"variable":"output"},"dst":{"type":"BreachMinSphereDist","index":0,"variable":"in_value"}},
+          {"src":{"type":"BreachMinSphereDist","index":0,"variable":"out_value"},"dst":{"type":"AlbedoColor","index":0,"stage":"PixelOutput_Calc","variable":"input"}},
           {"src":{"type":"NormalTexToTbn","index":0,"variable":"tbn_normal"},"dst":{"type":"TbnNormal","index":0,"stage":"PixelOutput_Calc","variable":"input"}}]}
         """;
 
@@ -96,16 +96,16 @@ public class GraphSurveyTests
         Assert.Contains(
             "  FromVertexLocalUV · alone 2 · among 2 · graphs 1 · Art/Models/Monsters 1, Art/Textures/Environment 1",
             survey, StringComparison.Ordinal);
-        Assert.Contains("  DepthDistance · alone 0 · among 1 · graphs 1 · Art/Textures/Environment 1", survey, StringComparison.Ordinal);
+        Assert.Contains("  BreachMinSphereDist · alone 0 · among 1 · graphs 1 · Art/Textures/Environment 1", survey, StringComparison.Ordinal);
         Assert.Contains("  stage PixelOutput_Calc · alone 0 · among 1", survey, StringComparison.Ordinal);
         Assert.DoesNotContain("NormalTexToTbn ·", survey, StringComparison.Ordinal);
         Assert.True(
             survey.IndexOf("  FromVertexLocalUV · alone", StringComparison.Ordinal)
-                < survey.IndexOf("  DepthDistance · alone", StringComparison.Ordinal),
+                < survey.IndexOf("  BreachMinSphereDist · alone", StringComparison.Ordinal),
             "what completes the most comes first");
 
         Assert.Contains("  1. FromVertexLocalUV · completes 2 · 75.0% of the coloured materials evaluate whole after it", survey, StringComparison.Ordinal);
-        Assert.Contains("  2. DepthDistance · completes 0 · 75.0%", survey, StringComparison.Ordinal);
+        Assert.Contains("  2. BreachMinSphereDist · completes 0 · 75.0%", survey, StringComparison.Ordinal);
         Assert.Contains("  3. stage PixelOutput_Calc · completes 1 · 100.0%", survey, StringComparison.Ordinal);
 
         Assert.Contains("  Metadata/Tinted.fxgraph · 2 materials · missing FromVertexLocalUV", survey, StringComparison.Ordinal);
@@ -192,12 +192,12 @@ public class GraphSurveyTests
             {"nodes":[
               {"type":"InputUV","index":0,"stage":"Texturing_Init"},
               {"type":"SampleTexture","index":0,"parameters":[{"path":"Art/a.dds","srgb":true},{}]},
-              {"type":"DepthDistance","index":0},
+              {"type":"BreachMinSphereDist","index":0},
               {"type":"AlbedoColor","index":0,"stage":"Texturing_Init"}],
              "links":[
               {"src":{"type":"InputUV","index":0,"stage":"Texturing_Init","variable":"output"},"dst":{"type":"SampleTexture","index":0,"variable":"uv"}},
               {"src":{"type":"SampleTexture","index":0,"variable":"rgba","swizzle":"xyz"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"xyz"}},
-              {"src":{"type":"DepthDistance","index":0,"variable":"distance"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"w"}}]}
+              {"src":{"type":"BreachMinSphereDist","index":0,"variable":"dist"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"w"}}]}
             """;
         var files = new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase)
         {
@@ -208,7 +208,7 @@ public class GraphSurveyTests
         string survey = GraphSurvey.Of(path => files.GetValueOrDefault(path), ["Art/Textures/Environment/a.mat"]);
 
         Assert.Contains("    1 evaluate whole now (100.0%)", survey, StringComparison.Ordinal);
-        Assert.DoesNotContain("DepthDistance", survey, StringComparison.Ordinal);
+        Assert.DoesNotContain("BreachMinSphereDist", survey, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -222,7 +222,7 @@ public class GraphSurveyTests
         Assert.True(ShadeProgram.Knows("InputIndirectColor"));
         Assert.True(ShadeProgram.Knows("SampleInputTriplanar"));
         Assert.True(ShadeProgram.Knows("Noise31"));
-        Assert.False(ShadeProgram.Knows("DepthDistance"));
+        Assert.False(ShadeProgram.Knows("BreachMinSphereDist"));
         Assert.True(ShadeProgram.Knows("InputVertexColor"));
         Assert.False(ShadeProgram.Knows("InputVertexUV"));
         Assert.True(ShadeProgram.Knows("FromVertexLocalPosition"));
@@ -243,6 +243,34 @@ public class GraphSurveyTests
     [Fact]
     public void ANDNOTHINGToSurveyIsSaidRatherThanCounted()
         => Assert.StartsWith("no survey", GraphSurvey.Of(null, ["a.mat"]), StringComparison.Ordinal);
+
+    /// <summary>
+    /// The survey counts where a material's graphs name two blend modes that differ, and whether the picture differs by which one stands.
+    /// </summary>
+    /// <remarks>
+    /// Three materials: one whose graphs say Opaque and then AlphaBlend - drawn solid or mixed by the
+    /// rule - one whose say AlphaBlend and then NoZWriteAlphaBlend - two names, both mixed - and one
+    /// naming a single mode, which no rule can change.
+    /// </remarks>
+    [Fact]
+    public void THESURVEYCountsWhereTheBlendRuleChangesWhatIsDrawn()
+    {
+        var files = new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["Metadata/Opaque.fxgraph"] = Encoding.UTF8.GetBytes("""{"version":3,"overriden_blend_mode":"Opaque"}"""),
+            ["Metadata/ForceAlphaBlend.fxgraph"] = Encoding.UTF8.GetBytes("""{"version":3,"overriden_blend_mode":"AlphaBlend"}"""),
+            ["Metadata/ForceNoZWriteAlphaBlend.fxgraph"] = Encoding.UTF8.GetBytes("""{"version":3,"overriden_blend_mode":"NoZWriteAlphaBlend"}"""),
+            ["Art/solid-or-mixed.mat"] = Material("Metadata/Opaque.fxgraph", "Metadata/ForceAlphaBlend.fxgraph"),
+            ["Art/mixed-either-way.mat"] = Material("Metadata/ForceAlphaBlend.fxgraph", "Metadata/ForceNoZWriteAlphaBlend.fxgraph"),
+            ["Art/one-mode.mat"] = Material("Metadata/ForceAlphaBlend.fxgraph"),
+        };
+
+        string survey = GraphSurvey.Of(path => files.GetValueOrDefault(path), [.. files.Keys.Where(one => one.EndsWith(".mat", StringComparison.Ordinal))]);
+
+        Assert.Contains("  3 materials name a blend mode; 2 name two that differ, and for 1 of those what is drawn differs by which one stands", survey, StringComparison.Ordinal);
+        Assert.Contains("    Opaque → AlphaBlend · opaque / mixed · 1 · Art/solid-or-mixed.mat", survey, StringComparison.Ordinal);
+        Assert.Contains("    AlphaBlend → NoZWriteAlphaBlend · mixed / mixed · 1 · Art/mixed-either-way.mat", survey, StringComparison.Ordinal);
+    }
 
     private static byte[] Material(params string[] graphs)
         => Encoding.UTF8.GetBytes(

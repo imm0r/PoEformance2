@@ -726,7 +726,9 @@ public static class MeshPicture
             canvas.Keeping();
         }
 
-        var drawn = new Drawn(mesh, triangles, lamp, ink, palette, translucent, programs, stride, places, turns, ticking, clocked);
+        // A POINT'S DEPTH IS THE VIEW'S THIRD COLUMN, the way into the picture - see ShadeProgram.Eye.
+        var eye = new Vector4(view.M13, view.M23, view.M33, view.M43);
+        var drawn = new Drawn(mesh, triangles, lamp, ink, palette, translucent, programs, stride, places, turns, ticking, clocked, eye);
         InBands(canvas, new Drawing(canvas, drawn), again: false);
         if (clocked > 0)
         {
@@ -887,9 +889,10 @@ public static class MeshPicture
     /// <param name="Turns">The model-space normals a program reads.</param>
     /// <param name="Ticking">Which programs read the clock, by their place in <paramref name="Programs"/> - empty where the drawing keeps nothing.</param>
     /// <param name="Clocked">How many of <see cref="Canvas.Clocked"/> are the clock's - nought where the drawing keeps nothing.</param>
+    /// <param name="Eye">The way into the picture in the model's space and the origin's depth - see ShadeProgram.Eye.</param>
     internal sealed record Drawn(
         SkinnedMesh Mesh, int Triangles, Vector3 Lamp, Vector3 Ink, Mipmaps?[] Palette, bool Translucent,
-        ShadeProgram[] Programs, int Stride, Vector3[] Places, Vector3[] Turns, bool[] Ticking, int Clocked);
+        ShadeProgram[] Programs, int Stride, Vector3[] Places, Vector3[] Turns, bool[] Ticking, int Clocked, Vector4 Eye);
 
     /// <summary>The rows in one band - see <see cref="InBands"/>.</summary>
     private const int BandRows = 8;
@@ -1313,6 +1316,7 @@ public static class MeshPicture
         private readonly bool _translucent;
         private readonly ShadeProgram[] _programs;
         private readonly float _time;
+        private readonly Vector4 _eye;
         private readonly int[] _shades;
         private readonly float[] _shadeLevels;
         private readonly int _stride;
@@ -1333,6 +1337,7 @@ public static class MeshPicture
         {
             SkinnedMesh mesh = drawn.Mesh;
             _time = canvas.Time;
+            _eye = drawn.Eye;
             _programs = drawn.Programs;
             _shades = canvas.Shades;
             _shadeLevels = canvas.ShadeLevels;
@@ -1473,18 +1478,19 @@ public static class MeshPicture
             // A TIE GOES TO WHICHEVER COMES FIRST IN THE MESH, where the passes are split - see Again.
             bool ranked = _winners is not null && !Translucent(blend);
 
-            // A SHADE PROGRAM WHERE THE TRIANGLE HAS ONE AND IS SOLID OR CUT OUT: a translucent shape
-            // is drawn by its texture's own alpha, which a program's colour does not carry. A cut-out
-            // one takes its EDGE from the texture's alpha and its colour from the program - foliage is
-            // cut out, and a tree whose leaves are shaded by a vertex-colour graph (VertexColourAO)
-            // never ran it while cut-outs were drawn plain.
+            // A SHADE PROGRAM WHERE THE TRIANGLE HAS ONE AND IS SOLID, CUT OUT OR MIXED. A cut-out one
+            // takes its EDGE from the texture's alpha and its colour from the program - foliage is cut
+            // out, and a tree whose leaves are shaded by a vertex-colour graph (VertexColourAO) never
+            // ran it while cut-outs were drawn plain. A mixed one takes both from the program, which is
+            // what a ground layer's graphs make its alpha of: a mud whose texture has no alpha at all
+            // fades by the depth behind it (ParallaxUvSpaceContactFade). Added light stays its texture's.
             int shadeAt = _programs.Length > 0 ? _shades[one] : -1;
-            ShadeProgram? program = shadeAt >= 0 && blend is MaterialBlend.Opaque or MaterialBlend.Cutout ? _programs[shadeAt] : null;
+            ShadeProgram? program = shadeAt >= 0 && blend is MaterialBlend.Opaque or MaterialBlend.Cutout or MaterialBlend.Alpha ? _programs[shadeAt] : null;
             Span<Vector4> registers = program is null ? default : stackalloc Vector4[program.Registers];
             ReadOnlySpan<float> shadeLevels = program is null
                 ? default
                 : new ReadOnlySpan<float>(_shadeLevels, one * _stride, program.Samples);
-            program?.Preset(registers, _time);
+            program?.Preset(registers, _time, _eye);
             Vector3 p0 = default, p1 = default, p2 = default, n0 = default, n1 = default, n2 = default;
             Vector4 v0 = default, v1 = default, v2 = default;
             bool tinted = program is { UsesVertexColour: true };
@@ -1512,6 +1518,13 @@ public static class MeshPicture
                 s0 = _coordinates[i0];
                 s1 = _coordinates[i1];
                 s2 = _coordinates[i2];
+            }
+
+            // THE TRIANGLE'S OWN ∂p/∂u AND ∂p/∂v where a march reads them - see FixModelTBN.
+            if (program is { UsesTangents: true })
+            {
+                (Vector3 tangent, Vector3 binormal) = ShadeProgram.Spanned(p0, p1, p2, s0, s1, s2);
+                ShadeProgram.Frame(registers, tangent, binormal);
             }
 
             for (int y = top; y <= foot; y++)
@@ -1554,8 +1567,41 @@ public static class MeshPicture
                             continue;
                         }
 
-                        _stamps[at] = owner;
                         Spot spot_ = new(first, second, third);
+                        if (program is not null)
+                        {
+                            // THE SOLID DEPTH IS STILL WHAT THE BUFFER HOLDS: the translucent pass
+                            // writes none - see Band - so a layer measures against the ground under it.
+                            Vector3 mixed = program.Colour(
+                                registers,
+                                spot_.Of(s0, s1, s2),
+                                (first * p0) + (second * p1) + (third * p2),
+                                (first * n0) + (second * n1) + (third * n2),
+                                shadeLevels,
+                                out float cover,
+                                out Vector3 mixedSpecular,
+                                out float mixedGloss,
+                                tinted ? (first * v0) + (second * v1) + (third * v2) : default,
+                                held);
+
+                            // THE PROGRAM'S ALPHA WHERE ITS GRAPHS SET ONE, the texture's where they
+                            // do not - a mixed shape whose graphs only colour it is drawn as it was.
+                            if (!program.HasAlpha && !float.IsNegativeInfinity(cover))
+                            {
+                                cover = skinned ? Sample4(skin!, spot_.Of(s0, s1, s2), level).W : 0.5f;
+                            }
+
+                            if (!(cover > 0f))
+                            {
+                                continue;
+                            }
+
+                            _stamps[at] = owner;
+                            Over(at, blend, new Vector4(Lit(program, mixed, mixedSpecular, mixedGloss, (first * f0) + (second * f1) + (third * f2)), cover));
+                            continue;
+                        }
+
+                        _stamps[at] = owner;
                         Over(at, blend, skinned ? Sample4(skin!, spot_.Of(s0, s1, s2), level) : new Vector4(_ink, 0.5f));
                         continue;
                     }
@@ -1585,7 +1631,7 @@ public static class MeshPicture
                             out specular,
                             out gloss,
                             tinted ? (first * v0) + (second * v1) + (third * v2) : default);
-                        if (cut && program.HasAlpha && alpha < CutoutAlpha)
+                        if ((cut && program.HasAlpha && alpha < CutoutAlpha) || float.IsNegativeInfinity(alpha))
                         {
                             continue;
                         }
@@ -1621,38 +1667,43 @@ public static class MeshPicture
                         _winners![at] = one;
                     }
 
-                    Vector3 normal = (first * f0) + (second * f1) + (third * f2);
-                    if (normal.LengthSquared() > 1e-6f)
-                    {
-                        normal = Vector3.Normalize(normal);
-                    }
-
-                    // TWO-SIDED, because the mesh's winding is not established and a single-sided
-                    // light leaves whole limbs black where the triangles happen to face away.
-                    float lit = MathF.Abs(Vector3.Dot(normal, _lamp));
-                    float shade = Ambient + ((1f - Ambient) * lit);
-
-                    // A SPECULAR COLOUR IS LIGHT TOO - a metal's albedo is black and its colour is all
-                    // in it. The glossy program is lit the game's way, the other flat; see Glossed and Flat.
-                    if (program is { HasSpecular: true })
-                    {
-                        if (program.HasGloss)
-                        {
-                            colour = Glossed(colour, shade, normal, specular, gloss);
-                            shade = 1f;
-                        }
-                        else
-                        {
-                            colour = Flat(colour, specular);
-                        }
-                    }
-
-                    _pixels[at * 4] = Byte(colour.X * shade);
-                    _pixels[(at * 4) + 1] = Byte(colour.Y * shade);
-                    _pixels[(at * 4) + 2] = Byte(colour.Z * shade);
+                    Vector3 shown = Lit(program, colour, specular, gloss, (first * f0) + (second * f1) + (third * f2));
+                    _pixels[at * 4] = Byte(shown.X);
+                    _pixels[(at * 4) + 1] = Byte(shown.Y);
+                    _pixels[(at * 4) + 2] = Byte(shown.Z);
                     _pixels[(at * 4) + 3] = 255;
                 }
             }
+        }
+
+        /// <summary>One pixel's colour under the picture's light - the solid pass's and a mixed program's alike.</summary>
+        /// <param name="program">The program the colour came from, or null for a texture's or the ink.</param>
+        /// <param name="colour">The colour, sRGB nought to one.</param>
+        /// <param name="specular">The program's specular colour, linear.</param>
+        /// <param name="gloss">The program's gloss.</param>
+        /// <param name="facing">The pixel's normal in view space, interpolated.</param>
+        private Vector3 Lit(ShadeProgram? program, Vector3 colour, Vector3 specular, float gloss, Vector3 facing)
+        {
+            Vector3 normal = facing.LengthSquared() > 1e-6f ? Vector3.Normalize(facing) : facing;
+
+            // TWO-SIDED, because the mesh's winding is not established and a single-sided
+            // light leaves whole limbs black where the triangles happen to face away.
+            float lit = MathF.Abs(Vector3.Dot(normal, _lamp));
+            float shade = Ambient + ((1f - Ambient) * lit);
+
+            // A SPECULAR COLOUR IS LIGHT TOO - a metal's albedo is black and its colour is all
+            // in it. The glossy program is lit the game's way, the other flat; see Glossed and Flat.
+            if (program is { HasSpecular: true })
+            {
+                if (program.HasGloss)
+                {
+                    return Glossed(colour, shade, normal, specular, gloss);
+                }
+
+                colour = Flat(colour, specular);
+            }
+
+            return colour * shade;
         }
 
         /// <summary>

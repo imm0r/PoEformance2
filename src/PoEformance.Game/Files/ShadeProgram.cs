@@ -85,10 +85,10 @@ public sealed record ShadeCompile(ShadeProgram? Program, IReadOnlyList<string> S
 /// unlinked; a node with nothing linked into it at all is another question, and a writer like that
 /// is still taken to write nothing (see Fed).
 ///
-/// ONLY THE COLOUR'S XYZ IS DRAWN - the renderer runs a program on opaque triangles alone and takes
-/// three components - so a colour's w is compiled apart from its xyz: where the w cannot be (a
-/// soft particle's fade by the depth behind it) the colour stands and its w is marked unset, and a
-/// later graph reading that w is refused, not handed nought.
+/// A COLOUR'S W IS COMPILED APART FROM ITS XYZ. The xyz is what is drawn; the w is the alpha a
+/// cut-out shape is cut on and a mixed one is mixed by - a ground layer's fade by the solid depth
+/// behind it (see Behind) - and where the w cannot be worked out the colour stands, its w is marked
+/// unset, and a later graph reading that w is refused, not handed nought.
 ///
 /// <c>InputVertexColor</c> IS THE MESH'S COLOUR STREAM - four bytes a vertex behind bit 1 of the
 /// vertex format word (see SkinnedMesh.Colours for how that was established), interpolated and
@@ -148,8 +148,42 @@ public sealed class ShadeProgram
     /// </remarks>
     internal const int Clock = 5;
 
+    /// <summary>
+    /// The depth of the solid surface behind the pixel, in all four - what DepthDistance and MaskedContactFade measure a layer against.
+    /// </summary>
+    /// <remarks>
+    /// THE ENGINE READS IT OUT OF ITS DEPTH BUFFER (ReadNonlinearDepth, depth_projection) and so does
+    /// the picture: a translucent triangle is drawn after every solid one and writes no depth, so what
+    /// the buffer holds under it is the solid surface the game's depth pass would hold there. In the
+    /// picture's own depth units - see <see cref="Eye"/>. The largest float where nothing solid is.
+    /// </remarks>
+    internal const int Behind = 6;
+
+    /// <summary>
+    /// The way into the picture in the model's space, in xyz, and the depth of the model's origin, in w - set per drawing.
+    /// </summary>
+    /// <remarks>
+    /// THE PICTURE'S CAMERA IS ORTHOGRAPHIC, so every view ray runs the same way and a point's depth
+    /// is one dot product: <c>dot(p, Eye.xyz) + Eye.w</c>, the view matrix's third column. That is
+    /// also the engine's <c>world_view_dir</c> - <c>-normalize(camera - world_pos)</c> points from the
+    /// eye into the scene - and its depth along the ray, which DepthDistance takes the difference of.
+    /// </remarks>
+    internal const int Eye = 7;
+
+    /// <summary>How far the triangle's surface moves per unit of u - ∂p/∂u - set per triangle. See FixModelTBN.</summary>
+    internal const int Tangent = 8;
+
+    /// <summary>How far the triangle's surface moves per unit of v - ∂p/∂v - set per triangle. See FixModelTBN.</summary>
+    internal const int Binormal = 9;
+
+    /// <summary>Set in x where a step discarded the pixel, as the engine's <c>discard</c> does.</summary>
+    internal const int Dropped = 10;
+
     /// <summary>How many registers are the mesh's own, before any a program allocates.</summary>
-    private const int Fixed = 6;
+    private const int Fixed = 11;
+
+    /// <summary>Stands in for FixModelTBN's basis, which only ParallaxUvSpace takes - see <see cref="Basis"/>.</summary>
+    private const int FixedBasis = -3;
 
     /// <summary>
     /// Stands in for the TBN basis, which is a matrix and so in no register - see <see cref="Basis"/>'s use in Transform.
@@ -230,6 +264,7 @@ public sealed class ShadeProgram
             "FromVertexColor", "Time",
             "ModelOrigin", "GroundScroll", "Transform", "LookUpTexture",
             "Noise31", "PerlinNoise31", "Vibrance", "Rotate", "RotateUV", "RadiusToPolarNorm",
+            "DepthDistance", "GetDepthDistance", "MaskedContactFade", "ViewDir", "FixModelTBN", "ParallaxUvSpace",
         ],
         StringComparer.Ordinal);
 
@@ -277,8 +312,11 @@ public sealed class ShadeProgram
         Graphs = graphs;
         _sheets = sheets;
         UsesNormal = result == Normal || steps.Any(one => one.Reads(Normal));
-        UsesVertexNormal = result == VertexNormal || steps.Any(one => one.Reads(VertexNormal));
+        UsesVertexNormal = result == VertexNormal || steps.Any(one => one.Reads(VertexNormal) || one.Op == Op.Parallax);
         UsesVertexColour = result == VertexColour || steps.Any(one => one.Reads(VertexColour));
+        UsesTangents = steps.Any(one => one.Op == Op.Parallax);
+        UsesDepth = steps.Any(one => one.Op is Op.Depth or Op.ContactFade);
+        Discards = steps.Any(one => one.Op == Op.ContactFade || (one.Op == Op.Depth && one.Extra != 0));
         UsesTime = result == Clock || specular == Clock || gloss == Clock || steps.Any(one => one.Reads(Clock));
     }
 
@@ -330,6 +368,15 @@ public sealed class ShadeProgram
         Sine,
         Sample,
         SampleLod,
+
+        /// <summary>DepthDistance: how far the solid surface behind lies past a point, along the view - discarding where it lies before it when Extra says so.</summary>
+        Depth,
+
+        /// <summary>MaskedContactFade: a colour's alpha faded by how far the solid surface lies below it, and discarded where it lies above.</summary>
+        ContactFade,
+
+        /// <summary>ParallaxUvSpace: the coordinates and the distance along the view where the ray meets the height texture - B is the read, like Sample's.</summary>
+        Parallax,
     }
 
     /// <summary>The stages a colour is assembled across, in the order they are run.</summary>
@@ -397,6 +444,15 @@ public sealed class ShadeProgram
 
     /// <summary>Whether a run reads the game's clock - then the picture changes as it runs, and is redrawn as an animation is.</summary>
     public bool UsesTime { get; }
+
+    /// <summary>Whether a step reads the triangle's ∂p/∂u and ∂p/∂v - see <see cref="Frame"/>.</summary>
+    public bool UsesTangents { get; }
+
+    /// <summary>Whether a step reads the solid surface's depth behind the pixel - see <see cref="Behind"/>.</summary>
+    public bool UsesDepth { get; }
+
+    /// <summary>Whether a step may discard the pixel - see <see cref="Dropped"/>.</summary>
+    public bool Discards { get; }
 
     /// <summary>Whether a run also leaves the specular colour the graphs wrote - see <see cref="Glossy"/>.</summary>
     public bool HasSpecular => _specular >= 0;
@@ -510,11 +566,31 @@ public sealed class ShadeProgram
             }
         }
 
+        // WHAT EACH STAGE SAW, per graph - a read is of its own stage (see Unit). Copied only when a
+        // write has changed something since the last copy, so a stage nobody writes at costs a reference.
+        var views = new IReadOnlyDictionary<string, Held>?[chain.Count, Stages.Count];
+        var units = new Unit?[chain.Count];
+        var pinned = new bool[chain.Count];
+        for (var link = 0; link < chain.Count; link++)
+        {
+            pinned[link] = chain[link].Graph.Nodes.All(node => ReadBy(node.Type) is null || IndexOf(node.Stage) >= 0);
+        }
+
+        var changes = 0;
+        var copied = -1;
+        IReadOnlyDictionary<string, Held> copy = state;
         for (var at = 0; at < Stages.Count; at++)
         {
             string stage = Stages[at];
             for (var link = 0; link < chain.Count; link++)
             {
+                if (copied != changes)
+                {
+                    copy = new Dictionary<string, Held>(state, StringComparer.Ordinal);
+                    copied = changes;
+                }
+
+                views[link, at] = copy;
                 if (writers[link, at] is not { } mine)
                 {
                     continue;
@@ -524,8 +600,12 @@ public sealed class ShadeProgram
                 // - so the snapshot is taken once, and one unit serves every write, sharing what they share.
                 (ShaderInstance instance, _) = chain[link];
                 string named = Named(instance.Parent);
-                var seen = new Dictionary<string, Held>(state, StringComparer.Ordinal);
-                var unit = new Unit(build, lookups[link], instance, seen, lost, moved);
+                IReadOnlyDictionary<string, Held> seen = copy;
+                int graph = link;
+                Unit unit = pinned[link]
+                    ? units[link] ??= new Unit(build, lookups[link], instance, seen, lost, moved, stageAt => views[graph, stageAt])
+                    : new Unit(build, lookups[link], instance, seen, lost, moved, _ => seen);
+                unit.At(seen);
                 var wrote = new List<(string Channel, int Register, int Unset, bool Alpha)>();
                 foreach (Writer writer in mine)
                 {
@@ -576,6 +656,7 @@ public sealed class ShadeProgram
                 // IN THE GRAPH'S OWN ORDER, so a second write of one channel stands over the first.
                 foreach ((string channel, int register, int unset, bool alpha) in wrote)
                 {
+                    changes++;
                     if (register == int.MinValue)
                     {
                         state.Remove(channel);
@@ -658,13 +739,54 @@ public sealed class ShadeProgram
     /// <summary>
     /// Puts the constants in their registers - once per triangle, since nothing writes them.
     /// </summary>
-    internal void Preset(Span<Vector4> registers, float time = 0f)
+    /// <param name="registers">The registers.</param>
+    /// <param name="time">The clock - see <see cref="Clock"/>.</param>
+    /// <param name="eye">The way into the picture and the origin's depth - see <see cref="Eye"/>.</param>
+    internal void Preset(Span<Vector4> registers, float time = 0f, Vector4 eye = default)
     {
         registers[Clock] = new Vector4(time);
+        registers[Behind] = new Vector4(float.MaxValue);
+        registers[Eye] = eye;
+        registers[Tangent] = Vector4.Zero;
+        registers[Binormal] = Vector4.Zero;
+        registers[Dropped] = Vector4.Zero;
         for (var one = 0; one < _constantAt.Length; one++)
         {
             registers[_constantAt[one]] = _constants[one];
         }
+    }
+
+    /// <summary>
+    /// Puts one triangle's ∂p/∂u and ∂p/∂v in their registers - what FixModelTBN's screen-space frame comes to on a flat triangle.
+    /// </summary>
+    internal static void Frame(Span<Vector4> registers, Vector3 tangent, Vector3 binormal)
+    {
+        registers[Tangent] = new Vector4(tangent, 0f);
+        registers[Binormal] = new Vector4(binormal, 0f);
+    }
+
+    /// <summary>
+    /// A triangle's ∂p/∂u and ∂p/∂v from its corners: the two edges solved for the coordinates that run along them - nought where the coordinates do not span the triangle.
+    /// </summary>
+    /// <remarks>
+    /// GetScreenspaceTangentFrame's own system, <c>dp = T du + B dv</c>, solved with the triangle's two
+    /// edges where the engine solves it with the screen derivatives - which on a flat triangle are two
+    /// combinations of the same edges and give the same T and B.
+    /// </remarks>
+    internal static (Vector3 Tangent, Vector3 Binormal) Spanned(Vector3 p0, Vector3 p1, Vector3 p2, Vector2 s0, Vector2 s1, Vector2 s2)
+    {
+        Vector2 d1 = s1 - s0;
+        Vector2 d2 = s2 - s0;
+        float det = (d1.X * d2.Y) - (d2.X * d1.Y);
+        if (!(MathF.Abs(det) > 1e-12f))
+        {
+            return default;
+        }
+
+        Vector3 e1 = p1 - p0;
+        Vector3 e2 = p2 - p0;
+        float inv = 1f / det;
+        return (((e1 * d2.Y) - (e2 * d1.Y)) * inv, ((e2 * d1.X) - (e1 * d2.X)) * inv);
     }
 
     /// <summary>
@@ -697,11 +819,24 @@ public sealed class ShadeProgram
     /// The colour at one pixel, its alpha, and the specular colour and gloss the graphs left - linear,
     /// nought where <see cref="HasSpecular"/> or <see cref="HasGloss"/> says there are none.
     /// </summary>
+    /// <remarks>
+    /// A DISCARDED PIXEL COMES BACK WITH AN ALPHA OF MINUS INFINITY, below every cut-off and every
+    /// share of coverage, so a caller that draws by alpha drops it without having to be told.
+    /// </remarks>
     internal Vector3 Colour(
         Span<Vector4> registers, Vector2 coordinates, Vector3 position, Vector3 normal, ReadOnlySpan<float> levels,
-        out float alpha, out Vector3 specular, out float gloss, Vector4 vertexColour = default)
+        out float alpha, out Vector3 specular, out float gloss, Vector4 vertexColour = default, float behind = float.MaxValue)
     {
         registers[Coordinates] = new Vector4(coordinates, 0f, 0f);
+        if (UsesDepth)
+        {
+            registers[Behind] = new Vector4(behind);
+        }
+
+        if (Discards)
+        {
+            registers[Dropped] = Vector4.Zero;
+        }
         registers[Position] = new Vector4(position, 0f);
         if (UsesVertexColour)
         {
@@ -721,7 +856,7 @@ public sealed class ShadeProgram
         Run(registers, levels, default, -1);
 
         Vector4 colour = registers[_result];
-        alpha = colour.W;
+        alpha = Discards && registers[Dropped].X > 0f ? float.NegativeInfinity : colour.W;
         specular = _specular >= 0 ? new Vector3(registers[_specular].X, registers[_specular].Y, registers[_specular].Z) : default;
         gloss = _gloss >= 0 ? registers[_gloss].X : 0f;
         return new Vector3(Srgb(colour.X), Srgb(colour.Y), Srgb(colour.Z));
@@ -1027,6 +1162,40 @@ public sealed class ShadeProgram
 
                     break;
 
+                case Op.Depth:
+                {
+                    // DepthDistance: length(bottom - camera) - length(world_pos - camera), which on a
+                    // parallel view is the difference of the two depths along it.
+                    float distance = r[Behind].X - Deep(r, r[step.A]);
+                    if (step.Extra != 0 && distance < 0f)
+                    {
+                        r[Dropped] = Vector4.One;
+                    }
+
+                    r[step.To] = new Vector4(distance);
+                    break;
+                }
+
+                case Op.ContactFade:
+                    r[step.To] = Faded(r, step);
+                    break;
+
+                case Op.Parallax:
+                    if (corner >= 0)
+                    {
+                        // THE RAY STARTS WHERE THE COORDINATES ARE, so the height texture is read at
+                        // the level they step at - the raymarch's own ddx and ddy of the origin.
+                        Vector4 at = r[step.A];
+                        spots[(step.B * 3) + corner] = new Vector2(at.X, at.Y);
+                        r[step.To] = new Vector4(at.X, at.Y, 0f, 0f);
+                    }
+                    else
+                    {
+                        r[step.To] = Parallaxed(r, step, levels[step.B]);
+                    }
+
+                    break;
+
                 case Op.SampleLod:
                     r[step.To] = corner >= 0
                         ? Vector4.Zero
@@ -1042,6 +1211,105 @@ public sealed class ShadeProgram
     }
 
     /// <summary>One texture read at a level, linearised where the texture is sRGB.</summary>
+    /// <summary>A point's depth along the picture's view - see <see cref="Eye"/>.</summary>
+    private static float Deep(Span<Vector4> r, Vector4 point)
+    {
+        Vector4 eye = r[Eye];
+        return (point.X * eye.X) + (point.Y * eye.Y) + (point.Z * eye.Z) + eye.W;
+    }
+
+    /// <summary>
+    /// MaskedContactFade, as <c>shaders/renderer/nodes</c> writes it: the alpha times how far the solid surface lies below, over the fade distance - and discarded where it lies above.
+    /// </summary>
+    /// <remarks>
+    /// <c>surface_dist = bottom_world_pos.z - world_pos.z</c>, the point behind the pixel being the
+    /// pixel's point carried along the view to the solid depth - so it is the view's z times the depth
+    /// difference. The fade distance is the parameter times ten, shrinking to nothing as the normal
+    /// turns from straight up: <c>1 - pow(saturate(1 - |n.z|), 0.2)</c>. A division by nought is
+    /// HLSL's: past nought saturates to one, nought over nought is not a number and saturates to nought.
+    /// The mask texture the fragment samples is never used by it and is not read here.
+    /// </remarks>
+    private static Vector4 Faded(Span<Vector4> r, Step step)
+    {
+        Vector4 albedo = r[step.A];
+        float surface = r[Eye].Z * (r[Behind].X - Deep(r, r[step.B]));
+        if (surface < 0f)
+        {
+            r[Dropped] = Vector4.One;
+        }
+
+        float fade = r[step.D].X * 10f * (1f - MathF.Pow(Saturated(1f - MathF.Abs(r[step.C].Z)), 0.2f));
+        float ratio = fade > 0f ? Saturated(surface / fade) : surface > 0f ? 1f : 0f;
+        albedo.W *= ratio;
+        return albedo;
+    }
+
+    /// <summary>
+    /// ParallaxUvSpace, as the game's fragment writes it, with UvSpaceRaymarchChord: the coordinates where the view ray meets the height texture, in xy, and how far along the view that is, in z.
+    /// </summary>
+    /// <remarks>
+    /// <c>uv_to_world</c> is FixModelTBN's basis - the triangle's ∂p/∂u and ∂p/∂v, and the normal
+    /// scaled to the depth - inverted to carry the view into texture space, where the ray starts at
+    /// height one over the coordinates and runs down to nought. The march is the chord one, line for
+    /// line: linear steps until the ray dips under the height, then the chord between the last point
+    /// above and the first below, refined. D packs the depth, the offset and the two step counts.
+    /// The height is the texture's red, read with the wrap every read here has and at the level the
+    /// starting coordinates step at - the fragment's SAMPLE_TEX2DGRAD with the origin's ddx and ddy.
+    /// </remarks>
+    private Vector4 Parallaxed(Span<Vector4> r, Step step, float level)
+    {
+        Vector4 uv = r[step.A];
+        Vector4 packed = r[step.D];
+        Vector4 n = r[VertexNormal];
+        var normal = new Vector3(n.X, n.Y, n.Z);
+        float length = normal.Length();
+        var toWorld = new Matrix4x4(
+            r[Tangent].X, r[Tangent].Y, r[Tangent].Z, 0f,
+            r[Binormal].X, r[Binormal].Y, r[Binormal].Z, 0f,
+            normal.X / (length + 1e-7f) * packed.X, normal.Y / (length + 1e-7f) * packed.X, normal.Z / (length + 1e-7f) * packed.X, 0f,
+            0f, 0f, 0f, 1f);
+        if (!Matrix4x4.Invert(toWorld, out Matrix4x4 toUv))
+        {
+            return new Vector4(uv.X, uv.Y, 0f, 0f);
+        }
+
+        Vector4 way = r[step.C];
+        Vector3 dir = Vector3.TransformNormal(new Vector3(way.X, way.Y, way.Z), toUv);
+        float dz = MathF.Abs(dir.Z) > 1e-7f ? dir.Z : 1e-7f;
+        float offsetScale = packed.Y / dz;
+        var origin = new Vector3(uv.X + (dir.X * offsetScale), uv.Y + (dir.Y * offsetScale), 1f);
+
+        // UvSpaceRaymarchChord.
+        int linear = (int)packed.Z;
+        int refine = (int)packed.W;
+        float most = -origin.Z / dz;
+        float linearStep = 1f / (linear + 1);
+        var low = new Vector2(0f, -1f);
+        var high = new Vector2(1f, 1f);
+        float chord = 0f;
+        var found = false;
+        for (var at = 0; at < linear + refine + 2; at++)
+        {
+            float x = found ? chord : linearStep * at;
+            Vector3 point = origin + (dir * (most * x));
+            float y = Read(step.Extra, new Vector2(point.X, point.Y), level).X - point.Z;
+            if (y > 0f)
+            {
+                found = true;
+                high = new Vector2(x, y);
+            }
+            else
+            {
+                low = new Vector2(x, y);
+            }
+
+            chord = low.X + ((high.X - low.X) * Saturated(-low.Y / MathF.Max(1e-7f, -low.Y + high.Y)));
+        }
+
+        float along = (chord * most) + offsetScale;
+        return new Vector4(uv.X + (dir.X * along), uv.Y + (dir.Y * along), along, 0f);
+    }
+
     private Vector4 Read(int texture, Vector2 spot, float level)
     {
         Mipmaps? sheet = _sheets[texture];
@@ -1108,7 +1376,7 @@ public sealed class ShadeProgram
             // that wrote the rest; nothing else writes a register twice.
             keep[at] = true;
             Live(live, step.A);
-            if (step.Op != Op.Sample)
+            if (step.Op is not (Op.Sample or Op.Parallax))
             {
                 Live(live, step.B);
             }
@@ -1159,7 +1427,7 @@ public sealed class ShadeProgram
 
             int b = step.B;
             int extra = step.Extra;
-            if (step.Op is Op.Sample or Op.SampleLod)
+            if (step.Op is Op.Sample or Op.SampleLod or Op.Parallax)
             {
                 if (textureMap[extra] < 0)
                 {
@@ -1168,7 +1436,7 @@ public sealed class ShadeProgram
                 }
 
                 extra = textureMap[extra];
-                if (step.Op == Op.Sample)
+                if (step.Op is Op.Sample or Op.Parallax)
                 {
                     b = sampleTextures.Count;
                     sampleTextures.Add(extra);
@@ -1729,8 +1997,9 @@ public sealed class ShadeProgram
         {
             Op.Clear => false,
 
-            // A READ'S B IS WHICH LEVEL IT TAKES, not a register.
+            // A READ'S B IS WHICH LEVEL IT TAKES, not a register - and the parallax's march is a read.
             Op.Sample => A == register,
+            Op.Parallax => A == register || C == register || D == register || E == register,
             _ => A == register || B == register || C == register || D == register || E == register,
         };
     }
@@ -1884,6 +2153,14 @@ public sealed class ShadeProgram
             return at;
         }
 
+        /// <summary>A read's level slot for a step that reads a texture itself - the parallax's march.</summary>
+        public int Read(int texture)
+        {
+            int read = SampleTextures.Count;
+            SampleTextures.Add(texture);
+            return read;
+        }
+
         public int Sample(int texture, int coordinates)
         {
             int read = SampleTextures.Count;
@@ -1916,9 +2193,20 @@ public sealed class ShadeProgram
     }
 
     /// <summary>One graph's writes at one stage being compiled: its graph, its instance and the values it reads.</summary>
+    /// <remarks>
+    /// A READ IS OF ITS OWN STAGE. <c>InputUV</c> at UVSetup_Final reads the coordinates as they were
+    /// when that stage ran - before this graph's own write there - wherever its value is used: the
+    /// fragment is placed at its stage and its result carried on. ParallaxUvSpaceContactFade marches
+    /// from the UVSetup_Final coordinates and measures its fade, at Texturing_Final, at the point that
+    /// march found; read at Texturing_Final, the march would start from where it had already ended.
+    /// So a read takes the values its stage saw (<paramref name="viewAt"/>), and a unit whose every read
+    /// is pinned that way is shared by all of its graph's stages, so a node feeding two of them is
+    /// compiled once - a march is the most a pixel costs.
+    /// </remarks>
     private sealed class Unit(
         Builder build, Lookup lookup, ShaderInstance instance,
-        IReadOnlyDictionary<string, Held> seen, IReadOnlyDictionary<string, string> lost, Displaced moved)
+        IReadOnlyDictionary<string, Held> seen, IReadOnlyDictionary<string, string> lost, Displaced moved,
+        Func<int, IReadOnlyDictionary<string, Held>?> viewAt)
     {
         /// <summary>Every component taken from x - a float spread across a register.</summary>
         private const int Spread = 0b1111 << 8;
@@ -1934,6 +2222,16 @@ public sealed class ShadeProgram
 
         /// <summary>Begins one write.</summary>
         public void Start() => Why = string.Empty;
+
+        /// <summary>Moves the unit to the stage whose values are now <paramref name="now"/>.</summary>
+        public void At(IReadOnlyDictionary<string, Held> now) => seen = now;
+
+        /// <summary>The values a read sees: those of its own stage, or the current ones where it names none.</summary>
+        private IReadOnlyDictionary<string, Held>? Viewed(ShaderNode reader)
+        {
+            int at = IndexOf(reader.Stage);
+            return at < 0 ? seen : viewAt(at);
+        }
 
         /// <summary>Forgets what a write that was backed out compiled, from the register it was backed out to.</summary>
         public void Forget(int from)
@@ -2052,7 +2350,7 @@ public sealed class ShadeProgram
                 }
 
                 // A MATRIX OR A DIRECTION CUT INTO PARTS is neither any more.
-                if (from == Basis || build.Direction(from))
+                if (from is Basis or FixedBasis || build.Direction(from))
                 {
                     return Fail($"{node.Type} with part of the TBN basis");
                 }
@@ -2098,7 +2396,8 @@ public sealed class ShadeProgram
         {
             if (lookup.Node(source) is { } reader
                 && ReadBy(reader.Type) is { } channel
-                && seen.TryGetValue(channel, out Held held)
+                && Viewed(reader) is { } view
+                && view.TryGetValue(channel, out Held held)
                 && (Mask(swizzle) & held.Unset) != 0)
             {
                 return Fail($"{reader.Type}'s {Letters(Mask(swizzle) & held.Unset)}, which nothing has set");
@@ -2120,9 +2419,14 @@ public sealed class ShadeProgram
                 return null;
             }
 
-            if (register == Basis && (node.Type, port) is not (("Transform", "inmatrix") or ("TbnBasis", "input")))
+            if (register == Basis && (node.Type, port) is not (("Transform", "inmatrix") or ("TbnBasis", "input") or ("FixModelTBN", "model_tbn_basis")))
             {
                 return Fail($"{node.Type} reading the TBN basis");
+            }
+
+            if (register == FixedBasis && (node.Type, port) is not ("ParallaxUvSpace", "uv_to_world"))
+            {
+                return Fail($"{node.Type} reading FixModelTBN's basis");
             }
 
             if (build.Direction(register) && !Directional(node.Type, port))
@@ -2174,7 +2478,7 @@ public sealed class ShadeProgram
                 return known;
             }
 
-            if (node.Type is "SampleTexture2" or "SampleTextureAtlas2")
+            if (node.Type is "SampleTexture2" or "SampleTextureAtlas2" or "ParallaxUvSpace")
             {
                 return Paired(node, end.Variable);
             }
@@ -2213,21 +2517,24 @@ public sealed class ShadeProgram
                 return Fail($"{node.Type} feeding itself");
             }
 
-            (int First, int Second)? pair = node.Type == "SampleTexture2" ? Twice(node) : Atlas(node);
+            (int First, int Second)? pair = node.Type switch
+            {
+                "SampleTexture2" => Twice(node),
+                "ParallaxUvSpace" => Marched(node),
+                _ => Atlas(node),
+            };
             _open.Remove(node);
             if (pair is not { } registers)
             {
                 return null;
             }
 
-            _pairs[(node, "rgba0")] = registers.First;
-            _pairs[(node, "rgba1")] = registers.Second;
-            return output switch
-            {
-                "rgba0" => registers.First,
-                "rgba1" => registers.Second,
-                _ => Fail($"{node.Type} has no output called {output}"),
-            };
+            (string first, string second) = node.Type == "ParallaxUvSpace" ? ("out_uv", "out_world_pos") : ("rgba0", "rgba1");
+            _pairs[(node, first)] = registers.First;
+            _pairs[(node, second)] = registers.Second;
+            return output == first ? registers.First
+                : output == second ? registers.Second
+                : Fail($"{node.Type} has no output called {output}");
         }
 
         /// <summary>SampleTexture2: one texture read at two coordinates.</summary>
@@ -2266,7 +2573,12 @@ public sealed class ShadeProgram
         {
             if (ReadBy(node.Type) is { } channel)
             {
-                if (seen.TryGetValue(channel, out Held held))
+                if (Viewed(node) is not { } view)
+                {
+                    return Fail($"{node.Type} at {node.Stage}, read by a write at an earlier stage");
+                }
+
+                if (view.TryGetValue(channel, out Held held))
                 {
                     return held.Register;
                 }
@@ -2492,8 +2804,28 @@ public sealed class ShadeProgram
                 case "DotProduct3":
                 case "DotProduct4":
                     return Port(node, "a") is { } da && Port(node, "b") is { } db
-                        ? build.Emit(Op.Dot, da, db, extra: Width(node.Type))
+                        ? build.Emit(Op.Dot, Unit3(node, da), Unit3(node, db), extra: Width(node.Type))
                         : null;
+
+                // DepthDistance discards where the solid surface lies before the point; GetDepthDistance
+                // is the same distance without the discard.
+                case "DepthDistance":
+                case "GetDepthDistance":
+                    return Port(node, "world_pos") is { } deep
+                        ? build.Emit(Op.Depth, deep, extra: node.Type == "DepthDistance" ? 1 : 0)
+                        : null;
+
+                // -normalize(camera - world_pos): one way everywhere on a parallel view - see Eye.
+                case "ViewDir":
+                    return build.Emit(Op.Multiply, Eye, build.Constant(new Vector4(1f, 1f, 1f, 0f)));
+
+                case "MaskedContactFade":
+                    return Port(node, "in_albedo") is { } faded && Port(node, "world_pos") is { } contact && Port(node, "world_normal") is { } facing
+                        ? build.Emit(Op.ContactFade, faded, contact, facing, build.Constant(new Vector4(Said(node, 2, 10f))))
+                        : null;
+
+                case "FixModelTBN":
+                    return Fixed(node);
 
                 case "Length3":
                     return Single(node) is { } measured ? build.Emit(Op.Length, measured, extra: 3) : null;
@@ -3117,6 +3449,95 @@ public sealed class ShadeProgram
         }
 
         /// <summary>
+        /// An operand of a dot product, the basis's normal in it made unit length.
+        /// </summary>
+        /// <remarks>
+        /// THE ONE THING TAKEN AND NOT READ: the engine builds the pixel's TBN basis in a graph of its
+        /// own that is not among the sources, so whether its normal is normalised is not written down.
+        /// A dot product of it is a cosine wherever a graph uses one - ParallaxUvSpaceContactFade
+        /// weighs its fade by the view against the surface - so it is taken as one: exact if the
+        /// engine normalises, and off by the interpolation's shrink between unlike vertex normals if
+        /// it does not, which on a flat ground layer is nothing.
+        /// </remarks>
+        private int Unit3(ShaderNode node, int operand)
+            => node.Type == "DotProduct3" && build.Direction(operand) ? build.Emit(Op.Normalize, operand, extra: 3) : operand;
+
+        /// <summary>
+        /// FixModelTBN: the basis ParallaxUvSpace marches in - the triangle's ∂p/∂u and ∂p/∂v, and the model's normal.
+        /// </summary>
+        /// <remarks>
+        /// THE FRAGMENT TAKES EACH AXIS'S LENGTH FROM THE SCREEN-SPACE FRAME and its direction from the
+        /// model's own tangent and binormal, flipping the binormal. The mesh carries no tangents, and on
+        /// a flat triangle the screen-space frame IS ∂p/∂u and ∂p/∂v (see ShadeProgram.Spanned), so both
+        /// are taken from there - the same basis wherever the model's tangents run with its coordinates,
+        /// as tangents are built to. The coordinates and the position have to be the mesh's own for
+        /// that frame to be the one the fragment would find.
+        /// </remarks>
+        private int? Fixed(ShaderNode node)
+        {
+            if (Port(node, "model_tbn_basis") is not { } model || model != Basis)
+            {
+                return Fail("FixModelTBN of a basis other than the model's");
+            }
+
+            if (Port(node, "uv") is not { } coordinates || Port(node, "world_pos") is not { } position)
+            {
+                return null;
+            }
+
+            return coordinates == Coordinates && position == Position
+                ? FixedBasis
+                : Fail("FixModelTBN of coordinates or a position the mesh does not have");
+        }
+
+        /// <summary>
+        /// ParallaxUvSpace: the coordinates the view ray meets the height texture at, and the point there - see ShadeProgram.Parallaxed.
+        /// </summary>
+        /// <remarks>
+        /// THE STEP COUNTS ARE THE MARCH'S LOOPS and have to be constants - the fragment takes them as
+        /// ints. The depth, the offset and the counts ride one register; the march's own result holds
+        /// the coordinates in xy and the distance along the view in z, which the point is carried by.
+        /// </remarks>
+        private (int, int)? Marched(ShaderNode node)
+        {
+            if (Handed(node, "height_tex") is not { } height)
+            {
+                return null;
+            }
+
+            if (Port(node, "uv_to_world") is not { } basis || basis != FixedBasis)
+            {
+                Fail("ParallaxUvSpace in a basis other than FixModelTBN's");
+                return null;
+            }
+
+            if (Port(node, "depth") is not { } depth || Port(node, "offset") is not { } offset || Port(node, "in_uv") is not { } uv
+                || Port(node, "in_world_pos") is not { } position || Port(node, "in_world_dir") is not { } way
+                || Port(node, "lin_steps_count") is not { } linear || Port(node, "ref_steps_count") is not { } refine)
+            {
+                return null;
+            }
+
+            if (!build.ConstantOf(linear, out Vector4 linearSteps) || !build.ConstantOf(refine, out Vector4 refineSteps))
+            {
+                Fail("ParallaxUvSpace with step counts that are not constants");
+                return null;
+            }
+
+            int packed = build.Register();
+            build.Steps.Add(new Step(Op.Clear, packed, -1, -1, -1, -1, -1, 0));
+            build.Into(packed, depth, 0b0001 << 8);
+            build.Into(packed, offset, 0b0010 << 8);
+            build.Into(packed, build.Constant(new Vector4(0f, 0f, (int)linearSteps.X, (int)refineSteps.X)), (2 << 4) | (3 << 6) | (0b1100 << 8));
+
+            int marched = build.Emit(Op.Parallax, uv, build.Read(height), way, packed, extra: height);
+            int coordinates = build.Emit(Op.Multiply, marched, build.Constant(new Vector4(1f, 1f, 0f, 0f)));
+            int along = build.Register();
+            build.Into(along, marched, 2 | (2 << 2) | (2 << 4) | (2 << 6) | (0b1111 << 8));
+            return (coordinates, build.Emit(Op.MultiplyAdd, way, along, position));
+        }
+
+        /// <summary>
         /// Transform by the TBN basis, where the vector lies along the basis's normal alone.
         /// </summary>
         /// <remarks>
@@ -3224,7 +3645,7 @@ public sealed class ShadeProgram
         /// <summary>The ports a direction of unknown length may go to: where it is normalised before use, or passed through.</summary>
         private static bool Directional(string type, string port)
             => (type, port) is ("SampleInputTriplanar", "world_normal") or ("SampleTriplanar", "world_normal")
-                || type is "Normalize2" or "Normalize3" or "Normalize4" or "Dummy3" or "Dummy4";
+                || type is "Normalize2" or "Normalize3" or "Normalize4" or "Dummy3" or "Dummy4" or "DotProduct3";
 
         /// <summary>The width on the end of a node's type: 3 for Normalize3.</summary>
         private static int Width(string type) => type[^1] - '0';

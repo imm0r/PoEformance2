@@ -124,17 +124,17 @@ public class ShadeProgramTests
                 """
                 {"nodes":[
                   {"type":"InputWorldPos","index":0,"stage":"PreLighting"},
-                  {"type":"DepthDistance","index":0},
+                  {"type":"BreachMinSphereDist","index":0},
                   {"type":"AlbedoColor","index":0,"stage":"PreLighting"}],
                  "links":[
-                  {"src":{"type":"InputWorldPos","index":0,"stage":"PreLighting","variable":"output"},"dst":{"type":"DepthDistance","index":0,"variable":"world_pos"}},
-                  {"src":{"type":"DepthDistance","index":0,"variable":"distance"},"dst":{"type":"AlbedoColor","index":0,"stage":"PreLighting","variable":"input"}}]}
+                  {"src":{"type":"InputWorldPos","index":0,"stage":"PreLighting","variable":"output"},"dst":{"type":"BreachMinSphereDist","index":0,"variable":"world_pos"}},
+                  {"src":{"type":"BreachMinSphereDist","index":0,"variable":"dist"},"dst":{"type":"AlbedoColor","index":0,"stage":"PreLighting","variable":"input"}}]}
                 """)),
         ]);
 
         Assert.NotNull(compiled.Program);
         Assert.Equal(0, compiled.Program.Plain);
-        Assert.Equal(["DepthDistance in Dust_simple"], compiled.Skipped);
+        Assert.Equal(["BreachMinSphereDist in Dust_simple"], compiled.Skipped);
     }
 
     [Fact]
@@ -270,16 +270,29 @@ public class ShadeProgramTests
             compiled.Program.Textures);
     }
 
-    /// <summary>The tall dune: PBRGround's colour at OffsetUVTiling's coordinates, the contact fade named.</summary>
+    /// <summary>The tall dune: PBRGround's colour at OffsetUVTiling's coordinates, faded where it meets the ground under it.</summary>
+    /// <remarks>
+    /// THE FADE WAS NAMED AND LEFT OUT until MaskedContactFade was read from the game's own fragment:
+    /// it now compiles, measures against the solid depth behind the pixel, and discards where that
+    /// lies above the dune - see ShadeProgram.Faded.
+    /// </remarks>
     [Fact]
-    public void ANDTHEDUNEFromTheInstallTilesItsColourAndNamesTheFade()
+    public void ANDTHEDUNEFromTheInstallTilesItsColourAndFadesItWhereItMeetsTheGround()
     {
         ShadeCompile compiled = Real("Art/Textures/Environment/desert/GroundMaterials/TallDune1c.mat");
 
         Assert.NotNull(compiled.Program);
         Assert.Equal(-1, compiled.Program.Plain);
-        Assert.Equal(["Metadata/Effects/Graphs/General/BasicColour.fxgraph", "Metadata/Materials/Ground/PBRGround.fxgraph"], compiled.Program.Graphs);
-        Assert.Equal(["MaskedContactFade in MaskedContactFade"], compiled.Skipped);
+        Assert.Equal(
+            [
+                "Metadata/Effects/Graphs/General/BasicColour.fxgraph",
+                "Metadata/Materials/Ground/PBRGround.fxgraph",
+                "Metadata/Effects/Graphs/General/MaskedContactFade.fxgraph",
+            ],
+            compiled.Program.Graphs);
+        Assert.Empty(compiled.Skipped);
+        Assert.True(compiled.Program.UsesDepth);
+        Assert.True(compiled.Program.Discards);
     }
 
     /// <summary>
@@ -813,11 +826,11 @@ public class ShadeProgramTests
                 """
                 {"nodes":[
                   {"type":"InputWorldPos","index":0,"stage":"Texturing_Init"},
-                  {"type":"DepthDistance","index":0},
+                  {"type":"BreachMinSphereDist","index":0},
                   {"type":"IndirectColor","index":0,"stage":"Texturing_Init"}],
                  "links":[
-                  {"src":{"type":"InputWorldPos","index":0,"stage":"Texturing_Init","variable":"output"},"dst":{"type":"DepthDistance","index":0,"variable":"world_pos"}},
-                  {"src":{"type":"DepthDistance","index":0,"variable":"distance"},"dst":{"type":"IndirectColor","index":0,"stage":"Texturing_Init","variable":"input"}}]}
+                  {"src":{"type":"InputWorldPos","index":0,"stage":"Texturing_Init","variable":"output"},"dst":{"type":"BreachMinSphereDist","index":0,"variable":"world_pos"}},
+                  {"src":{"type":"BreachMinSphereDist","index":0,"variable":"dist"},"dst":{"type":"IndirectColor","index":0,"stage":"Texturing_Init","variable":"input"}}]}
                 """)),
             (Instance("Metadata/Reader.fxgraph"), Graph(Reading("InputIndirectColor", "xyz", "Texturing"))),
         ]);
@@ -979,10 +992,10 @@ public class ShadeProgramTests
         ShadeCompile alone = ShadeProgram.Compile([(Instance(), Graph(
             """
             {"nodes":[
-              {"type":"DepthDistance","index":0},
+              {"type":"BreachMinSphereDist","index":0},
               {"type":"AlbedoColor","index":0,"stage":"Texturing_Init"}],
              "links":[
-              {"src":{"type":"DepthDistance","index":0,"variable":"distance"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"w"}}]}
+              {"src":{"type":"BreachMinSphereDist","index":0,"variable":"dist"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"w"}}]}
             """))]);
         Assert.Null(alone.Program);
         Assert.Equal(["AlbedoColor with its w alone, whose xyz are then not written down in Test"], alone.Skipped);
@@ -1071,12 +1084,12 @@ public class ShadeProgramTests
         {"nodes":[
           {"type":"InputUV","index":0,"stage":"Texturing_Init"},
           {"type":"SampleTexture","index":0,"parameters":[{"path":"Art/a.dds","srgb":true},{}]},
-          {"type":"DepthDistance","index":0},
+          {"type":"BreachMinSphereDist","index":0},
           {"type":"AlbedoColor","index":0,"stage":"Texturing_Init"}],
          "links":[
           {"src":{"type":"InputUV","index":0,"stage":"Texturing_Init","variable":"output"},"dst":{"type":"SampleTexture","index":0,"variable":"uv"}},
           {"src":{"type":"SampleTexture","index":0,"variable":"rgba","swizzle":"xyz"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"xyz"}},
-          {"src":{"type":"DepthDistance","index":0,"variable":"distance"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"w"}}]}
+          {"src":{"type":"BreachMinSphereDist","index":0,"variable":"dist"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"w"}}]}
         """;
 
     /// <summary>A base graph: a texture as the whole colour, and an occlusion of 0.7 in the indirect light's w.</summary>

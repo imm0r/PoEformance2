@@ -2949,7 +2949,8 @@ public sealed class MonsterPortrait
             if (ImGui.IsItemHovered())
             {
                 ImGui.SetTooltip("Reads every material in the install and writes which graph nodes keep the most of them"
-                    + " from being coloured by their graphs, ranked - " + GraphSurvey.File + " beside the dumps, with "
+                    + " from being coloured by their graphs, ranked, and how often \"blend: first\" and \"last\" draw a material"
+                    + " differently - " + GraphSurvey.File + " beside the dumps, with "
                     + GraphSurvey.ExamplesFile + ": a whole graph for each thing a graph reads from the vertex side. Takes a while.");
             }
         }
