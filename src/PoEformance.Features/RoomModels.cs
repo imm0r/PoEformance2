@@ -120,13 +120,15 @@ public static class RoomModels
     /// <param name="doodads">Most doodads placed - see <see cref="UsualDoodads"/>; zero or less is the usual.</param>
     /// <param name="tools">Whether the level editor's tools are placed too - see <see cref="IsTool"/>.</param>
     /// <param name="progress">Where the build says how far it has got, or null - see <see cref="ModelProgress"/>.</param>
+    /// <param name="heights">How high a doodad whose line carries a height is set - see <see cref="DoodadHeight"/>.</param>
     public static MonsterModel Of(
         Func<string, byte[]?>? read,
         string? path,
         bool shaded = false,
         int doodads = UsualDoodads,
         bool tools = false,
-        ModelProgress? progress = null)
+        ModelProgress? progress = null,
+        DoodadHeight heights = DoodadHeight.Ground)
     {
         if (read is null)
         {
@@ -168,7 +170,7 @@ public static class RoomModels
 
         var paints = new MonsterModels.Paints { Progress = progress };
         var pile = new ModelPile();
-        Doodads laid = Lay(room, Counted, paints, pile, doodads, tools, beyond: null);
+        Doodads laid = Lay(room, Counted, paints, pile, doodads, tools, beyond: null, heights);
 
         SkinnedMesh joined = SkinnedMesh.Joined(pile.Joins);
         if (!joined.Ready)
@@ -241,7 +243,8 @@ public static class RoomModels
         ModelPile pile,
         int doodads,
         bool tools,
-        Func<RoomDoodad, Matrix4x4>? beyond)
+        Func<RoomDoodad, Matrix4x4>? beyond,
+        DoodadHeight heights = DoodadHeight.Ground)
     {
         var models = new Dictionary<string, MonsterModel>(StringComparer.OrdinalIgnoreCase);
         float size = CellSize;
@@ -295,7 +298,13 @@ public static class RoomModels
                 * Matrix4x4.CreateTranslation(one.X * size, one.Y * size, 0f);
             if (beyond is not null)
             {
+                // THE ROOM AS LAID SETS ITS OWN HEIGHT, from the area's ground under the doodad.
                 place *= beyond(one);
+            }
+            else if (heights != DoodadHeight.Ground && one.Height is { } height)
+            {
+                // ON ITS OWN THE ROOM'S GROUND IS NOUGHT, so the height and the ground plus it are one.
+                place *= Matrix4x4.CreateTranslation(0f, 0f, height);
             }
 
             pile.Add(model, place, one.Ao);

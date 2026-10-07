@@ -15,7 +15,9 @@ namespace PoEformance.Features;
 /// <param name="Tools">Whether the level editor's tools are placed too - see <see cref="RoomModels.IsTool"/>.</param>
 /// <param name="Laid">Where the room is drawn as the area laid it - "x,y,turn,area" - or empty for the room as its file has it; see LaidRoomModels.</param>
 /// <param name="AtLevel">Whether a laid room's pieces are set at their tiles' own levels rather than fitted to the area's ground - see LaidRoomModels.</param>
-public readonly record struct RoomKey(string Path, int Doodads = RoomModels.UsualDoodads, bool Tools = false, string Laid = "", bool AtLevel = false)
+/// <param name="Heights">How high a doodad that carries a height in its line is set - see <see cref="DoodadHeight"/>.</param>
+public readonly record struct RoomKey(
+    string Path, int Doodads = RoomModels.UsualDoodads, bool Tools = false, string Laid = "", bool AtLevel = false, DoodadHeight Heights = DoodadHeight.Ground)
 {
     /// <summary>What starts the word naming the place the room is laid at.</summary>
     public const string LaidWord = "laid=";
@@ -29,15 +31,18 @@ public readonly record struct RoomKey(string Path, int Doodads = RoomModels.Usua
     /// <summary>The word saying a laid room's pieces are set at their tiles' own levels.</summary>
     public const string LevelWord = "level";
 
+    /// <summary>What starts the word naming how doodads with a height are set; "file" or "added" follows.</summary>
+    public const string HeightsWord = "heights=";
+
     /// <summary>The key as a string - the bare path at the usual choices.</summary>
     public override string ToString()
     {
-        if (Doodads == RoomModels.UsualDoodads && !Tools && Laid.Length == 0 && !AtLevel)
+        if (Doodads == RoomModels.UsualDoodads && !Tools && Laid.Length == 0 && !AtLevel && Heights == DoodadHeight.Ground)
         {
             return Path;
         }
 
-        var words = new List<string>(4);
+        var words = new List<string>(5);
         if (Doodads != RoomModels.UsualDoodads)
         {
             words.Add(string.Create(CultureInfo.InvariantCulture, $"{DoodadsWord}{Doodads}"));
@@ -56,6 +61,11 @@ public readonly record struct RoomKey(string Path, int Doodads = RoomModels.Usua
         if (AtLevel)
         {
             words.Add(LevelWord);
+        }
+
+        if (Heights != DoodadHeight.Ground)
+        {
+            words.Add(HeightsWord + (Heights == DoodadHeight.File ? "file" : "added"));
         }
 
         return string.Concat(Path, TileKey.Mark.ToString(), string.Join(TileKey.WordMark, words));
@@ -91,6 +101,7 @@ public readonly record struct RoomKey(string Path, int Doodads = RoomModels.Usua
         int doodads = RoomModels.UsualDoodads;
         var tools = false;
         var level = false;
+        var heights = DoodadHeight.Ground;
         string laid = string.Empty;
         ReadOnlySpan<char> words = key.AsSpan(mark + 1);
         foreach (Range one in words.Split(TileKey.WordMark))
@@ -114,9 +125,35 @@ public readonly record struct RoomKey(string Path, int Doodads = RoomModels.Usua
             {
                 level = true;
             }
+            else if (word.StartsWith(HeightsWord, StringComparison.Ordinal))
+            {
+                ReadOnlySpan<char> how = word[HeightsWord.Length..];
+                heights = how.SequenceEqual("file") ? DoodadHeight.File : how.SequenceEqual("added") ? DoodadHeight.Added : DoodadHeight.Ground;
+            }
         }
 
-        RoomKey read = new(key[..mark], doodads, tools, laid, level);
+        RoomKey read = new(key[..mark], doodads, tools, laid, level, heights);
         return read.Laid.Length == 0 || read.TryLaid(out _, out _, out _, out _) ? read : read with { Laid = string.Empty };
     }
+}
+
+/// <summary>
+/// How high a doodad whose line carries a height is set: on the ground, at the height, or at the ground plus the height.
+/// </summary>
+/// <remarks>
+/// A CHOICE BECAUSE IT IS NOT SETTLED - see RoomDoodad.Height. A doodad whose line carries none is on the
+/// ground whichever is chosen. "At the height" and "the ground plus it" are the two readings the one
+/// pot read from memory could not tell apart, its ground being where the height put it; the doodad
+/// heights line under a laid room counts which of the three the game's entities agree with.
+/// </remarks>
+public enum DoodadHeight : byte
+{
+    /// <summary>On the ground under it, the height ignored - every picture before the height was read.</summary>
+    Ground,
+
+    /// <summary>At the height itself, in the area's own z.</summary>
+    File,
+
+    /// <summary>At the ground under it plus the height.</summary>
+    Added,
 }

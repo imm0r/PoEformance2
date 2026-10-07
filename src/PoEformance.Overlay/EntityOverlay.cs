@@ -3010,7 +3010,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Here = PlayerTile,
             Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize)
             {
-                Load = (read, _, key, _, progress) => TileBookWindow.Load(read, key, () => _snapshot.Terrain as TerrainGrid, progress),
+                Load = (read, _, key, _, progress) => TileBookWindow.Load(read, key, () => _snapshot.Terrain as TerrainGrid, progress, () => _snapshot.Entities),
                 Ink = TileBookWindow.GroundInk,
                 Shaded = true,
                 Masked = true,

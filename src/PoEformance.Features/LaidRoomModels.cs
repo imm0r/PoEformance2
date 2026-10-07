@@ -81,6 +81,8 @@ public static class LaidRoomModels
     /// <param name="tools">Whether the level editor's tools are placed too.</param>
     /// <param name="atLevel">Whether each piece is set at its tiles' own level rather than fitted to the area's ground - see the remarks.</param>
     /// <param name="progress">Where the build says how far it has got, or null - see <see cref="ModelProgress"/>.</param>
+    /// <param name="heights">How high a doodad whose line carries a height is set - see <see cref="DoodadHeight"/>.</param>
+    /// <param name="entities">The area's entities in memory, to hold the room's doodads against - see <see cref="HeightsSaid"/> - or null.</param>
     public static MonsterModel Of(
         Func<string, byte[]?>? read,
         string? path,
@@ -92,7 +94,9 @@ public static class LaidRoomModels
         int doodads = RoomModels.UsualDoodads,
         bool tools = false,
         bool atLevel = false,
-        ModelProgress? progress = null)
+        ModelProgress? progress = null,
+        DoodadHeight heights = DoodadHeight.Ground,
+        IReadOnlyList<WorldEntity>? entities = null)
     {
         if (read is null)
         {
@@ -258,7 +262,14 @@ public static class LaidRoomModels
             Vector2 at = Vector2.Transform(new Vector2(one.X, one.Y) / RoomModels.CellsPerTile, laying);
             int cellX = (int)((x + at.X) * RoomModels.CellsPerTile);
             int cellY = (int)((y + at.Y) * RoomModels.CellsPerTile);
-            return beyondFlat * Matrix4x4.CreateTranslation(0f, 0f, grid.HeightAt(cellX, cellY));
+            float ground = grid.HeightAt(cellX, cellY);
+            float z = heights switch
+            {
+                DoodadHeight.File when one.Height is { } height => height,
+                DoodadHeight.Added when one.Height is { } height => ground + height,
+                _ => ground,
+            };
+            return beyondFlat * Matrix4x4.CreateTranslation(0f, 0f, z);
         });
 
         SkinnedMesh joined = SkinnedMesh.Joined(pile.Joins);
@@ -289,6 +300,11 @@ public static class LaidRoomModels
         }
 
         said.AddRange(laid.Said());
+        string held = HeightsSaid(room, laying, x, y, grid, entities);
+        if (held.Length > 0)
+        {
+            said.Add(held);
+        }
 
         MonsterModel model = RoomModels.Piled(joined, pile, path, made.Values.Select(one => one.Props).Concat(laid.Models)) with
         {
@@ -377,6 +393,131 @@ public static class LaidRoomModels
     /// Where a piece's height comes out each way: the lift that fits its ground to the area's, how far its ground then misses the area's, and how far it misses at its tile's level - root mean squares, in world units.
     /// </summary>
     private readonly record struct Height(float Fitted, int Samples, double MissFitted, double MissAtLevel);
+
+    /// <summary>Most doodads named one by one in the heights line; the rest are only counted.</summary>
+    private const int MostHeldNamed = 6;
+
+    /// <summary>
+    /// The room's doodads held against the entities the game made of them: the height each line carries beside the entity's own z, its terrain height and the area's ground there, and how far it is from where the room puts it.
+    /// </summary>
+    /// <remarks>
+    /// WHY THIS EXISTS. A doodad line carries a value no reference names - RoomDoodad.Height - and the
+    /// one pot read by hand from memory sat at exactly its line's -115. That one cannot tell "the value
+    /// is the height" from "the ground plus the value", because the ground under it was where the value
+    /// put it. The game settles it wherever the two differ, and every doodad it makes an entity of is a
+    /// case: found by its stub, which is the entity's own path, and by being the nearest of that path to
+    /// where the room puts the doodad - within a tile, or it is somebody else's.
+    ///
+    /// BOTH HALVES PRINTED, AND COUNTED, NOT CONCLUDED: the z and each reading's prediction, so the line
+    /// is read rather than trusted - the same stance as the level line above it.
+    /// </remarks>
+    internal static string HeightsSaid(RoomLayout room, Matrix3x2 laying, int x, int y, TerrainGrid grid, IReadOnlyList<WorldEntity>? entities)
+    {
+        if (entities is null)
+        {
+            return string.Empty;
+        }
+
+        var byPath = new Dictionary<string, List<WorldEntity>>(StringComparer.OrdinalIgnoreCase);
+        foreach (WorldEntity entity in entities)
+        {
+            if (entity.Path.Length == 0)
+            {
+                continue;
+            }
+
+            if (!byPath.TryGetValue(entity.Path, out List<WorldEntity>? named))
+            {
+                named = [];
+                byPath[entity.Path] = named;
+            }
+
+            named.Add(entity);
+        }
+
+        // EACH ENTITY TO ONE DOODAD, the nearest pairs first: two pots a few cells apart would otherwise
+        // both claim the one entity nearer to either, and the second pot report a height it never had.
+        var pairs = new List<(float Distance, int Doodad, WorldEntity Entity)>();
+        var cells = new Vector2[room.Doodads.Count];
+        for (var at = 0; at < room.Doodads.Count; at++)
+        {
+            RoomDoodad one = room.Doodads[at];
+            cells[at] = InArea(laying, x, y, new Vector2(one.X, one.Y) / RoomModels.CellsPerTile);
+            if (one.Stub.Length == 0 || !byPath.TryGetValue(one.Stub, out List<WorldEntity>? candidates))
+            {
+                continue;
+            }
+
+            foreach (WorldEntity entity in candidates)
+            {
+                float distance = Vector2.Distance(new Vector2(entity.WorldX, entity.WorldY), cells[at]);
+                if (distance <= TileModels.Side)
+                {
+                    pairs.Add((distance, at, entity));
+                }
+            }
+        }
+
+        pairs.Sort((a, b) => a.Distance.CompareTo(b.Distance));
+        var matched = new WorldEntity?[room.Doodads.Count];
+        var taken = new HashSet<WorldEntity>(ReferenceEqualityComparer.Instance);
+        foreach ((_, int doodad, WorldEntity entity) in pairs)
+        {
+            if (matched[doodad] is null && taken.Add(entity))
+            {
+                matched[doodad] = entity;
+            }
+        }
+
+        int found = 0, carrying = 0, asHeight = 0, asAdded = 0, asGround = 0;
+        var listed = new List<string>(MostHeldNamed);
+        for (var at = 0; at < room.Doodads.Count; at++)
+        {
+            if (matched[at] is not { } entity)
+            {
+                continue;
+            }
+
+            RoomDoodad one = room.Doodads[at];
+            var place = new Vector2(entity.WorldX, entity.WorldY);
+            found++;
+            float ground = grid.HeightAt((int)(entity.WorldX / RoomModels.CellSize), (int)(entity.WorldY / RoomModels.CellSize));
+            bool height = one.Height is { } value && MathF.Abs(entity.WorldZ - value) < 1f;
+            bool added = one.Height is { } plus && MathF.Abs(entity.WorldZ - (ground + plus)) < 1f;
+            bool onGround = MathF.Abs(entity.WorldZ - ground) < 1f;
+            carrying += one.Height.HasValue ? 1 : 0;
+            asHeight += height ? 1 : 0;
+            asAdded += added ? 1 : 0;
+            asGround += onGround ? 1 : 0;
+
+            if (listed.Count < MostHeldNamed)
+            {
+                string exact = one.Exact is { } spot
+                    ? string.Create(CultureInfo.InvariantCulture, $", {Vector2.Distance(place, InArea(laying, x, y, spot / TileModels.Side)):0.0} from its exact place")
+                    : string.Empty;
+                listed.Add(string.Create(CultureInfo.InvariantCulture,
+                    $"{Tail(one.Ao)}: line {(one.Height is { } said ? said.ToString("0.#", CultureInfo.InvariantCulture) : "none")}, z {entity.WorldZ:0.#}, its terrain height {entity.TerrainHeight:0.#}, the area's ground {ground:0.#}, {Vector2.Distance(place, cells[at]):0.0} from its cell{exact}"));
+            }
+        }
+
+        if (found == 0)
+        {
+            return "doodad heights: none of the room's doodads is in memory as an entity - the game makes entities of few doodads, and holds them only near the player";
+        }
+
+        string counted = string.Create(CultureInfo.InvariantCulture,
+            $"doodad heights: {found} of the room's doodads are in memory as entities, {carrying} with a height in their line - z is that height on {asHeight}, the ground plus it on {asAdded}, the ground on {asGround}");
+        return counted + "; " + string.Join("; ", listed) + (found > listed.Count ? string.Create(CultureInfo.InvariantCulture, $"; and {found - listed.Count} more") : string.Empty);
+    }
+
+    /// <summary>A place in the room, in tiles from its corner, as a place in the area in world units.</summary>
+    private static Vector2 InArea(Matrix3x2 laying, int x, int y, Vector2 inTiles)
+    {
+        Vector2 at = Vector2.Transform(inTiles, laying);
+        return new Vector2(x + at.X, y + at.Y) * TileModels.Side;
+    }
+
+    private static string Tail(string path) => path[(path.LastIndexOf('/') + 1)..];
 
     /// <summary>How many different tile files the block names - what the bar counts the reading against.</summary>
     private static int Distinct(TerrainTiles tiles, int x, int y, int wide, int tall)

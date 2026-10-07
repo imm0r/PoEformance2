@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Numerics;
 
 namespace PoEformance.Game.Files;
 
@@ -8,8 +9,34 @@ namespace PoEformance.Game.Files;
 /// <param name="Turn">poe_data_tools' "radians" - an angle, 0 to 2 pi in older files and -pi to pi in later ones.</param>
 /// <param name="Scale">Mostly 1; poe_data_tools sees 0 to 250.</param>
 /// <param name="Ao">The doodad's <c>.ao</c> - the same kind of file a monster or an item is drawn from.</param>
-/// <param name="Stub">The virtual file stub after it. Informational.</param>
-public readonly record struct RoomDoodad(int X, int Y, float Turn, float Scale, string Ao, string Stub);
+/// <param name="Stub">
+/// The virtual file stub after it: <c>Metadata/MiscellaneousObjects/Doodad</c> for most, and an object's
+/// own type for the few the game makes an entity of - which is how one is found in memory.
+/// </param>
+public readonly record struct RoomDoodad(int X, int Y, float Turn, float Scale, string Ao, string Stub)
+{
+    /// <summary>
+    /// The first of the line's counted floats, or null where it counts none - what it means is not settled; see the remarks.
+    /// </summary>
+    /// <remarks>
+    /// NEITHER REFERENCE NAMES IT. poe_data_tools reads it as "floats", a count and that many values;
+    /// annalithic's poeformats as "unk7". In seepage's 2x2_offices_01 twelve of fifty-four doodads carry
+    /// one value - 0, 10, -45, -115, -240 - and none carries two. One of them is in memory: a
+    /// VaalPotCluster01 whose line says -115 has a Render z of -115, and its own TerrainHeight is -115
+    /// too. Kept so that is checked against more of the game - see LaidRoomModels' doodad heights line.
+    /// </remarks>
+    public float? Height { get; init; }
+
+    /// <summary>
+    /// The first of the line's counted float pairs, from version 34 - a place in the room's own units, finer than its cell.
+    /// </summary>
+    /// <remarks>
+    /// READ, NOT YET DRAWN WITH. The four in seepage's offices sit about half a cell past their cell's
+    /// corner - 3386.6, 2125.29 for cell 311, 195 at 250 / 23 a cell - which reads as the exact place the
+    /// cell rounds; the doodad heights line says how far each is from where the entity really is.
+    /// </remarks>
+    public Vector2? Exact { get; init; }
+}
 
 /// <summary>
 /// One slot of a room's grid: what kind it is and, for a <c>k</c> slot, the tile it asks for.
@@ -520,10 +547,16 @@ public sealed class RoomLayout
         int y = Whole(Next(numbers, ref at), "a doodad's y");
         // READ, THEN STEPPED - never "at += Whole(Next(ref at))": C# reads the left side before the
         // call moves it, and the count's own word is lost. The field check below caught exactly that.
+        Vector2? exact = null;
         if (version >= 34)
         {
             long pairs = Whole(Next(numbers, ref at), "a doodad's pair count");
+            int first = at;
             Skip(numbers, ref at, pairs * 2, "a doodad's pairs");
+            if (pairs > 0)
+            {
+                exact = new Vector2(Real(numbers[first], "a doodad's pair"), Real(numbers[first + 1], "a doodad's pair"));
+            }
         }
 
         float turn = Real(Next(numbers, ref at), "a doodad's angle");
@@ -539,7 +572,9 @@ public sealed class RoomLayout
         }
 
         int floats = Whole(Next(numbers, ref at), "a doodad's float count");
+        int firstFloat = at;
         Skip(numbers, ref at, floats, "a doodad's floats");
+        float? height = floats > 0 ? Real(numbers[firstFloat], "a doodad's float") : null;
         float scale = Real(Next(numbers, ref at), "a doodad's scale");
 
         if (at != numbers.Length)
@@ -552,7 +587,7 @@ public sealed class RoomLayout
         int next = line.IndexOf('"', after);
         string stub = next >= 0 ? Quoted(line, next).Text : string.Empty;
 
-        return new RoomDoodad(x, y, turn, scale, ao.Replace('\\', '/'), stub);
+        return new RoomDoodad(x, y, turn, scale, ao.Replace('\\', '/'), stub) { Height = height, Exact = exact };
     }
 
     private static (string Text, int After) Quoted(string line, int open)
