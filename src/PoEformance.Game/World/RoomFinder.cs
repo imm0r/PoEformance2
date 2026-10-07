@@ -73,6 +73,9 @@ public sealed record RoomSearch(IReadOnlyList<RoomCandidate> Candidates, int Cor
     /// <summary>Whether the candidates were checked against the tiles actually laid.</summary>
     public bool TileChecked { get; init; }
 
+    /// <summary>Corners the room's slots leave unnamed - nought, no ground stated - and so free to be anything.</summary>
+    public int Free { get; init; }
+
     /// <summary>Whether any candidate agrees everywhere.</summary>
     public bool Found => Candidates.Count > 0 && Candidates[0].Exact;
 }
@@ -96,8 +99,14 @@ public sealed record RoomSearch(IReadOnlyList<RoomCandidate> Candidates, int Cor
 ///
 /// EVERY WAY ROUND. Which way the area's rows run against a room's lines is nothing this has to
 /// know: the room is tried in all eight placements, so whatever the area's axes are, one of them
-/// is the room's. A corner type nought - "no ground type" - is a type like any other and must meet
-/// a corner the area lists with a blank name, as every area's list begins with one.
+/// is the room's.
+///
+/// A CORNER TYPE NOUGHT NAMES NOTHING, and is left free. poe_data_tools reads it as no ground at all
+/// (None), and the rooms bear that out: the channel's 1open_01.arm writes nought at exactly its 36
+/// inner corners - the walkable floor - while the area gives that floor a named type. Read as "must
+/// meet a corner the area lists blank", as the first version did, every inner corner of every room
+/// missed: Atziri's temple rooms agreed 76 of 80 everywhere and none exactly, a seepage room 109 of
+/// 239, and the nearest of those lay in the void past the map's edge, where blank ground is.
 ///
 /// EXACT, OR THE NEAREST. A room laid where the ground says it was agrees at every corner, and those
 /// are listed; where none does, the few nearest are listed instead with how far off they are,
@@ -126,8 +135,6 @@ public static class RoomFinder
     /// <summary>How many of the nearest are kept to be ranked by their tiles before the list is cut to <see cref="Nearest"/>.</summary>
     private const int Pool = 64;
 
-    /// <summary>A stamp value meaning "a corner the area lists with a blank name".</summary>
-    private const int Blank = -2;
 
     /// <summary>A placement in words, for a list a person reads.</summary>
     public static string Said(int turn)
@@ -176,7 +183,7 @@ public static class RoomFinder
             return RoomSearch.Not($"the area's ground types are not to be trusted: {ground.Note}");
         }
 
-        (Dictionary<(int U, int V), int>? stamp, int left, string why) = Stamped(room, ground);
+        (Dictionary<(int U, int V), int>? stamp, int left, int free, string why) = Stamped(room, ground);
         if (stamp is null)
         {
             return RoomSearch.Not(why);
@@ -184,7 +191,8 @@ public static class RoomFinder
 
         if (stamp.Count == 0)
         {
-            return RoomSearch.Not($"the room has no one by one k slot to make a stamp of - {left} bigger ones left out") with { Left = left };
+            return RoomSearch.Not($"the room names no corner's ground in a one by one k slot - {left} bigger slots left out, {free} corners unnamed")
+                with { Left = left, Free = free };
         }
 
         // THE AREA ONCE, as a flat array: the search asks every corner many times over.
@@ -196,12 +204,6 @@ public static class RoomFinder
             {
                 area[(y * across) + x] = ground.At(x, y);
             }
-        }
-
-        var blank = new bool[ground.Types.Count];
-        for (var type = 0; type < blank.Length; type++)
-        {
-            blank[type] = ground.Types[type].Length == 0;
         }
 
         var exact = new List<RoomCandidate>();
@@ -223,7 +225,7 @@ public static class RoomFinder
                 {
                     // EXACT FIRST, out at the first corner that disagrees - the ordinary case by far.
                     int at = 0;
-                    while (at < corners && Agrees(area[((y + vs[at]) * across) + x + us[at]], wants[at], blank))
+                    while (at < corners && area[((y + vs[at]) * across) + x + us[at]] == wants[at])
                     {
                         at++;
                     }
@@ -249,7 +251,7 @@ public static class RoomFinder
                         int misses = 1;
                         for (at++; at < corners && misses < worst; at++)
                         {
-                            if (!Agrees(area[((y + vs[at]) * across) + x + us[at]], wants[at], blank))
+                            if (area[((y + vs[at]) * across) + x + us[at]] != wants[at])
                             {
                                 misses++;
                             }
@@ -287,18 +289,18 @@ public static class RoomFinder
         var parted = new RoomMisses[found.Count];
         for (var one = 0; one < found.Count; one++)
         {
-            IReadOnlyList<(int X, int Y)> astray = found[one].Exact ? [] : Astray(found[one], stamp, room, area, across, blank, us, vs, wants);
+            IReadOnlyList<(int X, int Y)> astray = found[one].Exact ? [] : Astray(found[one], stamp, room, area, across, us, vs, wants);
             IReadOnlyList<(int X, int Y)> unlike = check?.Unlike(found[one]) ?? [];
             parted[one] = astray.Count == 0 && unlike.Count == 0 ? RoomMisses.None : new RoomMisses(astray, unlike);
         }
 
-        return new RoomSearch(found, corners, more, left, string.Empty) { Misses = parted, TileChecked = check is not null };
+        return new RoomSearch(found, corners, more, left, string.Empty) { Misses = parted, TileChecked = check is not null, Free = free };
     }
 
     /// <summary>The area corners where one candidate's stamp and the ground disagree.</summary>
     private static List<(int X, int Y)> Astray(
         RoomCandidate candidate, Dictionary<(int U, int V), int> stamp, RoomLayout room,
-        int[] area, int across, bool[] blank, int[] us, int[] vs, int[] wants)
+        int[] area, int across, int[] us, int[] vs, int[] wants)
     {
         Placed(stamp, room.Width, room.Height, candidate.Turn, us, vs, wants);
         var astray = new List<(int X, int Y)>();
@@ -306,7 +308,7 @@ public static class RoomFinder
         {
             int x = candidate.X + us[at];
             int y = candidate.Y + vs[at];
-            if (!Agrees(area[(y * across) + x], wants[at], blank))
+            if (area[(y * across) + x] != wants[at])
             {
                 astray.Add((x, y));
             }
@@ -459,10 +461,11 @@ public static class RoomFinder
     /// <summary>
     /// The room's corner stamp - grid corner to the area type it must be - or null and why.
     /// </summary>
-    private static (Dictionary<(int U, int V), int>? Stamp, int Left, string Why) Stamped(RoomLayout room, TerrainGroundTypes ground)
+    private static (Dictionary<(int U, int V), int>? Stamp, int Left, int Free, string Why) Stamped(RoomLayout room, TerrainGroundTypes ground)
     {
         var stamp = new Dictionary<(int U, int V), int>();
         var torn = new HashSet<(int U, int V)>();
+        var unnamed = new HashSet<(int U, int V)>();
         int left = 0;
         for (var line = 0; line < room.Height; line++)
         {
@@ -482,24 +485,6 @@ public static class RoomFinder
 
                 for (var corner = 0; corner < 4; corner++)
                 {
-                    int index = slot.Ground(corner);
-                    int wants;
-                    if (index == 0)
-                    {
-                        wants = Blank;
-                    }
-                    else
-                    {
-                        string name = room.Named(index);
-                        wants = TypeOf(ground, name);
-                        if (wants < 0)
-                        {
-                            return (null, left, name.Length == 0
-                                ? $"a slot names ground type {index}, past the room's {room.Strings.Count} strings"
-                                : $"the room's ground type {name} is not among this area's - it is not laid here");
-                        }
-                    }
-
                     // Down-left at the slot's own column and line, then round: see RoomSlot.
                     (int du, int dv) = corner switch
                     {
@@ -509,6 +494,24 @@ public static class RoomFinder
                         _ => (0, 1),
                     };
                     (int U, int V) at = (column + du, line + dv);
+
+                    // NOUGHT NAMES NO GROUND - left free; see the class remarks.
+                    int index = slot.Ground(corner);
+                    if (index == 0)
+                    {
+                        unnamed.Add(at);
+                        continue;
+                    }
+
+                    string name = room.Named(index);
+                    int wants = TypeOf(ground, name);
+                    if (wants < 0)
+                    {
+                        return (null, left, 0, name.Length == 0
+                            ? $"a slot names ground type {index}, past the room's {room.Strings.Count} strings"
+                            : $"the room's ground type {name} is not among this area's - it is not laid here");
+                    }
+
                     if (torn.Contains(at))
                     {
                         continue;
@@ -526,7 +529,10 @@ public static class RoomFinder
             }
         }
 
-        return (stamp, left, string.Empty);
+        // A CORNER ONE SLOT LEAVES FREE AND ANOTHER NAMES is named; only the ones nobody names are free.
+        unnamed.ExceptWith(stamp.Keys);
+        unnamed.ExceptWith(torn);
+        return (stamp, left, unnamed.Count, string.Empty);
     }
 
     /// <summary>The area's index for a ground type file, or -1.</summary>
@@ -580,8 +586,6 @@ public static class RoomFinder
         return (wide, tall);
     }
 
-    private static bool Agrees(int area, int wants, bool[] blank)
-        => wants == Blank ? (uint)area < (uint)blank.Length && blank[area] : area == wants;
 
     /// <summary>Puts a candidate into the short list of the nearest, best first, keeping it to <paramref name="keep"/>.</summary>
     private static void Nearer(List<RoomCandidate> near, RoomCandidate candidate, int keep)

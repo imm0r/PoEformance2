@@ -475,15 +475,24 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         string left = found.Left > 0
             ? string.Create(CultureInfo.InvariantCulture, $"; {found.Left} slots bigger than a tile left out of the ground")
             : string.Empty;
+        if (found.Free > 0)
+        {
+            left += string.Create(CultureInfo.InvariantCulture, $"; {found.Free} corners the room leaves unnamed are free");
+        }
+
         if (found.TileChecked)
         {
             left += "; ranked by the tiles laid";
         }
+
+        // THE BEST SHARE SAID OUTRIGHT where nothing fits: a "nearest" agreeing on under half its
+        // corners is no place at all, and the outline would otherwise read as a claim.
+        int best = found.Candidates.Count > 0 ? Share(found.Candidates[0]) : 0;
         ImGui.TextDisabled(ImGuiText.Escape(found.Found
             ? string.Create(CultureInfo.InvariantCulture,
                 $"where it lies: {found.Candidates.Count + found.More} place{(found.Candidates.Count + found.More == 1 ? string.Empty : "s")} fit all {found.Corners} corners{left} - pick one to outline it on the large map")
             : string.Create(CultureInfo.InvariantCulture,
-                $"where it lies: nowhere fits all {found.Corners} corners{left}; the nearest:")));
+                $"where it lies: nowhere fits all {found.Corners} corners{left}; the nearest agrees on {best}% - pick one to see where it parts:")));
 
         float rows = Math.Min(found.Candidates.Count, 6);
         if (rows == 0)
@@ -502,7 +511,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
                         ? string.Create(CultureInfo.InvariantCulture, $"  ·  tiles {where.TilesAgree}/{where.Tiles}, big {where.BigAgree}/{where.Big}")
                         : string.Create(CultureInfo.InvariantCulture, $"  ·  tiles {where.TilesAgree}/{where.Tiles}");
                 string label = string.Create(CultureInfo.InvariantCulture,
-                    $"tile {where.X}, {where.Y}  ·  {RoomFinder.Said(where.Turn)}  ·  {where.Matched}/{where.Corners} corners{tiles}##where{one}");
+                    $"tile {where.X}, {where.Y}  ·  {RoomFinder.Said(where.Turn)}  ·  {where.Matched}/{where.Corners} corners ({Share(where)}%){tiles}##where{one}");
                 if (ImGui.Selectable(label, _ghosted == one))
                 {
                     _ghosted = _ghosted == one ? -1 : one;
@@ -527,6 +536,9 @@ public sealed class TileBookWindow : BookWindow<TileBook>
 
         ImGui.EndChild();
     }
+
+    /// <summary>How much of a candidate's corners agree, as a whole percentage, rounded down so nothing short of all reads 100.</summary>
+    private static int Share(RoomCandidate where) => where.Corners > 0 ? where.Matched * 100 / where.Corners : 0;
 
     /// <summary>The ways the current area laid a tile, one bit per placement - zero where it did not, or the tables were not read.</summary>
     private byte LaidHere(string tile) => Laid?.Invoke().GetValueOrDefault(tile) ?? 0;
