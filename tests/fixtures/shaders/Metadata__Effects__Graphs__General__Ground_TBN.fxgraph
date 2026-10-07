@@ -1,0 +1,46 @@
+{
+    "version": 3,
+    "nodes": [
+        {
+            "type": "GetGroundTBN",
+            "index": 0,
+            "ui_position": [
+                1114.0,
+                20.0
+            ]
+        },
+        {
+            "type": "TbnBasis",
+            "index": 0,
+            "stage": "UVSetup",
+            "ui_position": [
+                1300.0,
+                20.0
+            ]
+        },
+        {
+            "type": "InputTbnBasis",
+            "index": 0,
+            "stage": "UVSetup",
+            "ui_position": [
+                800.0,
+                20.0
+            ]
+        }
+    ],
+    "links": [
+        {
+            "src": {
+                "type": "GetGroundTBN",
+                "index": 0,
+                "variable": "tbn_basis"
+            },
+            "dst": {
+                "type": "TbnBasis",
+                "index": 0,
+                "stage": "UVSetup",
+                "variable": "input"
+            }
+        }
+    ]
+}

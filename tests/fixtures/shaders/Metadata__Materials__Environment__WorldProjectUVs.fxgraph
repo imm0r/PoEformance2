@@ -1,0 +1,465 @@
+{
+    "version": 3,
+    "shader_group": [
+        "Material"
+    ],
+    "nodes": [
+        {
+            "type": "InputWorldPos",
+            "index": 0,
+            "stage": "UVSetup",
+            "ui_position": [
+                376.0,
+                -31.0
+            ]
+        },
+        {
+            "type": "WorldPos",
+            "index": 0,
+            "stage": "UVSetup",
+            "ui_position": [
+                1474.6668701171876,
+                -27.666671752929689
+            ]
+        },
+        {
+            "type": "ConstantPixel",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": 0.0010000000474974514
+                }
+            ],
+            "custom_parameter": "Scale_Amount",
+            "ui_position": [
+                453.0,
+                360.0
+            ]
+        },
+        {
+            "type": "Multiply",
+            "index": 0,
+            "ui_position": [
+                780.0,
+                215.0
+            ]
+        },
+        {
+            "type": "Multiply",
+            "index": 1,
+            "ui_position": [
+                779.0,
+                348.0
+            ]
+        },
+        {
+            "type": "MultiplyConst2",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": 0.5
+                }
+            ],
+            "ui_position": [
+                1013.0,
+                238.75
+            ]
+        },
+        {
+            "type": "UV",
+            "index": 0,
+            "stage": "UVSetup",
+            "ui_position": [
+                1474.6668701171876,
+                -27.666671752929689
+            ]
+        },
+        {
+            "type": "GetGroundTBN",
+            "index": 1,
+            "ui_position": [
+                67.0,
+                825.0
+            ]
+        },
+        {
+            "type": "Float3x3ToRows",
+            "index": 1,
+            "ui_position": [
+                391.0,
+                750.0
+            ]
+        },
+        {
+            "type": "InputTbnBasis",
+            "index": 0,
+            "stage": "UVSetup",
+            "ui_position": [
+                376.0,
+                -31.0
+            ]
+        },
+        {
+            "type": "Float3x3ToRows",
+            "index": 0,
+            "ui_position": [
+                329.0,
+                544.0
+            ]
+        },
+        {
+            "type": "GetQuatFromTwoVecs",
+            "index": 0,
+            "ui_position": [
+                740.0,
+                710.0
+            ]
+        },
+        {
+            "type": "RotateVecByQuat",
+            "index": 1,
+            "ui_position": [
+                1120.0,
+                438.0
+            ]
+        },
+        {
+            "type": "RotateVecByQuat",
+            "index": 0,
+            "ui_position": [
+                1144.0,
+                550.0
+            ]
+        },
+        {
+            "type": "RowsToFloat3x3",
+            "index": 0,
+            "ui_position": [
+                1506.0,
+                614.0
+            ]
+        },
+        {
+            "type": "TbnBasis",
+            "index": 0,
+            "stage": "UVSetup",
+            "ui_position": [
+                1474.6668701171876,
+                -27.666671752929689
+            ]
+        },
+        {
+            "type": "InputUV",
+            "index": 0,
+            "stage": "UVSetup",
+            "ui_position": [
+                376.0,
+                -31.0
+            ]
+        }
+    ],
+    "links": [
+        {
+            "src": {
+                "type": "InputWorldPos",
+                "index": 0,
+                "stage": "UVSetup",
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "WorldPos",
+                "index": 0,
+                "stage": "UVSetup",
+                "variable": "input",
+                "swizzle": "x"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldPos",
+                "index": 0,
+                "stage": "UVSetup",
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "WorldPos",
+                "index": 0,
+                "stage": "UVSetup",
+                "variable": "input",
+                "swizzle": "y"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldPos",
+                "index": 0,
+                "stage": "UVSetup",
+                "variable": "output",
+                "swizzle": "z"
+            },
+            "dst": {
+                "type": "WorldPos",
+                "index": 0,
+                "stage": "UVSetup",
+                "variable": "input",
+                "swizzle": "z"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldPos",
+                "index": 0,
+                "stage": "UVSetup",
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "Multiply",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "InputWorldPos",
+                "index": 0,
+                "stage": "UVSetup",
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "Multiply",
+                "index": 1,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantPixel",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply",
+                "index": 1,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "MultiplyConst2",
+                "index": 0,
+                "variable": "a",
+                "swizzle": "x"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "MultiplyConst2",
+                "index": 0,
+                "variable": "a",
+                "swizzle": "y"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst2",
+                "index": 0,
+                "variable": "output",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "UV",
+                "index": 0,
+                "stage": "UVSetup",
+                "variable": "input",
+                "swizzle": "x"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst2",
+                "index": 0,
+                "variable": "output",
+                "swizzle": "y"
+            },
+            "dst": {
+                "type": "UV",
+                "index": 0,
+                "stage": "UVSetup",
+                "variable": "input",
+                "swizzle": "y"
+            }
+        },
+        {
+            "src": {
+                "type": "GetGroundTBN",
+                "index": 1,
+                "variable": "tbn_basis"
+            },
+            "dst": {
+                "type": "Float3x3ToRows",
+                "index": 1,
+                "variable": "mat"
+            }
+        },
+        {
+            "src": {
+                "type": "InputTbnBasis",
+                "index": 0,
+                "stage": "UVSetup",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Float3x3ToRows",
+                "index": 0,
+                "variable": "mat"
+            }
+        },
+        {
+            "src": {
+                "type": "Float3x3ToRows",
+                "index": 1,
+                "variable": "row2"
+            },
+            "dst": {
+                "type": "GetQuatFromTwoVecs",
+                "index": 0,
+                "variable": "from_vec"
+            }
+        },
+        {
+            "src": {
+                "type": "Float3x3ToRows",
+                "index": 0,
+                "variable": "row2"
+            },
+            "dst": {
+                "type": "GetQuatFromTwoVecs",
+                "index": 0,
+                "variable": "to_vec"
+            }
+        },
+        {
+            "src": {
+                "type": "Float3x3ToRows",
+                "index": 1,
+                "variable": "row0"
+            },
+            "dst": {
+                "type": "RotateVecByQuat",
+                "index": 1,
+                "variable": "in_vec"
+            }
+        },
+        {
+            "src": {
+                "type": "GetQuatFromTwoVecs",
+                "index": 0,
+                "variable": "quat"
+            },
+            "dst": {
+                "type": "RotateVecByQuat",
+                "index": 1,
+                "variable": "quat"
+            }
+        },
+        {
+            "src": {
+                "type": "Float3x3ToRows",
+                "index": 1,
+                "variable": "row1"
+            },
+            "dst": {
+                "type": "RotateVecByQuat",
+                "index": 0,
+                "variable": "in_vec"
+            }
+        },
+        {
+            "src": {
+                "type": "GetQuatFromTwoVecs",
+                "index": 0,
+                "variable": "quat"
+            },
+            "dst": {
+                "type": "RotateVecByQuat",
+                "index": 0,
+                "variable": "quat"
+            }
+        },
+        {
+            "src": {
+                "type": "RotateVecByQuat",
+                "index": 1,
+                "variable": "out_vec"
+            },
+            "dst": {
+                "type": "RowsToFloat3x3",
+                "index": 0,
+                "variable": "row0"
+            }
+        },
+        {
+            "src": {
+                "type": "RotateVecByQuat",
+                "index": 0,
+                "variable": "out_vec"
+            },
+            "dst": {
+                "type": "RowsToFloat3x3",
+                "index": 0,
+                "variable": "row1"
+            }
+        },
+        {
+            "src": {
+                "type": "Float3x3ToRows",
+                "index": 0,
+                "variable": "row2"
+            },
+            "dst": {
+                "type": "RowsToFloat3x3",
+                "index": 0,
+                "variable": "row2"
+            }
+        },
+        {
+            "src": {
+                "type": "RowsToFloat3x3",
+                "index": 0,
+                "variable": "mat"
+            },
+            "dst": {
+                "type": "TbnBasis",
+                "index": 0,
+                "stage": "UVSetup",
+                "variable": "input"
+            }
+        }
+    ]
+}

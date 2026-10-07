@@ -1319,6 +1319,85 @@ public class ShadeProgramTests
             MeshPicture.Of(Quad(), new MeshPicture.Canvas(64) { Time = 0.25f }, shades: [turning]));
     }
 
+    /// <summary>Muddle pushes the coordinates along a sine of their x and a cosine of their y, as utilitynodes.ffx writes it.</summary>
+    [Fact]
+    public void MUDDLEPushesTheCoordinatesAlongASineAndACosineOfThemselves()
+    {
+        // No scale: (0.2, 0.6) + (sin(0.2 * 2), cos(0.6 * 2)) * 0.4 / 2, and nothing reads the clock.
+        string still = Wavering("""{"value":[0.0,0.0]},{"value":2.0},{"value":0.4}""");
+        Assert.False(Compile(still).UsesTime);
+        AssertColour(still, 0.2f + (MathF.Sin(0.4f) * 0.2f), 0.6f + (MathF.Cos(1.2f) * 0.2f), 0f);
+    }
+
+    /// <summary>Muddle's scale moves both phases on with the clock - and as declared, at "2 2", it runs.</summary>
+    [Fact]
+    public void ANDItsScaleRunsWithTheClock()
+    {
+        // A quarter of a second in, at a scale of (1, 0.5): the phases move on by 0.25 and 0.125.
+        ShadeProgram moving = Compile(Wavering("""{"value":[1.0,0.5]},{"value":2.0},{"value":0.4}"""));
+        Assert.True(moving.UsesTime);
+        AssertClose(
+            MeshPicture.Of(Quad(), 64, skins: [Sheet(Srgb(0.2f + (MathF.Sin(0.65f) * 0.2f)), Srgb(0.6f + (MathF.Cos(1.325f) * 0.2f)), 0)]),
+            MeshPicture.Of(Quad(), new MeshPicture.Canvas(64) { Time = 0.25f }, shades: [moving]));
+
+        // As declared: a scale of (2, 2), a frequency of 30 and an intensity of 0.1.
+        ShadeProgram declared = Compile(Wavering(string.Empty));
+        Assert.True(declared.UsesTime);
+        AssertClose(
+            MeshPicture.Of(Quad(), 64, skins: [Sheet(Srgb(0.2f + (MathF.Sin(6.5f) * 0.1f / 30f)), Srgb(0.6f + (MathF.Cos(18.5f) * 0.1f / 30f)), 0)]),
+            MeshPicture.Of(Quad(), new MeshPicture.Canvas(64) { Time = 0.25f }, shades: [declared]));
+    }
+
+    /// <summary>MuddleInput is Muddle with its scale, frequency and intensity on ports.</summary>
+    [Fact]
+    public void MUDDLEINPUTTakesItsNumbersFromPortsAndRunsAScaleThereWithTheClock()
+    {
+        static string Graph_(string scale) => Colouring(
+            $$$"""
+              {"type":"ConstantFloat2","index":0,"parameters":[{"value":[0.2,0.6]}]},
+              {"type":"ConstantFloat2","index":1,"parameters":[{"value":{{{scale}}}}]},
+              {"type":"ConstantFloat","index":0,"parameters":[{"value":2.0}]},
+              {"type":"ConstantFloat","index":1,"parameters":[{"value":0.4}]},
+              {"type":"MuddleInput","index":0}
+            """,
+            """
+              {"src":{"type":"ConstantFloat2","index":0,"variable":"output"},"dst":{"type":"MuddleInput","index":0,"variable":"in_uv"}},
+              {"src":{"type":"ConstantFloat2","index":1,"variable":"output"},"dst":{"type":"MuddleInput","index":0,"variable":"uv_scale"}},
+              {"src":{"type":"ConstantFloat","index":0,"variable":"output"},"dst":{"type":"MuddleInput","index":0,"variable":"freq"}},
+              {"src":{"type":"ConstantFloat","index":1,"variable":"output"},"dst":{"type":"MuddleInput","index":0,"variable":"intensity"}}
+            """,
+            "MuddleInput", "out_uv", "xy");
+
+        string still = Graph_("[0.0,0.0]");
+        Assert.False(Compile(still).UsesTime);
+        AssertColour(still, 0.2f + (MathF.Sin(0.4f) * 0.2f), 0.6f + (MathF.Cos(1.2f) * 0.2f), 0f);
+
+        ShadeProgram moving = Compile(Graph_("[1.0,0.5]"));
+        Assert.True(moving.UsesTime);
+        AssertClose(
+            MeshPicture.Of(Quad(), 64, skins: [Sheet(Srgb(0.2f + (MathF.Sin(0.65f) * 0.2f)), Srgb(0.6f + (MathF.Cos(1.325f) * 0.2f)), 0)]),
+            MeshPicture.Of(Quad(), new MeshPicture.Canvas(64) { Time = 0.25f }, shades: [moving]));
+    }
+
+    /// <summary>
+    /// Doryani's blood pool compiles whole: the mask's Muddle and the flow map both read the clock.
+    /// </summary>
+    /// <remarks>
+    /// DOR_BloodArena01c.mat, from the doryani_arena_01 dump: its TextureMuddleMask was left out for
+    /// the Muddle in its coordinates, the one node of its chain this did not evaluate.
+    /// </remarks>
+    [Fact]
+    public void DORYANISBLOODPOOLCompilesWholeAndRunsWithTheClock()
+    {
+        ShadeCompile compiled = Real("Art/Models/Terrain/Jungle/Tiles/Sanctum/Textures/DOR_BloodArena01c.mat");
+
+        // Nothing left out - the colour itself is DielectricSpecGlossBN's, read where the others moved it.
+        Assert.Empty(compiled.Skipped);
+        Assert.NotNull(compiled.Program);
+        Assert.Equal(["Metadata/Materials/DielectricSpecGlossBN.fxgraph"], compiled.Program.Graphs);
+        Assert.True(compiled.Program.UsesTime);
+    }
+
     [Fact]
     public void TIMEIsTheClockTheDrawingIsAt()
     {
@@ -1400,6 +1479,18 @@ public class ShadeProgramTests
               {"src":{"type":"ConstantFloat2","index":0,"variable":"output"},"dst":{"type":"{{{type}}}","index":0,"variable":"in_uv"}}
             """,
             type, "out_uv", "xy");
+
+    /// <summary>A Muddle reading (0.2, 0.6), with the parameters given, into the colour's x and y.</summary>
+    private static string Wavering(string parameters) =>
+        Colouring(
+            $$$"""
+              {"type":"ConstantFloat2","index":0,"parameters":[{"value":[0.2,0.6]}]},
+              {"type":"Muddle","index":0{{{(parameters.Length > 0 ? ",\"parameters\":[" + parameters + "]" : string.Empty)}}}}
+            """,
+            """
+              {"src":{"type":"ConstantFloat2","index":0,"variable":"output"},"dst":{"type":"Muddle","index":0,"variable":"in_uv"}}
+            """,
+            "Muddle", "out_uv", "xy");
 
     /// <summary>The vertex world position, by a swizzle or whole, into the colour.</summary>
     private static string WorldPositioned(string swizzle) =>

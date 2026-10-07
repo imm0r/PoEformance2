@@ -101,12 +101,13 @@ public sealed record ShadeCompile(ShadeProgram? Program, IReadOnlyList<string> S
 /// white from <c>InitSemanticsData</c> and replaced only through COLOR0 - the mesh's own stream by
 /// the engine's OutputVertexLocalColor, or what a graph's OutputVertexColor wrote, which is refused.
 ///
-/// A NODE THAT READS THE CLOCK RUNS WITH IT. <c>Time</c> is the game's clock, and MuddleTex, MuddleTex2
-/// and RotateUVOld multiply it by a parameter - a scroll, an angle per second. The clock is handed in
-/// per drawing (see Clock), and a picture whose program reads it is redrawn as the clock runs, as an
-/// animation is - not frozen at an instant of this reader's choosing, and not refused either. With
-/// the parameter at nought, each one's declared default, the term is left out and the program does
-/// not read the clock at all. <c>FromVertexVariance</c> is a particle's: the fragment hands on
+/// A NODE THAT READS THE CLOCK RUNS WITH IT. <c>Time</c> is the game's clock, and MuddleTex, MuddleTex2,
+/// Muddle and RotateUVOld multiply it by a parameter - a scroll, a phase or an angle per second. The
+/// clock is handed in per drawing (see Clock), and a picture whose program reads it is redrawn as the
+/// clock runs, as an animation is - not frozen at an instant of this reader's choosing, and not
+/// refused either. With the parameter at nought the term is left out and the program does not read
+/// the clock at all; nought is each one's declared default but Muddle's, whose <c>uv_scale</c> is
+/// declared "2 2" - a Muddle left as declared runs with the clock. <c>FromVertexVariance</c> is a particle's: the fragment hands on
 /// <c>uv2.x</c> under <c>PARTICLE_VARIANCE_ENABLED</c> and nought otherwise, and a mesh is not a
 /// particle, so it is nought.
 ///
@@ -223,7 +224,7 @@ public sealed class ShadeProgram
             "Float2ToCoords", "Float3ToCoords", "Float4ToCoords", "CoordsToFloat2", "CoordsToFloat3", "CoordsToFloat4",
             "SampleTexture", "SampleInputTexture", "SampleInputTextureLod", "SampleInputTriplanar",
             "SampleTriplanar", "SampleTexture2", "SampleTextureAtlas2", "SampleTextureLod", "SampleDispersedTexture",
-            "MuddleTex", "MuddleTexFromInput", "MuddleTex2", "FromVertexVariance",
+            "MuddleTex", "MuddleTexFromInput", "MuddleTex2", "Muddle", "MuddleInput", "FromVertexVariance",
             "RGBToTbn", "ScaleUVMaya", "HardLightBlend", "Sine", "RotateUVOld",
             "FromVertexNormal", "FromVertexWorldPos", "FromVertexLocalPosition", "InputVertexPosition", "InputVertexNormal", "InputVertexColor",
             "FromVertexColor", "Time",
@@ -2568,6 +2569,12 @@ public sealed class ShadeProgram
                 case "MuddleTex2":
                     return MuddledTwice(node);
 
+                case "Muddle":
+                    return Wavered(node);
+
+                case "MuddleInput":
+                    return WaveredFromInput(node);
+
                 // semanticsData.uv2.x under PARTICLE_VARIANCE_ENABLED and nought otherwise, says the
                 // fragment; a mesh is not a particle, so it is nought.
                 case "FromVertexVariance":
@@ -2804,6 +2811,69 @@ public sealed class ShadeProgram
                 : build.Emit(Op.MultiplyAdd, Clock, Scroll(scroll), variance);
 
             return Muddle(sheet, uv, frequency, shifted, intensity);
+        }
+
+        /// <summary>
+        /// Muddle: the coordinates pushed along a sine of their x and a cosine of their y, each riding on the clock.
+        /// </summary>
+        /// <remarks>
+        /// <c>in_uv + float2(sin(in_uv.x * freq + uv_scale.x * time), cos(in_uv.y * freq + uv_scale.y * time)) * (intensity / max(1e-7, freq))</c>,
+        /// the uniforms in the order the fragment declares them, with its defaults: uv_scale "2 2" at 0,
+        /// freq 30 at 1 and intensity 0.1 at 2. No texture is read - unlike MuddleTex, whose name it shares.
+        /// </remarks>
+        private int? Wavered(ShaderNode node)
+        {
+            if (Port(node, "in_uv") is not { } uv)
+            {
+                return null;
+            }
+
+            Vector4 scale = Numbers(node, 0, new Vector4(2f, 2f, 0f, 0f));
+            float frequency = Said(node, 1, 30f);
+            float amount = Said(node, 2, 0.1f) / MathF.Max(1e-7f, frequency);
+            return Waver(
+                uv,
+                build.Constant(new Vector4(frequency)),
+                scale.X == 0f && scale.Y == 0f ? -1 : build.Constant(new Vector4(scale.X, scale.Y, 0f, 0f)),
+                build.Constant(new Vector4(amount, amount, 0f, 0f)));
+        }
+
+        /// <summary>MuddleInput: Muddle with its scale, frequency and intensity on ports.</summary>
+        /// <remarks>A scale on a port rides on the clock as in <see cref="Wavered"/>; a constant nought leaves the term out.</remarks>
+        private int? WaveredFromInput(ShaderNode node)
+        {
+            if (Port(node, "in_uv") is not { } uv || Port(node, "uv_scale") is not { } scale
+                || Port(node, "freq") is not { } frequency || Port(node, "intensity") is not { } intensity)
+            {
+                return null;
+            }
+
+            int amount = build.Emit(
+                Op.Multiply,
+                build.Emit(Op.Divide, intensity, build.Emit(Op.Max, frequency, build.Constant(new Vector4(1e-7f)))),
+                build.Constant(new Vector4(1f, 1f, 0f, 0f)));
+            return Waver(
+                uv,
+                frequency,
+                build.ConstantOf(scale, out Vector4 fixed_) && fixed_.X == 0f && fixed_.Y == 0f ? -1 : Scroll(scale),
+                amount);
+        }
+
+        /// <summary>
+        /// Muddle's body: <c>uv + sin(uv * frequency + time * scale + (0, pi/2)) * amount</c>, the clock's term
+        /// left out where there is no scale - the cosine is the sine a quarter turn on.
+        /// </summary>
+        /// <param name="amount">The push, already divided by the frequency, with its z and w nought so they pass through.</param>
+        private int Waver(int uv, int frequency, int scale, int amount)
+        {
+            int along = build.Emit(Op.Multiply, uv, frequency);
+            if (scale >= 0)
+            {
+                along = build.Emit(Op.MultiplyAdd, Clock, scale, along);
+            }
+
+            int wave = build.Emit(Op.Sine, build.Emit(Op.Add, along, build.Constant(new Vector4(0f, MathF.PI / 2f, 0f, 0f))));
+            return build.Emit(Op.MultiplyAdd, wave, amount, uv);
         }
 
         /// <summary>
