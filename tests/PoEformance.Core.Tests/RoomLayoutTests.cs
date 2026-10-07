@@ -84,6 +84,31 @@ public class RoomLayoutTests
 
         Assert.Equal("Metadata/Doodads/Tree.ao", room.Doodads[1].Ao);
         Assert.Equal(1f, room.Doodads[1].Scale);
+
+        // THE COUNTED FLOATS' FIRST IS KEPT AS THE HEIGHT - the rock counts one, the tree none.
+        Assert.Equal(7.5f, rock.Height);
+        Assert.Null(room.Doodads[1].Height);
+        Assert.Null(rock.Exact);
+    }
+
+    /// <summary>A pot's line from seepage's 2x2_offices_01 as the game wrote it: its exact place, its turn, and the height it carries.</summary>
+    [Fact]
+    public void ADOODADLineCarriesItsExactPlaceAndAHeight()
+    {
+        string text = Version36.Replace(
+            "4 6 1 0.1 0.2 3.14 0 0 0 1 1 0 0 1 \"Metadata/Doodads/Rhoa.ao\" \"stub\" 1 lane=4",
+            "311 195 1 3386.6 2125.29 3.1196 0 0 0.99994 0.010994 1 0 1 -240 1 \"Metadata/Terrain/Doodads/Jungle/VaalProps/VaalPots/VaalPotCluster01_Light.ao\" \"Metadata/Terrain/Doodads/Jungle/VaalProps/VaalPots/VaalPotCluster01\" 0",
+            StringComparison.Ordinal);
+        RoomLayout room = RoomLayout.Parse(text);
+
+        Assert.True(room.Ready, room.Why);
+        RoomDoodad pot = Assert.Single(room.Doodads);
+        Assert.Equal((311, 195), (pot.X, pot.Y));
+        Assert.Equal(3.1196f, pot.Turn);
+        Assert.Equal(1f, pot.Scale);
+        Assert.Equal(-240f, pot.Height);
+        Assert.Equal(new System.Numerics.Vector2(3386.6f, 2125.29f), pot.Exact);
+        Assert.Equal("Metadata/Terrain/Doodads/Jungle/VaalProps/VaalPots/VaalPotCluster01", pot.Stub);
     }
 
     [Fact]
@@ -99,6 +124,8 @@ public class RoomLayoutTests
         Assert.Equal(3.14f, rhoa.Turn);
         Assert.Equal(1f, rhoa.Scale);
         Assert.Equal("Metadata/Doodads/Rhoa.ao", rhoa.Ao);
+        Assert.Equal(new System.Numerics.Vector2(0.1f, 0.2f), rhoa.Exact);
+        Assert.Null(rhoa.Height);
     }
 
     /// <summary>A three by two room of version 36 whose tail after the doodads ends in the given lines.</summary>
@@ -343,6 +370,36 @@ public class RoomLayoutTests
         Assert.Equal(path + "|laid=13,21,7,-12345+level", level.ToString());
         Assert.Equal(level, RoomKey.Read(level.ToString()));
         Assert.False(RoomKey.Read(key.ToString()).AtLevel);
+
+        // AND HOW HIGH A DOODAD WITH A HEIGHT IS SET, ground unless written.
+        var file = new RoomKey(path, Heights: DoodadHeight.File);
+        Assert.Equal(path + "|heights=file", file.ToString());
+        Assert.Equal(file, RoomKey.Read(file.ToString()));
+        var added = new RoomKey(path, Laid: laid, AtLevel: true, Heights: DoodadHeight.Added);
+        Assert.Equal(path + "|laid=13,21,7,-12345+level+heights=added", added.ToString());
+        Assert.Equal(added, RoomKey.Read(added.ToString()));
+        Assert.Equal(DoodadHeight.Ground, RoomKey.Read(level.ToString()).Heights);
+        Assert.Equal(DoodadHeight.Ground, RoomKey.Read(path + "|heights=sideways").Heights);
+    }
+
+    /// <summary>A doodad whose line carries a height is set at it where asked, on a room of its own where the ground is nought; one carrying none stays put.</summary>
+    [Fact]
+    public void ADOODADWithAHeightIsSetAtItWhereAsked()
+    {
+        Dictionary<string, byte[]> files = Install();
+        MonsterModel ground = RoomModels.Of(p => files.GetValueOrDefault(p), "Metadata/Terrain/Woods/Rooms/Clearing.arm");
+        MonsterModel file = RoomModels.Of(p => files.GetValueOrDefault(p), "Metadata/Terrain/Woods/Rooms/Clearing.arm", heights: DoodadHeight.File);
+        MonsterModel added = RoomModels.Of(p => files.GetValueOrDefault(p), "Metadata/Terrain/Woods/Rooms/Clearing.arm", heights: DoodadHeight.Added);
+        Assert.True(ground.Ready, ground.Why);
+
+        // THE ROCK CARRIES 7.5 AND THE TREE NOTHING - the rock's shape moves by it, the tree's not at all.
+        MeshShape rock = ground.Mesh.Shapes[0];
+        MeshShape tree = ground.Mesh.Shapes[1];
+        Assert.Equal(7.5f, Z(file, rock) - Z(ground, rock), 3);
+        Assert.Equal(7.5f, Z(added, rock) - Z(ground, rock), 3);
+        Assert.Equal(0f, Z(file, tree) - Z(ground, tree), 3);
+
+        static float Z(MonsterModel model, MeshShape shape) => model.Mesh.Positions[model.Mesh.Indices[shape.From]].Z;
     }
 
     /// <summary>

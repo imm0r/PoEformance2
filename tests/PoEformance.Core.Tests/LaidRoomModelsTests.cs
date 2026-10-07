@@ -255,7 +255,17 @@ public class LaidRoomModelsTests
     /// <param name="level">The tile's own level, which its sub-tile heights are written relative to.</param>
     /// <param name="sunk">How far below the area's ground the file's ground is written.</param>
     /// <param name="atLevel">Whether the piece is set at its tile's level rather than fitted.</param>
-    private static MonsterModel Laid(int placement, byte selector, int lies, bool flat = false, float level = 0f, float sunk = 0f, bool atLevel = false)
+    private static MonsterModel Laid(
+        int placement,
+        byte selector,
+        int lies,
+        bool flat = false,
+        float level = 0f,
+        float sunk = 0f,
+        bool atLevel = false,
+        string? doodads = null,
+        IReadOnlyList<WorldEntity>? entities = null,
+        DoodadHeight doodadHeights = DoodadHeight.Ground)
     {
         var ids = new int[TilesX * TilesY];
         Array.Fill(ids, -1);
@@ -297,7 +307,62 @@ public class LaidRoomModelsTests
 
         int stride = ((TilesX * Cells) + 1) / 2;
         var grid = new TerrainGrid(new byte[stride * TilesY * Cells], stride, TilesY * Cells, TilesX, TilesY, heights, tiles: tiles);
-        return LaidRoomModels.Of(Files(sunk).GetValueOrDefault, RoomPath, grid, 1, 1, 0, atLevel: atLevel);
+        Dictionary<string, byte[]> files = Files(sunk);
+        if (doodads is not null)
+        {
+            files[RoomPath] = Text(WithDoodads(doodads));
+        }
+
+        return LaidRoomModels.Of(files.GetValueOrDefault, RoomPath, grid, 1, 1, 0, atLevel: atLevel, heights: doodadHeights, entities: entities);
+    }
+
+    /// <summary>The test room with these doodad lines in place of its empty doodad group - after its grid, the second k line.</summary>
+    private static string WithDoodads(string lines)
+    {
+        List<string> room = [.. RoomText.ReplaceLineEndings("\n").Split('\n')];
+        int grid = room.FindLastIndex(line => line.StartsWith("k 1 1", StringComparison.Ordinal));
+        room.InsertRange(grid + 1, lines.ReplaceLineEndings("\n").Split('\n'));
+        return string.Join('\n', room);
+    }
+
+    /// <summary>
+    /// The doodad heights line: a doodad found in memory by its stub and its place, its line's height beside its z and the area's ground - and the three readings counted.
+    /// </summary>
+    /// <remarks>
+    /// The pot at cell 11, 11 carries -115 and its entity sits at -115 on ground that is not nought, so only
+    /// "z is that height" holds. The second pot's entity is two thousand units away, somebody else's;
+    /// the rock is a plain doodad, which the game makes no entity of.
+    /// </remarks>
+    [Fact]
+    public void THEDOODADHeightsLineHoldsADoodadAgainstItsEntity()
+    {
+        const string doodads = """
+            11 11 0 0 0 0 0 1 0 0 1 -115 1 "Metadata/Test/Pot.ao" "Metadata/Test/Pot" 0
+            2 2 0 0 0 0 0 1 0 0 0 1 "Metadata/Test/Pot.ao" "Metadata/Test/Pot" 0
+            5 5 0 0 0 0 0 1 0 0 0 1 "Metadata/Test/Rock.ao" "Metadata/MiscellaneousObjects/Doodad" 0
+            """;
+        float at = (1f + (11f / RoomModels.CellsPerTile)) * TileModels.Side;
+        WorldEntity[] entities =
+        [
+            new(1, 1, "Metadata/Test/Pot", EntityKind.Unknown, at + 2f, at, -115f, TerrainHeight: -115f),
+            new(2, 2, "Metadata/Test/Pot", EntityKind.Unknown, 2000f, 2000f, -7f),
+            new(3, 3, "Metadata/Monsters/Rhoa", EntityKind.Monster, at, at, 0f),
+        ];
+
+        MonsterModel room = Laid(placement: 3, selector: 0, lies: 3, flat: true, level: 40f, doodads: doodads, entities: entities);
+
+        Assert.Contains(
+            "doodad heights: 1 of the room's doodads are in memory as entities, 1 with a height in their line - z is that height on 1, the ground plus it on 0, the ground on 0; Pot.ao: line -115, z -115, its terrain height -115, the area's ground ",
+            room.Move,
+            StringComparison.Ordinal);
+        Assert.Contains(", 2.0 from its cell", room.Move, StringComparison.Ordinal);
+
+        // WITHOUT THE AREA'S ENTITIES THERE IS NO LINE, and none of them found says so.
+        Assert.DoesNotContain("doodad heights:", Laid(placement: 3, selector: 0, lies: 3, flat: true, doodads: doodads).Move, StringComparison.Ordinal);
+        Assert.Contains(
+            "doodad heights: none of the room's doodads is in memory",
+            Laid(placement: 3, selector: 0, lies: 3, flat: true, doodads: doodads, entities: [entities[2]]).Move,
+            StringComparison.Ordinal);
     }
 
     /// <summary>

@@ -168,6 +168,9 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     /// <summary>Whether a laid room's pieces are set at their tiles' own levels rather than fitted to the area's ground - see LaidRoomModels.</summary>
     private bool _atLevel;
 
+    /// <summary>How high doodads with a height in their line are set - see DoodadHeight.</summary>
+    private DoodadHeight _heights;
+
     /// <summary>Every tile file's identity read for the area in <see cref="_identitiesOf"/> - one read per file across every room searched there.</summary>
     private ConcurrentDictionary<string, TileIdentity?> _identities = new(StringComparer.OrdinalIgnoreCase);
     private TerrainGrid? _identitiesOf;
@@ -302,7 +305,13 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     /// <param name="key">What to load - see <see cref="TileKey"/> and <see cref="RoomKey"/>.</param>
     /// <param name="terrain">The current area, for a room laid from its tiles; null leaves such a room out.</param>
     /// <param name="progress">Where the build says how far it has got, for the pane's bar, or null.</param>
-    public static MonsterModel Load(Func<string, byte[]?> read, string key, Func<TerrainGrid?>? terrain = null, ModelProgress? progress = null)
+    /// <param name="entities">The area's entities in memory, for a laid room's doodad heights line, or null.</param>
+    public static MonsterModel Load(
+        Func<string, byte[]?> read,
+        string key,
+        Func<TerrainGrid?>? terrain = null,
+        ModelProgress? progress = null,
+        Func<IReadOnlyList<WorldEntity>?>? entities = null)
     {
         ArgumentNullException.ThrowIfNull(key);
 
@@ -326,14 +335,16 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         RoomKey room = RoomKey.Read(key);
         if (!room.TryLaid(out int x, out int y, out int turn, out int area))
         {
-            return RoomModels.Of(read, room.Path, shaded: true, doodads: room.Doodads, tools: room.Tools, progress: progress);
+            return RoomModels.Of(read, room.Path, shaded: true, doodads: room.Doodads, tools: room.Tools, progress: progress, heights: room.Heights);
         }
 
         // ONLY IN THE AREA THE PLACE WAS FOUND IN: a place is a tile of one area's grid, and the key
         // names that grid so a new area cannot lay the room over somebody else's tiles.
         TerrainGrid? grid = terrain?.Invoke();
         return grid is not null && Stamp(grid) == area
-            ? LaidRoomModels.Of(read, room.Path, grid, x, y, turn, shaded: true, doodads: room.Doodads, tools: room.Tools, atLevel: room.AtLevel, progress: progress)
+            ? LaidRoomModels.Of(
+                read, room.Path, grid, x, y, turn, shaded: true, doodads: room.Doodads, tools: room.Tools, atLevel: room.AtLevel,
+                progress: progress, heights: room.Heights, entities: entities?.Invoke())
             : MonsterModel.None with { Why = "the area this place was found in is gone - pick the room's place again" };
     }
 
@@ -473,6 +484,32 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         }
 
         ImGui.SameLine();
+        if (ImGui.SmallButton(_heights switch
+        {
+            DoodadHeight.File => "doodad z: line##roomheights",
+            DoodadHeight.Added => "doodad z: ground + line##roomheights",
+            _ => "doodad z: ground##roomheights",
+        }))
+        {
+            _heights = _heights switch
+            {
+                DoodadHeight.Ground => DoodadHeight.File,
+                DoodadHeight.File => DoodadHeight.Added,
+                _ => DoodadHeight.Ground,
+            };
+            Changed?.Invoke();
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("How high a doodad is set whose line in the room carries a height - a value neither reference names.\n"
+                + "ground: on the ground under it, the value ignored, as before.\n"
+                + "line: at the value itself.\n"
+                + "ground + line: at the ground plus the value.\n"
+                + "Doodads whose line carries none stay on the ground. Which the game does: see the \"doodad heights:\" line under a laid room.");
+        }
+
+        ImGui.SameLine();
         ImGui.Checkbox("as laid##roomlaid", ref _asLaid);
         if (ImGui.IsItemHovered())
         {
@@ -498,7 +535,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     private string LaidKey(string chosen)
     {
         string laid = LaidPlace();
-        return new RoomKey(chosen, _doodads, _tools, laid, AtLevel: laid.Length > 0 && _atLevel).ToString();
+        return new RoomKey(chosen, _doodads, _tools, laid, AtLevel: laid.Length > 0 && _atLevel, Heights: _heights).ToString();
     }
 
     /// <summary>The place the room is drawn laid at, as the key writes it - or empty for the room as its file has it.</summary>
