@@ -165,6 +165,9 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     /// <summary>Whether a room whose place is outlined is drawn as the area laid it - see LaidRoomModels.</summary>
     private bool _asLaid = true;
 
+    /// <summary>Whether a laid room's pieces are set at their tiles' own levels rather than fitted to the area's ground - see LaidRoomModels.</summary>
+    private bool _atLevel;
+
     /// <summary>Every tile file's identity read for the area in <see cref="_identitiesOf"/> - one read per file across every room searched there.</summary>
     private ConcurrentDictionary<string, TileIdentity?> _identities = new(StringComparer.OrdinalIgnoreCase);
     private TerrainGrid? _identitiesOf;
@@ -328,7 +331,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         // names that grid so a new area cannot lay the room over somebody else's tiles.
         TerrainGrid? grid = terrain?.Invoke();
         return grid is not null && Stamp(grid) == area
-            ? LaidRoomModels.Of(read, room.Path, grid, x, y, turn, shaded: true, doodads: room.Doodads, tools: room.Tools)
+            ? LaidRoomModels.Of(read, room.Path, grid, x, y, turn, shaded: true, doodads: room.Doodads, tools: room.Tools, atLevel: room.AtLevel)
             : MonsterModel.None with { Why = "the area this place was found in is gone - pick the room's place again" };
     }
 
@@ -400,7 +403,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         }
 
         string key = room
-            ? new RoomKey(chosen, _doodads, _tools, LaidPlace()).ToString()
+            ? LaidKey(chosen)
             : new TileKey(chosen, _ground, _walls, Placing(chosen), Laying(chosen)).ToString();
         if (!string.Equals(key, _subjectKey, StringComparison.Ordinal))
         {
@@ -475,6 +478,25 @@ public sealed class TileBookWindow : BookWindow<TileBook>
                 + " the joins to the map included - each turned the way the game laid it, and the room's doodads set on them.\n"
                 + "Off, or with no place picked: the room's doodads as its file has them.");
         }
+
+        if (_asLaid)
+        {
+            ImGui.SameLine();
+            ImGui.Checkbox("tile level##roomlevel", ref _atLevel);
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip("Each piece set at its tiles' own level - the height the area's ground is measured from - rather than"
+                    + " raised until its ground meets the area's on average.\n"
+                    + "Which of the two the game does is not settled: compare both with the game, and see the \"level:\" line under the picture.");
+            }
+        }
+    }
+
+    /// <summary>The key a room loads under: laid where picked, at the tiles' levels where asked.</summary>
+    private string LaidKey(string chosen)
+    {
+        string laid = LaidPlace();
+        return new RoomKey(chosen, _doodads, _tools, laid, AtLevel: laid.Length > 0 && _atLevel).ToString();
     }
 
     /// <summary>The place the room is drawn laid at, as the key writes it - or empty for the room as its file has it.</summary>

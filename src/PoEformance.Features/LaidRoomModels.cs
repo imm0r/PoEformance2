@@ -34,6 +34,14 @@ namespace PoEformance.Features;
 /// coin toss that shows as pieces turned round. The room that showed it chose "Y turned over,
 /// heights the other way" on 6 of its 14 sloped pieces.
 ///
+/// HOW HIGH A PIECE GOES IS NOT SETTLED, and the line says what each answer would do. Fitted, each
+/// piece is raised until its ground meets the area's on average - which is exact only where the file's
+/// ground has the shape the area's heights have, and the sloped pieces say it often does not. At its
+/// tile's level, it goes where the area's own heights are measured from: a tile's sub-tile heights
+/// are described relative to its level (TerrainHeightField), and a file's ground counted from the
+/// same level would be set there unfitted. Seepage's offices, fitted, came out with their sand over
+/// floors the game shows bare - which of the two the game does is what the switch and the line are for.
+///
 /// AND A PIECE SEVERAL TILES ACROSS IS CHECKED AGAINST THE AREA'S OWN INDEX: every one of its area
 /// tiles names the column and row of the file it holds, so where the drawing puts each sub-tile can
 /// be compared with where the game says it is - counting the rows from the top, as the files are laid
@@ -71,6 +79,7 @@ public static class LaidRoomModels
     /// <param name="shaded">Whether each material's shader graphs are read.</param>
     /// <param name="doodads">Most doodads placed, and the measure of the tiles' triangles too - see RoomModels.UsualDoodads.</param>
     /// <param name="tools">Whether the level editor's tools are placed too.</param>
+    /// <param name="atLevel">Whether each piece is set at its tiles' own level rather than fitted to the area's ground - see the remarks.</param>
     public static MonsterModel Of(
         Func<string, byte[]?>? read,
         string? path,
@@ -80,7 +89,8 @@ public static class LaidRoomModels
         int turn,
         bool shaded = false,
         int doodads = RoomModels.UsualDoodads,
-        bool tools = false)
+        bool tools = false,
+        bool atLevel = false)
     {
         if (read is null)
         {
@@ -170,6 +180,8 @@ public static class LaidRoomModels
         long mostTriangles = (long)(doodads > 0 ? doodads : RoomModels.UsualDoodads) * RoomModels.TrianglesPerDoodad;
         int laidPieces = 0, broken = 0, bare = 0, capped = 0, unturned = 0;
         int several = 0, fromTop = 0, fromBottom = 0;
+        int fitsFitted = 0, fitsAtLevel = 0;
+        var above = new List<float>(pieces.Count);
         var used = new HashSet<int>();
         foreach (TilePiece piece in pieces)
         {
@@ -201,7 +213,16 @@ public static class LaidRoomModels
                 continue;
             }
 
-            float lift = Way.Lift(piece, one, grid, x, y, flat);
+            float level = Level(piece, grid);
+            Height height = Way.Measure(piece, one, grid, x, y, flat, level);
+            if (height.Samples >= 3)
+            {
+                above.Add(level - height.Fitted);
+                fitsFitted += height.MissFitted <= Fits ? 1 : 0;
+                fitsAtLevel += height.MissAtLevel <= Fits ? 1 : 0;
+            }
+
+            float lift = atLevel ? level : height.Fitted;
             Matrix4x4 place = Spatial(flat) * Matrix4x4.CreateTranslation(0f, 0f, lift);
             if (one.Props.Ready)
             {
@@ -248,6 +269,7 @@ public static class LaidRoomModels
                 + (capped > 0 ? string.Create(CultureInfo.InvariantCulture, $", {capped} left out to keep it turnable - the doodads slider raises it") : string.Empty)
                 + (unturned > 0 ? string.Create(CultureInfo.InvariantCulture, $", {unturned} laid no way the game's tables said - drawn as their files have them") : string.Empty),
             Heights(ways, chosen, settled),
+            Levels(above, fitsFitted, fitsAtLevel, atLevel),
         };
         if (several > 0)
         {
@@ -283,6 +305,36 @@ public static class LaidRoomModels
             $"heights: drawn with the files {chosen.Said} before the game's own turn - {chosen.Fitting}/{chosen.Sloped} sloped pieces meet the area's ground within {Fits} units; next {next.Said} {next.Fitting}/{next.Sloped}; the other {ways.Length - 2} at most {rest}/{chosen.Sloped}");
     }
 
+    /// <summary>What the two ways of setting a piece's height said, for the line under the picture.</summary>
+    private static string Levels(List<float> above, int fitsFitted, int fitsAtLevel, bool atLevel)
+    {
+        string drawn = atLevel ? "drawn at the tiles' levels" : "drawn fitted";
+        if (above.Count == 0)
+        {
+            return "level: no piece with a ground to measure - " + drawn;
+        }
+
+        above.Sort();
+        float Share(float share) => above[Math.Clamp((int)MathF.Round(share * (above.Count - 1)), 0, above.Count - 1)];
+        return string.Create(CultureInfo.InvariantCulture,
+            $"level: fitted to the area's ground, a piece sits {Share(0.5f):+0;-0;0} units above its tile's own level (the middle half {Share(0.25f):+0;-0;0} to {Share(0.75f):+0;-0;0}, all {above[0]:+0;-0;0} to {above[^1]:+0;-0;0}), and its ground meets the area's within {Fits} units on {fitsAtLevel}/{above.Count} pieces at the tile's level, {fitsFitted}/{above.Count} fitted - {drawn}");
+    }
+
+    /// <summary>The level of the tiles a piece covers, which their sub-tile heights are described relative to - their mean, should they differ.</summary>
+    private static float Level(TilePiece piece, TerrainGrid grid)
+    {
+        float sum = 0f;
+        for (int tileY = piece.MinY; tileY <= piece.MaxY; tileY++)
+        {
+            for (int tileX = piece.MinX; tileX <= piece.MaxX; tileX++)
+            {
+                sum += grid.LevelAt(tileX, tileY);
+            }
+        }
+
+        return sum / (piece.Width * piece.Height);
+    }
+
     /// <summary>
     /// Whether every area tile of a piece holds the sub-tile the drawing puts over it, by the area's own index: its column, and its row counted from the file's top or its bottom.
     /// </summary>
@@ -309,6 +361,11 @@ public static class LaidRoomModels
 
         return true;
     }
+
+    /// <summary>
+    /// Where a piece's height comes out each way: the lift that fits its ground to the area's, how far its ground then misses the area's, and how far it misses at its tile's level - root mean squares, in world units.
+    /// </summary>
+    private readonly record struct Height(float Fitted, int Samples, double MissFitted, double MissAtLevel);
 
     /// <summary>A flat placement as a placement in space, the height left alone.</summary>
     private static Matrix4x4 Spatial(Matrix3x2 flat) => new(
@@ -386,25 +443,42 @@ public static class LaidRoomModels
             return flat * Matrix3x2.CreateTranslation(middle);
         }
 
-        /// <summary>How far to raise a piece so its ground meets the area's on average.</summary>
-        public static float Lift(TilePiece piece, Made one, TerrainGrid grid, int x, int y, Matrix3x2 flat)
+        /// <summary>
+        /// The lift that meets a piece's ground with the area's on average, and how far the ground misses the area's fitted that way and set at <paramref name="level"/> - one pass over the same points.
+        /// </summary>
+        public static Height Measure(TilePiece piece, Made one, TerrainGrid grid, int x, int y, Matrix3x2 flat, float level)
         {
             int middleX = ((piece.MinX + piece.MaxX + 1) * RoomModels.CellsPerTile) / 2;
             int middleY = ((piece.MinY + piece.MaxY + 1) * RoomModels.CellsPerTile) / 2;
             if (one.Lookup is null || !Matrix3x2.Invert(flat, out Matrix3x2 back))
             {
-                return grid.HeightAt(middleX, middleY);
+                return new Height(grid.HeightAt(middleX, middleY), 0, double.NaN, double.NaN);
             }
 
             double sum = 0;
+            double squares = 0;
+            double atLevel = 0;
             int count = 0;
             foreach ((float file, float area) in Samples(piece, one.Lookup, grid, x, y, back))
             {
-                sum += area - file;
+                double miss = area - file;
+                sum += miss;
+                squares += miss * miss;
+                atLevel += (miss - level) * (miss - level);
                 count++;
             }
 
-            return count > 0 ? (float)(sum / count) : grid.HeightAt(middleX, middleY);
+            if (count == 0)
+            {
+                return new Height(grid.HeightAt(middleX, middleY), 0, double.NaN, double.NaN);
+            }
+
+            double fitted = sum / count;
+            return new Height(
+                (float)fitted,
+                count,
+                Math.Sqrt(Math.Max(0, (squares / count) - (fitted * fitted))),
+                Math.Sqrt(atLevel / count));
         }
 
         /// <summary>Whether the area's own ground rises within a piece - asked of the area alone, before any mesh is.</summary>

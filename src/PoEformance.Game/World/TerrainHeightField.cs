@@ -93,6 +93,14 @@ public sealed class TerrainHeightField
         byte[] selectorTable, byte[] helperTable)
         => new(tileHeights, tilesX, tilesY, rotation, subIndex, subHeights, selectorTable, helperTable);
 
+    /// <summary>
+    /// A tile's own level, in the world units entities report: the height its sub-tile slope is described relative to - 0 outside the field.
+    /// </summary>
+    public float LevelAt(int tileX, int tileY)
+        => (uint)tileX < (uint)TilesX && (uint)tileY < (uint)TilesY && (tileY * TilesX) + tileX < _tileBase.Length
+            ? _tileBase[(tileY * TilesX) + tileX]
+            : 0f;
+
     /// <summary>Ground height at a grid cell, in the world units entities report.</summary>
     public float HeightAt(int cellX, int cellY)
     {

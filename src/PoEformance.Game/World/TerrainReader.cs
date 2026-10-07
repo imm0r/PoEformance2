@@ -265,6 +265,9 @@ public sealed class TerrainGrid
     /// </remarks>
     public float HeightAt(int cellX, int cellY) => _heights?.HeightAt(cellX, cellY) ?? 0f;
 
+    /// <summary>A tile's own level, which its cells' heights are described relative to - see TerrainHeightField.LevelAt. 0 when heights are unavailable.</summary>
+    public float LevelAt(int tileX, int tileY) => _heights?.LevelAt(tileX, tileY) ?? 0f;
+
     /// <summary>
     /// How far to move a cell, in cells, so a FLAT drawing shows it at its real height.
     /// </summary>

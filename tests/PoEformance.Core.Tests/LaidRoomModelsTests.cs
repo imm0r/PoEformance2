@@ -100,6 +100,45 @@ public class LaidRoomModelsTests
         Assert.Equal((250f, 250f), (top.X, top.Y));
     }
 
+    /// <summary>
+    /// A file whose ground sits below the area's is raised to it fitted and left where its tile's level puts it otherwise - and the line says by how much the two differ.
+    /// </summary>
+    /// <remarks>
+    /// The area's heights are the plane over a tile level of nought; the file's ground is the same
+    /// plane forty units further down. Fitted, the piece comes up forty to meet the area; at its level
+    /// it stays down, and only the line's count says the area's ground is missed there.
+    /// </remarks>
+    [Fact]
+    public void APIECEFittedMeetsTheAreasGroundAndAtItsLevelStaysWhereTheFileHasIt()
+    {
+        MonsterModel fitted = Laid(placement: 3, selector: 0, lies: 3, sunk: 40f);
+        MonsterModel level = Laid(placement: 3, selector: 0, lies: 3, sunk: 40f, atLevel: true);
+
+        Assert.True(fitted.Ready, fitted.Why);
+        Assert.True(level.Ready, level.Why);
+        Assert.Equal(Plane(250f, 250f), Highest(fitted).Z, 8f);
+        Assert.Equal(Plane(250f, 250f) + 40f, Highest(level).Z, 8f);
+
+        Assert.InRange(Above(fitted), 36, 44);
+        Assert.Contains("within 8 units on 0/1 pieces at the tile's level, 1/1 fitted - drawn fitted", fitted.Move, StringComparison.Ordinal);
+        Assert.Contains("- drawn at the tiles' levels", level.Move, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Where the file's ground has the area's own shape, counted from the tile's level, the two ways agree - on a tile raised well off nought.
+    /// </summary>
+    [Fact]
+    public void ANDWhereTheFileCountsFromItsTilesLevelTheTwoAgree()
+    {
+        MonsterModel fitted = Laid(placement: 3, selector: 0, lies: 3, level: -100f);
+        MonsterModel level = Laid(placement: 3, selector: 0, lies: 3, level: -100f, atLevel: true);
+
+        Assert.Equal(Plane(250f, 250f) - 100f, Highest(fitted).Z, 8f);
+        Assert.Equal(Plane(250f, 250f) - 100f, Highest(level).Z, 8f);
+        Assert.InRange(Above(fitted), -4, 4);
+        Assert.Contains("within 8 units on 1/1 pieces at the tile's level, 1/1 fitted", fitted.Move, StringComparison.Ordinal);
+    }
+
     [Fact]
     public void WITHNoSlopeNothingIsSettledAndTheLineSaysSo()
     {
@@ -209,7 +248,10 @@ public class LaidRoomModelsTests
     /// <summary>
     /// The room laid over an area whose one tile is laid the given way, its heights written with the file lying on the template as <paramref name="lies"/> says - TileOrientation's placement numbers.
     /// </summary>
-    private static MonsterModel Laid(int placement, byte selector, int lies, bool flat = false)
+    /// <param name="level">The tile's own level, which its sub-tile heights are written relative to.</param>
+    /// <param name="sunk">How far below the area's ground the file's ground is written.</param>
+    /// <param name="atLevel">Whether the piece is set at its tile's level rather than fitted.</param>
+    private static MonsterModel Laid(int placement, byte selector, int lies, bool flat = false, float level = 0f, float sunk = 0f, bool atLevel = false)
     {
         var ids = new int[TilesX * TilesY];
         Array.Fill(ids, -1);
@@ -244,12 +286,26 @@ public class LaidRoomModelsTests
         var which = new int[ids.Length];
         Array.Fill(which, -1);
         which[at] = 0;
+        var levels = new float[ids.Length];
+        levels[at] = level;
         TerrainHeightField heights = TerrainHeightField.WithSubTile(
-            new float[ids.Length], TilesX, TilesY, rotation, which, [array], TileOrientationTests.GameSelectors, TileOrientationTests.GameHelper);
+            levels, TilesX, TilesY, rotation, which, [array], TileOrientationTests.GameSelectors, TileOrientationTests.GameHelper);
 
         int stride = ((TilesX * Cells) + 1) / 2;
         var grid = new TerrainGrid(new byte[stride * TilesY * Cells], stride, TilesY * Cells, TilesX, TilesY, heights, tiles: tiles);
-        return LaidRoomModels.Of(Files().GetValueOrDefault, RoomPath, grid, 1, 1, 0);
+        return LaidRoomModels.Of(Files(sunk).GetValueOrDefault, RoomPath, grid, 1, 1, 0, atLevel: atLevel);
+    }
+
+    /// <summary>
+    /// How far above its tile's level the line says a fitted piece sits - within a height step of the truth, the area's heights being whole steps of HeightScale.
+    /// </summary>
+    private static int Above(MonsterModel room)
+    {
+        const string said = "level: fitted to the area's ground, a piece sits ";
+        int at = room.Move.IndexOf(said, StringComparison.Ordinal);
+        Assert.True(at >= 0, room.Move);
+        string rest = room.Move[(at + said.Length)..];
+        return int.Parse(rest[..rest.IndexOf(' ', StringComparison.Ordinal)], System.Globalization.NumberStyles.AllowLeadingSign, System.Globalization.CultureInfo.InvariantCulture);
     }
 
     /// <summary>The vertex with the greatest height.</summary>
@@ -260,14 +316,14 @@ public class LaidRoomModelsTests
     }
 
     /// <summary>The install: the room, the one by one tile's definition, template and mesh, and a one by two tile's.</summary>
-    private static Dictionary<string, byte[]> Files()
+    private static Dictionary<string, byte[]> Files(float sunk = 0f)
     {
         return new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase)
         {
             [RoomPath] = Text(RoomText),
             [TilePath] = Tdt(TemplatePath),
             [TemplatePath] = Text("version 3\nSize 1 1\nTileMeshRoot \"Art/Models/Terrain/Test/Slope\"\n"),
-            [MeshPath] = Tgm(10),
+            [MeshPath] = Tgm(10, sunk),
             [TallPath] = Tdt(TallTemplatePath),
             [TallTemplatePath] = Text("version 3\nSize 1 2\nTileMeshRoot \"Art/Models/Terrain/Test/Tall\"\n"),
             ["Art/Models/Terrain/Test/Tall_c1r1.tgm"] = Tgm(2),
@@ -335,8 +391,8 @@ public class LaidRoomModelsTests
         return stream.ToArray();
     }
 
-    /// <summary>A sub-tile of no props and a ground of n by n quads over the tile, on the plane.</summary>
-    private static byte[] Tgm(int n)
+    /// <summary>A sub-tile of no props and a ground of n by n quads over the tile, on the plane - <paramref name="sunk"/> further down.</summary>
+    private static byte[] Tgm(int n, float sunk = 0f)
     {
         using var stream = new MemoryStream();
         using var write = new BinaryWriter(stream);
@@ -392,7 +448,7 @@ public class LaidRoomModelsTests
                     float y = (row + (corner / 2)) * step;
                     write.Write(x);
                     write.Write(y);
-                    write.Write(Plane(x, y));
+                    write.Write(Plane(x, y) + sunk);
                     write.Write(new byte[] { 0, 0, 127, 0, 127, 0, 0, 0 });
                     write.Write(BitConverter.HalfToUInt16Bits((Half)0.5f));
                     write.Write(BitConverter.HalfToUInt16Bits((Half)0.5f));

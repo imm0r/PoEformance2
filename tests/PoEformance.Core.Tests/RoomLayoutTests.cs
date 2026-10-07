@@ -328,6 +328,12 @@ public class RoomLayoutTests
         Assert.Equal(string.Empty, RoomKey.Read(path + "|laid=13,21,9,5").Laid);
         Assert.Equal(string.Empty, RoomKey.Read(path + "|laid=nowhere").Laid);
         Assert.False(new RoomKey(path).TryLaid(out _, out _, out _, out _));
+
+        // AND THE PIECES AT THEIR TILES' LEVELS, a word of its own that reads back - and is off unless written.
+        var level = new RoomKey(path, Laid: laid, AtLevel: true);
+        Assert.Equal(path + "|laid=13,21,7,-12345+level", level.ToString());
+        Assert.Equal(level, RoomKey.Read(level.ToString()));
+        Assert.False(RoomKey.Read(key.ToString()).AtLevel);
     }
 
     /// <summary>
