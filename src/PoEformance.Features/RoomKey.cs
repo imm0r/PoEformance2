@@ -14,7 +14,8 @@ namespace PoEformance.Features;
 /// <param name="Doodads">Most doodads placed - see <see cref="RoomModels.UsualDoodads"/>.</param>
 /// <param name="Tools">Whether the level editor's tools are placed too - see <see cref="RoomModels.IsTool"/>.</param>
 /// <param name="Laid">Where the room is drawn as the area laid it - "x,y,turn,area" - or empty for the room as its file has it; see LaidRoomModels.</param>
-public readonly record struct RoomKey(string Path, int Doodads = RoomModels.UsualDoodads, bool Tools = false, string Laid = "")
+/// <param name="AtLevel">Whether a laid room's pieces are set at their tiles' own levels rather than fitted to the area's ground - see LaidRoomModels.</param>
+public readonly record struct RoomKey(string Path, int Doodads = RoomModels.UsualDoodads, bool Tools = false, string Laid = "", bool AtLevel = false)
 {
     /// <summary>What starts the word naming the place the room is laid at.</summary>
     public const string LaidWord = "laid=";
@@ -25,15 +26,18 @@ public readonly record struct RoomKey(string Path, int Doodads = RoomModels.Usua
     /// <summary>The word saying the editor's tools are placed.</summary>
     public const string ToolsWord = "tools";
 
+    /// <summary>The word saying a laid room's pieces are set at their tiles' own levels.</summary>
+    public const string LevelWord = "level";
+
     /// <summary>The key as a string - the bare path at the usual choices.</summary>
     public override string ToString()
     {
-        if (Doodads == RoomModels.UsualDoodads && !Tools && Laid.Length == 0)
+        if (Doodads == RoomModels.UsualDoodads && !Tools && Laid.Length == 0 && !AtLevel)
         {
             return Path;
         }
 
-        var words = new List<string>(3);
+        var words = new List<string>(4);
         if (Doodads != RoomModels.UsualDoodads)
         {
             words.Add(string.Create(CultureInfo.InvariantCulture, $"{DoodadsWord}{Doodads}"));
@@ -47,6 +51,11 @@ public readonly record struct RoomKey(string Path, int Doodads = RoomModels.Usua
         if (Laid.Length > 0)
         {
             words.Add(LaidWord + Laid);
+        }
+
+        if (AtLevel)
+        {
+            words.Add(LevelWord);
         }
 
         return string.Concat(Path, TileKey.Mark.ToString(), string.Join(TileKey.WordMark, words));
@@ -81,6 +90,7 @@ public readonly record struct RoomKey(string Path, int Doodads = RoomModels.Usua
 
         int doodads = RoomModels.UsualDoodads;
         var tools = false;
+        var level = false;
         string laid = string.Empty;
         ReadOnlySpan<char> words = key.AsSpan(mark + 1);
         foreach (Range one in words.Split(TileKey.WordMark))
@@ -100,9 +110,13 @@ public readonly record struct RoomKey(string Path, int Doodads = RoomModels.Usua
             {
                 laid = word[LaidWord.Length..].ToString();
             }
+            else if (word.SequenceEqual(LevelWord))
+            {
+                level = true;
+            }
         }
 
-        RoomKey read = new(key[..mark], doodads, tools, laid);
+        RoomKey read = new(key[..mark], doodads, tools, laid, level);
         return read.Laid.Length == 0 || read.TryLaid(out _, out _, out _, out _) ? read : read with { Laid = string.Empty };
     }
 }
