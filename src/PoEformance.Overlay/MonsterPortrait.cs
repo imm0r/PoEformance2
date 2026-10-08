@@ -977,10 +977,22 @@ public sealed class MonsterPortrait
     /// </summary>
     public void DrawOpener()
     {
+        if (!DrawWindowSwitch())
+        {
+            return;
+        }
+
+        ImGui.SameLine();
+        DrawState();
+    }
+
+    /// <summary>The window's switch alone. False, with the reason said, where there is no install to read a model from.</summary>
+    public bool DrawWindowSwitch()
+    {
         if (!Possible)
         {
             ImGui.TextDisabled("No install to read the model from.");
-            return;
+            return false;
         }
 
         bool open = WindowOpen;
@@ -992,9 +1004,23 @@ public sealed class MonsterPortrait
 
         OverlayLayout.Hint("The model in a window of its own: drag to turn it, the wheel zooms, a double click puts it back."
             + " Choosing another row opens it again.");
-        // SHORT: what the model is doing, in a few words - the whole account is the window's "info".
-        // A reason can run to a paragraph, so it is cut and given whole on hover.
-        ImGui.SameLine();
+        return true;
+    }
+
+    /// <summary>
+    /// What the model is doing, in a few words - text only, for a line of information beside a name.
+    /// </summary>
+    /// <remarks>
+    /// SHORT: the whole account is the window's "info". A reason can run to a paragraph, so it is cut
+    /// and given whole on hover.
+    /// </remarks>
+    public void DrawState()
+    {
+        if (!Possible)
+        {
+            return;
+        }
+
         if (_loading is { IsCompleted: false })
         {
             ImGui.TextDisabled(_progress is { } progress ? ImGuiText.Escape(progress.Said()) : "building the model…");
@@ -1013,9 +1039,16 @@ public sealed class MonsterPortrait
                 CultureInfo.InvariantCulture,
                 $"ready · {ByteCount.Said(_model.Bytes)} in {_model.Files} file{(_model.Files == 1 ? string.Empty : "s")}"));
         }
+        else
+        {
+            ImGui.TextDisabled("no model");
+        }
     }
 
-    /// <summary>How much of a reason the window's switch shows before cutting it - see <see cref="DrawOpener"/>.</summary>
+    /// <summary>Whether the files button has written something and says where on a line of its own - a bar under a list makes room for it.</summary>
+    public bool HasFilesLine => _dumped.Length > 0;
+
+    /// <summary>How much of a reason the state shows before cutting it - see <see cref="DrawState"/>.</summary>
     private const int ShortWhy = 60;
 
     /// <summary>Takes a finished load, whether or not the window is open to draw it - the book's dump and export work from it.</summary>
