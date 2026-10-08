@@ -2,6 +2,14 @@ using System.Runtime.Versioning;
 using PoEformance.Features;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.Formats.Bmp;
+using SixLabors.ImageSharp.Formats.Gif;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Formats.Pbm;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.Formats.Qoi;
+using SixLabors.ImageSharp.Formats.Tga;
+using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
@@ -140,17 +148,40 @@ public sealed class IconCache : IDisposable
     /// which is exactly what choosing no icon looks like. <see cref="TerrainLayer"/> learned
     /// the same thing the same way, on the first area whose terrain was large enough to split.
     ///
-    /// A cloned configuration rather than the global default: the renderer loads its own images
-    /// through that, and this is not the place to change how they are allocated.
+    /// A configuration of its own rather than the global default: the renderer loads its own
+    /// images through that, and this is not the place to change how they are allocated.
     /// </remarks>
     internal static readonly Configuration Contiguous = Contiguously();
 
     private static Configuration Contiguously()
     {
-        Configuration configuration = Configuration.Default.Clone();
+        Configuration configuration = WithoutTiff();
         configuration.PreferContiguousImageBuffers = true;
         return configuration;
     }
+
+    /// <summary>
+    /// A configuration knowing every format ImageSharp 3.1 knows by default except TIFF.
+    /// </summary>
+    /// <remarks>
+    /// THE GROUND THE AUDIT SUPPRESSION IN Directory.Build.props STANDS ON. Of the advisories
+    /// suppressed there, the one a decode could reach is the BigTIFF reader looping on a malformed
+    /// entry count, and a picture this tool decodes is any file a person points a setting at - so
+    /// TIFF is left out rather than trusted not to turn up. Everything else stays: the atlas folder
+    /// takes JPEG and BMP as well as PNG, and a marker icon may be anything ImageSharp reads.
+    /// A .tif chosen as an icon now fails as an unknown format, which every caller already treats
+    /// as "not a picture we can draw". The list is Configuration.CreateDefaultInstance's at
+    /// v3.1.12, minus TiffConfigurationModule.
+    /// </remarks>
+    internal static Configuration WithoutTiff() => new(
+        new PngConfigurationModule(),
+        new JpegConfigurationModule(),
+        new GifConfigurationModule(),
+        new BmpConfigurationModule(),
+        new PbmConfigurationModule(),
+        new TgaConfigurationModule(),
+        new WebpConfigurationModule(),
+        new QoiConfigurationModule());
 
     public IconCache(Func<string, Image<Rgba32>, bool, IntPtr> upload, Action<string> release)
     {
