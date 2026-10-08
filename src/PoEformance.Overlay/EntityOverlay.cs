@@ -383,6 +383,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         HideBehindPanels = settings.HideBehindPanels;
         HideWindowsBehindPanels = settings.HideWindowsBehindPanels;
         ScreenshotKey = settings.ScreenshotKey;
+        _capture.Key = settings.CaptureKey;
         KeepOut = settings.MapKeepOutOrDefault;
         _projectiles.Enabled = settings.ShowProjectiles;
         _projectiles.ShowTrails = settings.ProjectileTrails;
@@ -494,6 +495,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             HideBehindPanels = HideBehindPanels,
             HideWindowsBehindPanels = HideWindowsBehindPanels,
             ScreenshotKey = ScreenshotKey,
+            CaptureKey = _capture.Key,
             MapKeepOut = KeepOut,
 
             // FROM THE WINDOW WHERE THERE IS ONE, and from the file where there is not: a build
@@ -2122,6 +2124,21 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // Read per press, like the list: the table is replaced whenever it is loaded again.
         _bossExport = new BossExportPanel(() => _bossIcons.Source);
 
+        // Everything it reads, it reads as the press happens or while it waits - see CaptureKey.
+        _capture = new CaptureKey(
+            () => _snapshot,
+            () => _tracked,
+            () => _snapshot.Terrain is TerrainGrid grid && _areaRooms is not null
+                ? _areaRooms.Arranged(grid, AreaRoomFiles(), _tileBook?.RoomsOverlap ?? RoomOverlap.Rims)
+                : null,
+            () => _areaRooms is not null && _snapshot.Terrain is TerrainGrid { Ground: not null },
+            () => _areaRooms?.Progress ?? (0, 0),
+            () => LoadedFiles?.Invoke() ?? [],
+            () => Version)
+        {
+            Changed = () => SettingsChanged?.Invoke(),
+        };
+
         // The entry card takes its plates from the same cache the markers use, so a picture
         // that cannot be loaded is reported in one place and given up on once.
         _preloadEntry.Icons = _icons;
@@ -2228,6 +2245,25 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// </remarks>
     public bool HideWindowsBehindPanels { get; set; } = true;
 
+    /// <summary>The capture key and the capture it runs - see <see cref="CaptureKey"/>.</summary>
+    private readonly CaptureKey _capture;
+
+    /// <summary>
+    /// Starts the memory half of a capture in its folder, or null where one is already running - set by whoever owns the reader. Unset, the capture says it has none. See CaptureKey.RecordMemory.
+    /// </summary>
+    public Func<string, Task<string>?>? RecordMemory
+    {
+        get => _capture.RecordMemory;
+        set => _capture.RecordMemory = value;
+    }
+
+    /// <summary>Why this session has no memory recording to offer the capture, where <see cref="RecordMemory"/> is not set.</summary>
+    public string NoMemory
+    {
+        get => _capture.NoMemory;
+        set => _capture.NoMemory = value;
+    }
+
     /// <summary>Delete - what the screenshot key is until somebody chooses another.</summary>
     private const int DefaultScreenshotKey = 0x2E;
 
@@ -2299,16 +2335,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         if (_shotListening)
         {
             ImGui.Button("Press a key...  (Esc cancels)");
-            for (int key = 8; key < 255; key++)
+            if (CaptureKey.PressedKey() is int key and > 0)
             {
-                // Mouse buttons and the generic modifiers are not keys somebody binds: the click
-                // that opened this is still down, and Ctrl is the "whole overlay" modifier.
-                if (key is 0x01 or 0x02 or 0x04 or 0x05 or 0x06 or (>= 0x10 and <= 0x12) or (>= 0xA0 and <= 0xA5)
-                    || !ScreenInput.IsDown(key))
-                {
-                    continue;
-                }
-
                 if (key != 0x1B)
                 {
                     ScreenshotKey = key;
@@ -2316,7 +2344,6 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 }
 
                 _shotListening = false;
-                break;
             }
         }
         else if (ImGui.Button($"{(ConsoleKey)ScreenshotKeyOrDefault}##shotkey"))
@@ -3245,6 +3272,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // tileset choice and the dump both read it, and building it twice would read every tileset twice.
         var catalog = new TilesetCatalog(readFile, () => TileSets);
         _areaRooms = readFile is null ? null : new AreaRooms(readFile);
+        _capture.Read = readFile;
         var window = new TileBookWindow(() => TileFiles, TilesHere)
         {
             AllRooms = _areaRooms,
@@ -3871,6 +3899,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // disappears under the cursor and neither dragging nor a button ever registers.
         // Keystrokes are a different question and stay strict - see InputSender.
         if (!GameWindowTracker.IsForeground(_gameWindow) && !GameWindowTracker.IsOwnProcessForeground())
+        {
+            return;
+        }
+
+        // FIRST, before anything is drawn: while it hides the overlay for the picture of the game
+        // alone, nothing at all may reach the screen - the screenshot key's own line included.
+        if (_capture.Poll(Environment.TickCount64, ImGui.GetIO().WantTextInput))
         {
             return;
         }
@@ -5322,6 +5357,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         OverlayLayout.Hint("Only the windows actually lying on top of the open panel.");
 
         DrawScreenshotControls();
+        _capture.DrawControls();
 
         _keepOut.DrawControls();
     }

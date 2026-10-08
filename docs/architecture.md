@@ -42,13 +42,14 @@ The schema is simultaneously:
 
 ### 2. Every memory read goes through `IMemoryReader` — so sessions are recordable
 
-`IMemoryReader` has one real method: `TryRead(address, span)`. Three implementations:
+`IMemoryReader` has one real method: `TryRead(address, span)`. Four implementations:
 
 | Implementation | Purpose |
 |---|---|
 | `LiveMemoryReader` | ReadProcessMemory against the running game (read-only handle) |
 | `RecordingMemoryReader` | wraps another reader, writes every successful read to a file |
 | `ReplayMemoryReader` | replays a recorded file as if it were the live process, with frame seeking |
+| `TapMemoryReader` | passes reads through, and records a stretch of them on demand - the capture key's memory half, held open while the capture's one full read runs inside it |
 
 Consequences, in increasing order of importance:
 
@@ -72,6 +73,13 @@ negative one. (Checked, on the session recorded 2026-08-07: the UI root's own `S
 is in there, because resolving the chain reads it, but `root+Children` never was — so nothing
 in that file can say anything about the atlas.) To record something that can answer questions
 about a feature offline, **that feature has to be running while the recording is made**.
+
+**The same limit has a second edge: a session recording leaves out every read over 64 KB.** That
+keeps the module image out, and with it the terrain - the walkable grid and the tile array are
+each one read of hundreds of kilobytes - so no `--record` session holds the terrain, and a replay
+of one reads "terrain not read" (checked on `session-2026-08-rotation-clickmove.rec`). The capture
+key's recording keeps reads up to 8 MB and reads the terrain afresh inside itself, which is the
+way to get an area's layout into a file.
 
 **And a third way a replay misleads, found 2026-08 while mining the committed fixtures for
 offsets nobody had decoded: a region swept ONCE reads as constant forever.** The replay serves
