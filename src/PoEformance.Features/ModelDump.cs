@@ -37,7 +37,7 @@ namespace PoEformance.Features;
 /// ON DEMAND ONLY, behind a button. It re-reads and decodes the .ao chain and the manifest, and
 /// nothing on the drawing path ever calls it.
 /// </remarks>
-public static class ModelDump
+public static partial class ModelDump
 {
     /// <summary>How far the extends chain is followed. The same cap the model walk uses.</summary>
     private const int MostHops = 8;
@@ -150,12 +150,14 @@ public static class ModelDump
     /// <param name="model">The model already gathered, for the shapes and what each one wears.</param>
     /// <param name="tilesets">Which tilesets place which tile - see <see cref="Ground"/>.</param>
     /// <param name="shaders">The install's shader sources, counted here and written whole by <see cref="ShaderSources"/>.</param>
+    /// <param name="loaded">The files the current area loaded, for a room's lighting section - see <see cref="Lighting"/>.</param>
     public static string OfTile(
         Func<string, byte[]?>? read,
         string path,
         MonsterModel? model,
         TilesetIndex? tilesets = null,
-        IReadOnlyList<string>? shaders = null)
+        IReadOnlyList<string>? shaders = null,
+        IReadOnlyList<string>? loaded = null)
     {
         var said = new StringBuilder();
         bool room = model?.Kind == ModelKind.Room || TileBook.IsRoom(path);
@@ -302,14 +304,264 @@ public static class ModelDump
                 .AppendLine(one < model.GlossShades.Count && model.GlossShades[one] is { HasGloss: true } ? " · glossy" : string.Empty);
         }
 
-        // A ROOM HAS NO GROUND OF ITS OWN - its tiles are chosen when the area is generated.
+        // A ROOM HAS NO GROUND OF ITS OWN - its tiles are chosen when the area is generated. It has
+        // LIGHT, though, which is worked out from the files below.
         if (!room)
         {
             Ground(read, path, tilesets, printed, said);
         }
+        else
+        {
+            said.AppendLine().Append(Lighting(read, path, loaded));
+        }
 
         Shaders(shaders, said);
         return said.ToString();
+    }
+
+    /// <summary>Most loaded tilesets whose environment lines are printed.</summary>
+    private const int MostLitTilesets = 8;
+
+    /// <summary>Most environment files printed whole.</summary>
+    private const int MostEnvironments = 12;
+
+    /// <summary>Most doodad files whose lights are printed.</summary>
+    private const int MostLitDoodads = 48;
+
+    /// <summary>How much of a file that is not text is shown, as hex.</summary>
+    private const int MostHex = 512;
+
+    /// <summary>A file name ending in .env, quoted or not - how .arm zones, tilesets and environments name one.</summary>
+    /// <remarks>
+    /// GENERATED AT BUILD TIME, as FlaskKeyBindings' are: Native AOT has no runtime compiler, and a
+    /// Compiled one built on first use cost enough processor time in the middle of the test run to
+    /// starve SnapshotFeedTests' cadence check - which passed on main and failed with this beside it.
+    /// </remarks>
+    [System.Text.RegularExpressions.GeneratedRegex(
+        @"(?<path>[\w/\\.\-]+\.env)(?![\w.])",
+        System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.CultureInvariant)]
+    private static partial System.Text.RegularExpressions.Regex EnvNamed();
+
+    /// <summary>
+    /// Everything that could say how a room is LIT, raw: the environments that apply to it, whole, and every doodad's lights, byte by byte.
+    /// </summary>
+    /// <remarks>
+    /// WRITTEN TO WORK THE FORMATS OUT, NOT TO DRAW. The picture is lit by one fixed lamp and a flat
+    /// ambient; the game's light comes from places nothing here has read yet:
+    /// <list type="bullet">
+    /// <item>AN ENVIRONMENT, <c>.env</c> - named by the area's tileset (annalithic's Tsi.cs reads
+    /// <c>Environment</c>, <c>Environment1</c>, <c>Environment2</c>, <c>EnvironmentPreload</c>,
+    /// <c>EnvironmentSector</c>) and by a room's zones (poe_data_tools' <c>env_file</c>). Neither
+    /// reference parses the file itself, so it is printed whole - from all three places it can be
+    /// named in, the area's loaded files among them, which say what the game actually took.</item>
+    /// <item>A DOODAD'S LIGHTS, in its rig - AnimationSkeleton.Lights. Both references step over
+    /// each light's 59 bytes, so they are printed as hex and as floats read at each of the four
+    /// alignments, which is what a colour, a radius or a position shows up as.</item>
+    /// </list>
+    /// And any block or entry of a doodad's .ao that says "light", because if the game keeps light
+    /// anywhere else, that is where it would be named.
+    /// </remarks>
+    /// <param name="read">How to get a file out of the install, by path.</param>
+    /// <param name="room">The room's .arm.</param>
+    /// <param name="loaded">The files the current area loaded, or null.</param>
+    public static string Lighting(Func<string, byte[]?> read, string room, IReadOnlyList<string>? loaded)
+    {
+        ArgumentNullException.ThrowIfNull(read);
+        ArgumentNullException.ThrowIfNull(room);
+        var said = new StringBuilder();
+        said.AppendLine("=== lighting");
+
+        var environments = new List<(string Path, string From)>();
+        var named = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        void Name(string path, string from)
+        {
+            string file = Slashed(path);
+            if (file.Length > 0 && named.Add(file))
+            {
+                environments.Add((file, from));
+            }
+        }
+
+        string arm = Raw(read, room) ?? string.Empty;
+        foreach (System.Text.RegularExpressions.Match one in EnvNamed().Matches(arm))
+        {
+            Name(one.Groups["path"].Value, "named by the room's .arm");
+        }
+
+        IReadOnlyList<string> files = loaded ?? [];
+        string[] tilesets = [.. files.Where(one => one.EndsWith(TilesetFile.Extension, StringComparison.OrdinalIgnoreCase)).Take(MostLitTilesets)];
+        said.Append(files.Count == 0 ? "no loaded-file list to hand" : $"{files.Count} files the area loaded")
+            .Append(", ").Append(Say(tilesets.Length)).AppendLine(" of them tilesets");
+        foreach (string tsi in tilesets)
+        {
+            string text = Raw(read, tsi) ?? string.Empty;
+            said.Append("--- loaded .tsi ").AppendLine(tsi);
+            foreach (string line in text.Split('\n'))
+            {
+                string trimmed = line.Trim();
+                if (trimmed.StartsWith("Env", StringComparison.OrdinalIgnoreCase))
+                {
+                    said.Append("  ").AppendLine(trimmed);
+                }
+            }
+
+            foreach (System.Text.RegularExpressions.Match one in EnvNamed().Matches(text))
+            {
+                Name(TilesetFile.Beside(tsi, one.Groups["path"].Value), "named by " + tsi);
+            }
+        }
+
+        foreach (string file in files.Where(one => one.EndsWith(".env", StringComparison.OrdinalIgnoreCase)))
+        {
+            Name(file, "in the area's loaded files");
+        }
+
+        if (environments.Count == 0)
+        {
+            said.AppendLine("(no .env named by the room, by a loaded tileset, or among the area's loaded files)");
+        }
+
+        foreach ((string path, string from) in environments.Take(MostEnvironments))
+        {
+            said.AppendLine().Append("=== .env ").Append(path).Append("  (").Append(from).AppendLine(")");
+            said.AppendLine(Printed(read(path)));
+        }
+
+        if (environments.Count > MostEnvironments)
+        {
+            said.Append("(").Append(Say(environments.Count - MostEnvironments)).AppendLine(" more named, not printed)");
+        }
+
+        said.AppendLine();
+        Lights(read, RoomLayout.Read(read(Slashed(room))), said);
+        return said.ToString();
+    }
+
+    /// <summary>
+    /// Every doodad of a room whose rig carries lights, or whose .ao says "light": the rig, each light's name and bytes, and the .ao's own words.
+    /// </summary>
+    private static void Lights(Func<string, byte[]?> read, RoomLayout layout, StringBuilder said)
+    {
+        said.AppendLine("=== doodad lights");
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        int looked = 0, lit = 0;
+        foreach (RoomDoodad doodad in layout.Doodads)
+        {
+            if (doodad.Ao.Length == 0 || !seen.Add(doodad.Ao))
+            {
+                continue;
+            }
+
+            AnimatedObject ao = AnimatedObject.Read(read(Slashed(doodad.Ao)));
+            if (!ao.Ready)
+            {
+                continue;
+            }
+
+            looked++;
+            List<AnimatedObject> chain = Whole(read, ao);
+            var words = new List<string>();
+            foreach (AoStruct block in chain.SelectMany(one => one.Structs))
+            {
+                bool lightBlock = block.Name.Contains("light", StringComparison.OrdinalIgnoreCase);
+                foreach (AoEntry entry in block.Entries.SelectMany(one => one.Walk()))
+                {
+                    if (lightBlock || entry.Key.Contains("light", StringComparison.OrdinalIgnoreCase)
+                        || entry.Value.Contains("light", StringComparison.OrdinalIgnoreCase))
+                    {
+                        words.Add($"{block.Name}{(block.Client ? " (client)" : string.Empty)}  {entry.Key} = {entry.Value}");
+                    }
+                }
+
+                if (lightBlock && block.Entries.Count == 0)
+                {
+                    words.Add($"{block.Name}{(block.Client ? " (client)" : string.Empty)}  (empty)");
+                }
+            }
+
+            string skeleton = Entryed(chain, "ClientAnimationController", "skeleton");
+            AnimationSkeleton rig = skeleton.Length > 0 ? AnimationSkeleton.Read(read(Slashed(skeleton))) : AnimationSkeleton.None;
+            if (rig.Lights.Count == 0 && words.Count == 0)
+            {
+                continue;
+            }
+
+            if (++lit > MostLitDoodads)
+            {
+                said.AppendLine("(more doodads with lights, not printed)");
+                break;
+            }
+
+            said.Append("--- ").AppendLine(doodad.Ao);
+            if (skeleton.Length > 0)
+            {
+                said.Append("  rig ").Append(skeleton).Append("  version ").Append(Say(rig.Version))
+                    .Append(", ").Append(Say(rig.Bones.Count)).Append(" bones, ").Append(Say(rig.Lights.Count)).AppendLine(" lights");
+            }
+
+            foreach (string word in words)
+            {
+                said.Append("  ao: ").AppendLine(word);
+            }
+
+            for (var one = 0; one < rig.Lights.Count; one++)
+            {
+                byte[] raw = one < rig.LightBytes.Count ? rig.LightBytes[one] : [];
+                said.Append("  light ").Append(Say(one)).Append(' ').Append(rig.Lights[one])
+                    .Append("  (").Append(Say(raw.Length)).AppendLine(" bytes after the name's length)");
+                Hexed(raw, "    ", said);
+                for (var align = 0; align < 4; align++)
+                {
+                    said.Append("    f32 @").Append(Say(align)).Append(':');
+                    for (int at = align; at + 4 <= raw.Length; at += 4)
+                    {
+                        said.Append(' ').Append(BitConverter.ToSingle(raw, at).ToString("G5", CultureInfo.InvariantCulture));
+                    }
+
+                    said.AppendLine();
+                }
+            }
+        }
+
+        said.Append(Say(looked)).Append(" doodad files read, ").Append(Say(Math.Min(lit, MostLitDoodads)))
+            .AppendLine(" with lights or with light in their .ao");
+    }
+
+    /// <summary>A file as text where it is text, or its first bytes as hex where it is not.</summary>
+    private static string Printed(byte[]? content)
+    {
+        if (content is not { Length: > 0 })
+        {
+            return "(not in the install)";
+        }
+
+        string text = StatDescriptionFiles.Decode(content);
+        int control = text.Count(one => char.IsControl(one) && one is not ('\n' or '\r' or '\t'));
+        if (text.Length > 0 && control * 20 < text.Length)
+        {
+            return Trimmed(text);
+        }
+
+        var said = new StringBuilder();
+        said.Append("(not text: ").Append(Say(content.Length)).Append(" bytes, the first ")
+            .Append(Say(Math.Min(MostHex, content.Length))).AppendLine(" as hex)");
+        Hexed(content.AsSpan(0, Math.Min(MostHex, content.Length)), string.Empty, said);
+        return said.ToString().TrimEnd();
+    }
+
+    /// <summary>Bytes as hex, sixteen to a line, each line led by its offset.</summary>
+    private static void Hexed(ReadOnlySpan<byte> bytes, string indent, StringBuilder said)
+    {
+        for (var row = 0; row < bytes.Length; row += 16)
+        {
+            said.Append(indent).Append(row.ToString("X4", CultureInfo.InvariantCulture)).Append(' ');
+            for (int at = row; at < Math.Min(row + 16, bytes.Length); at++)
+            {
+                said.Append(' ').Append(bytes[at].ToString("X2", CultureInfo.InvariantCulture));
+            }
+
+            said.AppendLine();
+        }
     }
 
     /// <summary>Most of one text file printed, so a large list cannot bury the rest of the dump.</summary>

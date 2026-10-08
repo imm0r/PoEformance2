@@ -3274,6 +3274,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 Tilesets = catalog,
                 Shaders = () => ShaderFiles,
                 Materials = () => MaterialFiles,
+                Loaded = () => LoadedFiles?.Invoke() ?? [],
             },
         };
 

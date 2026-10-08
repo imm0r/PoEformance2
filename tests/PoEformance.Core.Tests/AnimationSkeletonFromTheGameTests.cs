@@ -232,6 +232,28 @@ public class AnimationSkeletonFromTheGameTests
     }
 
     /// <summary>
+    /// A light's undecoded bytes are kept as the file holds them: the 59 between its name's length and its name, on a version 11 rig.
+    /// </summary>
+    /// <remarks>
+    /// What the tile book's dump prints for working the layout out - see ModelDump.Lighting - so it
+    /// has to be the file's bytes exactly, and not one off at either end. Checked against the name's
+    /// own place in the file: its length byte sits 60 before it.
+    /// </remarks>
+    [Fact]
+    public void ALIGHTSBytesAreKeptAsTheFileHoldsThem()
+    {
+        byte[] file = File.ReadAllBytes(Path.Combine(DirectoryHolding("tests"), "tests", "fixtures", Lit));
+        AnimationSkeleton said = AnimationSkeleton.Read(file);
+
+        byte[] raw = Assert.Single(said.LightBytes);
+        Assert.Equal(51 + 4 + 4, raw.Length);
+
+        int name = file.AsSpan().IndexOf("PointLightShape1"u8);
+        Assert.Equal("PointLightShape1".Length, file[name - 60]);
+        Assert.Equal(file[(name - 59)..name], raw);
+    }
+
+    /// <summary>
     /// A real version 7 rig reads its animations out of the frames interleaved with them.
     /// </summary>
     /// <remarks>
