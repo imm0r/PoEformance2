@@ -679,6 +679,9 @@ public sealed class MonsterPortrait
     /// <summary>The install's shader sources, for a tile's dump to search - see ModelDump.OfTile.</summary>
     public Func<IReadOnlyList<string>>? Shaders { get; set; }
 
+    /// <summary>The files the current area loaded, for a room's dump to find the environments it is lit by - see ModelDump.Lighting.</summary>
+    public Func<IReadOnlyList<string>>? Loaded { get; set; }
+
     /// <summary>Every material the install has, for the graph survey - see GraphSurvey. Null leaves its button out.</summary>
     public Func<IReadOnlyList<string>>? Materials { get; set; }
 
@@ -3046,6 +3049,7 @@ public sealed class MonsterPortrait
         Func<string, byte[]?>? install = _install;
         TilesetCatalog? catalog = Tilesets;
         IReadOnlyList<string> shaders = Shaders?.Invoke() ?? [];
+        IReadOnlyList<string> loaded = Loaded?.Invoke() ?? [];
         _dumped = "writing " + at + " - reading every tileset, this takes a moment";
 
         // AND EVERY SHADER SOURCE BESIDE IT, whole - see ModelDump.ShaderSources. One file for all
@@ -3058,7 +3062,7 @@ public sealed class MonsterPortrait
                 Write(beside, () => ModelDump.ShaderSources(install, shaders));
             }
 
-            Write(at, () => ModelDump.OfTile(install, tile, model, catalog?.Wait(), shaders),
+            Write(at, () => ModelDump.OfTile(install, tile, model, catalog?.Wait(), shaders, loaded),
                 beside.Length > 0 ? $" - and the {shaders.Count} shader sources beside it, in {ModelDump.ShaderFile}" : string.Empty);
         });
     }

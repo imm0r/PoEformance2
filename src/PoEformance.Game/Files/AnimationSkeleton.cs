@@ -125,6 +125,7 @@ public sealed class AnimationSkeleton
         Bones = [];
         Animations = [];
         Lights = [];
+        LightBytes = [];
     }
 
     /// <summary>Nothing read.</summary>
@@ -157,6 +158,17 @@ public sealed class AnimationSkeleton
     /// monsters have none; the ones that glow have one.
     /// </remarks>
     public IReadOnlyList<string> Lights { get; private init; }
+
+    /// <summary>
+    /// Each light's fixed part as the file holds it, beside <see cref="Lights"/> - 51 bytes, 4 more from version 7, 4 more from 9.
+    /// </summary>
+    /// <remarks>
+    /// KEPT RAW BECAUSE NOBODY HAS DECODED IT. Both references step over these bytes (poe_data_tools'
+    /// <c>unk_bytes1..3</c>, poeformats' skipped 55), and a light's colour, reach and place are in
+    /// them or nowhere. The tile book's dump prints them for a room's doodads, so the layout can be
+    /// worked out from real lights rather than guessed - see ModelDump.Lighting.
+    /// </remarks>
+    public IReadOnlyList<byte[]> LightBytes { get; private init; }
 
     /// <summary>Where the embedded bundle of keyframes begins, or -1 where there is none.</summary>
     public int TracksAt { get; private init; } = -1;
@@ -259,14 +271,16 @@ public sealed class AnimationSkeleton
         }
 
         var lit = new string[lights];
+        var litBytes = new byte[lights][];
         for (var one = 0; one < lights; one++)
         {
-            if (Light(span, ref at, version) is not { } name)
+            if (Light(span, ref at, version, out byte[] raw) is not { } name)
             {
                 return Fault($"light {one} of {lights} ran off the end at byte {at}", version);
             }
 
             lit[one] = name;
+            litBytes[one] = raw;
         }
 
         var hung = new SkeletonAnimation[animations];
@@ -314,6 +328,7 @@ public sealed class AnimationSkeleton
                 {
                     Version = version,
                     Lights = lit,
+                    LightBytes = litBytes,
                     Bones = bones,
                     Animations = hung,
                     TracksAt = HeaderBytes,
@@ -331,6 +346,7 @@ public sealed class AnimationSkeleton
         {
             Version = version,
             Lights = lit,
+            LightBytes = litBytes,
             Bones = bones,
             Animations = hung,
             TracksAt = tracks is null ? -1 : at,
@@ -469,11 +485,12 @@ public sealed class AnimationSkeleton
     /// ABSENCE OF A COUNTEREXAMPLE IN WHAT WAS LOOKED AT IS NOT ABSENCE IN THE GAME, which is the
     /// same lesson this project's own notes open with.
     /// </remarks>
-    private static string? Light(ReadOnlySpan<byte> file, ref int at, int version)
+    private static string? Light(ReadOnlySpan<byte> file, ref int at, int version, out byte[] raw)
     {
         // Fifty-one bytes of it always, four more from version 7 and four more again from 9, which
         // makes 60 on the versions a light has ever been seen on.
         int fixedPart = 1 + 51 + (version >= 7 ? 4 : 0) + (version >= 9 ? 4 : 0);
+        raw = [];
 
         if (at + fixedPart > file.Length)
         {
@@ -481,6 +498,7 @@ public sealed class AnimationSkeleton
         }
 
         int length = file[at];
+        raw = file.Slice(at + 1, fixedPart - 1).ToArray();
         at += fixedPart;
 
         if (at + length > file.Length)
