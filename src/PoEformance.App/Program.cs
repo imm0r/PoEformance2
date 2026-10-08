@@ -527,6 +527,9 @@ internal static class Program
     /// <summary>What a material is called wherever it is - the graph survey reads every one.</summary>
     private const string MaterialExtension = ".mat";
 
+    /// <summary>What an environment is called wherever it is - the env survey reads every one.</summary>
+    private const string EnvironmentExtension = ".env";
+
     /// <summary>What a shader source is called wherever it is - the tile dump searches them for the ground's coordinates.</summary>
     private static readonly string[] ShaderExtensions = [".ffx", ".hlsl", ".hlsli", ".fxh"];
 
@@ -3372,14 +3375,19 @@ internal static class Program
                     // materials from being coloured by their graphs. Only the paths - the survey
                     // reads the files when it is asked for.
                     new PoEformance.Game.Files.BundleIndex.WalkPlace(string.Empty, [MaterialExtension]),
+
+                    // AND EVERY ENVIRONMENT, for the env survey: the keys a sun is given in, which no
+                    // file read so far had. Only the paths again.
+                    new PoEformance.Game.Files.BundleIndex.WalkPlace(string.Empty, [EnvironmentExtension]),
                 ]);
                 List<string> tiles = [.. found[0].Where(one => !one.EndsWith(TilesetExtension, StringComparison.OrdinalIgnoreCase))];
                 List<string> sets = [.. found[0].Where(one => one.EndsWith(TilesetExtension, StringComparison.OrdinalIgnoreCase))];
                 List<string> shaders = [.. found[1].Concat(found[2]).Distinct(StringComparer.OrdinalIgnoreCase)];
-                Console.WriteLine($"tiles: {tiles.Count} tile definitions and rooms, {sets.Count} tilesets, {shaders.Count} shader sources, {found[3].Count} materials in the install");
+                Console.WriteLine($"tiles: {tiles.Count} tile definitions and rooms, {sets.Count} tilesets, {shaders.Count} shader sources, {found[3].Count} materials, {found[4].Count} environments in the install");
                 overlay.TileSets = sets;
                 overlay.ShaderFiles = shaders;
                 overlay.MaterialFiles = found[3];
+                overlay.EnvironmentFiles = found[4];
                 overlay.TileFiles = tiles;
             });
         }

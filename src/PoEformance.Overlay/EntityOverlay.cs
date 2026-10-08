@@ -1109,6 +1109,22 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private IReadOnlyList<string> _materialFiles = [];
 
     /// <summary>
+    /// Every environment (<c>.env</c>) the install has, for the env survey - see EnvSurvey.
+    /// </summary>
+    /// <remarks>Set by the same walk as <see cref="TileFiles"/>; empty until it runs.</remarks>
+    public IReadOnlyList<string> EnvironmentFiles
+    {
+        get => _environmentFiles;
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            _environmentFiles = value;
+        }
+    }
+
+    private IReadOnlyList<string> _environmentFiles = [];
+
+    /// <summary>
     /// How many rooms of the current area each tile file builds, by path - a NEW dictionary only when
     /// the area's terrain changes, which is what tells the tile book to rebuild.
     /// </summary>
@@ -3307,6 +3323,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 Tilesets = catalog,
                 Shaders = () => ShaderFiles,
                 Materials = () => MaterialFiles,
+                Environments = () => EnvironmentFiles,
                 Loaded = () => LoadedFiles?.Invoke() ?? [],
             },
         };
