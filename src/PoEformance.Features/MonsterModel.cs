@@ -190,6 +190,24 @@ public sealed record MonsterModel(
     /// </remarks>
     public string Move { get; init; } = string.Empty;
 
+    /// <summary>
+    /// The point lights a room's doodads carry, in the model's own space - see RoomLights. Empty for anything but a room.
+    /// </summary>
+    public IReadOnlyList<PointLight> Lights { get; init; } = [];
+
+    /// <summary>What reading those lights came to, for the line under a lit picture - see RoomLights.Gathered.</summary>
+    public string LightsSaid { get; init; } = string.Empty;
+
+    /// <summary>
+    /// Where the model's origin is in the area, in world units, where the model is drawn as the area laid it - else null.
+    /// </summary>
+    /// <remarks>
+    /// A LAID ROOM'S CORNER IS THE PICTURE'S ORIGIN (LaidRoomModels), its x and y the area's own and its
+    /// heights the area's terrain heights - so a point the area names, the player's feet, lands in the
+    /// picture by taking this off. A room drawn as its file has it has no place in any area.
+    /// </remarks>
+    public Vector2? AreaOrigin { get; init; }
+
     /// <summary>Whether there is a skeleton with animations on it that fits this mesh.</summary>
     public bool Moves => Move.Length == 0 && Rig.Ready && Rig.Animations.Count > 0;
 

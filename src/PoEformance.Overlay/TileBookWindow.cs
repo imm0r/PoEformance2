@@ -147,6 +147,9 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     /// <summary>The tile the player stands on, for the "around you" row. Null leaves the row out.</summary>
     public Func<(int X, int Y)?>? Here { get; init; }
 
+    /// <summary>The switches that light the picture the game's way, or null for none - see SceneLightPanel.</summary>
+    public SceneLightPanel? Lighting { get; init; }
+
     /// <summary>The search running or run for <see cref="_searchedFor"/> in <see cref="_searchedIn"/>.</summary>
     private Task<RoomSearch>? _searching;
     private RoomSearch? _found;
@@ -526,6 +529,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             }
         }
 
+        Lighting?.Draw(Model?.Showing);
         ImGui.Separator();
 
         if (Model is not { } model)

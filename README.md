@@ -95,6 +95,13 @@ read is read once more from nothing - the terrain, every entity with every switc
 files - plus the raw bytes of the game's root objects, one hop beyond them, and every component of
 the entities around you; `memory.txt` beside it says what sits at which address.
 
+The Tile Book's picture of a room can be **lit the game's way** (its *light* section, *game light*):
+the area's own `.env` - or any other picked from the install - gives the sun, the player's light,
+the environment's diffuse cube and the exposure; the room's doodads give their point lights from
+their `.ao` Lights blocks. Each part has its own switch, and where no file says how the game turns
+a number into a direction - the sun's phi and theta, the cube's two angles - the readings are offered
+side by side, to be held against a screenshot from the game.
+
 The overlay draws the area's layout **on the game's own map** — including the parts not
 explored yet — and marks living monsters, chests, drops and NPCs on it. The large map when
 it is open, the minimap otherwise, clipped to whichever is on screen. It

@@ -672,6 +672,24 @@ public sealed class MonsterPortrait
     private IReadOnlyList<ShadeProgram?>? _drawnShades;
 
     /// <summary>
+    /// The game's light a model is drawn under, or null for the picture's own - see SceneLightPanel. Null leaves every picture as it was.
+    /// </summary>
+    /// <remarks>
+    /// ASKED EVERY FRAME AND COMPARED BY REFERENCE: the panel hands back the same light while nothing
+    /// changed, and a new one the moment a switch, a reading or the environment does - which redraws.
+    /// </remarks>
+    public Func<MonsterModel, SceneLight?>? SceneLit { get; set; }
+
+    /// <summary>The model the pane is showing, or MonsterModel.None.</summary>
+    public MonsterModel Showing => _model;
+
+    /// <summary>The light the last picture was drawn under, compared by reference.</summary>
+    private SceneLight? _drawnLight;
+
+    /// <summary>The light for the model in the pane, or null.</summary>
+    private SceneLight? Lit() => SceneLit?.Invoke(_model);
+
+    /// <summary>
     /// Which tilesets place which tile, for a tile's dump to find the areas that use it - see ModelDump.OfTile.
     /// </summary>
     public TilesetCatalog? Tilesets { get; set; }
@@ -2425,6 +2443,7 @@ public sealed class MonsterPortrait
             || _drawnGrey != Greyed
             || !ReferenceEquals(_drawnShades, ShadesOf(_model))
             || !ReferenceEquals(_drawnBlends, Blends())
+            || !ReferenceEquals(_drawnLight, Lit())
             || (posed && (_drawnFrame != _frame || _drawnAnimation != _chosen))
             || _probeAsked;
 
@@ -2683,12 +2702,14 @@ public sealed class MonsterPortrait
         float grey = Grey ? GreyFactor : float.NaN;
         IReadOnlyList<MaterialBlend>? blends = Blends();
         IReadOnlyList<ShadeProgram?>? shades = ShadesOf(model);
+        SceneLight? light = Lit();
+        canvas.Light = light;
         int drawing = _drawing;
 
         // AGAIN, NOT WHOLE, where nothing but the time moved since the canvas was last drawn whole:
         // only the triangles that read the clock are drawn - see MeshPicture.Again. Grey is laid on
         // after, so it is not part of what has to match.
-        var key = new ClockKey(model, turn, tilt, zoom, pan, ink, size, blends, shades);
+        var key = new ClockKey(model, turn, tilt, zoom, pan, ink, size, blends, shades, light);
         bool again = key == _clockKey;
         _clockKey = key;
         _clockDrawing = Task.Run(() =>
@@ -2721,7 +2742,7 @@ public sealed class MonsterPortrait
     /// <remarks>The lists compare by reference: the model's are made once, and the blends once per model.</remarks>
     private sealed record ClockKey(
         MonsterModel Model, float Turn, float Tilt, float Zoom, Vector2 Pan, Vector3 Ink, int Size,
-        IReadOnlyList<MaterialBlend>? Blends, IReadOnlyList<ShadeProgram?>? Shades);
+        IReadOnlyList<MaterialBlend>? Blends, IReadOnlyList<ShadeProgram?>? Shades, SceneLight? Light);
 
     /// <summary>A picture the clock asked for, and what it was asked for with - see <see cref="ClockLanded"/>.</summary>
     /// <param name="Picture">The pixels, on the clock's own canvas.</param>
@@ -2770,6 +2791,7 @@ public sealed class MonsterPortrait
         _drawnClock = _clock;
         _drawnShades = ShadesOf(_model);
         _drawnBlends = Blends();
+        _drawnLight = Lit();
         _drawing++;
 
         try
@@ -2779,6 +2801,7 @@ public sealed class MonsterPortrait
             GamePicture drawn;
             float lowest;
             MeshPicture.Canvas canvas = Probing(Clocked(Canvas(size)), size);
+            canvas.Light = _drawnLight;
             if (posed && _pose is not null && _tracks is not null)
             {
                 _pose.Take(_tracks, _frame);
@@ -3359,6 +3382,7 @@ public sealed class MonsterPortrait
     /// <summary>Draws the model as it stands, at the export's own size.</summary>
     private GamePicture Taken(MeshPicture.Canvas canvas)
     {
+        canvas.Light = Lit();
         if (_tracks is { Ready: true } && _pose is not null)
         {
             _pose.Take(_tracks, _frame);

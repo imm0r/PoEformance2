@@ -623,7 +623,7 @@ public static partial class ModelDump
     /// what reads as a position, a turn and two more numbers. Printed as the file has them rather than named, until a
     /// light drawn at its parent's position plus these can be held against the game.
     /// </remarks>
-    private static (string Path, string Where)? Attached(string value)
+    internal static (string Path, string Where)? Attached(string value)
     {
         string[] words = value.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         if (words.Length == 0 || !words[^1].Trim('"').EndsWith(".ao", StringComparison.OrdinalIgnoreCase))
@@ -1929,7 +1929,7 @@ public static partial class ModelDump
     }
 
     /// <summary>A piece and everything it extends, nearest first - the same walk MonsterModel does.</summary>
-    private static List<AnimatedObject> Whole(Func<string, byte[]?> read, AnimatedObject ao)
+    internal static List<AnimatedObject> Whole(Func<string, byte[]?> read, AnimatedObject ao)
     {
         var chain = new List<AnimatedObject> { ao };
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -1998,7 +1998,7 @@ public static partial class ModelDump
     }
 
     /// <summary>One entry's value, taken from the nearest file in the chain that has it.</summary>
-    private static string Entryed(IReadOnlyList<AnimatedObject> chain, string block, string key)
+    internal static string Entryed(IReadOnlyList<AnimatedObject> chain, string block, string key)
     {
         foreach (AnimatedObject one in chain)
         {
