@@ -304,9 +304,13 @@ public abstract class BookWindow<TBook>
     /// </remarks>
     protected virtual bool PaneUnder => false;
 
-    /// <summary>How tall the bar under the list is: three rows of controls - see <see cref="PaneUnder"/>.</summary>
+    /// <summary>
+    /// How tall the bar under the list is: its two lines, and a third while the model's files button says where it wrote - see <see cref="PaneUnder"/>.
+    /// </summary>
+    /// <remarks>AS TALL AS ITS LINES AND NO TALLER: a bar with a blank line under it was the list's height given to nothing.</remarks>
     protected virtual float PaneUnderHeight
-        => (ImGui.GetFrameHeightWithSpacing() * 3f) + (ImGui.GetStyle().WindowPadding.Y * 2f);
+        => (ImGui.GetFrameHeightWithSpacing() * (Model?.HasFilesLine == true ? 3f : 2f))
+            - ImGui.GetStyle().ItemSpacing.Y + (ImGui.GetStyle().WindowPadding.Y * 2f);
 
     /// <summary>
     /// The table as it stands this frame.

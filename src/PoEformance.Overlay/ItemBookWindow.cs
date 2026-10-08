@@ -104,8 +104,12 @@ public sealed class ItemBookWindow : BookWindow<ItemBook>
     protected override bool PaneUnder => true;
 
     /// <summary>
-    /// The bar under the list: the item, which of its models, the model window's switch - then its file and the model's own switches.
+    /// The bar under the list: a line that says what the item is - its name, kind, file and how its model is doing - and a line of every switch.
     /// </summary>
+    /// <remarks>
+    /// INFORMATION ABOVE, SWITCHES BELOW, the layout drawn for it from the live client: words and
+    /// controls mixed on one line read as neither, and the two lines now line up as two kinds of thing.
+    /// </remarks>
     protected override void Pane()
     {
         if (Chosen.Length == 0 || _of.Find(Chosen) is not { } one)
@@ -114,6 +118,22 @@ public sealed class ItemBookWindow : BookWindow<ItemBook>
             return;
         }
 
+        // WHICH MODEL IS SHOWN IS A CHOICE AND SAID AS ONE: AOFile is the item lying on the ground -
+        // its files end in Drop.ao - and AOFile2 the item in a hand, ending in Held.ao or naming a
+        // .fmt outright. Only offered where both are filled - on the switches' line.
+        bool both = one.Ao.Length > 0 && one.Ao2.Length > 0;
+        bool second = both ? _second : one.Ao.Length == 0;
+        string ao = second ? one.Ao2 : one.Ao;
+        string key = one.Path + "|" + ao;
+        if (!string.Equals(key, _subjectKey, StringComparison.Ordinal))
+        {
+            _subjectKey = key;
+            _subject = new MonsterVariety(Name: one.Name, AoFiles: [ao]);
+        }
+
+        Model?.Show(_subject, _subjectKey, one.Name);
+
+        // THE LINE OF INFORMATION.
         if (one.Unique)
         {
             ImGui.TextColored(UniqueInk, ImGuiText.Escape(one.Name));
@@ -130,14 +150,23 @@ public sealed class ItemBookWindow : BookWindow<ItemBook>
                 CultureInfo.InvariantCulture,
                 $"{(one.Class.Length > 0 ? one.Class : "no class")}  ·  drop {one.DropLevel}  ·  {one.Width}x{one.Height}")));
 
-        // WHICH MODEL IS SHOWN IS A CHOICE AND SAID AS ONE: AOFile is the item lying on the ground -
-        // its files end in Drop.ao - and AOFile2 the item in a hand, ending in Held.ao or naming a
-        // .fmt outright. Only offered where both are filled.
-        bool both = one.Ao.Length > 0 && one.Ao2.Length > 0;
-        bool second = both ? _second : one.Ao.Length == 0;
-        if (both)
+        // THE FILE'S NAME, its whole path and the item's art on hover - the path alone ran past the bar.
+        ImGui.SameLine();
+        ImGui.TextDisabled(ImGuiText.Escape((second ? "held  " : "drop  ") + ao[(ao.Replace('\\', '/').LastIndexOf('/') + 1)..]));
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(ImGuiText.Escape($"{ao}\n{one.Path}\nart {one.Art}\nicon {one.Icon}"));
+        }
+
+        if (Model is { } shown)
         {
             ImGui.SameLine();
+            shown.DrawState();
+        }
+
+        // THE LINE OF SWITCHES.
+        if (both)
+        {
             if (ImGui.RadioButton("drop", !_second))
             {
                 _second = false;
@@ -149,33 +178,13 @@ public sealed class ItemBookWindow : BookWindow<ItemBook>
                 _second = true;
             }
 
-            second = _second;
+            ImGui.SameLine();
         }
 
-        string ao = second ? one.Ao2 : one.Ao;
-        string key = one.Path + "|" + ao;
-        if (!string.Equals(key, _subjectKey, StringComparison.Ordinal))
-        {
-            _subjectKey = key;
-            _subject = new MonsterVariety(Name: one.Name, AoFiles: [ao]);
-        }
-
-        if (Model is { } model)
+        if (Model is { } model && model.DrawWindowSwitch())
         {
             ImGui.SameLine();
-            model.Show(_subject, _subjectKey, one.Name);
-            model.DrawOpener();
+            ModelRow();
         }
-
-        // THE FILE'S NAME, its whole path and the item's art on hover - the path alone ran past the bar.
-        ImGui.AlignTextToFramePadding();
-        ImGui.TextDisabled(ImGuiText.Escape((second ? "held  " : "drop  ") + ao[(ao.Replace('\\', '/').LastIndexOf('/') + 1)..]));
-        if (ImGui.IsItemHovered())
-        {
-            ImGui.SetTooltip(ImGuiText.Escape($"{ao}\n{one.Path}\nart {one.Art}\nicon {one.Icon}"));
-        }
-
-        ImGui.SameLine();
-        ModelRow();
     }
 }
