@@ -473,7 +473,16 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     /// <summary>The mark a key carries for the area a room's place was found in - the grid's own, for this session.</summary>
     public static int Stamp(TerrainGrid grid) => RuntimeHelpers.GetHashCode(grid);
 
-    /// <summary>What the tile or room is and where it is used, then its geometry under it.</summary>
+    /// <summary>
+    /// What the tile or room is, then its switches in folds - the model itself has a window of its own.
+    /// </summary>
+    /// <remarks>
+    /// IN FOLDS, ASKED FOR FROM THE LIVE CLIENT: the pane stacked the name, the tile's or room's
+    /// switches, the room search, the light, the model's export row, its files and the picture, and
+    /// what was left for the picture was a corner. The picture went to a window
+    /// (MonsterPortrait.DrawWindow) and the rest falls into five folds, each opened or closed by a
+    /// click on its header and kept that way in the settings - see <see cref="Sections"/>.
+    /// </remarks>
     protected override void Pane()
     {
         string chosen = Chosen;
@@ -486,57 +495,8 @@ public sealed class TileBookWindow : BookWindow<TileBook>
 
         bool room = TileBook.IsRoom(chosen);
         (string set, string folder, string name) = TileBook.Split(chosen);
-        ImGui.TextUnformatted(name);
-        ImGui.TextDisabled(ImGuiText.Escape(
-            (room ? "room  ·  " : "tile  ·  ") + (folder.Length > 0 ? $"{set}  ·  {folder}" : set)));
-
         int placed = Page.Placed[row];
-        ImGui.TextDisabled(room
-            ? placed > 0 ? "loaded for this area" : "not loaded for this area"
-            : placed > 0
-                ? string.Create(CultureInfo.InvariantCulture, $"placed {placed} times in this area")
-                : "not placed in this area");
-
-        ImGui.TextDisabled(ImGuiText.Escape(chosen));
-
-        if (!room)
-        {
-            ImGui.Checkbox("ground", ref _ground);
-            if (ImGui.IsItemHovered())
-            {
-                ImGui.SetTooltip("The tile's ground block, drawn plain. A tileset's MaterialsList names the ground textures - the dump lists them -"
-                    + " but the ground has no texture coordinates, and how the engine makes them is not yet known."
-                    + " Off shows the props alone, where the ground rises around them.");
-            }
-
-            ImGui.SameLine();
-            ImGui.Checkbox("black walls", ref _walls);
-            if (ImGui.IsItemHovered())
-            {
-                ImGui.SetTooltip("The shapes painted with blacknofog.dds: walls hanging from a cliff's edge to close the gap under it."
-                    + " The game's camera never looks behind them; off leaves them out.");
-            }
-
-            DrawnAs(chosen);
-            LaidAs(chosen);
-        }
-        else
-        {
-            DoodadCap();
-            if (placed > 0)
-            {
-                Whereabouts(chosen);
-            }
-        }
-
-        Lighting?.Draw(Model?.Showing);
-        ImGui.Separator();
-
-        if (Model is not { } model)
-        {
-            ImGui.TextDisabled("No model viewer attached.");
-            return;
-        }
+        Heading(chosen, room, set, folder, name, placed);
 
         string key = room
             ? LaidKey(chosen)
@@ -547,8 +507,157 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             _subject = new MonsterVariety(Name: name);
         }
 
-        Vector2 avail = ImGui.GetContentRegionAvail();
-        model.Draw(_subject, _subjectKey, avail.X, avail.Y);
+        if (Model is { } shown)
+        {
+            shown.Show(_subject, _subjectKey, name);
+            shown.DrawOpener();
+        }
+        else
+        {
+            ImGui.TextDisabled("No model viewer attached.");
+        }
+
+        ImGui.Spacing();
+        if (Section(DrawingFold, "Drawing"))
+        {
+            if (room)
+            {
+                DoodadCap();
+            }
+            else
+            {
+                TileDrawing(chosen);
+            }
+        }
+
+        if (room && placed > 0 && Section(WhereFold, "Where it lies in this area"))
+        {
+            Whereabouts(chosen);
+        }
+
+        if (Lighting is { } lighting && Section(LightFold, "Light"))
+        {
+            lighting.Draw(Model?.Showing);
+        }
+
+        if (Model is { } model)
+        {
+            if (Section(ExportFold, "View & export"))
+            {
+                model.DrawExport();
+            }
+
+            if (Section(FilesFold, "Files & surveys"))
+            {
+                model.DrawFiles();
+            }
+
+            model.DrawWindow();
+        }
+    }
+
+    /// <summary>The name large, what it is beside it, where it is from and whether this area uses it, and its path - which a click copies.</summary>
+    private static void Heading(string chosen, bool room, string set, string folder, string name, int placed)
+    {
+        OverlayFonts.PushHeading();
+        try
+        {
+            ImGui.TextUnformatted(name);
+        }
+        finally
+        {
+            OverlayFonts.PopHeading();
+        }
+
+        ImGui.SameLine();
+        ImGui.TextDisabled(room ? "room" : "tile");
+
+        string used = room
+            ? placed > 0 ? "loaded for this area" : "not loaded for this area"
+            : placed > 0
+                ? string.Create(CultureInfo.InvariantCulture, $"placed {placed} times in this area")
+                : "not placed in this area";
+        ImGui.TextDisabled(ImGuiText.Escape((folder.Length > 0 ? $"{set}  ·  {folder}" : set) + "  ·  " + used));
+
+        ImGui.TextDisabled(ImGuiText.Escape(chosen));
+        if (ImGui.IsItemClicked())
+        {
+            ImGui.SetClipboardText(chosen);
+        }
+
+        OverlayLayout.Hint("The file's path. A click copies it.");
+    }
+
+    /// <summary>A tile's switches: its ground, its black walls, the tileset it is drawn as and the way it is laid.</summary>
+    private void TileDrawing(string chosen)
+    {
+        ImGui.Checkbox("ground", ref _ground);
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("The tile's ground block, drawn plain. A tileset's MaterialsList names the ground textures - the dump lists them -"
+                + " but the ground has no texture coordinates, and how the engine makes them is not yet known."
+                + " Off shows the props alone, where the ground rises around them.");
+        }
+
+        ImGui.SameLine();
+        ImGui.Checkbox("black walls", ref _walls);
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("The shapes painted with blacknofog.dds: walls hanging from a cliff's edge to close the gap under it."
+                + " The game's camera never looks behind them; off leaves them out.");
+        }
+
+        DrawnAs(chosen);
+        LaidAs(chosen);
+    }
+
+    /// <summary>The folds' ids - what the settings file keeps, so a fold renamed on screen keeps its state.</summary>
+    private const string DrawingFold = "drawing";
+    private const string WhereFold = "where";
+    private const string LightFold = "light";
+    private const string ExportFold = "export";
+    private const string FilesFold = "files";
+
+    private static readonly string[] Folds = [DrawingFold, WhereFold, LightFold, ExportFold, FilesFold];
+
+    /// <summary>Each fold's state where somebody set it; the rest stand as <see cref="Usual"/> says.</summary>
+    private readonly Dictionary<string, bool> _folds = new(StringComparer.Ordinal);
+
+    /// <summary>Open until closed: what a tile or room IS drawn as, and where it lies. The rest are asked for.</summary>
+    private static bool Usual(string fold) => fold is DrawingFold or WhereFold;
+
+    /// <summary>Which folds are open, by id, for the settings file.</summary>
+    public IReadOnlyList<string> SectionsOpen => [.. Folds.Where(Opened)];
+
+    /// <summary>Puts back which folds were open, or leaves the usual ones where the file says nothing.</summary>
+    public void Sections(IReadOnlyList<string>? open)
+    {
+        if (open is null)
+        {
+            return;
+        }
+
+        foreach (string fold in Folds)
+        {
+            _folds[fold] = open.Contains(fold, StringComparer.Ordinal);
+        }
+    }
+
+    private bool Opened(string fold) => _folds.TryGetValue(fold, out bool open) ? open : Usual(fold);
+
+    /// <summary>One fold's header, as wide as the pane; a click opens or closes it and the choice is written down.</summary>
+    private bool Section(string fold, string label)
+    {
+        bool open = Opened(fold);
+        ImGui.SetNextItemOpen(open, ImGuiCond.Always);
+        bool now = ImGui.CollapsingHeader(label + "###tile-fold-" + fold);
+        if (now != open)
+        {
+            _folds[fold] = now;
+            Changed?.Invoke();
+        }
+
+        return now;
     }
 
     /// <summary>The chosen tileset where it places this tile, or empty - see <see cref="_tileset"/>.</summary>
@@ -606,7 +715,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
                 + " Everything from Metadata/Terrain/Doodads/Tools/ counts, which is a rule on the folder's name.");
         }
 
-        ImGui.SameLine();
+        // A SECOND ROW FOR WHERE THINGS GO: the first says how much is drawn, this one where it stands.
         if (ImGui.SmallButton(_heights switch
         {
             DoodadHeight.Ground => "doodad z: ground##roomheights",

@@ -68,9 +68,6 @@ public sealed class MonsterBookWindow : BookWindow<MonsterBook>
     private static readonly List<string> _weak = [];
     private static readonly List<string> _quiet = [];
 
-    /// <summary>What the third boundary is known by - to ImGui, and in the settings file.</summary>
-    private const string ModelPane = "model";
-
     /// <summary>How wide the identity block's label column is, in ems.</summary>
     /// <remarks>
     /// NARROWER THAN THE FIGURES BELOW IT, because its labels are: "blood", "base" and "quest
@@ -86,9 +83,6 @@ public sealed class MonsterBookWindow : BookWindow<MonsterBook>
     private readonly Func<MonsterVarieties> _table;
     private readonly Func<StatDescriptions> _sentences;
 
-    /// <summary>Where the detail pane ends and the model's begins. Of the room those two share.</summary>
-    private readonly PaneSplit _model = new(0.58f, ModelPane);
-
     /// <summary>The table the book was built from, to notice when a different one arrives.</summary>
     private MonsterVarieties _of = MonsterVarieties.Empty;
 
@@ -98,18 +92,12 @@ public sealed class MonsterBookWindow : BookWindow<MonsterBook>
     private MonsterBook _page = MonsterBook.Empty;
 
     /// <summary>
-    /// Whether the monster's model has a pane of its own.
+    /// Whether the monster's model window is open - kept in the settings as the model pane's switch was.
     /// </summary>
     /// <remarks>
-    /// A PANE RATHER THAN A CORNER OF THE DETAIL ONE, which is what it was first. A picture placed
-    /// inside a column of text has to be told how much room the words want, and ImGui has no text
-    /// flow to ask - so it was measured, and every way of measuring it was wrong in its own way:
-    /// the section headers' hit boxes stole the drag, a group containing one measured as the whole
-    /// pane, and the width the lists reported moved the picture whenever one was opened. A pane
-    /// has no column to measure and nothing to sit beside.
-    ///
-    /// ON BY DEFAULT for the reason the rail is - a pane nobody knows about is a pane nobody opens
-    /// - and folded away by the same button-and-setting pair when the width is wanted elsewhere.
+    /// A WINDOW NOW, NOT A PANE: the picture shared the book's width with the list and the details,
+    /// and was asked for in a window of its own from the live client - see MonsterPortrait.Show.
+    /// The button at the window's right edge opens and closes it; choosing a monster opens it.
     /// </remarks>
     private bool _modelOpen = true;
 
@@ -125,7 +113,7 @@ public sealed class MonsterBookWindow : BookWindow<MonsterBook>
         _sentences = sentences;
     }
 
-    /// <summary>Whether the model has a pane, for whoever writes the settings file.</summary>
+    /// <summary>Whether the model's window is open, for whoever writes the settings file.</summary>
     public bool ModelOpen => _modelOpen;
 
     /// <inheritdoc/>
@@ -161,16 +149,6 @@ public sealed class MonsterBookWindow : BookWindow<MonsterBook>
         Show(columns, rail, widths, panes);
     }
 
-    /// <inheritdoc/>
-    protected override void MorePanes(Dictionary<string, double> into)
-    {
-        ArgumentNullException.ThrowIfNull(into);
-        into[ModelPane] = _model.Share;
-    }
-
-    /// <inheritdoc/>
-    protected override void RestorePanes(IReadOnlyDictionary<string, double> panes) => Put(panes, ModelPane, _model);
-
     /// <summary>
     /// The third boundary, and the pane's own capture settings, which are written to the same file.
     /// </summary>
@@ -181,10 +159,15 @@ public sealed class MonsterBookWindow : BookWindow<MonsterBook>
     /// </remarks>
     protected override void Wired()
     {
-        _model.Settled = Moved;
         if (Model is not null)
         {
             Model.Changed = Moved;
+            Model.WindowOpen = _modelOpen;
+            Model.WindowChanged = open =>
+            {
+                _modelOpen = open;
+                Moved();
+            };
         }
     }
 
@@ -221,7 +204,7 @@ public sealed class MonsterBookWindow : BookWindow<MonsterBook>
     /// <summary>Where the panes below will end, as offsets from the left of the window's content.</summary>
     /// <param name="List">The right edge of the list pane, which Columns and Copy list hang from.</param>
     /// <param name="Detail">The right edge of the detail pane: where the query box stops and the footer ends.</param>
-    /// <param name="Room">The whole width, which is the model pane's right edge and the window's.</param>
+    /// <param name="Room">The whole width, the window's.</param>
     private readonly record struct Edges(float List, float Detail, float Room);
 
     /// <summary>
@@ -264,9 +247,7 @@ public sealed class MonsterBookWindow : BookWindow<MonsterBook>
         float list = ListSplit.Would(rest);
         rest -= list + grip;
 
-        float detail = _modelOpen ? _model.Would(rest) : rest;
-
-        return new Edges(from + list, from + list + grip + detail, room);
+        return new Edges(from + list, from + list + grip + rest, room);
     }
 
     /// <summary>
@@ -367,6 +348,11 @@ public sealed class MonsterBookWindow : BookWindow<MonsterBook>
         if (ImGui.Button("Model"))
         {
             _modelOpen = !_modelOpen;
+            if (Model is not null)
+            {
+                Model.WindowOpen = _modelOpen;
+            }
+
             Changed?.Invoke();
         }
 
@@ -374,75 +360,15 @@ public sealed class MonsterBookWindow : BookWindow<MonsterBook>
         {
             ImGui.SetTooltip(
                 _modelOpen
-                    ? "Fold the model away and give its width back to the rest."
-                    : "Show the monster's own 3D model, read out of the game's files.");
+                    ? "Close the model's window."
+                    : "Open the monster's own 3D model, read out of the game's files, in a window of its own.");
         }
     }
 
     /// <summary>
-    /// The rail, the list, the detail pane and - where it is open - the model pane.
+    /// The pane beside the list: the monster's details, with its model's switches under its name - the model itself has a window of its own.
     /// </summary>
-    /// <remarks>
-    /// THE DETAIL PANE GIVES UP WIDTH ONLY WHEN THE MODEL IS SHOWING. With the model folded away
-    /// it takes the rest, exactly as it did before there was a model at all.
-    /// </remarks>
-    protected override void Body(float tall)
-    {
-        RailPaneDrawn(tall);
-        ListPaneDrawn(tall);
-
-        float detail = _modelOpen ? _model.Left() : 0f;
-        if (ImGui.BeginChild("##monster-detail", new Vector2(detail, tall), ImGuiChildFlags.Borders))
-        {
-            Detail();
-        }
-
-        ImGui.EndChild();
-
-        if (_modelOpen)
-        {
-            _model.Bar(tall);
-
-            if (ImGui.BeginChild("##monster-model", new Vector2(0f, tall), ImGuiChildFlags.Borders))
-            {
-                Pane();
-            }
-
-            ImGui.EndChild();
-        }
-    }
-
-    /// <summary>
-    /// The monster's model, filling its own pane.
-    /// </summary>
-    /// <remarks>
-    /// HANDED BOTH SIDES OF THE PANE, and the portrait fits its square to the smaller of them less
-    /// its own row and lines: the picture is square and a pane is not, and fitting it to the width
-    /// alone would run a tall model off the bottom of a short pane, where there is no scrolling to
-    /// rescue it - the drag that turns the model would fight the one that scrolls. Only the
-    /// portrait knows how many lines it is about to write under the picture, so the fitting is its.
-    /// </remarks>
-    protected override void Pane()
-    {
-        // NOT Possible: the portrait says that itself, and better - it knows whether what is
-        // missing is the install or the renderer. Only a viewer that was never wired up at all is
-        // this method's to answer for.
-        if (Model is not { } model)
-        {
-            ImGui.TextDisabled("No model viewer attached.");
-            return;
-        }
-
-        string chosen = Chosen;
-        if (chosen.Length == 0 || _of.Find(chosen) is not { } one)
-        {
-            ImGui.TextDisabled("Choose a monster on the left.");
-            return;
-        }
-
-        Vector2 room = ImGui.GetContentRegionAvail();
-        model.Draw(one, chosen, room.X, room.Y);
-    }
+    protected override void Pane() => Detail();
 
     /// <summary>
     /// The line under the panes: what the table holds, and the day it was last built.
@@ -595,6 +521,7 @@ public sealed class MonsterBookWindow : BookWindow<MonsterBook>
         }
 
         Identity(_of, one, chosen);
+        ModelTools(one, chosen, one.Name is { Length: > 0 } named ? named : Tail(chosen));
         ImGui.Separator();
 
         // NOTHING IS PLACED BESIDE ANYTHING HERE ANY MORE, and that is the whole of what the model

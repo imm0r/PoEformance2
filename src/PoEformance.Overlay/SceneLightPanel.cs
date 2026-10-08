@@ -149,14 +149,9 @@ public sealed class SceneLightPanel
         return _built;
     }
 
-    /// <summary>The panel: a folded section with the switches, the environment picker, the readings and what they came to.</summary>
+    /// <summary>The panel: the switches, the environment picker, the readings and what they came to - under a fold the book draws.</summary>
     public void Draw(MonsterModel? model)
     {
-        if (!OverlayLayout.Subsection("light##scene-light"))
-        {
-            return;
-        }
-
         if (ImGui.Checkbox("game light##scene-on", ref _on))
         {
             _version++;

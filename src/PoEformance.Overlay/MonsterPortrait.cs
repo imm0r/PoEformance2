@@ -874,13 +874,108 @@ public sealed class MonsterPortrait
     public bool Playing => _playing;
 
     /// <summary>
-    /// Draws the monster, or says why it cannot.
+    /// The book this pane belongs to - "monster", "item", "tile", "effect" - which names its window and keeps the four apart.
     /// </summary>
+    public string Book { get; init; } = "monster";
+
+    /// <summary>Whether the model's own window is open - see <see cref="DrawWindow"/>.</summary>
+    public bool WindowOpen { get; set; } = true;
+
+    /// <summary>Told when the window is opened or closed, with the new state, for a book that keeps it.</summary>
+    public Action<bool>? WindowChanged { get; set; }
+
+    /// <summary>
+    /// What the book's chosen row is, every frame it is chosen: starts its load when it changes, and opens the window then.
+    /// </summary>
+    /// <remarks>
+    /// THE MODEL HAS A WINDOW OF ITS OWN, asked for from the live client: the picture shared its pane
+    /// with every switch the book has, and what was left for it was a postage stamp. So the book says
+    /// what to show and draws its own switches (<see cref="DrawExport"/>, <see cref="DrawFiles"/>), and
+    /// the window draws the picture and what acts on the picture itself.
+    ///
+    /// A NEW CHOICE OPENS THE WINDOW AGAIN, closed or not - choosing a row is asking to see it. Closed,
+    /// nothing is drawn, so a book browsed with the window shut costs no rendering; the model is still
+    /// read, because the dump and the export work from it.
+    /// </remarks>
     /// <param name="one">The monster to show, or null for none.</param>
     /// <param name="path">Its path, which is what tells one monster from another.</param>
-    /// <param name="wide">How wide the pane is.</param>
-    /// <param name="tall">How tall it is. The picture is square and fits inside both, with its row and its lines.</param>
-    public void Draw(MonsterVariety? one, string path, float wide, float tall)
+    /// <param name="title">What the window's title calls it.</param>
+    public void Show(MonsterVariety? one, string path, string title)
+    {
+        if (!Possible)
+        {
+            return;
+        }
+
+        if (!string.Equals(path, _asked, StringComparison.Ordinal))
+        {
+            _asked = path;
+            if (path.Length > 0 && !WindowOpen)
+            {
+                WindowOpen = true;
+                WindowChanged?.Invoke(true);
+            }
+        }
+
+        _title = title ?? string.Empty;
+        Wanted(one, path);
+        Adopted();
+    }
+
+    /// <summary>The path last handed to <see cref="Show"/>, so only a new choice opens the window.</summary>
+    private string _asked = string.Empty;
+
+    /// <summary>What the window's title calls the model.</summary>
+    private string _title = string.Empty;
+
+    /// <summary>Whether the lines under the picture are unfolded - see <see cref="Status"/>.</summary>
+    private bool _infoOpen;
+
+    /// <summary>
+    /// The model's own window: the picture, its animation row, the buttons on it, and its lines folded under it. Call every frame the book is drawn.
+    /// </summary>
+    /// <remarks>
+    /// BEGUN FROM INSIDE THE BOOK'S DRAW, which ImGui allows - a Begin inside another window's makes a
+    /// window of its own, the way the export preview already is one. So the window is there while its
+    /// book is, and goes with it when another tab is chosen. Where it sits and how big it is are
+    /// ImGui's to remember, by the id after the ###, as for every other window here.
+    /// </remarks>
+    public void DrawWindow()
+    {
+        // THE EXPORT'S PREVIEW IS A WINDOW OF ITS OWN TOO, and stays up whether or not this one is.
+        Shots();
+        if (!Possible || !WindowOpen || _wanted.Length == 0)
+        {
+            return;
+        }
+
+        // AT THE SCREEN'S RIGHT THE FIRST TIME, beside the tools window rather than over it; after
+        // that wherever it was left.
+        Vector2 screen = ImGui.GetIO().DisplaySize;
+        ImGui.SetNextWindowPos(new Vector2(MathF.Max(0f, screen.X - 680f), 60f), ImGuiCond.FirstUseEver);
+        ImGui.SetNextWindowSize(new Vector2(640f, 720f), ImGuiCond.FirstUseEver);
+        ImGui.SetNextWindowSizeConstraints(new Vector2(240f, 240f), new Vector2(float.MaxValue, float.MaxValue));
+        bool open = true;
+        string name = _title.Length > 0 ? _title : "model";
+        bool expanded = ImGui.Begin($"{name} - {Book} model###{Book}-model-window", ref open, ImGuiWindowFlags.NoFocusOnAppearing);
+        if (expanded)
+        {
+            Vector2 room = ImGui.GetContentRegionAvail();
+            Picture(room.X, room.Y);
+        }
+
+        ImGui.End();
+        if (!open)
+        {
+            WindowOpen = false;
+            WindowChanged?.Invoke(false);
+        }
+    }
+
+    /// <summary>
+    /// The book's switch for the window - and what the model is doing while it builds or why there is none, which the book shows beside it.
+    /// </summary>
+    public void DrawOpener()
     {
         if (!Possible)
         {
@@ -888,8 +983,61 @@ public sealed class MonsterPortrait
             return;
         }
 
-        Wanted(one, path);
+        bool open = WindowOpen;
+        if (ImGui.Checkbox($"model window##{Book}-model-window", ref open))
+        {
+            WindowOpen = open;
+            WindowChanged?.Invoke(open);
+        }
 
+        OverlayLayout.Hint("The model in a window of its own: drag to turn it, the wheel zooms, a double click puts it back."
+            + " Choosing another row opens it again.");
+        ImGui.SameLine();
+        if (_loading is { IsCompleted: false })
+        {
+            ImGui.TextDisabled(_progress is { } progress ? ImGuiText.Escape(progress.Said()) : "building the model…");
+        }
+        else if (Why.Length > 0)
+        {
+            ImGui.TextDisabled(ImGuiText.Escape(Why));
+        }
+        else if (_model.Ready)
+        {
+            ImGui.TextDisabled(ImGuiText.Escape(_cost.Length > 0 ? _cost : "ready"));
+        }
+    }
+
+    /// <summary>Takes a finished load, whether or not the window is open to draw it - the book's dump and export work from it.</summary>
+    private void Adopted()
+    {
+        if (_loading is not { IsCompleted: true } done)
+        {
+            return;
+        }
+
+        _model = done.IsCompletedSuccessfully
+            ? done.Result
+
+            // A FAULTED TASK IS NOT A CRASH HERE. MonsterModels answers with a reason rather
+            // than throwing, so reaching this means something underneath it did - and the
+            // window says so instead of the session ending on the next frame.
+            : MonsterModel.None with { Why = Said(done.Exception) };
+
+        Why = _model.Why;
+        _loading = null;
+        _shown = string.Empty;
+        _drawnTurn = float.NaN;
+        Rigged();
+        Said();
+    }
+
+    /// <summary>
+    /// The picture and what acts on it, fitted to the room it is given.
+    /// </summary>
+    /// <param name="wide">How wide the room is.</param>
+    /// <param name="tall">How tall it is. The picture is square and fits inside both, with its row and its lines.</param>
+    private void Picture(float wide, float tall)
+    {
         Turned();
 
         // THE SIZE IS SETTLED BEFORE THE PICTURE IS TAKEN, because what it is drawn at follows
@@ -908,7 +1056,6 @@ public sealed class MonsterPortrait
         // that plays it again, under the cap, and not only the reason. They draw nothing while
         // there is no skeleton to control, which is every frame the model is still loading.
         Controls(side);
-        Capture();
 
         if (_texture == IntPtr.Zero)
         {
@@ -924,22 +1071,6 @@ public sealed class MonsterPortrait
             if (_cost.Length > 0)
             {
                 ImGui.TextDisabled(_cost);
-            }
-
-            // A TILE OR ROOM THAT DID NOT LOAD CAN STILL BE DUMPED - its own file and the reason - since
-            // "the room places no doodads" is exactly the claim somebody wants to check against the file.
-            // Only the tile book's portrait has a tileset catalogue, which is what marks it here.
-            if (Tilesets is not null && _loading is not { IsCompleted: false } && _wanted.Length > 0 && !_model.Ready)
-            {
-                if (ImGui.Button("files##monster-dump-failed"))
-                {
-                    Dump();
-                }
-
-                if (_dumped.Length > 0)
-                {
-                    PathLink.Line(_dumped);
-                }
             }
 
             return;
@@ -1038,7 +1169,6 @@ public sealed class MonsterPortrait
         }
 
         ImGui.SetCursorScreenPos(below);
-        Shots();
         Status();
         Probed();
     }
@@ -1673,9 +1803,16 @@ public sealed class MonsterPortrait
     private float Chrome(float wide)
     {
         float chrome = _pose is not null && _model.Moves ? ImGui.GetFrameHeightWithSpacing() : 0f;
-        if (_model.Ready)
+        if (_status.Count == 0)
         {
-            chrome += ImGui.GetFrameHeightWithSpacing();
+            return chrome;
+        }
+
+        // THE LINES' HEADER, and the lines themselves only while they are unfolded - see Status.
+        chrome += ImGui.GetFrameHeightWithSpacing();
+        if (!_infoOpen)
+        {
+            return chrome;
         }
 
         float spacing = ImGui.GetStyle().ItemSpacing.Y;
@@ -2016,6 +2153,15 @@ public sealed class MonsterPortrait
     private void Status()
     {
         if (_status.Count == 0)
+        {
+            return;
+        }
+
+        // FOLDED BY DEFAULT, so the picture has the window: the lines are what to read when a picture
+        // looks wrong, not while turning one that looks right. The first of them is in the header.
+        ImGui.SetNextItemOpen(_infoOpen, ImGuiCond.Always);
+        _infoOpen = ImGui.CollapsingHeader($"info: {_status[0]}###monster-info");
+        if (!_infoOpen)
         {
             return;
         }
@@ -2390,24 +2536,7 @@ public sealed class MonsterPortrait
     /// <param name="side">How wide the picture will be shown, which decides what it is drawn at.</param>
     private void Finished(float side)
     {
-        if (_loading is { IsCompleted: true } done)
-        {
-            _model = done.IsCompletedSuccessfully
-                ? done.Result
-
-                // A FAULTED TASK IS NOT A CRASH HERE. MonsterModels answers with a reason rather
-                // than throwing, so reaching this means something underneath it did - and the
-                // window says so instead of the session ending on the next frame.
-                : MonsterModel.None with { Why = Said(done.Exception) };
-
-            Why = _model.Why;
-            _loading = null;
-            _shown = string.Empty;
-            _drawnTurn = float.NaN;
-            Rigged();
-            Said();
-        }
-
+        Adopted();
         if (!_model.Ready)
         {
             Drop();
@@ -2891,26 +3020,25 @@ public sealed class MonsterPortrait
         return lowest;
     }
 
-    /// <summary>Works out this frame's floor from the camera the picture was drawn with, and draws it.</summary>
     /// <summary>
-    /// The row that turns a model into icon art: the floor, the greying, the backdrop, the file.
+    /// The row that turns a model into icon art: the floor, the greying, the backdrop, the file - drawn by the book.
     /// </summary>
     /// <remarks>
     /// WHAT THIS ROW IS FOR, in one line: a boss the game draws no map icon for still has a
     /// model, so the icon is made from the model - pose it, pause it, press the button, and the
     /// Active and Inactive halves are on disk, cut out, at the size a sheet cell is.
     ///
-    /// SEPARATE FROM THE ANIMATION ROW ABOVE because it is there for every model, and that one
-    /// is not: a rig with no animations draws no animation row at all, and the monsters worth
-    /// making an icon of should not be the ones that happen to move.
+    /// IN THE BOOK AND NOT THE MODEL'S WINDOW, which keeps the picture and what acts on it alone:
+    /// these change what is written or how it is framed, and the window is for looking.
     ///
     /// THE SLIDER HIDES WHILE THE GREYING IS OFF. It is the one control here that says nothing
     /// until it is in use, and a pane can be narrow.
     /// </remarks>
-    private void Capture()
+    public void DrawExport()
     {
         if (!_model.Ready)
         {
+            ImGui.TextDisabled("no model to export yet");
             return;
         }
 
@@ -3005,21 +3133,43 @@ public sealed class MonsterPortrait
         {
             ImGui.SetTooltip(SaveSaid);
         }
+    }
 
-        ImGui.SameLine();
-        if (ImGui.Button("files##monster-dump"))
+    /// <summary>
+    /// The buttons that write a model's files out as text, and the install-wide surveys - in the book, beside its other switches.
+    /// </summary>
+    /// <remarks>
+    /// A TILE OR ROOM THAT DID NOT LOAD CAN STILL BE DUMPED - its own file and the reason - since "the
+    /// room places no doodads" is exactly the claim somebody wants to check against the file. Only the
+    /// tile book's portrait has a tileset catalogue, which is what marks it here.
+    /// </remarks>
+    public void DrawFiles()
+    {
+        bool failed = Tilesets is not null && _loading is not { IsCompleted: false } && _wanted.Length > 0 && !_model.Ready;
+        bool any = false;
+        if (_model.Ready || failed)
         {
-            Dump();
-        }
+            if (ImGui.Button("files##monster-dump"))
+            {
+                Dump();
+            }
 
-        if (ImGui.IsItemHovered())
-        {
-            ImGui.SetTooltip(DumpSaid);
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip(DumpSaid);
+            }
+
+            any = true;
         }
 
         if (Materials is not null)
         {
-            ImGui.SameLine();
+            if (any)
+            {
+                ImGui.SameLine();
+            }
+
+            any = true;
             if (ImGui.Button("graphs##monster-survey"))
             {
                 Survey();
@@ -3036,7 +3186,12 @@ public sealed class MonsterPortrait
 
         if (Environments is not null)
         {
-            ImGui.SameLine();
+            if (any)
+            {
+                ImGui.SameLine();
+            }
+
+            any = true;
             if (ImGui.Button("envs##monster-envs"))
             {
                 SurveyEnvironments();
@@ -3048,6 +3203,11 @@ public sealed class MonsterPortrait
                     + " files, with its range and some values, and a few whole files that light their area with a sun - "
                     + EnvSurvey.File + " beside the dumps.");
             }
+        }
+
+        if (!any)
+        {
+            ImGui.TextDisabled("nothing to write until a model is read");
         }
 
         if (_dumped.Length > 0)
