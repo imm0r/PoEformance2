@@ -121,6 +121,14 @@ public sealed class MonsterPortrait
     /// <summary>The line under the picture that says what the mouse does.</summary>
     private const string Gestures = "drag turns · wheel zooms at the pointer · double-click resets";
 
+    /// <summary>The same where the picture has a sun to move.</summary>
+    private const string SunGestures = "drag turns · shift + drag moves the sun · wheel zooms at the pointer · double-click resets";
+
+    /// <summary>The sun's mark on the picture: its colour, and its disc's radius in font sizes.</summary>
+    private static readonly Vector4 SunInk = new(1f, 0.82f, 0.3f, 1f);
+
+    private const float SunDisc = 0.4f;
+
     /// <summary>The same line while the orbit runs, when a drag does nothing.</summary>
     private const string Orbiting = "orbiting · the top-right button stops it · no dragging until then";
 
@@ -683,6 +691,14 @@ public sealed class MonsterPortrait
     /// <summary>The model the pane is showing, or MonsterModel.None.</summary>
     public MonsterModel Showing => _model;
 
+    /// <summary>
+    /// The sun shift + drag moves, and whose mark the picture shows while it is set by hand - see SceneLightPanel. Null leaves the drag turning the model only.
+    /// </summary>
+    public IMovableSun? Sun { get; set; }
+
+    /// <summary>Whether the drag in hand is moving the sun - it stays so until the button is let go, shift or not.</summary>
+    private bool _sunHeld;
+
     /// <summary>The light the last picture was drawn under, compared by reference.</summary>
     private SceneLight? _drawnLight;
 
@@ -1169,11 +1185,30 @@ public sealed class MonsterPortrait
         if (held && ImGui.IsMouseDragging(ImGuiMouseButton.Left))
         {
             Vector2 moved = ImGui.GetIO().MouseDelta;
-            _turn -= moved.X / Sweep * MathF.Tau;
-            _tilt = Math.Clamp(_tilt + (moved.Y / Sweep * MathF.Tau), -MathF.PI / 3f, MathF.PI / 3f);
+            if (Sun is { } sun && (_sunHeld || ImGui.GetIO().KeyShift))
+            {
+                _sunHeld = true;
+                MoveSun(sun, moved, camera);
+            }
+            else
+            {
+                _turn -= moved.X / Sweep * MathF.Tau;
+                _tilt = Math.Clamp(_tilt + (moved.Y / Sweep * MathF.Tau), -MathF.PI / 3f, MathF.PI / 3f);
+            }
+        }
+
+        // LET GO, the sun stays where it was put and its shadows are drawn sharp again.
+        if (!held && _sunHeld)
+        {
+            _sunHeld = false;
+            if (Sun?.Free is { } put)
+            {
+                Sun.Shine(put, moving: false);
+            }
         }
 
         _held = held;
+        SunMark(draw, corner, side, camera);
 
         // A CLICK, NOT A DRAG, PROBES THE PIXEL UNDER IT while probing - see PictureProbe. As a share
         // of the picture, because the next drawing may be at another rung than this one.
@@ -1615,6 +1650,68 @@ public sealed class MonsterPortrait
     }
 
     /// <summary>
+    /// Moves the sun by a drag: up raises it, across turns it round so that its mark follows the hand on the picture.
+    /// </summary>
+    /// <remarks>
+    /// WHICH WAY ROUND FOLLOWS THE HAND depends on how the picture is turned, so it is measured rather
+    /// than reasoned: the mark is put through the camera a little each way round, and the drag goes the
+    /// way that moves it the same way as the pointer.
+    /// </remarks>
+    private void MoveSun(IMovableSun sun, Vector2 moved, MeshPicture.Camera camera)
+    {
+        Vector3 travels = sun.Free ?? _drawnLight?.SunDirection ?? SceneLight.SunToward(0f, MathF.PI / 4f);
+        (float round, float height) = SceneLight.SunStands(travels);
+        height = Math.Clamp(height - (moved.Y / Sweep * MathF.PI), 0.02f, MathF.PI / 2f);
+        if (moved.X != 0f && camera.Ready)
+        {
+            (Vector3 centre, float reach) = Reach();
+            const float step = 0.01f;
+            float ahead = camera.Place(centre - (SceneLight.SunToward(round + step, height) * reach)).X;
+            float behind = camera.Place(centre - (SceneLight.SunToward(round - step, height) * reach)).X;
+            round += (ahead >= behind ? 1f : -1f) * moved.X / Sweep * MathF.Tau;
+        }
+
+        sun.Shine(SceneLight.SunToward(round, height), moving: true);
+    }
+
+    /// <summary>
+    /// The hand-set sun's mark: a disc where the sun stands beyond the model, rays round it, and a line to the model's middle - faint where it stands behind the model.
+    /// </summary>
+    private void SunMark(ImDrawListPtr draw, Vector2 corner, float side, MeshPicture.Camera camera)
+    {
+        if (Sun?.Free is not { } travels || !camera.Ready || side <= 0f)
+        {
+            return;
+        }
+
+        (Vector3 centre, float reach) = Reach();
+        Vector3 middle = camera.Place(centre);
+        Vector3 at = camera.Place(centre - (travels * reach * 1.15f));
+        float inset = ImGui.GetFontSize();
+        var from = corner + (new Vector2(middle.X, middle.Y) * side);
+        var to = corner + new Vector2(Math.Clamp(at.X * side, inset, side - inset), Math.Clamp(at.Y * side, inset, side - inset));
+        bool behind = at.Z > middle.Z;
+        Vector4 ink = behind ? SunInk with { W = 0.45f } : SunInk;
+        uint colour = ImGui.GetColorU32(ink);
+        draw.AddLine(from, to, ImGui.GetColorU32(ink with { W = ink.W * 0.5f }), 1.5f);
+        float radius = ImGui.GetFontSize() * SunDisc;
+        draw.AddCircleFilled(to, radius, colour);
+        for (var ray = 0; ray < 8; ray++)
+        {
+            float angle = ray * MathF.PI / 4f;
+            var way = new Vector2(MathF.Cos(angle), MathF.Sin(angle));
+            draw.AddLine(to + (way * radius * 1.4f), to + (way * radius * 2.1f), colour, 1.5f);
+        }
+    }
+
+    /// <summary>The model's middle and how far its box reaches from it - where the sun's mark is set beyond.</summary>
+    private (Vector3 Centre, float Reach) Reach()
+    {
+        Vector3 least = _model.Mesh.Least, most = _model.Mesh.Most;
+        return ((least + most) * 0.5f, MathF.Max(1f, Vector3.Distance(least, most) * 0.5f));
+    }
+
+    /// <summary>
     /// The two widgets over the picture's top edge: the orbit button at the right, and the
     /// animation's progress in the middle, both the button's height.
     /// </summary>
@@ -1799,7 +1896,7 @@ public sealed class MonsterPortrait
             return;
         }
 
-        _status.Add(_orbiting ? Orbiting : Gestures);
+        _status.Add(_orbiting ? Orbiting : Sun is not null ? SunGestures : Gestures);
         if (Ground)
         {
             _status.Add(FloorSaid);

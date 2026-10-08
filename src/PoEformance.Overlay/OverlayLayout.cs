@@ -503,6 +503,39 @@ public static class OverlayLayout
     }
 
     /// <summary>
+    /// Puts the next item beside the last one where it fits before <paramref name="right"/>, else at the start of a new line at <paramref name="indent"/>.
+    /// </summary>
+    /// <remarks>
+    /// A ROW THAT WRAPS INSTEAD OF RUNNING OFF A NARROW PANE: a row of switches set side by side
+    /// with SameLine alone was cut at the pane's edge, and the controls past it - a slider, a
+    /// whole combo - were simply not there to find.
+    /// </remarks>
+    /// <param name="width">How wide the next item is.</param>
+    /// <param name="right">The right edge to keep inside, in screen coordinates.</param>
+    /// <param name="indent">Where a wrapped item starts, as a cursor x in the window; nought leaves ImGui's own line start.</param>
+    public static void Flow(float width, float right, float indent = 0f) => Flow(ImGui.GetItemRectMax().X, width, right, indent);
+
+    /// <summary>
+    /// <see cref="Flow(float, float, float)"/> from where the last item was seen to end - for a caller that asked about it, a tooltip and all, before placing the next.
+    /// </summary>
+    /// <remarks>A tooltip drawn in between can leave ImGui's last item pointing into the tooltip - see <see cref="Hint"/> - so the edge is taken first.</remarks>
+    public static void Flow(float end, float width, float right, float indent)
+    {
+        if (end + ImGui.GetStyle().ItemSpacing.X + width <= right)
+        {
+            ImGui.SameLine();
+        }
+        else if (indent > 0f)
+        {
+            ImGui.SetCursorPosX(indent);
+        }
+    }
+
+    /// <summary>How wide a checkbox with this visible label is.</summary>
+    public static float CheckboxWidth(string label)
+        => ImGui.GetFrameHeight() + ImGui.GetStyle().ItemInnerSpacing.X + ImGui.CalcTextSize(label).X;
+
+    /// <summary>
     /// One headline figure: its name, its value, and its sentence under the pointer.
     /// </summary>
     /// <remarks>

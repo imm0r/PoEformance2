@@ -20,24 +20,32 @@ namespace PoEformance.Game.Files;
 /// WHAT CASTS: solid and cut-out shapes, a cut-out one through its texture's alpha as the picture cuts
 /// it. Translucent shapes do not, as they write no depth in the picture either.
 ///
+/// COARSE WHILE THE SUN MOVES: a map a quarter as wide costs a fraction of the full one, so a sun
+/// dragged round the picture keeps up with the hand, and the full map is drawn once it is let go.
+///
 /// READ WITH FOUR TEXELS AND AN OFFSET ALONG THE NORMAL: one texel's comparison is a hard staircase
 /// along every shadow's edge, and a surface tested against its own depth shades itself in stripes
 /// ("acne") unless the point is moved off it by about a texel first.
 /// </remarks>
 public sealed class ShadowMap
 {
-    /// <summary>The map's side, in texels.</summary>
-    public const int Side = 2048;
+    /// <summary>The map's usual side, in texels.</summary>
+    public const int Usual = 2048;
+
+    /// <summary>The side while the sun is being moved.</summary>
+    public const int Coarse = 512;
 
     private readonly int[] _depth;
+    private readonly int _side;
     private readonly Vector3 _u, _v, _w;
     private readonly Vector2 _least;
     private readonly float _perUnit;
     private readonly float _nearest;
 
-    private ShadowMap(int[] depth, Vector3 u, Vector3 v, Vector3 w, Vector2 least, float perUnit, float nearest, Vector3 direction)
+    private ShadowMap(int[] depth, int side, Vector3 u, Vector3 v, Vector3 w, Vector2 least, float perUnit, float nearest, Vector3 direction)
     {
         _depth = depth;
+        _side = side;
         _u = u;
         _v = v;
         _w = w;
@@ -53,6 +61,9 @@ public sealed class ShadowMap
     /// <summary>How many world units one texel covers.</summary>
     public float Texel => 1f / _perUnit;
 
+    /// <summary>How many texels the map is across.</summary>
+    public int Side => _side;
+
     /// <summary>
     /// The map of a mesh along a direction.
     /// </summary>
@@ -63,10 +74,12 @@ public sealed class ShadowMap
     /// <param name="casts">Whether a triangle casts at all, by its index.</param>
     /// <param name="cutout">For a cut-out triangle, its texture and coordinates; null for a solid one.</param>
     /// <param name="threads">How many threads may draw it.</param>
+    /// <param name="side">How many texels across - <see cref="Usual"/> or <see cref="Coarse"/>.</param>
     internal static ShadowMap? Build(
-        Vector3[] places, int[] indices, int triangles, Vector3 direction, Func<int, bool> casts, Func<int, (Mipmaps Skin, Vector2[] Coordinates)?> cutout, int threads)
+        Vector3[] places, int[] indices, int triangles, Vector3 direction, Func<int, bool> casts, Func<int, (Mipmaps Skin, Vector2[] Coordinates)?> cutout, int threads,
+        int side = Usual)
     {
-        if (places.Length == 0 || triangles == 0 || !(direction.LengthSquared() > 0f))
+        if (places.Length == 0 || triangles == 0 || !(direction.LengthSquared() > 0f) || side < 16)
         {
             return null;
         }
@@ -93,11 +106,11 @@ public sealed class ShadowMap
         }
 
         // A TEXEL OF MARGIN EACH SIDE, so nothing lands on the edge the reads clamp to.
-        float perUnit = (Side - 2) / span;
+        float perUnit = (side - 2) / span;
         least -= new Vector2(1f / perUnit);
         nearest -= 1f;
 
-        var depth = new int[Side * Side];
+        var depth = new int[side * side];
         Array.Fill(depth, int.MaxValue);
         var corners = new Vector3[places.Length];
         for (var at = 0; at < places.Length; at++)
@@ -116,11 +129,11 @@ public sealed class ShadowMap
             {
                 if (casts(one))
                 {
-                    Draw(depth, corners, indices, one, cutout(one));
+                    Draw(depth, side, corners, indices, one, cutout(one));
                 }
             });
 
-        return new ShadowMap(depth, u, v, w, least, perUnit, nearest, w);
+        return new ShadowMap(depth, side, u, v, w, least, perUnit, nearest, w);
     }
 
     /// <summary>How much of the light reaches a point - one in the open, nought in full shadow, between along an edge.</summary>
@@ -133,7 +146,7 @@ public sealed class ShadowMap
         float x = ((Vector3.Dot(off, _u) - _least.X) * _perUnit) - 0.5f;
         float y = ((Vector3.Dot(off, _v) - _least.Y) * _perUnit) - 0.5f;
         float depth = Vector3.Dot(off, _w) - _nearest - (texel * 2f);
-        if (x < 0f || y < 0f || x >= Side - 1 || y >= Side - 1)
+        if (x < 0f || y < 0f || x >= _side - 1 || y >= _side - 1)
         {
             return 1f;
         }
@@ -147,11 +160,11 @@ public sealed class ShadowMap
 
     private float Open(int x, int y, float depth)
     {
-        int held = _depth[(y * Side) + x];
+        int held = _depth[(y * _side) + x];
         return held == int.MaxValue || depth <= BitConverter.Int32BitsToSingle(held) ? 1f : 0f;
     }
 
-    private static void Draw(int[] depth, Vector3[] corners, int[] indices, int one, (Mipmaps Skin, Vector2[] Coordinates)? cutout)
+    private static void Draw(int[] depth, int side, Vector3[] corners, int[] indices, int one, (Mipmaps Skin, Vector2[] Coordinates)? cutout)
     {
         int i0 = indices[one * 3], i1 = indices[(one * 3) + 1], i2 = indices[(one * 3) + 2];
         Vector3 c0 = corners[i0], c1 = corners[i1], c2 = corners[i2];
@@ -165,9 +178,9 @@ public sealed class ShadowMap
         float total = area * sign;
         float inv = 1f / total;
         int left = Math.Max(0, (int)MathF.Floor(MathF.Min(c0.X, MathF.Min(c1.X, c2.X))));
-        int right = Math.Min(Side - 1, (int)MathF.Ceiling(MathF.Max(c0.X, MathF.Max(c1.X, c2.X))));
+        int right = Math.Min(side - 1, (int)MathF.Ceiling(MathF.Max(c0.X, MathF.Max(c1.X, c2.X))));
         int top = Math.Max(0, (int)MathF.Floor(MathF.Min(c0.Y, MathF.Min(c1.Y, c2.Y))));
-        int bottom = Math.Min(Side - 1, (int)MathF.Ceiling(MathF.Max(c0.Y, MathF.Max(c1.Y, c2.Y))));
+        int bottom = Math.Min(side - 1, (int)MathF.Ceiling(MathF.Max(c0.Y, MathF.Max(c1.Y, c2.Y))));
 
         Mipmaps? skin = null;
         Vector2 s0 = default, s1 = default, s2 = default;
@@ -204,7 +217,7 @@ public sealed class ShadowMap
 
                 float away = MathF.Max(0f, (first * c0.Z) + (second * c1.Z) + (third * c2.Z));
                 int bits = BitConverter.SingleToInt32Bits(away);
-                int at = (y * Side) + x;
+                int at = (y * side) + x;
                 int held = Volatile.Read(ref depth[at]);
                 while (bits < held)
                 {

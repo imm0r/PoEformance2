@@ -1446,6 +1446,33 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             ? (player.WorldX, player.WorldY, grid.HeightAt((int)(player.WorldX / MapView.WorldToGrid), (int)(player.WorldY / MapView.WorldToGrid)))
             : null;
 
+    /// <summary>
+    /// How the area's ground runs on the screen by the live camera - the player and a step from the player along x and along y put through the matrix - or null outside the game.
+    /// </summary>
+    private SceneLight.GroundOnScreen? LiveGround()
+    {
+        if (!_snapshot.InGame || _snapshot.Player is not WorldEntity player || _snapshot.Matrix.Length < 16)
+        {
+            return null;
+        }
+
+        Vector2 size = ImGui.GetIO().DisplaySize;
+        const float step = 100f;
+        Vector2? origin = OnScreen(player.WorldX, player.WorldY, player.WorldZ, size);
+        Vector2? alongX = OnScreen(player.WorldX + step, player.WorldY, player.WorldZ, size);
+        Vector2? alongY = OnScreen(player.WorldX, player.WorldY + step, player.WorldZ, size);
+        return origin is { } o && alongX is { } x && alongY is { } y
+            ? new SceneLight.GroundOnScreen(x - o, y - o)
+            : null;
+    }
+
+    /// <summary>A world point on the screen as right and up from the screen's middle, in pixels, or null behind the camera.</summary>
+    private Vector2? OnScreen(float x, float y, float z, Vector2 size)
+    {
+        (double cx, double cy, double cw) = WorldToScreen.Clip(_snapshot.Matrix, x, y, z);
+        return cw > 1e-6 ? new Vector2((float)(cx / cw) * size.X * 0.5f, (float)(cy / cw) * size.Y * 0.5f) : null;
+    }
+
     private (int X, int Y)? PlayerTile()
         => _snapshot.Player is WorldEntity player
             ? ((int)(player.WorldX / MapView.WorldToGrid) / TerrainGrid.CellsPerTile, (int)(player.WorldY / MapView.WorldToGrid) / TerrainGrid.CellsPerTile)
@@ -2291,6 +2318,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         get => _capture.NoMemory;
         set => _capture.NoMemory = value;
     }
+
+    /// <summary>
+    /// Starts a search of the whole of the game's memory for runs of floats, nearest an address first - set by whoever owns the reader, before the tile book is attached. See FloatHunt.
+    /// </summary>
+    /// <remarks>
+    /// The tile book's light panel asks the game with it which reading of an environment's angles it
+    /// uses - see LightHunt. Unset, its button says the overlay cannot search.
+    /// </remarks>
+    public Func<IReadOnlyList<FloatNeedle>, ulong, FloatHuntProgress, Task<FloatHuntResult>?>? HuntFloats { get; set; }
 
     /// <summary>Delete - what the screenshot key is until somebody chooses another.</summary>
     private const int DefaultScreenshotKey = 0x2E;
@@ -3304,7 +3340,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         var catalog = new TilesetCatalog(readFile, () => TileSets);
         _areaRooms = readFile is null ? null : new AreaRooms(readFile);
         _capture.Read = readFile;
-        var lighting = new SceneLightPanel(readFile, () => EnvironmentFiles, () => _snapshot.Area.Environment, PlayerGround);
+        // THE HUNT AS IT STANDS NOW: HuntFloats is set before the books are attached, and the anchor is
+        // the player's own entity, on the game's heap, whenever the button is pressed.
+        Func<IReadOnlyList<FloatNeedle>, ulong, FloatHuntProgress, Task<FloatHuntResult>?>? huntFloats = HuntFloats;
+        var lighting = new SceneLightPanel(
+            readFile, () => EnvironmentFiles, () => _snapshot.Area.Environment, PlayerGround, LiveGround,
+            huntFloats is null ? null : (needles, progress) => huntFloats(needles, _snapshot.Player?.Address ?? 0, progress));
         var window = new TileBookWindow(() => TileFiles, TilesHere)
         {
             Lighting = lighting,
@@ -3339,6 +3380,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 Environments = () => EnvironmentFiles,
                 Loaded = () => LoadedFiles?.Invoke() ?? [],
                 SceneLit = lighting.For,
+                Sun = lighting,
             },
         };
 

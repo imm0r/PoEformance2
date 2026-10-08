@@ -307,10 +307,34 @@ from bcdec and held against it block for block; `CubeMap`). The sun's shadows ar
 drawing of the mesh along its light (`ShadowMap`), kept until the sun or the mesh changes. What
 no file says - how phi and theta make the sun's direction, how hor_angle and vert_angle make the
 cube's turn, which number a room light's `light_position_data.a` is, the player light's radius and
-height - is offered as candidate readings in the tile book's *light* section (`SceneLightPanel`).
+height - is offered as candidate readings in the tile book's *light* section (`SceneLightPanel`),
+each named for what it does on the game's screen: where its shadows fall, by the live camera
+(`SceneLight.GroundOnScreen`, the map's transform without a game), and how high its sun stands.
 Null, the usual, leaves every picture exactly as it was. Measured at 1024 square on four threads
 against 180,000 triangles: 26 ms plain, 53 with sixty point lights, 76 with the sun and its
 shadows; drawing the shadow map is 280 ms, once per sun.
+
+**Which reading the game uses is asked of the game** (`LightHunt` over `FloatHunt`): the game turns
+the angles into a vector and a matrix on its processor before its shaders see them, so every
+reading's vector is worked out and the whole of the game's memory searched for it, nearest the
+player's entity first. Each word costs one shift and one bit test - its top sixteen bits against a
+bitmap of the buckets the needles' most telling floats fall in - about 2.7 GB a second on one
+core. What a find means comes from the shaders: the sun's shader input is the way the light
+travels (`direction = -light_direction_data`), and the cube is read by `mul(float4(dir, 0),
+env_map_rotation)`, System.Numerics' own order, the order the camera matrix is kept in. A reading
+found alone is taken; both signs of one vector settle nothing, and the report says so.
+
+**The colour grade** (`ColourGrade`) is `post_transform`'s 3D table applied as `ApplyColorGrading`
+does with GGG_POE_1 off: divided by the brightest channel past one, looked up trilinearly by the
+colour with a gamma of 2.2 taken off, multiplied back - and what comes out is linear light, since
+`imgui.hlsl` hands it straight to `ApplyOETF`. The pow is a 4096-step table read linearly; the
+lookup is 29 ns a pixel on one core against a picture's coherent colours. The file had not been
+seen when this was written, so the plain formats and BC6H are read and anything else names itself.
+
+**A free sun** stands where it is put - two sliders, its bearing on the game's screen and its
+height, or shift + drag in the model window (`IMovableSun`), the drag's direction measured through
+the picture's camera so the sun's mark follows the hand. While it moves its shadow map is 512
+square (`ShadowMap.Coarse`), and 2048 once it is let go.
 
 It lives in a **window of its own** now, in every book (`MonsterPortrait.DrawWindow`): the
 picture, its animation row, the buttons on it, and its lines folded under it. The book keeps the

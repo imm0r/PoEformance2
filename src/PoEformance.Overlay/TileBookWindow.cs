@@ -335,12 +335,16 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             return;
         }
 
+        // THE RIGHT EDGE, taken while the cursor still starts a line: the words after the boxes wrap
+        // there instead of running past the pane - "with no free place" was cut off.
+        float right = ImGui.GetCursorScreenPos().X + ImGui.GetContentRegionAvail().X;
         ImGui.SameLine();
         if (ImGui.Checkbox("rooms on map##roomsonmap", ref _roomsOnMap))
         {
             Changed?.Invoke();
         }
 
+        float end = ImGui.GetItemRectMax().X;
         if (ImGui.IsItemHovered())
         {
             ImGui.SetTooltip("Every room this area loaded, outlined on the large map with its name - each where its search ranks it first,"
@@ -355,13 +359,14 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             return;
         }
 
-        ImGui.SameLine();
+        OverlayLayout.Flow(end, OverlayLayout.CheckboxWidth("rims shared"), right, 0f);
         bool rims = RoomsOverlap == RoomOverlap.Rims;
         if (ImGui.Checkbox("rims shared##roomsrims", ref rims))
         {
             RoomsOverlap = rims ? RoomOverlap.Rims : RoomOverlap.None;
         }
 
+        end = ImGui.GetItemRectMax().X;
         if (ImGui.IsItemHovered())
         {
             ImGui.SetTooltip("On: two rooms may both hold a tile on the outermost row or column of their footprints - where rooms join -"
@@ -371,16 +376,18 @@ public sealed class TileBookWindow : BookWindow<TileBook>
                 + "Pick a row of a room's list to see the tiles it shares with each room on the map.");
         }
 
-        ImGui.SameLine();
         if (rooms.Running)
         {
             (int done, int of) = rooms.Progress;
-            ImGui.TextDisabled(string.Create(CultureInfo.InvariantCulture, $"rooms: {done} of {of} searched"));
+            string searched = string.Create(CultureInfo.InvariantCulture, $"rooms: {done} of {of} searched");
+            OverlayLayout.Flow(end, ImGui.CalcTextSize(searched).X, right, 0f);
+            ImGui.TextDisabled(searched);
             return;
         }
 
         if (rooms.Last is not { } arranged)
         {
+            OverlayLayout.Flow(end, ImGui.CalcTextSize("rooms: open a map to start").X, right, 0f);
             ImGui.TextDisabled("rooms: open a map to start");
             return;
         }
@@ -406,7 +413,8 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             _roomsDetail = string.Join('\n', lines);
         }
 
-        ImGui.TextDisabled(_roomsSaid);
+        OverlayLayout.Flow(end, ImGui.CalcTextSize(_roomsSaid).X, right, 0f);
+        ImGuiText.Wrapped(OverlayInk.Quiet, ImGuiText.Escape(_roomsSaid));
         if (ImGui.IsItemHovered() && _roomsDetail.Length > 0)
         {
             ImGui.SetTooltip(ImGuiText.Escape(_roomsDetail));
@@ -858,13 +866,13 @@ public sealed class TileBookWindow : BookWindow<TileBook>
 
         if (_found is not { } found)
         {
-            ImGui.TextDisabled("where it lies: looking for it in this area...");
+            ImGuiText.Wrapped(OverlayInk.Quiet, "where it lies: looking for it in this area...");
             return;
         }
 
         if (found.Why.Length > 0)
         {
-            ImGui.TextDisabled(ImGuiText.Escape("where it lies: " + found.Why));
+            ImGuiText.Wrapped(OverlayInk.Quiet, ImGuiText.Escape("where it lies: " + found.Why));
             return;
         }
 
@@ -873,7 +881,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         // THE BEST SHARE SAID OUTRIGHT where nothing fits: a "nearest" agreeing on under half its
         // corners is no place at all, and the outline would otherwise read as a claim.
         int best = found.Candidates.Count > 0 ? Share(found.Candidates[0]) : 0;
-        ImGui.TextDisabled(ImGuiText.Escape(found.TileChecked
+        ImGuiText.Wrapped(OverlayInk.Quiet, ImGuiText.Escape(found.TileChecked
             ? string.Create(CultureInfo.InvariantCulture,
                 $"where it lies: places{standing} ranked by the tiles laid, then the corners - {found.Fits} fit all {found.Corners} corners; pick one to outline it on the large map")
             : found.Found
