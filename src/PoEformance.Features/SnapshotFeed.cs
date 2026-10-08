@@ -51,6 +51,9 @@ public sealed class SnapshotFeed : IDisposable
     private long _lastReadTicks;
     private string _lastFailure = string.Empty;
 
+    /// <summary>The viewport the reader is reading for - the last one the renderer published.</summary>
+    public UiScale Viewport => (UiScale)Volatile.Read(ref _viewport);
+
     /// <summary>Starts the reader thread.</summary>
     /// <param name="read">Reads one snapshot. Called only on the feed's thread.</param>
     /// <param name="interval">Target time between reads.</param>

@@ -50,30 +50,35 @@ public sealed class TapMemoryReader : IMemoryReader, IMemoryRegions
     public uint ModuleSize => _inner.ModuleSize;
 
     /// <summary>
-    /// Records every read from now for a count of frames, then closes the file. Null while another recording runs.
+    /// Records every read from now until the recording's end, then closes the file. Null while another recording runs.
     /// </summary>
     /// <param name="output">Where the recording goes - closed when it ends.</param>
     /// <param name="notes">Written first: the resolved statics, and whatever else a replay needs to know.</param>
-    /// <param name="frames">How many of <see cref="MarkFrame"/>'s ticks to record for.</param>
+    /// <param name="how">How long it runs, and how large a read and a file it keeps.</param>
     /// <returns>Completes with the file's size once it is closed.</returns>
-    public Task<long>? Start(Stream output, IEnumerable<KeyValuePair<string, string>> notes, int frames)
+    public Task<long>? Start(Stream output, IEnumerable<KeyValuePair<string, string>> notes, TapRecording how)
     {
         ArgumentNullException.ThrowIfNull(output);
         ArgumentNullException.ThrowIfNull(notes);
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(frames);
+        ArgumentNullException.ThrowIfNull(how);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(how.Frames);
         if (Recording)
         {
             output.Dispose();
             return null;
         }
 
-        var recorder = new RecordingMemoryReader(_kept, output);
+        var recorder = new RecordingMemoryReader(_kept, output)
+        {
+            MaxRecordedReadBytes = how.MaxReadBytes,
+            MaxTotalBytes = how.MaxTotalBytes,
+        };
         foreach ((string key, string value) in notes)
         {
             recorder.Note(key, value);
         }
 
-        var tap = new Tap(recorder, frames);
+        var tap = new Tap(recorder, how);
         if (Interlocked.CompareExchange(ref _tap, tap, null) is not null)
         {
             recorder.Dispose();
@@ -84,7 +89,7 @@ public sealed class TapMemoryReader : IMemoryReader, IMemoryRegions
     }
 
     /// <summary>
-    /// One tick of the reader's loop: a frame boundary in the recording, and its end once the count is spent. Call once per tick, from one thread.
+    /// One tick of the reader's loop: a frame boundary in the recording, and its end once its frames are spent and what it waits for is done. Call once per tick, from one thread.
     /// </summary>
     public void MarkFrame()
     {
@@ -94,7 +99,9 @@ public sealed class TapMemoryReader : IMemoryReader, IMemoryRegions
             return;
         }
 
-        if (tap.FramesLeft-- > 0)
+        int ticks = ++tap.Ticks;
+        bool spent = ticks > tap.How.Frames && (tap.How.Until is null || tap.How.Until.IsCompleted);
+        if (!spent && ticks <= Math.Max(tap.How.Frames, tap.How.MostFrames))
         {
             tap.Recorder.MarkFrame();
             return;
@@ -147,11 +154,13 @@ public sealed class TapMemoryReader : IMemoryReader, IMemoryRegions
         _inner.Dispose();
     }
 
-    private sealed class Tap(RecordingMemoryReader recorder, int frames)
+    private sealed class Tap(RecordingMemoryReader recorder, TapRecording how)
     {
         public RecordingMemoryReader Recorder { get; } = recorder;
 
-        public int FramesLeft { get; set; } = frames;
+        public TapRecording How { get; } = how;
+
+        public int Ticks { get; set; }
 
         public TaskCompletionSource<long> Done { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
     }
@@ -175,4 +184,29 @@ public sealed class TapMemoryReader : IMemoryReader, IMemoryRegions
         {
         }
     }
+}
+
+/// <summary>
+/// How long a <see cref="TapMemoryReader"/> recording runs, and how much of what it sees it keeps.
+/// </summary>
+/// <param name="Frames">Ticks of the reader it runs for at least.</param>
+/// <remarks>
+/// THE LIMITS ARE WIDER THAN --record'S on purpose. A session recording leaves out any read over
+/// 64 KB, which is what keeps the module image out - and also the terrain, whose walkable grid and
+/// tile array are each one read of several hundred kilobytes. A capture is a few seconds long and
+/// exists to hold exactly those, so its reads are kept up to the format's own largest.
+/// </remarks>
+public sealed record TapRecording(int Frames)
+{
+    /// <summary>Something else that must finish inside the recording - it runs on until this is done, up to <see cref="MostFrames"/>.</summary>
+    public Task? Until { get; init; }
+
+    /// <summary>The longest it runs whatever it waits for: a minute at the reader's thirty ticks a second.</summary>
+    public int MostFrames { get; init; } = 30 * 60;
+
+    /// <summary>The largest single read kept.</summary>
+    public int MaxReadBytes { get; init; } = RecordingFormat.DefaultMaxRecordedReadBytes;
+
+    /// <summary>The size the file stops growing at.</summary>
+    public long MaxTotalBytes { get; init; } = 16 * 1024 * 1024;
 }

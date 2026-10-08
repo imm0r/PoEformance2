@@ -19,9 +19,9 @@ public class TapMemoryReaderTests
         Assert.Equal(7UL, tap.Read<ulong>(0x1000));
 
         var file = new MemoryStream();
-        Task<long> done = Assert.IsType<Task<long>>(tap.Start(file, Statics, frames: 2));
+        Task<long> done = Assert.IsType<Task<long>>(tap.Start(file, Statics, new TapRecording(2)));
         Assert.True(tap.Recording);
-        Assert.Null(tap.Start(new MemoryStream(), Statics, frames: 1));
+        Assert.Null(tap.Start(new MemoryStream(), Statics, new TapRecording(1)));
 
         tap.MarkFrame();
         Assert.Equal(8UL, tap.Read<ulong>(0x2000));
@@ -47,11 +47,11 @@ public class TapMemoryReaderTests
     {
         var live = new CountedReader();
         using var tap = new TapMemoryReader(live);
-        _ = tap.Start(new MemoryStream(), Statics, frames: 1);
+        _ = tap.Start(new MemoryStream(), Statics, new TapRecording(1));
         tap.Stop();
         Assert.False(tap.Recording);
         Assert.Equal(0, live.Disposed);
-        Assert.NotNull(tap.Start(new MemoryStream(), Statics, frames: 1));
+        Assert.NotNull(tap.Start(new MemoryStream(), Statics, new TapRecording(1)));
 
         tap.Dispose();
         Assert.Equal(1, live.Disposed);

@@ -3120,8 +3120,10 @@ internal static class Program
         // mistaken for a released one. See ToolVersion.
         overlay.Version = PoEformance.Features.ToolVersion.With(PoEformance.Features.BuildStamp.Load());
 
-        // The capture key's memory: a few seconds of this session, recorded on demand. The statics
-        // go in first, as --record writes them, or the recording could not be replayed.
+        // The capture key's memory: a recording started on demand, and inside it ONE pass that reads
+        // everything this tool can read from nothing - see CaptureMemory. The recording stays open
+        // until the pass is done, and keeps reads as large as the terrain's. The statics go in
+        // first, as --record writes them, or the recording could not be replayed.
         if (reader is TapMemoryReader tap)
         {
             KeyValuePair<string, string>[] notes =
@@ -3130,9 +3132,56 @@ internal static class Program
                     RecordingFormat.StaticNotePrefix + one.Name,
                     one.Address.ToString("X", System.Globalization.CultureInfo.InvariantCulture))),
             ];
-            overlay.RecordMemory = path => tap.Recording
-                ? null
-                : tap.Start(File.Create(path), notes, PoEformance.Features.CaptureReport.MemoryFrames);
+            overlay.RecordMemory = folder =>
+            {
+                if (tap.Recording)
+                {
+                    return null;
+                }
+
+                var passed = new TaskCompletionSource();
+                Task<long>? recorded = tap.Start(
+                    File.Create(Path.Combine(folder, PoEformance.Features.CaptureReport.MemoryFile)),
+                    notes,
+                    new TapRecording(PoEformance.Features.CaptureReport.MemoryFrames)
+                    {
+                        Until = passed.Task,
+                        MaxReadBytes = PoEformance.Features.CaptureMemory.MaxReadBytes,
+                        MaxTotalBytes = PoEformance.Features.CaptureMemory.MaxTotalBytes,
+                    });
+                if (recorded is null)
+                {
+                    return null;
+                }
+
+                PoEformance.Game.Ui.UiScale scale = feed.Viewport;
+                return Task.Run(async () =>
+                {
+                    string index;
+                    try
+                    {
+                        // A FRESH animation table, so every animation the game names is asked for
+                        // again inside the recording rather than served from this session's copy.
+                        index = PoEformance.Features.CaptureMemory.Pass(
+                            reader, schema, gameStatesStatic, rotation, itemNames, world.LandmarkNames,
+                            PoEformance.Game.Components.AnimationNames.Load(FindDataFile("animations.tsv")),
+                            scale, fileRoot, areaCounter);
+                    }
+                    catch (Exception exception)
+                    {
+                        index = $"the pass failed: {exception}";
+                    }
+                    finally
+                    {
+                        passed.TrySetResult();
+                    }
+
+                    await File.WriteAllTextAsync(Path.Combine(folder, PoEformance.Features.CaptureMemory.IndexFile), index).ConfigureAwait(false);
+                    long bytes = await recorded.ConfigureAwait(false);
+                    return $"{bytes / 1024} KB: the overlay's own reads for {PoEformance.Features.CaptureReport.MemoryFrames} reader ticks and "
+                        + $"one pass reading everything again from nothing - replay with --replay; {PoEformance.Features.CaptureMemory.IndexFile} says what the pass read where";
+                });
+            };
         }
         else
         {

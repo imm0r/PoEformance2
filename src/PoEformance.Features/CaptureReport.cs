@@ -30,7 +30,7 @@ public static class CaptureReport
     /// <summary>Tiles either side of the player's own a room may be and still be written.</summary>
     public const int RoomReach = 3;
 
-    /// <summary>Ticks of the reader the memory recording runs for - three seconds at its thirty a second.</summary>
+    /// <summary>Ticks of the reader the memory recording runs for at least - three seconds at its thirty a second; longer while the pass inside it runs (CaptureMemory).</summary>
     public const int MemoryFrames = 90;
 
     /// <summary>The game alone, the overlay hidden for the shot.</summary>
@@ -54,7 +54,7 @@ public static class CaptureReport
     /// <summary>The rooms around the player, each with its doodads' lights.</summary>
     public const string RoomsFile = "rooms.txt";
 
-    /// <summary>A few seconds of the overlay's own reads, replayable with --replay.</summary>
+    /// <summary>The overlay's own reads for a few seconds and one pass reading everything again - see CaptureMemory. Replayable with --replay.</summary>
     public const string MemoryFile = "memory.rec";
 
     /// <summary>Where captures go: beside the tool, like its exports.</summary>

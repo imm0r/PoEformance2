@@ -89,7 +89,10 @@ PoEformance.App --overlay --debug        # plus the projection diagnostics and c
 In the overlay, **F9** (rebindable under Appearance → Capture for Diagnosis) writes everything
 about the spot you stand on into `captures/<time> <area>/` beside the tool: a picture with and one
 without the overlay, the rooms around you with their light data, every entity, the area's loaded
-files, and three seconds of memory as a recording that `--replay` reads.
+files, and a memory recording that `--replay` reads. Inside that recording everything the tool can
+read is read once more from nothing - the terrain, every entity with every switch on, the loaded
+files - plus the raw bytes of the game's root objects, one hop beyond them, and every component of
+the entities around you; `memory.txt` beside it says what sits at which address.
 
 The overlay draws the area's layout **on the game's own map** — including the parts not
 explored yet — and marks living monsters, chests, drops and NPCs on it. The large map when

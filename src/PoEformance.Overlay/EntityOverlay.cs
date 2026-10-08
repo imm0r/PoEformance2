@@ -2249,9 +2249,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private readonly CaptureKey _capture;
 
     /// <summary>
-    /// Starts a memory recording into a file for a few seconds, or null where one is already running - set by whoever owns the reader. Unset, the capture says it has none.
+    /// Starts the memory half of a capture in its folder, or null where one is already running - set by whoever owns the reader. Unset, the capture says it has none. See CaptureKey.RecordMemory.
     /// </summary>
-    public Func<string, Task<long>?>? RecordMemory
+    public Func<string, Task<string>?>? RecordMemory
     {
         get => _capture.RecordMemory;
         set => _capture.RecordMemory = value;

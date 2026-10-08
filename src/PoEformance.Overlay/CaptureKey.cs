@@ -9,7 +9,7 @@ using SixLabors.ImageSharp.PixelFormats;
 namespace PoEformance.Overlay;
 
 /// <summary>
-/// One key, and everything about the spot the player stands on goes into one folder: two pictures, the rooms there with their lights, the entities, the area's files, and three seconds of memory.
+/// One key, and everything about the spot the player stands on goes into one folder: two pictures, the rooms there with their lights, the entities, the area's files, and a recording of memory read once more from nothing.
 /// </summary>
 /// <remarks>
 /// ASKED FOR so that what the tool's work keeps needing from the game arrives together. Until now
@@ -50,6 +50,9 @@ internal sealed class CaptureKey
 
     /// <summary>How long to wait for the room search before writing without it.</summary>
     public const int RoomWaitMs = 60_000;
+
+    /// <summary>How long the files wait for the memory half - past the longest a recording runs.</summary>
+    private const int MemoryWaitSeconds = 90;
 
     /// <summary>How long the line saying what happened stays up.</summary>
     private const int SaidMs = 5000;
@@ -106,9 +109,10 @@ internal sealed class CaptureKey
     public Func<string, byte[]?>? Read { get; set; }
 
     /// <summary>
-    /// Starts a memory recording into a file for <see cref="CaptureReport.MemoryFrames"/> ticks, or null where this session cannot - set by whoever owns the reader.
+    /// Starts the memory half of a capture in its folder - the recording, and the pass that reads everything once inside it - or null where one is already running. Set by whoever owns the reader.
     /// </summary>
-    public Func<string, Task<long>?>? RecordMemory { get; set; }
+    /// <remarks>Completes with what it wrote, in a line, once the recording is closed. See CaptureMemory.</remarks>
+    public Func<string, Task<string>?>? RecordMemory { get; set; }
 
     /// <summary>Says why there is no memory recording, where <see cref="RecordMemory"/> is not set.</summary>
     public string NoMemory { get; set; } = "this session's reader cannot record on demand";
@@ -214,7 +218,7 @@ internal sealed class CaptureKey
         {
             try
             {
-                run.Memory = record(Path.Combine(folder, CaptureReport.MemoryFile));
+                run.Memory = record(folder);
                 run.MemoryNote = run.Memory is null ? "a recording was already running" : string.Empty;
             }
             catch (Exception failed) when (failed is IOException or UnauthorizedAccessException)
@@ -312,14 +316,15 @@ internal sealed class CaptureKey
             });
         }
 
-        // Last, so the recording has had the time the rest took; three seconds is its whole length.
+        // Last, so the recording has had the time the rest took. It closes once its ticks are
+        // spent and the pass inside it is done - seconds, or a minute at the very most.
         if (run.Memory is { } memory)
         {
             try
             {
-                parts.Add(memory.Wait(TimeSpan.FromSeconds(15))
-                    ? $"{CaptureReport.MemoryFile}  {memory.Result / 1024} KB, {CaptureReport.MemoryFrames} reader ticks of the overlay's own reads - replay with --replay"
-                    : $"{CaptureReport.MemoryFile}  still recording when this was written - it closes itself when its ticks are done");
+                parts.Add(memory.Wait(TimeSpan.FromSeconds(MemoryWaitSeconds))
+                    ? $"{CaptureReport.MemoryFile}  {memory.Result}"
+                    : $"{CaptureReport.MemoryFile}  still recording after {MemoryWaitSeconds} s when this was written - it closes itself");
             }
             catch (AggregateException failed)
             {
@@ -365,7 +370,7 @@ internal sealed class CaptureKey
             (int done, int of) = _roomsProgress();
             text = run.Stage == Stage.Rooms
                 ? $"capturing... waiting for the room search ({done} of {of})"
-                : "capturing... writing the files";
+                : "capturing... writing the files and reading memory";
         }
         else if (now < _saidUntil)
         {
@@ -405,7 +410,8 @@ internal sealed class CaptureKey
 
         OverlayLayout.Hint(
             "Writes everything about the spot you stand on into one folder: a picture with and one without the overlay, "
-            + "the rooms around you with their light data, every entity, the area's loaded files and three seconds of memory.");
+            + "the rooms around you with their light data, every entity, the area's loaded files, and a memory recording "
+            + "in which everything the tool can read - the terrain included - is read once more.");
 
         if (_conflictOf != KeyOrDefault)
         {
@@ -476,7 +482,7 @@ internal sealed class CaptureKey
 
         public IReadOnlyList<string> Loaded { get; init; } = [];
 
-        public Task<long>? Memory { get; set; }
+        public Task<string>? Memory { get; set; }
 
         public string MemoryNote { get; set; } = string.Empty;
 
