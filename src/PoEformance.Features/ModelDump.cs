@@ -478,7 +478,18 @@ public static partial class ModelDump
         foreach ((string path, string from) in environments.Take(MostEnvironments))
         {
             said.AppendLine().Append("=== .env ").Append(path).Append("  (").Append(from).AppendLine(")");
-            said.AppendLine(Printed(read(path), MostEnvironmentHex));
+            byte[]? content = read(path);
+            said.AppendLine(Printed(content, MostEnvironmentHex));
+
+            // ITS CUBES' HEADERS, because the ambient light is a cube and only the header says what
+            // it is stored as - see EnvSurvey.Formats.
+            if (content is { Length: > 0 })
+            {
+                foreach ((string kind, string cube) in EnvSurvey.Cubes(StatDescriptionFiles.Decode(content)))
+                {
+                    said.Append(kind).Append(' ').Append(cube).Append(": ").AppendLine(Header(GameArt.ReadRaw(read, cube)));
+                }
+            }
         }
 
         if (environments.Count > MostEnvironments)
@@ -1274,7 +1285,7 @@ public static partial class ModelDump
     /// map taken for a colour one - is a shape in colours nobody painted, and only the header says
     /// which of the two it is. Read straight off the bytes, because the decoder keeps none of it.
     /// </remarks>
-    private static string Header(byte[]? dds)
+    public static string Header(byte[]? dds)
     {
         const int Least = 128;
         if (dds is null || dds.Length < Least)
@@ -1308,6 +1319,13 @@ public static partial class ModelDump
                 {
                     line.Append(" (").Append(name).Append(')');
                 }
+
+                // A CUBE says so twice in a DX10 file - in the old header's caps and in the new
+                // one's misc flags - and the array size beside it counts cubes, not faces.
+                if (dds.Length >= Least + 16 && (BitConverter.ToUInt32(dds, Least + 8) & 0x4) != 0)
+                {
+                    line.Append(" · cube x").Append(Say(BitConverter.ToInt32(dds, Least + 12)));
+                }
             }
         }
         else
@@ -1317,6 +1335,13 @@ public static partial class ModelDump
                 .Append(" g 0x").Append(BitConverter.ToUInt32(dds, 96).ToString("X8", CultureInfo.InvariantCulture))
                 .Append(" b 0x").Append(BitConverter.ToUInt32(dds, 100).ToString("X8", CultureInfo.InvariantCulture))
                 .Append(" a 0x").Append(BitConverter.ToUInt32(dds, 104).ToString("X8", CultureInfo.InvariantCulture));
+        }
+
+        // The old header's caps: 0x200 is a cube, and the six bits above it say which faces it holds.
+        uint caps = BitConverter.ToUInt32(dds, 112);
+        if ((caps & 0x200) != 0 && !line.ToString().Contains(" · cube", StringComparison.Ordinal))
+        {
+            line.Append(" · cube, faces 0x").Append(((caps >> 10) & 0x3F).ToString("X", CultureInfo.InvariantCulture));
         }
 
         return line.ToString();
