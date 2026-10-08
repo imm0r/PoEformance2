@@ -26,6 +26,16 @@ namespace PoEformance.Game.Files;
 /// what the shader declares - a 3D texture. The plain formats a table can be stored in are read,
 /// the sRGB ones decoded to linear as a graphics card decodes them when it samples; a file in any
 /// other format, or one that is not a volume, says exactly what it is instead of being drawn.
+///
+/// HOW ITS TEXELS ARE MEANT IS SETTLED BY THE TABLE ITSELF. A card reads an 8-bit texture either as
+/// it stands or through an sRGB view, which decodes every texel to linear light before it filters -
+/// whichever the engine creates it as, and the old DDS header cannot even say. The shader decides
+/// what a table that changes nothing must hold: the lookup is by pow(c, 1/2.2) and must give back c,
+/// so a neutral table holds either its own coordinate, read through an sRGB view, or that
+/// coordinate's 2.2nd power, read as it stands. A grade is a table near neutral, so it is read the
+/// way of the neutral table it lies nearer, and the line under the picture prints both distances.
+/// The first build read every table as it stands, and AzmerianRanges' came out washed - lifted
+/// shadows, white rock, the gamma put on twice.
 /// </remarks>
 public sealed class ColourGrade
 {
@@ -46,17 +56,29 @@ public sealed class ColourGrade
     private readonly Vector3[] _texels;
     private readonly int _width, _height, _depth;
 
-    private ColourGrade(Vector3[] texels, int width, int height, int depth, string format)
+    private ColourGrade(Vector3[] texels, int width, int height, int depth, string format, bool decoded, float fromGamma, float fromLinear)
     {
         _texels = texels;
         _width = width;
         _height = height;
         _depth = depth;
         Format = format;
+        Decoded = decoded;
+        FromGammaNeutral = fromGamma;
+        FromLinearNeutral = fromLinear;
     }
 
-    /// <summary>What it was stored as and how big, for the line that says what graded the picture.</summary>
+    /// <summary>What it was stored as and how big, and how its texels were taken, for the line that says what graded the picture.</summary>
     public string Format { get; }
+
+    /// <summary>Whether its texels were decoded from sRGB to linear light after reading - see the remarks.</summary>
+    public bool Decoded { get; }
+
+    /// <summary>How far the texels as read lie from a neutral table of gamma-encoded values, on average per channel.</summary>
+    public float FromGammaNeutral { get; }
+
+    /// <summary>How far they lie from a neutral table of linear values.</summary>
+    public float FromLinearNeutral { get; }
 
     /// <summary>The table, or null with why not.</summary>
     /// <param name="dds">The file's bytes, unpacked - GameArt.ReadRaw.</param>
@@ -161,7 +183,61 @@ public sealed class ColourGrade
             }
         }
 
-        return new ColourGrade(table, width, height, depth, string.Create(CultureInfo.InvariantCulture, $"{format.Name} {width} x {height} x {depth}"));
+        // THE NEUTRAL TABLE IT LIES NEARER says how its texels are meant - see the remarks.
+        (float fromGamma, float fromLinear) = Neutrality(table, width, height, depth);
+        bool decoded = fromGamma < fromLinear;
+        if (decoded)
+        {
+            for (var at = 0; at < table.Length; at++)
+            {
+                Vector3 one = table[at];
+                table[at] = new Vector3(Linear(one.X), Linear(one.Y), Linear(one.Z));
+            }
+        }
+
+        string viewless = format.Kind is Kind.Rgba8 or Kind.Bgra8 or Kind.Masked ? string.Empty : ", although its format has none";
+        string taken = decoded
+            ? string.Create(CultureInfo.InvariantCulture,
+                $"held gamma-encoded ({fromGamma:0.000} from a neutral table so, {fromLinear:0.000} as linear light) - decoded as an sRGB view decodes it{viewless}")
+            : string.Create(CultureInfo.InvariantCulture,
+                $"held as linear light ({fromLinear:0.000} from a neutral table so, {fromGamma:0.000} as gamma-encoded) - read as it stands");
+        return new ColourGrade(
+            table, width, height, depth, string.Create(CultureInfo.InvariantCulture, $"{format.Name} {width} x {height} x {depth}, {taken}"), decoded, fromGamma, fromLinear);
+    }
+
+    /// <summary>
+    /// How far a table lies, on average per channel, from the two tables that change nothing: one holding each texel's own coordinate, one holding its 2.2nd power.
+    /// </summary>
+    /// <remarks>
+    /// A TEXEL'S COORDINATE IS ITS CENTRE, (i + 0.5) / n: the shader samples at the colour itself, and
+    /// a clamping sampler reads texel i whole at that place - so that is what the table must hold there
+    /// to give the colour back.
+    /// </remarks>
+    private static (float FromGamma, float FromLinear) Neutrality(Vector3[] table, int width, int height, int depth)
+    {
+        double gamma = 0, linear = 0;
+        int at = 0;
+        for (var z = 0; z < depth; z++)
+        {
+            float b = (z + 0.5f) / depth;
+            for (var y = 0; y < height; y++)
+            {
+                float g = (y + 0.5f) / height;
+                for (var x = 0; x < width; x++, at++)
+                {
+                    float r = (x + 0.5f) / width;
+                    Vector3 held = table[at];
+                    var coordinate = new Vector3(r, g, b);
+                    var power = new Vector3(MathF.Pow(r, 2.2f), MathF.Pow(g, 2.2f), MathF.Pow(b, 2.2f));
+                    Vector3 off = Vector3.Abs(held - coordinate), offLinear = Vector3.Abs(held - power);
+                    gamma += off.X + off.Y + off.Z;
+                    linear += offLinear.X + offLinear.Y + offLinear.Z;
+                }
+            }
+        }
+
+        double channels = table.Length * 3.0;
+        return ((float)(gamma / channels), (float)(linear / channels));
     }
 
     /// <summary>A linear colour graded - the game's ApplyColorGrading with one table; linear in and out.</summary>

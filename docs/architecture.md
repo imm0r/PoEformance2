@@ -330,6 +330,18 @@ colour with a gamma of 2.2 taken off, multiplied back - and what comes out is li
 `imgui.hlsl` hands it straight to `ApplyOETF`. The pow is a 4096-step table read linearly; the
 lookup is 29 ns a pixel on one core against a picture's coherent colours. The file had not been
 seen when this was written, so the plain formats and BC6H are read and anything else names itself.
+How its texels are meant is settled by the table: a card reads an 8-bit texture as it stands or
+through an sRGB view, and the shader says a table that changes nothing holds either its own
+coordinate (read through the view) or that coordinate's 2.2nd power (read as it stands) - so a
+grade, a table near neutral, is read the way of the neutral one it lies nearer, both distances
+printed. Read as it stands, the first build's AzmerianRanges came out washed, the gamma put on twice.
+
+**A candidate that cannot change the picture says so instead of being offered.** The sky's readings
+are only the turns that differ - with one angle nought the four orders are one or two turns - and
+where the cube lights nothing (`gi_env_occlusion` 1, AzmerianRanges among them, or a flat ambient)
+the row says why. Where the sun readings that light the ground lie within ten degrees of each other -
+AzmerianRanges' phi 2.339 and theta 2.321, so swapping them changes nothing - a line under them says
+so, and each names its shadows' bearing in degrees.
 
 **A free sun** stands where it is put - two sliders, its bearing on the game's screen and its
 height, or shift + drag in the model window (`IMovableSun`), the drag's direction measured through
