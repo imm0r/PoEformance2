@@ -1,4 +1,6 @@
+using System.Globalization;
 using System.Numerics;
+using System.Text;
 using PoEformance.Game.Ui;
 using PoEformance.Game.World;
 
@@ -9,7 +11,53 @@ namespace PoEformance.Features;
 /// The point of interest's address, which is its identity - the position alone cannot say
 /// whether the user picked a different exit that happens to sit nearby.
 /// </param>
-public sealed record RouteTarget(ulong Target, float WorldX, float WorldY);
+public sealed record RouteTarget(ulong Target, float WorldX, float WorldY)
+{
+    /// <summary>The stops the route passes on its way, in world units and in order - see <see cref="RoutePlanner.AddVia"/>.</summary>
+    public IReadOnlyList<Vector2> Via { get; init; } = [];
+
+    /// <summary>Where arriving counts, for a destination bigger than a point - a room - or null for the radius around the point.</summary>
+    public RouteZone? Zone { get; init; }
+}
+
+/// <summary>
+/// The tiles a destination covers: standing on any of them is having arrived.
+/// </summary>
+/// <remarks>
+/// For a ROOM, which is somewhere you are as soon as you are inside it. The radius that suits a
+/// chest or an exit would keep the route to a room alive until its middle was reached, and the
+/// middle of a room is often a pillar or a pit.
+/// </remarks>
+public sealed class RouteZone
+{
+    private readonly int _tilesX;
+    private readonly int[] _tiles;
+
+    /// <param name="tilesX">The area's tiles across, which the indices are counted in.</param>
+    /// <param name="tiles">The tiles, by row-major index.</param>
+    public RouteZone(int tilesX, IEnumerable<int> tiles)
+    {
+        ArgumentNullException.ThrowIfNull(tiles);
+        _tilesX = tilesX;
+        _tiles = [.. tiles.Distinct().Order()];
+    }
+
+    /// <summary>How many tiles it covers.</summary>
+    public int Count => _tiles.Length;
+
+    /// <summary>Whether a world position stands on one of its tiles. A binary search - this is asked every read tick.</summary>
+    public bool Holds(float worldX, float worldY)
+    {
+        if (worldX < 0f || worldY < 0f || _tilesX <= 0)
+        {
+            return false;
+        }
+
+        int x = (int)(worldX / MapView.WorldToGrid) / TerrainGrid.CellsPerTile;
+        int y = (int)(worldY / MapView.WorldToGrid) / TerrainGrid.CellsPerTile;
+        return x < _tilesX && Array.BinarySearch(_tiles, (y * _tilesX) + x) >= 0;
+    }
+}
 
 /// <summary>Everywhere a route should lead. Published by the overlay, read by the reader thread.</summary>
 public sealed record RouteRequest(IReadOnlyList<RouteTarget> Targets)
@@ -85,6 +133,19 @@ public sealed class RoutePlanner
     /// <summary>A floor on how often the search runs, for a player moving continuously.</summary>
     private const long MinimumIntervalMs = 250;
 
+    /// <summary>
+    /// Stops one route may pass on its way.
+    /// </summary>
+    /// <remarks>
+    /// Each stop is a search of its own - the route is found leg by leg - so this bounds the
+    /// work per move the way <see cref="MaxRoutes"/> does. A stop past it replaces nothing and
+    /// is not added.
+    /// </remarks>
+    public const int MaxStops = 8;
+
+    /// <summary>The last identity handed to a route that leads to a bare point rather than to a place.</summary>
+    private static long _points;
+
     private readonly Action<Action> _schedule;
 
     private RouteRequest _request = RouteRequest.None;
@@ -142,10 +203,16 @@ public sealed class RoutePlanner
     /// Appends rather than inserting, so the existing routes keep their order - and with it
     /// their colours, which is what makes a second route readable next to the first.
     /// </remarks>
-    public void Toggle(ulong address, float worldX, float worldY)
+    public void Toggle(ulong address, float worldX, float worldY) => Toggle(new RouteTarget(address, worldX, worldY));
+
+    /// <summary>
+    /// Adds a destination as given - with its zone, for a room - or drops the one with its identity if it is already a destination.
+    /// </summary>
+    public void Toggle(RouteTarget chosen)
     {
+        ArgumentNullException.ThrowIfNull(chosen);
         List<RouteTarget> targets = [.. Targets];
-        int at = targets.FindIndex(t => t.Target == address);
+        int at = targets.FindIndex(t => t.Target == chosen.Target);
 
         if (at >= 0)
         {
@@ -158,7 +225,39 @@ public sealed class RoutePlanner
                 targets.RemoveAt(0);   // the oldest gives way, so a click always does something
             }
 
-            targets.Add(new RouteTarget(address, worldX, worldY));
+            targets.Add(chosen);
+        }
+
+        Request(new RouteRequest(targets));
+    }
+
+    /// <summary>
+    /// Adds a stop on the way: to the route chosen last, before its destination and after the stops it already has - or, with no route, a route to the point itself.
+    /// </summary>
+    /// <remarks>
+    /// THE NEWEST ROUTE, because a stop is said about the route somebody has just set up: pick a
+    /// destination, then pull the line through the corridor it should take. Stops are passed in
+    /// the order they were added. Reaching one drops it, and reaching a later one drops every
+    /// stop before it too - walked past is walked past. Reaching the destination ends the route
+    /// whatever stops are left, which is the rule every route already has.
+    /// </remarks>
+    public void AddVia(float worldX, float worldY)
+    {
+        List<RouteTarget> targets = [.. Targets];
+        if (targets.Count == 0)
+        {
+            ulong point = 0xC000_0000_0000_0000UL | (ulong)Interlocked.Increment(ref _points);
+            targets.Add(new RouteTarget(point, worldX, worldY));
+        }
+        else
+        {
+            RouteTarget newest = targets[^1];
+            if (newest.Via.Count >= MaxStops)
+            {
+                return;
+            }
+
+            targets[^1] = newest with { Via = [.. newest.Via, new Vector2(worldX, worldY)] };
         }
 
         Request(new RouteRequest(targets));
@@ -259,12 +358,7 @@ public sealed class RoutePlanner
                 var found = new List<RouteView>(targets.Count);
                 foreach (RouteTarget target in targets)
                 {
-                    List<(int X, int Y)> cells = TerrainPathfinder.FindPath(
-                        grid, start, Cell(target.WorldX, target.WorldY), out RouteOutcome outcome);
-
-                    found.Add(cells.Count == 0
-                        ? new RouteView(target.Target, [], 0f, Explain(outcome))
-                        : new RouteView(target.Target, cells, Length(cells), string.Empty));
+                    found.Add(Find(grid, start, target));
                 }
 
                 // A search that finished after the player left carries an answer about a map
@@ -279,6 +373,41 @@ public sealed class RoutePlanner
                 Volatile.Write(ref _searching, 0);
             }
         });
+    }
+
+    /// <summary>
+    /// One route, leg by leg: from the player to each stop in turn, then to the destination.
+    /// </summary>
+    /// <remarks>
+    /// A leg that finds no way fails the whole route and says which leg it was - a line drawn up
+    /// to the stop it cannot get past would read as the route, not as where it ends.
+    /// </remarks>
+    private static RouteView Find(TerrainGrid grid, (int X, int Y) start, RouteTarget target)
+    {
+        var cells = new List<(int X, int Y)>();
+        (int X, int Y) from = start;
+        for (int leg = 0; leg <= target.Via.Count; leg++)
+        {
+            (int X, int Y) to = leg < target.Via.Count
+                ? Cell(target.Via[leg].X, target.Via[leg].Y)
+                : Cell(target.WorldX, target.WorldY);
+            List<(int X, int Y)> path = TerrainPathfinder.FindPath(grid, from, to, out RouteOutcome outcome);
+            if (path.Count == 0)
+            {
+                string why = Explain(outcome);
+                return new RouteView(
+                    target.Target,
+                    [],
+                    0f,
+                    leg < target.Via.Count ? string.Create(CultureInfo.InvariantCulture, $"{why} - to stop {leg + 1}") : why);
+            }
+
+            // The legs meet at a stop, so the next one starts on the point this one ended on.
+            cells.AddRange(cells.Count > 0 && cells[^1] == path[0] ? path.Skip(1) : path);
+            from = path[^1];
+        }
+
+        return new RouteView(target.Target, cells, Length(cells), string.Empty);
     }
 
     /// <summary>What to tell the user when no route came back.</summary>
@@ -313,11 +442,43 @@ public sealed class RoutePlanner
     private static RouteRequest? Reached(RouteRequest request, Vector2 player)
     {
         float within = ArrivedWithinCells * MapView.WorldToGrid;
+        var changed = false;
+        var left = new List<RouteTarget>(request.Targets.Count);
+        foreach (RouteTarget target in request.Targets)
+        {
+            // A ROOM is arrived at on its first tile, anything else within the radius - and the
+            // destination ends the route whatever stops are still ahead of it.
+            bool arrived = target.Zone is { } zone
+                ? zone.Holds(player.X, player.Y)
+                : Vector2.Distance(player, new Vector2(target.WorldX, target.WorldY)) <= within;
+            if (arrived)
+            {
+                changed = true;
+                continue;
+            }
 
-        List<RouteTarget> left = [.. request.Targets.Where(target =>
-            Vector2.Distance(player, new Vector2(target.WorldX, target.WorldY)) > within)];
+            // The furthest stop the player stands at: it and every stop before it are behind them.
+            int passed = -1;
+            for (int stop = target.Via.Count - 1; stop >= 0; stop--)
+            {
+                if (Vector2.Distance(player, target.Via[stop]) <= within)
+                {
+                    passed = stop;
+                    break;
+                }
+            }
 
-        return left.Count == request.Targets.Count ? null : new RouteRequest(left);
+            if (passed < 0)
+            {
+                left.Add(target);
+                continue;
+            }
+
+            changed = true;
+            left.Add(target with { Via = [.. target.Via.Skip(passed + 1)] });
+        }
+
+        return changed ? new RouteRequest(left) : null;
     }
 
     /// <summary>
@@ -363,9 +524,24 @@ public sealed class RoutePlanner
         _plannedFor = string.Empty;
     }
 
-    /// <summary>What the current set of destinations is, for spotting a change cheaply.</summary>
+    /// <summary>What the current set of destinations and their stops is, for spotting a change cheaply.</summary>
     private static string Signature(IReadOnlyList<RouteTarget> targets)
-        => string.Join(',', targets.Select(t => t.Target.ToString("X", System.Globalization.CultureInfo.InvariantCulture)));
+    {
+        var said = new StringBuilder();
+        foreach (RouteTarget target in targets)
+        {
+            said.Append(CultureInfo.InvariantCulture, $"{target.Target:X}");
+            foreach (Vector2 stop in target.Via)
+            {
+                (int x, int y) = Cell(stop.X, stop.Y);
+                said.Append(CultureInfo.InvariantCulture, $">{x}:{y}");
+            }
+
+            said.Append(',');
+        }
+
+        return said.ToString();
+    }
 
     private static (int X, int Y) Cell(float worldX, float worldY)
         => ((int)(worldX / MapView.WorldToGrid), (int)(worldY / MapView.WorldToGrid));

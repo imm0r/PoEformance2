@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Numerics;
 using System.Runtime.Versioning;
 using ImGuiNET;
@@ -390,6 +391,51 @@ public sealed class PoiLayer
             if (Style.Visible(key))
             {
                 DrawRoute(draw, map, snapshot, player, route, Style.Colour(key), Style.Width(key, 0f));
+            }
+        }
+
+        DrawStops(draw, map, snapshot, player);
+    }
+
+    /// <summary>The stops' numbers, made once - a route holds at most <see cref="RoutePlanner.MaxStops"/>.</summary>
+    private static readonly string[] StopNumbers =
+        [.. Enumerable.Range(1, RoutePlanner.MaxStops).Select(one => one.ToString(CultureInfo.InvariantCulture))];
+
+    /// <summary>
+    /// The stops each route still has to pass, as rings in its colour - numbered on the large map - so a stop set is seen to be set.
+    /// </summary>
+    /// <remarks>
+    /// From the destinations rather than the found routes: a stop is there the moment it is
+    /// clicked, while the search that bends the line through it runs off the frame.
+    /// </remarks>
+    private void DrawStops(ImDrawListPtr draw, MapView map, WorldSnapshot snapshot, WorldEntity player)
+    {
+        TerrainGrid? grid = snapshot.Terrain;
+        float radius = map.IsLargeMap ? 6f : 4f;
+        foreach (RouteTarget target in _planner.Targets)
+        {
+            if (target.Via.Count == 0)
+            {
+                continue;
+            }
+
+            string key = StyleCatalogue.ForRoute(RouteSlot(target.Target));
+            if (!Style.Visible(key))
+            {
+                continue;
+            }
+
+            uint colour = Style.Colour(key);
+            for (int stop = 0; stop < target.Via.Count; stop++)
+            {
+                Vector2 via = target.Via[stop];
+                float height = grid?.HeightAt((int)(via.X / MapView.WorldToGrid), (int)(via.Y / MapView.WorldToGrid)) ?? player.TerrainHeight;
+                Vector2 at = map.Project(via.X, via.Y, height, player.WorldX, player.WorldY, player.TerrainHeight);
+                draw.AddCircle(at, radius, colour, 12, 2f);
+                if (map.IsLargeMap && stop < StopNumbers.Length)
+                {
+                    draw.AddText(at + new Vector2(radius + 2f, -radius - 2f), colour, StopNumbers[stop]);
+                }
             }
         }
     }
@@ -911,6 +957,8 @@ public sealed class PoiLayer
         {
             ImGui.TextColored(DimText, "click places to draw the way there - several at once");
         }
+
+        ImGui.TextColored(DimText, "ctrl + shift + click the large map: a stop on the newest route");
 
         ImGui.Separator();
 

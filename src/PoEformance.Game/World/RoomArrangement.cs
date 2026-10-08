@@ -285,6 +285,29 @@ public sealed record RoomArrangement(IReadOnlyList<RoomLaid> Laid, IReadOnlyList
         return (beside, tiles, corners);
     }
 
+    /// <summary>
+    /// The area tiles a room covers laid at a candidate, by row-major index - its slots that are not "n", or the whole footprint where its file is not to hand.
+    /// </summary>
+    public static int[] Tiles(RoomLayout? layout, RoomCandidate where, int tilesX, int tilesY)
+    {
+        var cells = new List<int>(where.Width * where.Height);
+        if (layout is { Ready: true })
+        {
+            Covered(layout, where, tilesX, tilesY, cells);
+            return [.. cells];
+        }
+
+        for (int y = Math.Max(0, where.Y); y < Math.Min(tilesY, where.Y + where.Height); y++)
+        {
+            for (int x = Math.Max(0, where.X); x < Math.Min(tilesX, where.X + where.Width); x++)
+            {
+                cells.Add((y * tilesX) + x);
+            }
+        }
+
+        return [.. cells];
+    }
+
     /// <summary>The area tiles a room covers laid at a candidate, by row-major index, into <paramref name="cells"/> - its slots that are not "n", those off the area left out.</summary>
     internal static void Covered(RoomLayout layout, RoomCandidate where, int tilesX, int tilesY, List<int> cells)
     {

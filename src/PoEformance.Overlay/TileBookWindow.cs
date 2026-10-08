@@ -342,7 +342,9 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         {
             ImGui.SetTooltip("Every room this area loaded, outlined on the large map with its name - each where its search ranks it first,"
                 + " the surest first, unless a surer room already holds one of its tiles: then the next place on its own list that is free.\n"
-                + "Searched off the frame, one room at a time, whenever the area or its rooms change.");
+                + "Searched off the frame, one room at a time, whenever the area or its rooms change.\n"
+                + "Ctrl + click a room's name on the large map to route there - the route goes once you stand in the room;"
+                + " ctrl + shift + click anywhere on the map puts a stop on the newest route.");
         }
 
         if (!_roomsOnMap)

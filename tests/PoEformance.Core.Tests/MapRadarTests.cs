@@ -94,6 +94,19 @@ public class MapRadarTests
     }
 
     [Fact]
+    public void Unproject_UndoesProjectAtTheSameHeight()
+    {
+        // What a stop clicked on the large map rests on: the point under the cursor, back in the
+        // world, at the ground's height there.
+        MapView map = View();
+        Vector2 screen = map.Project(1234, 2345, 120, 1000, 2000, 50);
+        Vector2 back = map.Unproject(screen, 120, 1000, 2000, 50);
+
+        Assert.Equal(1234f, back.X, 2);
+        Assert.Equal(2345f, back.Y, 2);
+    }
+
+    [Fact]
     public void Project_MovesWithTerrainHeight()
     {
         // On the map an entity is placed by the GROUND it stands on, so a ledge shifts it.

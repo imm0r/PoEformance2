@@ -1172,6 +1172,119 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// <summary>Every room of the area searched and arranged, for the large map to outline all at once - see <see cref="AreaRooms"/>. Null without an install.</summary>
     private AreaRooms? _areaRooms;
 
+    /// <summary>One room outline name as drawn: its plate on screen, and the room and place it names.</summary>
+    private readonly record struct RoomLabel(Vector2 Min, Vector2 Max, string Room, RoomCandidate Where, RoomLayout? Layout);
+
+    /// <summary>The room outline names drawn on the frame before, topmost last - what a ctrl + click this frame lands on. See <see cref="MapClicks"/>.</summary>
+    private readonly List<RoomLabel> _roomLabels = [];
+
+    /// <summary>The outline name under the cursor while ctrl is held, drawn lit - or null.</summary>
+    private (string Room, RoomCandidate Where)? _roomLabelLit;
+
+    /// <summary>Ctrl and shift, as the system reports them - see <see cref="ScreenInput.IsDown"/>.</summary>
+    private const int VkControl = 0x11;
+    private const int VkShift = 0x10;
+
+    /// <summary>
+    /// The large map's clicks that are the overlay's: ctrl + click on a room outline's name routes to the room, ctrl + shift + click anywhere on the map puts a stop on the newest route. True where an outline name has the cursor.
+    /// </summary>
+    /// <remarks>
+    /// BEFORE ANY ROOM NAME IS DRAWN, on the frame before's plates. The map's own room names
+    /// answer ctrl + click as well, and they are drawn first; asked after them, one click on a name
+    /// lying over theirs would route to both. A frame's lag on where a plate is costs nothing a
+    /// person could aim at.
+    ///
+    /// THE MOUSE IS TAKEN ONLY WHILE IT IS WANTED, as RoomLayer does - see its remarks for why a
+    /// click needs that at all: ctrl over an outline name, or ctrl and shift over an uncovered part
+    /// of the map. Without them every click still reaches the game, so dragging and zooming the
+    /// map are untouched.
+    ///
+    /// A STOP GOES ON THE GROUND UNDER THE CURSOR: the map flattens height into the vertical, so
+    /// the point is found at the player's height first and again at the ground's height there,
+    /// which settles it - see MapView.Unproject.
+    /// </remarks>
+    private bool MapClicks(MapView map, WorldEntity player)
+    {
+        _roomLabelLit = null;
+        if (!map.IsLargeMap || _planner is not { } planner || _snapshot.Terrain is not TerrainGrid grid)
+        {
+            _roomLabels.Clear();
+            return false;
+        }
+
+        bool ctrl = ScreenInput.IsDown(VkControl);
+        bool shift = ScreenInput.IsDown(VkShift);
+        Vector2 mouse = ImGui.GetMousePos();
+        var covered = false;
+        if (ctrl && shift)
+        {
+            if (map.Contains(mouse))
+            {
+                ImGui.SetNextFrameWantCaptureMouse(true);
+                ImDrawListPtr front = ImGui.GetForegroundDrawList();
+                front.AddCircle(mouse, 7f, 0xFF_FFFFFF, 16, 2f);
+                front.AddText(mouse + new Vector2(11f, -7f), 0xFF_FFFFFF, planner.Targets.Count > 0 ? "stop on the newest route" : "route to here");
+                if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                {
+                    Vector2 at = OnGround(map, player, grid, mouse);
+                    planner.AddVia(at.X, at.Y);
+                }
+            }
+        }
+        else if (ctrl)
+        {
+            for (int one = _roomLabels.Count - 1; one >= 0; one--)
+            {
+                RoomLabel label = _roomLabels[one];
+                if (mouse.X < label.Min.X || mouse.Y < label.Min.Y || mouse.X > label.Max.X || mouse.Y > label.Max.Y)
+                {
+                    continue;
+                }
+
+                covered = true;
+                _roomLabelLit = (label.Room, label.Where);
+                ImGui.SetNextFrameWantCaptureMouse(true);
+                if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                {
+                    RouteToRoom(planner, grid, label);
+                }
+
+                break;
+            }
+        }
+
+        _roomLabels.Clear();
+        return covered;
+    }
+
+    /// <summary>Starts the route to a room outline's room, or drops it - see <see cref="RoomRoute"/>.</summary>
+    private static void RouteToRoom(RoutePlanner planner, TerrainGrid grid, RoomLabel label)
+    {
+        ulong id = RoomRoute.IdFor(label.Room, label.Where);
+        if (planner.IsTarget(id))
+        {
+            planner.Toggle(id, 0f, 0f);
+        }
+        else if (RoomRoute.For(grid, label.Room, label.Layout, label.Where) is { } target)
+        {
+            planner.Toggle(target);
+        }
+    }
+
+    /// <summary>The world position of the ground under a point on the large map - see <see cref="MapClicks"/>.</summary>
+    private static Vector2 OnGround(MapView map, WorldEntity player, TerrainGrid grid, Vector2 screen)
+    {
+        float height = player.TerrainHeight;
+        Vector2 at = map.Unproject(screen, height, player.WorldX, player.WorldY, player.TerrainHeight);
+        for (var again = 0; again < 2; again++)
+        {
+            height = grid.HeightAt((int)(at.X / MapView.WorldToGrid), (int)(at.Y / MapView.WorldToGrid));
+            at = map.Unproject(screen, height, player.WorldX, player.WorldY, player.TerrainHeight);
+        }
+
+        return at;
+    }
+
     /// <summary>The area's rooms, by file, made again only when the tile book's "here" list is a new one.</summary>
     private string[] AreaRoomFiles()
     {
@@ -1222,8 +1335,30 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         foreach (RoomLaid room in arranged.Laid)
         {
             Outlined(draw, map, player, grid, room.Where, outline, width, corners);
-            Labelled(draw, corners, room.Room, name, plate, font);
+            Named(draw, corners, room.Room, room.Where, room.Layout, name, plate, font);
         }
+    }
+
+    /// <summary>A room outline's name, lit where ctrl has the cursor on it, kept for the next frame's ctrl + click - see <see cref="MapClicks"/>.</summary>
+    private void Named(
+        ImDrawListPtr draw, ReadOnlySpan<Vector2> corners, string room, RoomCandidate where, RoomLayout? layout, uint name, uint plate, float font)
+    {
+        bool lit = _roomLabelLit is { } on && on.Where == where && string.Equals(on.Room, room, StringComparison.Ordinal);
+        if (Labelled(draw, corners, room, name, plate, font) is not { } box)
+        {
+            return;
+        }
+
+        _roomLabels.Add(new RoomLabel(box.Min, box.Max, room, where, layout));
+        if (!lit)
+        {
+            return;
+        }
+
+        // LIT: an edge round the plate, and what the click will do written under it.
+        draw.AddRect(box.Min, box.Max, name, 3f, ImDrawFlags.None, 1.5f);
+        string said = _planner?.IsTarget(RoomRoute.IdFor(room, where)) == true ? "ctrl + click: drop the route" : "ctrl + click: route here";
+        draw.AddText(new Vector2(box.Min.X, box.Max.Y + 2f), name, said);
     }
 
     /// <summary>The room outlines' name size: the interface's font size times the "Name" row's scale.</summary>
@@ -1262,11 +1397,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     }
 
     /// <summary>A room's name at <paramref name="font"/> pixels on a plate in the middle of its outline - no name where <paramref name="colour"/> is nought, no plate where <paramref name="plate"/> is.</summary>
-    private static void Labelled(ImDrawListPtr draw, ReadOnlySpan<Vector2> corners, string room, uint colour, uint plate, float font)
+    private static (Vector2 Min, Vector2 Max)? Labelled(ImDrawListPtr draw, ReadOnlySpan<Vector2> corners, string room, uint colour, uint plate, float font)
     {
         if (colour == 0)
         {
-            return;
+            return null;
         }
 
         Vector2 middle = (corners[0] + corners[1] + corners[2] + corners[3]) * 0.25f;
@@ -1274,13 +1409,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         float scale = font / ImGui.GetFontSize();
         Vector2 size = ImGui.CalcTextSize(name) * scale;
         Vector2 at = middle - (size * 0.5f);
+        var pad = new Vector2(3f, 1f) * scale;
         if (plate != 0)
         {
-            var pad = new Vector2(3f, 1f) * scale;
             draw.AddRectFilled(at - pad, at + size + pad, plate, 3f * scale);
         }
 
         draw.AddText(ImGui.GetFont(), font, at, colour, name);
+        return (at - pad, at + size + pad);
     }
 
     /// <summary>The tile the player stands on, for the tile book's "around you" row, or null.</summary>
@@ -1368,7 +1504,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             }
         }
 
-        Labelled(draw, corners, ghost.Room, name, plate, RoomFont());
+        RoomLayout? layout = _areaRooms?.Last?.Layouts.GetValueOrDefault(ghost.Room);
+        Named(draw, corners, ghost.Room, ghost.Where, layout, name, plate, RoomFont());
     }
 
     /// <summary>
@@ -5387,8 +5524,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // the one that stays legible.
         _ground.DrawOnMap(draw, map, _snapshot, player);
 
+        // BEFORE the room names - see MapClicks.
+        bool outlineHovered = MapClicks(map, player);
+
         if (_rooms is not null)
         {
+            _rooms.Covered = outlineHovered;
             _rooms.DrawOnMap(draw, map, _snapshot, player);
 
             if (_poi is not null)

@@ -237,6 +237,32 @@ public readonly record struct MapView(
 
         return Centre + new Vector2((dx - dy) * cos, (dz - (dx + dy)) * sin);
     }
+
+    /// <summary>
+    /// The world position a point on this map stands for, at a given ground height - <see cref="Project"/> run backwards.
+    /// </summary>
+    /// <remarks>
+    /// The height has to be GIVEN, because the map flattens it into the vertical: one screen
+    /// point is a whole line of ground positions, one per height. A caller that wants the
+    /// ground under the cursor asks again with the height found at the first answer, which
+    /// settles in a step or two - the terrain does not climb fast enough across one cell to
+    /// move the answer further.
+    /// </remarks>
+    public Vector2 Unproject(
+        Vector2 screen, float terrainHeight,
+        float playerWorldX, float playerWorldY, float playerTerrainHeight)
+    {
+        float scale = ScaleBase / Zoom;
+        float cos = (float)(Diagonal * Math.Cos(CameraAngle) / scale);
+        float sin = (float)(Diagonal * Math.Sin(CameraAngle) / scale);
+        float dz = (terrainHeight - playerTerrainHeight) / HeightToGrid;
+
+        float across = (screen.X - Centre.X) / cos;          // dx - dy
+        float down = dz - ((screen.Y - Centre.Y) / sin);     // dx + dy
+        float dx = (down + across) * 0.5f;
+        float dy = (down - across) * 0.5f;
+        return new Vector2(playerWorldX + (dx * WorldToGrid), playerWorldY + (dy * WorldToGrid));
+    }
 }
 
 /// <summary>

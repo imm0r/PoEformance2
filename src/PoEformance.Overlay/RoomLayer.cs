@@ -39,6 +39,15 @@ public sealed class RoomLayer
     /// <summary>Ctrl, as the system reports it - see <see cref="ScreenInput.IsDown"/>.</summary>
     private const int VkControl = 0x11;
 
+    /// <summary>Shift, the same way: ctrl and shift together set a stop on a route, wherever the cursor is, and are not this layer's.</summary>
+    private const int VkShift = 0x10;
+
+    /// <summary>
+    /// Whether the cursor is on something drawn over these names this frame - the tile book's room outline names - which then has the hover and the click.
+    /// </summary>
+    /// <remarks>Set by the overlay before each draw; without it one ctrl + click would route to both.</remarks>
+    public bool Covered { get; set; }
+
     /// <summary>How near the cursor has to be to a room's dot to count as pointing at it.</summary>
     /// <remarks>
     /// Generous, because the alternative is worse than a stray hit: the dot is a few pixels
@@ -289,7 +298,7 @@ public sealed class RoomLayer
             draw.PopClipRect();
         }
 
-        if (under is not null)
+        if (under is not null && !Covered)
         {
             Answer(under, mouse, terrain);
         }
@@ -314,7 +323,7 @@ public sealed class RoomLayer
     private void Answer(TerrainRoom room, Vector2 mouse, TerrainGrid terrain)
     {
         bool picked = IsPicked(room);
-        bool ctrl = ScreenInput.IsDown(VkControl);
+        bool ctrl = ScreenInput.IsDown(VkControl) && !ScreenInput.IsDown(VkShift);
 
         string[] lines =
         [
