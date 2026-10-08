@@ -672,6 +672,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private const string Combat = "combat";
     private const string Atlas = "atlas";
     private const string Markers = "markers";
+    private const string Routes = "routes";
     private const string Entities = "entities";
 
     /// <summary>
@@ -3327,10 +3328,18 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         };
 
         // A PAGE OF ITS OWN for everything about routes but their looks, which stay on Markers -
-        // see PoiLayer.DrawRoutesTab. Beside the markers in the order, which is where somebody
-        // looking for "how routes work" would look next.
+        // see PoiLayer.DrawRouteSettings. Beside the markers in the order, which is where somebody
+        // looking for "how routes work" would look next. The list first, as on the atlas page's
+        // routing: it is what the page is opened for once the switches are set.
         PoiLayer poi = _poi;
-        _tools.Add(69, "routes", "Routes", poi.DrawRoutesTab);
+        _tools.Add(
+            69, "routes-active", "Active Routes", () => poi.DrawActiveRoutes(_snapshot),
+            page: Routes, pageLabel: "Routes", live: () => poi.ActiveRoutesLabel);
+        _tools.Add(69, "routes-settings", "Settings", poi.DrawRouteSettings, page: Routes, pageLabel: "Routes");
+
+        // TABS, the atlas page's reason: the list is watched while playing, the switches are set
+        // once - never both on screen at the same time.
+        _tools.AsTabs(Routes);
 
         // Attached with the places rather than beside them: pinning a room is asking for a
         // route to it, so the room layer wants the same planner and is useless without one.
@@ -5114,7 +5123,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         OverlayLayout.Group("What Is Drawn");
 
         // The points-of-interest window's switch lives on the Routes page with the rest of the
-        // routing - see PoiLayer.DrawRoutesTab.
+        // routing - see PoiLayer.DrawRouteSettings.
 
         if (_rooms is not null)
         {
