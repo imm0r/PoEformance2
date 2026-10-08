@@ -181,23 +181,87 @@ public class SnapshotFeedTests
     [Fact]
     public void SlowReads_DoNotAccumulateDelay()
     {
-        // The wait is paced by time ALREADY spent, so a read costing most of the interval
-        // still leaves the cadence near target instead of drifting to read + interval.
+        // The wait is paced by time ALREADY spent, so a read costing most of the interval still
+        // starts the next one on target instead of drifting to read + interval, and a read
+        // costing more than the interval is followed at once.
+        //
+        // ON A CLOCK THE TEST OWNS. This used to sleep 20ms per read and count the reads in 250ms
+        // of wall time, which the parallel suite on four cores failed one run in three with 4 reads:
+        // it measured how promptly a loaded machine woke two threads, not what the feed asked for.
+        // Here a read costs what it says on the stepped clock and a wait moves that clock by exactly
+        // what the feed asked for, so the gap between two reads is the pacing decision and nothing
+        // else - and waiting the full interval after every read fails it on every gap.
+        TimeSpan interval = TimeSpan.FromMilliseconds(25);
+        int[] costMilliseconds = [20, 20, 40, 20, 40, 5];
+
+        using var holding = new ManualResetEventSlim(false);
+        var clock = new SteppedClock(holding);
+        var starts = new List<TimeSpan>();
+
         using var feed = new SnapshotFeed(
             _ =>
             {
-                Thread.Sleep(20);
+                // One read past the costed ones, so the last costed read's gap is measured too.
+                starts.Add(clock.Now);
+                if (starts.Count > costMilliseconds.Length)
+                {
+                    clock.Hold = true;
+                }
+                else
+                {
+                    clock.Spend(TimeSpan.FromMilliseconds(costMilliseconds[starts.Count - 1]));
+                }
+
                 return SnapshotWith(1);
             },
-            TimeSpan.FromMilliseconds(25));
+            interval,
+            clock);
 
-        WaitFor(() => feed.ReadCount >= 1, "no read completed");
-        long start = feed.ReadCount;
-        Thread.Sleep(250);
-        long done = feed.ReadCount - start;
+        Assert.True(holding.Wait(TimeSpan.FromSeconds(5)), "the feed never got through its reads");
 
-        // At 25ms per cycle, 250ms allows ~10. Drifting to 45ms per cycle would give ~5.
-        Assert.True(done >= 7, $"only {done} reads in 250ms - the cadence drifted with cost");
+        for (int i = 0; i < costMilliseconds.Length; i++)
+        {
+            TimeSpan cost = TimeSpan.FromMilliseconds(costMilliseconds[i]);
+            TimeSpan expected = cost > interval ? cost : interval;
+            TimeSpan gap = starts[i + 1] - starts[i];
+            Assert.True(
+                gap == expected,
+                $"the read after one costing {cost.TotalMilliseconds}ms began {gap.TotalMilliseconds}ms after it, "
+                + $"not {expected.TotalMilliseconds}ms - the cadence drifted with cost");
+        }
+    }
+
+    /// <summary>
+    /// The feed's clock, stepped by the test: it moves by what a read says it cost and by exactly
+    /// the wait the feed asked for, and by nothing else.
+    /// </summary>
+    private sealed class SteppedClock(ManualResetEventSlim holding) : IFeedClock
+    {
+        private long _now;
+
+        public TimeSpan Now => TimeSpan.FromTicks(_now);
+
+        /// <summary>Parks the feed at its next wait until it is disposed.</summary>
+        public bool Hold { get; set; }
+
+        public void Spend(TimeSpan cost) => _now += cost.Ticks;
+
+        public long GetTimestamp() => _now;
+
+        public TimeSpan GetElapsedTime(long startingTimestamp) => TimeSpan.FromTicks(_now - startingTimestamp);
+
+        public void Wait(WaitHandle cancelled, TimeSpan duration)
+        {
+            _now += duration.Ticks;
+            if (Hold)
+            {
+                // Parked rather than returned: a clock that never makes the feed wait would leave
+                // it reading flat out on a machine the rest of the suite is sharing. Dispose sets
+                // the handle, which is what lets the loop end.
+                holding.Set();
+                cancelled.WaitOne();
+            }
+        }
     }
 
     [Fact]

@@ -58,12 +58,27 @@ public sealed class SnapshotFeed : IDisposable
     /// <param name="read">Reads one snapshot. Called only on the feed's thread.</param>
     /// <param name="interval">Target time between reads.</param>
     public SnapshotFeed(Func<UiScale, WorldSnapshot> read, TimeSpan interval)
+        : this(read, interval, clock: null)
+    {
+    }
+
+    /// <summary>Starts the reader thread, paced by <paramref name="clock"/> instead of the wall clock.</summary>
+    /// <remarks>
+    /// For the pacing test. Measured on the wall clock, the cadence is how promptly a loaded
+    /// machine wakes two threads, and the parallel suite on four cores failed it one run in three;
+    /// on a clock the test owns, it is the decision the loop made.
+    /// </remarks>
+    internal SnapshotFeed(Func<UiScale, WorldSnapshot> read, TimeSpan interval, IFeedClock? clock)
     {
         ArgumentNullException.ThrowIfNull(read);
         _read = read;
         _interval = interval > TimeSpan.Zero ? interval : TimeSpan.FromMilliseconds(1);
 
-        _thread = new Thread(Loop)
+        // Chosen ONCE, here, rather than called through on every cycle: the wall clock is a
+        // struct, so the production loop is compiled against it directly and the seam costs it
+        // nothing.
+        ThreadStart loop = clock is null ? () => Loop(default(WallClock)) : () => Loop(clock);
+        _thread = new Thread(loop)
         {
             Name = "world-reader",
             IsBackground = true, // a stuck read must never keep the process alive
@@ -112,12 +127,12 @@ public sealed class SnapshotFeed : IDisposable
         }
     }
 
-    private void Loop()
+    private void Loop<TClock>(TClock clock)
+        where TClock : IFeedClock
     {
-        var clock = new Stopwatch();
         while (!_cancellation.IsCancellationRequested)
         {
-            clock.Restart();
+            long started = clock.GetTimestamp();
             try
             {
                 WorldSnapshot snapshot = _read((UiScale)Volatile.Read(ref _viewport));
@@ -163,17 +178,27 @@ public sealed class SnapshotFeed : IDisposable
                 Interlocked.Increment(ref _failureCount);
             }
 
-            clock.Stop();
-            Volatile.Write(ref _lastReadTicks, clock.Elapsed.Ticks);
+            TimeSpan spent = clock.GetElapsedTime(started);
+            Volatile.Write(ref _lastReadTicks, spent.Ticks);
 
             // Pace by the time ALREADY spent, so a slow read shortens the wait instead of
             // adding to it - the cadence stays the target rather than drifting with cost.
-            TimeSpan remaining = _interval - clock.Elapsed;
+            TimeSpan remaining = _interval - spent;
             if (remaining > TimeSpan.Zero)
             {
-                _cancellation.Token.WaitHandle.WaitOne(remaining);
+                clock.Wait(_cancellation.Token.WaitHandle, remaining);
             }
         }
+    }
+
+    /// <summary>The time the loop runs on in production: the stopwatch, and a real wait.</summary>
+    private readonly struct WallClock : IFeedClock
+    {
+        public long GetTimestamp() => Stopwatch.GetTimestamp();
+
+        public TimeSpan GetElapsedTime(long startingTimestamp) => Stopwatch.GetElapsedTime(startingTimestamp);
+
+        public void Wait(WaitHandle cancelled, TimeSpan duration) => cancelled.WaitOne(duration);
     }
 
     /// <summary>One line naming the exception and the frame it came out of.</summary>
@@ -229,4 +254,21 @@ public sealed class SnapshotFeed : IDisposable
         _thread.Join(TimeSpan.FromSeconds(2));
         _cancellation.Dispose();
     }
+}
+
+/// <summary>The time a <see cref="SnapshotFeed"/> paces itself by.</summary>
+/// <remarks>
+/// A seam so the pacing can be tested on time the test owns. The loop is generic over it, so the
+/// production clock, a struct, costs no call through an interface on any cycle.
+/// </remarks>
+internal interface IFeedClock
+{
+    /// <summary>A mark to measure from, as <see cref="Stopwatch.GetTimestamp"/>.</summary>
+    long GetTimestamp();
+
+    /// <summary>The time since a mark taken by <see cref="GetTimestamp"/>.</summary>
+    TimeSpan GetElapsedTime(long startingTimestamp);
+
+    /// <summary>Waits <paramref name="duration"/>, or until <paramref name="cancelled"/> is set.</summary>
+    void Wait(WaitHandle cancelled, TimeSpan duration);
 }

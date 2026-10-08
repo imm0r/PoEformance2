@@ -10,4 +10,8 @@
   <ItemGroup>
     <ProjectReference Include="..\PoEformance.Game\PoEformance.Game.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <!-- For seams a test needs and the tool's own callers must not reach, such as SnapshotFeed's clock. -->
+    <InternalsVisibleTo Include="PoEformance.Core.Tests" />
+  </ItemGroup>
 </Project>
