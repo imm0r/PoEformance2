@@ -103,9 +103,12 @@ a bar under the list.
 The Tile Book's picture of a room can be **lit the game's way** (its *Light* fold, *game light*):
 the area's own `.env` - or any other picked from the install - gives the sun, the player's light,
 the environment's diffuse cube and the exposure; the room's doodads give their point lights from
-their `.ao` Lights blocks. Each part has its own switch, and where no file says how the game turns
-a number into a direction - the sun's phi and theta, the cube's two angles - the readings are offered
-side by side, to be held against a screenshot from the game.
+their `.ao` Lights blocks. Each part has its own switch, the environment's colour grade among them.
+Where no file says how the game turns a number into a direction - the sun's phi and theta, the
+sky's two angles - the readings are offered side by side, each named for what it does on the game's
+screen ("shadows fall down-right, sun 43° high"), and *find the readings* asks the game itself: it
+searches the game's memory for every reading's vector and takes the one it finds. A *free sun* stands
+anywhere - two sliders, or shift + drag in the model window, its shadows coarse while it moves.
 
 The overlay draws the area's layout **on the game's own map** — including the parts not
 explored yet — and marks living monsters, chests, drops and NPCs on it. The large map when

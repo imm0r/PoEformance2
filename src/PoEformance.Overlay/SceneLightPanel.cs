@@ -1,28 +1,52 @@
 using System.Globalization;
 using System.Numerics;
 using ImGuiNET;
+using PoEformance.Core.Diagnostics;
 using PoEformance.Features;
+using PoEformance.Game.Diagnostics;
 using PoEformance.Game.Files;
 
 namespace PoEformance.Overlay;
+
+/// <summary>A sun the model window can move by hand - see <see cref="SceneLightPanel"/>.</summary>
+public interface IMovableSun
+{
+    /// <summary>The way the hand-set sun's light travels, in the picture's space - null while the sun is the environment's.</summary>
+    Vector3? Free { get; }
+
+    /// <summary>Sets the sun to shine this way, freeing it from the environment if it was not.</summary>
+    /// <param name="travels">The way its light travels, unit length.</param>
+    /// <param name="moving">True while the hand is still moving it - the shadows are drawn coarse until it stops.</param>
+    void Shine(Vector3 travels, bool moving);
+}
 
 /// <summary>
 /// The tile book's switches for lighting a picture the game's way: which lights, which environment, and the candidate readings where no file says.
 /// </summary>
 /// <remarks>
 /// EVERY PART HAS ITS OWN SWITCH, as asked: the room's point lights, the sun, its shadows, the player's
-/// light, the ambient (none, the picture's flat one, the environment's cube) and the exposure - so each
-/// can be held against a screenshot from the game on its own.
+/// light, the ambient (none, the picture's flat one, the environment's cube), the exposure and the
+/// colour grade - so each can be held against a screenshot from the game on its own.
 ///
 /// THE CANDIDATE READINGS ARE CHOICES, NOT SETTINGS: how the sun's phi and theta, and the cube's two
 /// angles, become directions is worked out on the game's processor and written nowhere a file shows.
-/// Each reading is offered so the one that matches a screenshot can be found, and the line under the
-/// panel prints the numbers it gave.
+/// Each reading is named for what it does to the picture - where the shadows fall on the game's
+/// screen, how high the sun stands - so the one that matches the game can be seen; the technical
+/// meaning is in its hint and in the hunt's report. "find the readings" asks the game itself which
+/// one it holds (<see cref="LightHunt"/>) and takes the answer when there is exactly one.
+///
+/// THE FREE SUN stands anywhere: two sliders - its bearing on the game's screen and its height - and
+/// shift + drag in the model window (<see cref="IMovableSun"/>). While it moves its shadows are drawn
+/// on a coarse map, and on the full one once it stops.
 ///
 /// THE ENVIRONMENT IS THE AREA'S OWN BY DEFAULT - its WorldAreas row's Environments row - and any .env
-/// in the install can be picked instead, for a room seen outside its area.
+/// in the install can be picked instead, for a room seen outside its area. The hunt always asks about
+/// the area's own: that is the one the game has loaded.
+///
+/// THE ROWS WRAP (<see cref="OverlayLayout.Flow"/>): the pane is narrow, and set side by side they ran
+/// past its edge - the player light's height slider was there and could not be seen.
 /// </remarks>
-public sealed class SceneLightPanel
+public sealed class SceneLightPanel : IMovableSun
 {
     /// <summary>The player light's radius until a file says what it is - a candidate, see the slider's tooltip.</summary>
     private const float UsualPlayerRadius = 500f;
@@ -36,20 +60,25 @@ public sealed class SceneLightPanel
     /// <summary>Most environments the picker lists for a filter.</summary>
     private const int MostListed = 200;
 
-    private static readonly string SunReadings = string.Join('\0', [
-        "theta from up, phi round (to the sun)",
-        "theta as height, phi round (to the sun)",
-        "phi from up, theta round (to the sun)",
-        "phi as height, theta round (to the sun)",
-        "theta from up, phi round (light's way)",
-        "theta as height, phi round (light's way)",
-        "phi from up, theta round (light's way)",
-        "phi as height, theta round (light's way)",
-    ]) + "\0";
+    /// <summary>The free sun's lowest and highest, in degrees: below the first the ground is all shadow.</summary>
+    private const float LowestSun = 2f, HighestSun = 90f;
 
-    private static readonly string CubeReadings = "no turn\0z by hor, then x by vert\0x by vert, then z by hor\0z by hor, then y by vert\0y by vert, then z by hor\0";
+    /// <summary>What each sun reading means, for its hint and the hunt's report - the panel names them by what they do.</summary>
+    private static readonly string[] SunMeanings =
+    [
+        "theta from straight up, phi round from x; the vector points at the sun",
+        "theta as the height above the ground, phi round from x; the vector points at the sun",
+        "phi from straight up, theta round from x; the vector points at the sun",
+        "phi as the height above the ground, theta round from x; the vector points at the sun",
+        "theta from straight up, phi round from x; the vector is the way the light travels",
+        "theta as the height above the ground, phi round from x; the vector is the way the light travels",
+        "phi from straight up, theta round from x; the vector is the way the light travels",
+        "phi as the height above the ground, theta round from x; the vector is the way the light travels",
+    ];
 
-    private static readonly string PointShapes = "a = 0 (the player light's)\0a = 1\0a = penumbra_dist\0";
+    private static readonly string[] Ways = ["up", "up-right", "right", "down-right", "down", "down-left", "left", "up-left"];
+
+    private static readonly string PointShapes = "soft (a = 0, the player light's)\0sharp (a = 1)\0from penumbra_dist\0";
 
     private static readonly string Ambients = "no ambient\0flat ambient\0cube ambient\0";
 
@@ -57,6 +86,8 @@ public sealed class SceneLightPanel
     private readonly Func<IReadOnlyList<string>> _environments;
     private readonly Func<string> _areaEnvironment;
     private readonly Func<(float X, float Y, float Ground)?> _player;
+    private readonly Func<SceneLight.GroundOnScreen?> _screen;
+    private readonly Func<IReadOnlyList<FloatNeedle>, FloatHuntProgress, Task<FloatHuntResult>?>? _hunt;
 
     private bool _on;
     private bool _points = true;
@@ -64,6 +95,7 @@ public sealed class SceneLightPanel
     private bool _shadows = true;
     private bool _playerLight = true;
     private bool _exposure = true;
+    private bool _grade = true;
     private int _ambient = (int)SceneAmbient.Cube;
     private int _sunReading;
     private int _cubeReading;
@@ -75,10 +107,32 @@ public sealed class SceneLightPanel
     private string _filter = string.Empty;
     private int _version;
 
+    private bool _freeSun;
+    private float _freeRound;
+    private float _freeHeight = MathF.PI / 4f;
+    private bool _moving;
+
     private string _loadedPath = "\0";
     private EnvironmentSettings _environment = EnvironmentSettings.None;
     private CubeMap? _cube;
     private string _cubeSaid = string.Empty;
+    private ColourGrade? _gradeTable;
+    private string _gradeSaid = string.Empty;
+
+    private string _labelsFor = "\0";
+    private SceneLight.GroundOnScreen _labelsFrame;
+    private string[] _sunLabels = [];
+    private string _sunItems = string.Empty;
+    private float _sunWidest;
+    private string[] _cubeLabels = [];
+    private string _cubeItems = string.Empty;
+    private float _cubeWidest;
+
+    private Task<FloatHuntResult>? _hunting;
+    private LightHunt? _huntOf;
+    private FloatHuntProgress? _huntProgress;
+    private LightHuntVerdict? _verdict;
+    private string _huntWhy = string.Empty;
 
     private MonsterModel? _builtModel;
     private int _builtVersion = -1;
@@ -90,16 +144,38 @@ public sealed class SceneLightPanel
     /// <param name="environments">Every .env in the install.</param>
     /// <param name="areaEnvironment">The current area's own .env, or empty.</param>
     /// <param name="player">The player's place in the world and the ground's height under it, or null.</param>
+    /// <param name="screen">How the area's ground runs on the game's screen by the live camera, or null where it is not known - see <see cref="SceneLight.GroundOnScreen"/>.</param>
+    /// <param name="hunt">Starts a search of the game's memory for these needles, or null where there is no reader that can - see <see cref="FloatHunt"/>.</param>
     public SceneLightPanel(
         Func<string, byte[]?>? read,
         Func<IReadOnlyList<string>> environments,
         Func<string> areaEnvironment,
-        Func<(float X, float Y, float Ground)?> player)
+        Func<(float X, float Y, float Ground)?> player,
+        Func<SceneLight.GroundOnScreen?>? screen = null,
+        Func<IReadOnlyList<FloatNeedle>, FloatHuntProgress, Task<FloatHuntResult>?>? hunt = null)
     {
         _read = read;
         _environments = environments;
         _areaEnvironment = areaEnvironment;
         _player = player;
+        _screen = screen ?? (() => null);
+        _hunt = hunt;
+    }
+
+    /// <inheritdoc/>
+    public Vector3? Free => _on && _sun && _freeSun ? SceneLight.SunToward(_freeRound, _freeHeight) : null;
+
+    /// <inheritdoc/>
+    public void Shine(Vector3 travels, bool moving)
+    {
+        (float round, float height) = SceneLight.SunStands(travels);
+        _freeRound = round;
+        _freeHeight = Math.Clamp(height, LowestSun * MathF.PI / 180f, HighestSun * MathF.PI / 180f);
+        _freeSun = true;
+        _on = true;
+        _sun = true;
+        _moving = moving;
+        _version++;
     }
 
     /// <summary>
@@ -125,14 +201,18 @@ public sealed class SceneLightPanel
 
         EnvironmentSettings env = _environment;
         var reading = (SceneLight.SunReading)_sunReading;
+
+        // A FREE SUN IN AN ENVIRONMENT WITHOUT ONE shines white at one, or there would be nothing to move.
+        Vector3 sunColour = !_sun ? Vector3.Zero : env.SunLight != Vector3.Zero ? env.SunLight : _freeSun ? Vector3.One : Vector3.Zero;
         _built = new SceneLight(
             _points ? model.Lights : [],
             (SceneLight.PointShape)_pointShape,
             _playerLight ? new SceneLight.PlayerLamp(player, env.PlayerLight, _playerRadius) : null)
         {
-            SunColour = _sun ? env.SunLight : Vector3.Zero,
-            SunDirection = SceneLight.SunFrom(env.Phi ?? 0f, env.Theta ?? 0f, reading),
+            SunColour = sunColour,
+            SunDirection = _freeSun ? SceneLight.SunToward(_freeRound, _freeHeight) : SceneLight.SunFrom(env.Phi ?? 0f, env.Theta ?? 0f, reading),
             SunShadows = _shadows,
+            ShadowSide = _moving ? ShadowMap.Coarse : ShadowMap.Usual,
             Ambient = (SceneAmbient)_ambient,
             FlatAmbient = _flat,
             Cube = _cube,
@@ -141,6 +221,7 @@ public sealed class SceneLightPanel
             DirectLightEnvRatio = env.DirectLightEnvRatio ?? 0f,
             GiEnvOcclusion = Math.Clamp(env.GiEnvOcclusion ?? 0f, 0f, 1f),
             Exposure = _exposure ? MathF.Max(1f, env.Exposure ?? 1f) : 1f,
+            Grade = _grade ? _gradeTable : null,
         };
         _builtModel = model;
         _builtVersion = _version;
@@ -159,42 +240,49 @@ public sealed class SceneLightPanel
 
         OverlayLayout.Hint("Lights the picture the game's way, from the area's .env and the room's own lights, instead of the picture's lamp."
             + " Every part below has its own switch, so each can be held against a screenshot from the game.");
+        Finished();
         if (!_on)
         {
             return;
         }
 
-        // A LABEL COLUMN, so the rows read as what they are: which lights, from where the rest of
-        // the light comes, which environment, and the readings no file settles.
+        string path = Chosen();
+        Load(path);
+        SceneLight.GroundOnScreen frame = Frame();
+        Labels(path, frame);
+
+        // A LABEL COLUMN, so the rows read as what they are, and every row wraps at the pane's edge
+        // back to that column rather than running past it.
         float column = ImGui.CalcTextSize("environment").X + (ImGui.GetStyle().ItemSpacing.X * 3f);
+        float right = ImGui.GetCursorScreenPos().X + ImGui.GetContentRegionAvail().X;
 
-        Label("lights", column);
-        Switch("room##scene-points", ref _points, "The point lights the room's doodads carry in their .ao Lights blocks, the default state of each.");
-        ImGui.SameLine();
-        Switch("sun##scene-sun", ref _sun, "directional_light: its colour times its multiplier. Seepage's is nought.");
-        ImGui.SameLine();
-        Switch("shadows##scene-shadows", ref _shadows, "The sun's shadows: the room drawn once more along the sun's light, and a pixel is shaded where something nearer the sun covers it.");
-        ImGui.SameLine();
-        Switch("player##scene-player", ref _playerLight, "player_light: its colour times its intensity, a point light at the player's feet in a laid room, else over the middle of the picture.");
-        ImGui.SameLine();
-        Switch("exposure##scene-exposure", ref _exposure, "camera.exposure: the colour times max(1, exposure), the game's own tone mapping for PoE2. The colour grade (post_transform) is not applied.");
+        float start = Label("lights", column);
+        var row = new Row(right, start);
+        Switch("room##scene-points", ref _points, "The point lights the room's doodads carry in their .ao Lights blocks, the default state of each.", row, "sun");
+        Switch("sun##scene-sun", ref _sun, "directional_light: its colour times its multiplier. Seepage's is nought.", row, "shadows");
+        Switch("shadows##scene-shadows", ref _shadows,
+            "The sun's shadows: the room drawn once more along the sun's light, and a pixel is shaded where something nearer the sun covers it.", row, "player");
+        Switch("player##scene-player", ref _playerLight,
+            "player_light: its colour times its intensity, a point light at the player's feet in a laid room, else over the middle of the picture.", row, "exposure");
+        Switch("exposure##scene-exposure", ref _exposure, "camera.exposure: the colour times max(1, exposure), the game's own tone mapping for PoE2.", row, "colour grade");
+        Switch("colour grade##scene-grade", ref _grade, "post_transform: the environment's 3D colour table, applied after the exposure the way the game's post process applies it"
+            + " - looked up by the colour with a gamma of 2.2 taken off, giving back linear light.", row, null);
 
-        Label("ambient", column);
-        ImGui.SetNextItemWidth(130f);
+        start = Label("ambient", column);
+        ImGui.SetNextItemWidth(ComboWidth("cube ambient"));
         if (ImGui.Combo("##scene-ambient", ref _ambient, Ambients))
         {
             _version++;
         }
 
+        float flatWidth = ImGui.GetFontSize() * 7f;
+        OverlayLayout.Flow(ImGui.CalcTextSize("flat").X + ImGui.GetStyle().ItemSpacing.X + flatWidth, right, start);
         OverlayLayout.Hint("Where the light that comes from everywhere comes from.\n"
             + "cube: the environment's diffuse cube, by the turned normal, times env_brightness - the game's way.\n"
             + "flat: the picture's own, the same from every direction.\n"
             + "Where the .env gives gi_env_occlusion, that share of the cube is the game's GI instead, which is not drawn - the flat ambient stands in for it.");
-        ImGui.SameLine();
-        ImGui.AlignTextToFramePadding();
-        ImGui.TextDisabled("flat");
-        ImGui.SameLine();
-        ImGui.SetNextItemWidth(110f);
+        Named("flat");
+        ImGui.SetNextItemWidth(flatWidth);
         if (ImGui.SliderFloat("##scene-flat", ref _flat, 0f, 0.5f, "%.3f"))
         {
             _version++;
@@ -203,36 +291,74 @@ public sealed class SceneLightPanel
         OverlayLayout.Hint("The flat ambient's light, linear. The picture's usual is 0.04 - 0.22 on the screen's value.");
 
         Label("environment", column);
-        Picker();
+        Picker(path);
 
-        Label("readings", column);
-        Readings(column);
+        start = Label("sun", column);
+        SunRow(right, start, frame);
 
-        Said(model);
+        Label("sky", column);
+        Fitted(_cubeWidest, right);
+        if (ImGui.Combo("##scene-cube-reading", ref _cubeReading, _cubeItems))
+        {
+            _version++;
+        }
+
+        OverlayLayout.Hint("How environment_mapping's hor_angle and vert_angle turn the sky - the diffuse cube the ambient comes from - before it is read:"
+            + " env_map_rotation, worked out on the processor and in no file. Each reading turns it another way; \"find the readings\" below asks the game which.");
+
+        start = Label("lamps", column);
+        Lamps(right, start);
+
+        start = Label("in the game", column);
+        HuntRow(right, start);
+
+        Said(model, frame);
     }
 
-    /// <summary>A row's label in the label column, the row's controls after it.</summary>
-    private static void Label(string text, float column)
+    /// <summary>A row's label in the label column, the row's controls after it - and where those start, for a row that wraps.</summary>
+    private static float Label(string text, float column)
     {
         ImGui.AlignTextToFramePadding();
         ImGui.TextDisabled(text);
         ImGui.SameLine(column);
+        return ImGui.GetCursorPosX();
     }
 
-    private void Switch(string label, ref bool value, string hint)
+    /// <summary>A combo just wide enough for its widest item, or as wide as is left where that is less.</summary>
+    private static void Fitted(float widest, float right)
+    {
+        float room = right - ImGui.GetCursorScreenPos().X;
+        ImGui.SetNextItemWidth(MathF.Max(ImGui.GetFontSize() * 6f, MathF.Min(widest, room)));
+    }
+
+    private static float ComboWidth(string widest)
+        => ImGui.CalcTextSize(widest).X + ImGui.GetFrameHeight() + (ImGui.GetStyle().FramePadding.X * 2f) + ImGui.GetStyle().ItemInnerSpacing.X;
+
+    /// <summary>
+    /// A switch, then the place of the next one - a checkbox labelled <paramref name="next"/>, beside it or on the row's next line - then its hint.
+    /// </summary>
+    /// <remarks>In that order, so the hint's tooltip can never be what the next one's place is measured from.</remarks>
+    private void Switch(string label, ref bool value, string hint, Row row, string? next)
     {
         if (ImGui.Checkbox(label, ref value))
         {
             _version++;
         }
 
+        if (next is not null)
+        {
+            OverlayLayout.Flow(OverlayLayout.CheckboxWidth(next), row.Right, row.Start);
+        }
+
         OverlayLayout.Hint(hint);
     }
 
+    /// <summary>A row that wraps at its right edge back to where its controls start.</summary>
+    private readonly record struct Row(float Right, float Start);
+
     /// <summary>The environment: the area's own, or one picked from the install's by a filter - its file's name, the path on hover.</summary>
-    private void Picker()
+    private void Picker(string chosen)
     {
-        string chosen = Chosen();
         string shown = chosen.Length > 0 ? chosen[(chosen.Replace('\\', '/').LastIndexOf('/') + 1)..] : "(none known - pick one)";
         ImGui.SetNextItemWidth(Math.Clamp(ImGui.GetContentRegionAvail().X - 90f, 120f, 300f));
         if (ImGui.BeginCombo("##scene-env", ImGuiText.Escape(shown)))
@@ -286,50 +412,112 @@ public sealed class SceneLightPanel
         }
     }
 
-    /// <summary>The candidate readings, and the player light's two numbers no file gives - two rows under one label.</summary>
-    private void Readings(float column)
+    /// <summary>
+    /// The sun: the environment's by a reading named for where it throws the shadows, or a free one set by its bearing and height.
+    /// </summary>
+    private void SunRow(float right, float start, SceneLight.GroundOnScreen frame)
     {
-        Named("sun");
-        ImGui.SetNextItemWidth(240f);
-        if (ImGui.Combo("##scene-sun-reading", ref _sunReading, SunReadings))
+        if (!_freeSun)
         {
+            Fitted(_sunWidest, right);
+            if (ImGui.Combo("##scene-sun-reading", ref _sunReading, _sunItems))
+            {
+                _version++;
+            }
+
+            OverlayLayout.Hint("How directional_light's phi and theta make the sun's direction - worked out on the processor, in no file - named by where"
+                + " each reading throws the shadows on the game's screen and how high it puts the sun. Pick the one whose shadows fall as the game's do,"
+                + " or let \"find the readings\" below ask the game.\nThis one: " + SunMeanings[Math.Clamp(_sunReading, 0, SunMeanings.Length - 1)] + ".");
+            ImGui.SetCursorPosX(start);
+        }
+
+        if (ImGui.Checkbox("free sun##scene-free", ref _freeSun))
+        {
+            if (_freeSun)
+            {
+                // FROM WHERE THE ENVIRONMENT'S STANDS, so freeing it moves nothing until it is moved.
+                EnvironmentSettings env = _environment;
+                (_freeRound, float stands) = SceneLight.SunStands(SceneLight.SunFrom(env.Phi ?? 0f, env.Theta ?? 0f, (SceneLight.SunReading)_sunReading));
+                _freeHeight = stands * 180f / MathF.PI is >= LowestSun and <= HighestSun ? stands : MathF.PI / 4f;
+            }
+
+            _moving = false;
             _version++;
         }
 
-        OverlayLayout.Hint("How directional_light's phi and theta make the sun's direction - worked out on the processor, in no file."
-            + " Up is minus z, the game's own. Pick the one whose shadows fall as the game's do.");
-        ImGui.SameLine();
-        Named("cube");
-        ImGui.SetNextItemWidth(190f);
-        if (ImGui.Combo("##scene-cube-reading", ref _cubeReading, CubeReadings))
+        float sliderWidth = ImGui.GetFontSize() * 5.5f;
+        if (_freeSun)
         {
+            OverlayLayout.Flow(Slid("from", sliderWidth), right, start);
+        }
+
+        OverlayLayout.Hint("A sun of your own, anywhere: its bearing on the game's screen and its height, or shift + drag in the model window"
+            + " - across turns it round, up and down raises and lowers it. Its shadows are coarse while it moves and sharp once it stops."
+            + " Where the environment has no sun it shines white.");
+        if (!_freeSun)
+        {
+            return;
+        }
+
+        Vector2 way = frame.Way(new Vector3(MathF.Cos(_freeRound), MathF.Sin(_freeRound), 0f));
+        float bearing = SceneLight.GroundOnScreen.Bearing(way);
+        float height = _freeHeight * 180f / MathF.PI;
+        Named("from");
+        ImGui.SetNextItemWidth(sliderWidth);
+        if (ImGui.SliderFloat("##scene-free-from", ref bearing, 0f, 360f, "%.0f°"))
+        {
+            Vector2 ground = frame.Ground(SceneLight.GroundOnScreen.OfBearing(bearing));
+            _freeRound = MathF.Atan2(ground.Y, ground.X);
             _version++;
         }
 
-        OverlayLayout.Hint("How environment_mapping's hor_angle and vert_angle make env_map_rotation, the turn the normal takes before the cube is read.");
+        OverlayLayout.Flow(Slid("height", sliderWidth), right, start);
+        OverlayLayout.Hint("Where the sun stands as the game's screen shows it: nought at the top, ninety on the right, clockwise. The shadows fall the other way.");
+        Named("height");
+        ImGui.SetNextItemWidth(sliderWidth);
+        if (ImGui.SliderFloat("##scene-free-height", ref height, LowestSun, HighestSun, "%.0f°"))
+        {
+            _freeHeight = height * MathF.PI / 180f;
+            _version++;
+        }
 
-        ImGui.SetCursorPosX(ImGui.GetCursorPosX() + column);
+        OverlayLayout.Flow(ImGui.CalcTextSize("area's sun").X + (ImGui.GetStyle().FramePadding.X * 2f), right, start);
+        OverlayLayout.Hint("How high the sun stands above the ground: ninety is straight overhead.");
+        if (ImGui.SmallButton("area's sun##scene-free-off"))
+        {
+            _freeSun = false;
+            _moving = false;
+            _version++;
+        }
+
+        OverlayLayout.Hint("Back to the environment's sun, by the reading picked.");
+    }
+
+    /// <summary>The room lights' core and the player light's two numbers no file gives.</summary>
+    private void Lamps(float right, float start)
+    {
         Named("core");
-        ImGui.SetNextItemWidth(190f);
+        ImGui.SetNextItemWidth(ComboWidth("soft (a = 0, the player light's)"));
         if (ImGui.Combo("##scene-core", ref _pointShape, PointShapes))
         {
             _version++;
         }
 
-        OverlayLayout.Hint("Which number is a room light's light_position_data.a - the shader turns it into how sharp the light's core is,"
-            + " lerp(1/sqrt(0.02), 100, a). No line in a Lights block is named for it. It changes the light near the lamp, hardly at all past its radius.");
-        ImGui.SameLine();
+        float sliderWidth = ImGui.GetFontSize() * 4.5f;
+        OverlayLayout.Flow(Slid("player radius", sliderWidth), right, start);
+        OverlayLayout.Hint("How sharp a room light's core is - the shader's light_position_data.a, lerp(1/sqrt(0.02), 100, a), which no line in a Lights"
+            + " block is named for. It changes the light near the lamp, hardly at all past its radius.");
         Named("player radius");
-        ImGui.SetNextItemWidth(90f);
+        ImGui.SetNextItemWidth(sliderWidth);
         if (ImGui.SliderFloat("##scene-player-radius", ref _playerRadius, 50f, 2000f, "%.0f"))
         {
             _version++;
         }
 
+        OverlayLayout.Flow(Slid("height", sliderWidth), right, start);
         OverlayLayout.Hint("The player light's radius. No file read so far gives it - a candidate to match against a screenshot.");
-        ImGui.SameLine();
         Named("height");
-        ImGui.SetNextItemWidth(80f);
+        ImGui.SetNextItemWidth(sliderWidth);
         if (ImGui.SliderFloat("##scene-player-height", ref _playerHeight, 0f, 500f, "%.0f"))
         {
             _version++;
@@ -337,6 +525,120 @@ public sealed class SceneLightPanel
 
         OverlayLayout.Hint("How far above the ground the player light stands. Not in any file read so far either.");
     }
+
+    /// <summary>The hunt: a button that asks the game which readings it holds, what it is doing, and what it found.</summary>
+    private void HuntRow(float right, float start)
+    {
+        bool running = _hunting is { IsCompleted: false };
+        ImGui.BeginDisabled(_hunt is null || running);
+        if (ImGui.SmallButton("find the readings##scene-hunt"))
+        {
+            StartHunt();
+        }
+
+        ImGui.EndDisabled();
+        string said = running
+            ? string.Create(CultureInfo.InvariantCulture, $"looking... {(_huntProgress?.Bytes ?? 0) / (1024.0 * 1024 * 1024):0.00} GB")
+            : _huntWhy.Length > 0 ? _huntWhy
+            : _verdict?.Summary ?? string.Empty;
+        if (said.Length > 0)
+        {
+            OverlayLayout.Flow(ImGui.CalcTextSize(said).X, right, start);
+        }
+
+        OverlayLayout.Hint(_hunt is null
+            ? "Not attached to the game's memory in a way that can search it."
+            : "Works out every sun reading's vector and every sky reading's turn from the area's own .env, and searches the game's memory for them -"
+                + " the game keeps the one it uses. Where exactly one is found it is taken. A few seconds; stand in an area with a sun.");
+        if (said.Length == 0)
+        {
+            return;
+        }
+
+        ImGuiText.Wrapped(OverlayInk.Quiet, ImGuiText.Escape(said));
+        if (!running && _verdict is { } verdict)
+        {
+            OverlayLayout.Flow(ImGui.CalcTextSize("copy report").X + (ImGui.GetStyle().FramePadding.X * 2f), right, start);
+            if (ImGui.SmallButton("copy report##scene-hunt-copy"))
+            {
+                ImGui.SetClipboardText(verdict.Report);
+            }
+
+            OverlayLayout.Hint("The whole report - every reading, where each was found, the raw angles beside them - for pasting.");
+        }
+    }
+
+    private void StartHunt()
+    {
+        _verdict = null;
+        _huntWhy = string.Empty;
+        string path = _areaEnvironment();
+        if (path.Length == 0 || _read is null || _hunt is null)
+        {
+            _huntWhy = path.Length == 0 ? "the area's environment is not known" : "nothing to read or search with";
+            return;
+        }
+
+        EnvironmentSettings env = string.Equals(path, _loadedPath, StringComparison.OrdinalIgnoreCase)
+            ? _environment
+            : EnvironmentSettings.Read(path, _read(path.Replace('\\', '/').Trim()));
+        LightHunt? asked = LightHunt.For(path, env, SunReported, out string why);
+        if (asked is null)
+        {
+            _huntWhy = why;
+            return;
+        }
+
+        var progress = new FloatHuntProgress();
+        Task<FloatHuntResult>? task = _hunt(asked.Needles, progress);
+        if (task is null)
+        {
+            _huntWhy = "the search could not start";
+            return;
+        }
+
+        _huntOf = asked;
+        _huntProgress = progress;
+        _hunting = task;
+    }
+
+    /// <summary>Takes a finished hunt's answer - the readings it found, where there was exactly one each.</summary>
+    private void Finished()
+    {
+        if (_hunting is not { IsCompleted: true } done || _huntOf is not { } asked)
+        {
+            return;
+        }
+
+        _hunting = null;
+        _huntOf = null;
+        if (!done.IsCompletedSuccessfully)
+        {
+            _huntWhy = "the search failed: " + (done.Exception?.GetBaseException().Message ?? "cancelled");
+            return;
+        }
+
+        _verdict = asked.Read(done.Result);
+        if (_verdict.Sun is { } sun)
+        {
+            _sunReading = sun;
+            _freeSun = false;
+            _version++;
+        }
+
+        if (_verdict.Cube is { } cube)
+        {
+            _cubeReading = cube;
+            _version++;
+        }
+    }
+
+    /// <summary>A sun reading as the hunt's report names it: what the panel calls it and what it means.</summary>
+    private string SunReported(int reading)
+        => string.Create(CultureInfo.InvariantCulture, $"reading {reading + 1} ({SunMeanings[Math.Clamp(reading, 0, SunMeanings.Length - 1)]})");
+
+    /// <summary>How wide a slider is with its name before it.</summary>
+    private static float Slid(string name, float width) => ImGui.CalcTextSize(name).X + ImGui.GetStyle().ItemSpacing.X + width;
 
     /// <summary>A control's name before it, quiet.</summary>
     private static void Named(string text)
@@ -346,14 +648,105 @@ public sealed class SceneLightPanel
         ImGui.SameLine();
     }
 
+    /// <summary>How the ground runs on the game's screen: the live camera's where there is one, else the map's.</summary>
+    private SceneLight.GroundOnScreen Frame() => _screen() is { Ready: true } live ? live : SceneLight.GroundOnScreen.Map;
+
     /// <summary>
-    /// What the light came to - the environment's numbers, what was assumed, the lights, the cube - folded under a one-line summary.
+    /// The readings' names for this environment and screen: each sun reading by where its shadows fall and how high its sun stands, each sky reading by its turn in degrees.
+    /// </summary>
+    /// <remarks>
+    /// MADE ONCE PER ENVIRONMENT AND CAMERA, not per frame: they are strings, and the camera does not
+    /// move in this game.
+    /// </remarks>
+    private void Labels(string path, SceneLight.GroundOnScreen frame)
+    {
+        if (string.Equals(path, _labelsFor, StringComparison.OrdinalIgnoreCase) && Near(frame, _labelsFrame))
+        {
+            return;
+        }
+
+        _labelsFor = path;
+        _labelsFrame = frame;
+        EnvironmentSettings env = _environment;
+        int count = Enum.GetValues<SceneLight.SunReading>().Length;
+        _sunLabels = new string[count];
+        for (var reading = 0; reading < count; reading++)
+        {
+            _sunLabels[reading] = env.Phi is { } phi && env.Theta is { } theta
+                ? string.Create(CultureInfo.InvariantCulture, $"reading {reading + 1}: {Throws(SceneLight.SunFrom(phi, theta, (SceneLight.SunReading)reading), frame)}")
+                : string.Create(CultureInfo.InvariantCulture, $"reading {reading + 1}: the environment gives no sun angles");
+        }
+
+        _sunItems = string.Join('\0', _sunLabels) + "\0";
+        _sunWidest = _sunLabels.Max(one => ComboWidth(one));
+
+        float horizontal = env.HorAngle ?? 0f, vertical = env.VertAngle ?? 0f;
+        float h = horizontal * 180f / MathF.PI, v = vertical * 180f / MathF.PI;
+        bool turned = horizontal != 0f || vertical != 0f;
+        var turns = new List<Matrix4x4>();
+        int cubes = Enum.GetValues<SceneLight.CubeReading>().Length;
+        _cubeLabels = new string[cubes];
+        for (var reading = 0; reading < cubes; reading++)
+        {
+            Matrix4x4 turn = SceneLight.CubeTurnFrom(horizontal, vertical, (SceneLight.CubeReading)reading);
+            int same = turns.FindIndex(one => Near(one, turn));
+            turns.Add(turn);
+            string how = (SceneLight.CubeReading)reading switch
+            {
+                SceneLight.CubeReading.ZThenX => string.Create(CultureInfo.InvariantCulture, $"turned {h:0}°, then tipped {v:0}° about x"),
+                SceneLight.CubeReading.XThenZ => string.Create(CultureInfo.InvariantCulture, $"tipped {v:0}° about x, then turned {h:0}°"),
+                SceneLight.CubeReading.ZThenY => string.Create(CultureInfo.InvariantCulture, $"turned {h:0}°, then tipped {v:0}° about y"),
+                SceneLight.CubeReading.YThenZ => string.Create(CultureInfo.InvariantCulture, $"tipped {v:0}° about y, then turned {h:0}°"),
+                _ => "not turned",
+            };
+            _cubeLabels[reading] = reading == 0 ? "not turned"
+                : !turned ? string.Create(CultureInfo.InvariantCulture, $"reading {reading + 1}: the environment does not turn its sky")
+                : same >= 0 ? string.Create(CultureInfo.InvariantCulture, $"reading {reading + 1}: {how} (= reading {same + 1} here)")
+                : string.Create(CultureInfo.InvariantCulture, $"reading {reading + 1}: {how}");
+        }
+
+        _cubeItems = string.Join('\0', _cubeLabels) + "\0";
+        _cubeWidest = _cubeLabels.Max(one => ComboWidth(one));
+    }
+
+    /// <summary>What a sun shining this way does on the game's screen: where the shadows fall, and how high it stands.</summary>
+    private static string Throws(Vector3 travels, SceneLight.GroundOnScreen frame)
+    {
+        float height = MathF.Asin(Math.Clamp(travels.Z, -1f, 1f)) * 180f / MathF.PI;
+        if (height <= 0f)
+        {
+            return string.Create(CultureInfo.InvariantCulture, $"sun {-height:0}° below the ground - no sunlight");
+        }
+
+        Vector2 way = frame.Way(travels);
+        return way == Vector2.Zero
+            ? string.Create(CultureInfo.InvariantCulture, $"sun straight overhead")
+            : string.Create(CultureInfo.InvariantCulture, $"shadows fall {Way(way)}, sun {height:0}° high");
+    }
+
+    /// <summary>A screen way in words, by the nearest of eight.</summary>
+    private static string Way(Vector2 way)
+    {
+        float bearing = SceneLight.GroundOnScreen.Bearing(way);
+        return Ways[(int)MathF.Round(bearing / 45f) % Ways.Length];
+    }
+
+    private static bool Near(SceneLight.GroundOnScreen a, SceneLight.GroundOnScreen b)
+        => Vector2.DistanceSquared(a.X, b.X) < 1e-6f && Vector2.DistanceSquared(a.Y, b.Y) < 1e-6f;
+
+    private static bool Near(Matrix4x4 a, Matrix4x4 b)
+        => MathF.Abs(a.M11 - b.M11) + MathF.Abs(a.M12 - b.M12) + MathF.Abs(a.M13 - b.M13)
+            + MathF.Abs(a.M21 - b.M21) + MathF.Abs(a.M22 - b.M22) + MathF.Abs(a.M23 - b.M23)
+            + MathF.Abs(a.M31 - b.M31) + MathF.Abs(a.M32 - b.M32) + MathF.Abs(a.M33 - b.M33) < 1e-5f;
+
+    /// <summary>
+    /// What the light came to - the environment's numbers, what was assumed, the lights, the cube, the grade, the hunt's report - folded under a one-line summary.
     /// </summary>
     /// <remarks>
     /// FOLDED, because these are what to read when the picture and the game disagree, not while
     /// switching: open, they were a paragraph longer than the switches above them.
     /// </remarks>
-    private void Said(MonsterModel? model)
+    private void Said(MonsterModel? model, SceneLight.GroundOnScreen frame)
     {
         EnvironmentSettings env = _environment;
         var lines = new List<string> { env.Said() };
@@ -363,17 +756,18 @@ public sealed class SceneLightPanel
             lines.Add("assumed: " + string.Join("; ", assumed));
         }
 
-        string sunSaid = !env.Ready ? "no environment" : env.SunLight == Vector3.Zero ? "no sun" : "sun";
-        if (_sun && env.Ready && env.SunLight != Vector3.Zero)
+        string sunSaid = !env.Ready ? "no environment" : env.SunLight == Vector3.Zero && !_freeSun ? "no sun" : "sun";
+        if (_sun && (_freeSun || (env.Ready && env.SunLight != Vector3.Zero)))
         {
-            Vector3 travels = SceneLight.SunFrom(env.Phi ?? 0f, env.Theta ?? 0f, (SceneLight.SunReading)_sunReading);
+            Vector3 travels = _freeSun ? SceneLight.SunToward(_freeRound, _freeHeight) : SceneLight.SunFrom(env.Phi ?? 0f, env.Theta ?? 0f, (SceneLight.SunReading)_sunReading);
             float height = MathF.Asin(Math.Clamp(travels.Z, -1f, 1f)) * 180f / MathF.PI;
-            sunSaid = string.Create(CultureInfo.InvariantCulture, $"sun {height:0}° high{(height < 0f ? " - BELOW the ground" : string.Empty)}");
+            sunSaid = string.Create(CultureInfo.InvariantCulture, $"{(_freeSun ? "free sun" : "sun")} {height:0}° high{(height < 0f ? " - BELOW the ground" : string.Empty)}");
             lines.Add(string.Create(CultureInfo.InvariantCulture,
-                $"sun: light travels {travels.X:0.##} {travels.Y:0.##} {travels.Z:0.##} - the sun {height:0}° above the ground{(height < 0f ? ", BELOW it in this reading" : string.Empty)}"));
+                $"{(_freeSun ? "free sun" : "sun")}: light travels {travels.X:0.##} {travels.Y:0.##} {travels.Z:0.##} - {Throws(travels, frame)}"
+                + $" on the screen{(_screen() is { Ready: true } ? string.Empty : " (by the map's transform - no live camera)")}"));
             if (model?.AreaOrigin is null)
             {
-                lines.Add("sun: this room is drawn as its file has it - turned however the area turned it, so the sun's x and y may not be the area's");
+                lines.Add("sun: this room is drawn as its file has it - turned however the area turned it, so the picture's shadows may not fall as the screen's do");
             }
         }
 
@@ -395,9 +789,10 @@ public sealed class SceneLightPanel
                 : _player() is null ? "player light: over the middle - the player is not known" : "player light: at the player");
         }
 
-        if (env.PostTransform.Length > 0 && _exposure)
+        lines.Add(!_grade ? "colour grade: off" : _gradeSaid);
+        if (_verdict is { } verdict)
         {
-            lines.Add("colour grade not applied: " + env.PostTransform);
+            lines.AddRange(verdict.Report.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
         }
 
         string summary = string.Create(
@@ -419,7 +814,7 @@ public sealed class SceneLightPanel
     /// <summary>The .env in use: the picked one, else the area's.</summary>
     private string Chosen() => _picked.Length > 0 ? _picked : _areaEnvironment();
 
-    /// <summary>Reads an environment and its diffuse cube once, when it changes.</summary>
+    /// <summary>Reads an environment, its diffuse cube and its colour grade once, when it changes.</summary>
     private void Load(string path)
     {
         if (string.Equals(path, _loadedPath, StringComparison.OrdinalIgnoreCase))
@@ -430,6 +825,9 @@ public sealed class SceneLightPanel
         _loadedPath = path;
         _cube = null;
         _cubeSaid = string.Empty;
+        _gradeTable = null;
+        _gradeSaid = string.Empty;
+        _version++;
         if (path.Length == 0 || _read is null)
         {
             _environment = EnvironmentSettings.None with { Why = path.Length == 0 ? "no environment: the area's is not known - pick one" : "no install to read" };
@@ -437,6 +835,18 @@ public sealed class SceneLightPanel
         }
 
         _environment = EnvironmentSettings.Read(path, _read(path.Replace('\\', '/').Trim()));
+        if (_environment.PostTransform.Length == 0)
+        {
+            _gradeSaid = "colour grade: the environment names none";
+        }
+        else
+        {
+            _gradeTable = ColourGrade.Read(GameArt.ReadRaw(_read, _environment.PostTransform), out string gradeWhy);
+            _gradeSaid = _gradeTable is null
+                ? $"colour grade not applied: {_environment.PostTransform} not read - {gradeWhy}"
+                : $"colour grade {_environment.PostTransform}: {_gradeTable.Format}";
+        }
+
         if (_environment.DiffuseCube.Length == 0)
         {
             _cubeSaid = "cube: the environment names no diffuse cube - the flat ambient is used";

@@ -3123,6 +3123,13 @@ internal static class Program
         // mistaken for a released one. See ToolVersion.
         overlay.Version = PoEformance.Features.ToolVersion.With(PoEformance.Features.BuildStamp.Load());
 
+        // THE LIGHT PANEL'S SEARCH of the game's memory, off the frame - see FloatHunt and LightHunt.
+        // Set before the books are attached, which take it as they are made.
+        if (reader is IMemoryRegions space)
+        {
+            overlay.HuntFloats = (needles, anchor, progress) => Task.Run(() => PoEformance.Core.Diagnostics.FloatHunt.Run(reader, space, needles, anchor, progress));
+        }
+
         // The capture key's memory: a recording started on demand, and inside it ONE pass that reads
         // everything this tool can read from nothing - see CaptureMemory. The recording stays open
         // until the pass is done, and keeps reads as large as the terrain's. The statics go in

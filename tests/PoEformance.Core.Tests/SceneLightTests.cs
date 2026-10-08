@@ -336,10 +336,12 @@ public class SceneLightTests
     }
 
     /// <summary>
-    /// The sun's shadow darkens the floor under a slab and nothing else: a floor alone is not shaded by its own shadow map.
+    /// The sun's shadow darkens the floor under a slab and nothing else: a floor alone is not shaded by its own shadow map - on the full map and on the coarse one a moving sun is drawn with.
     /// </summary>
-    [Fact]
-    public void THESUNSShadowFallsUnderASlabAndNotOnTheFloorItself()
+    [Theory]
+    [InlineData(ShadowMap.Usual)]
+    [InlineData(ShadowMap.Coarse)]
+    public void THESUNSShadowFallsUnderASlabAndNotOnTheFloorItself(int side)
     {
         const int size = 96;
         SkinnedMesh alone = Floor(200f, 0f);
@@ -357,6 +359,7 @@ public class SceneLightTests
                     SunColour = Vector3.One,
                     SunDirection = slant,
                     SunShadows = shadows,
+                    ShadowSide = side,
                 },
             };
             return [.. MeshPicture.Of(mesh, canvas, 0f, Down).Rgba];

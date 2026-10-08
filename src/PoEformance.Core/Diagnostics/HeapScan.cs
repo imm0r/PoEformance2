@@ -220,7 +220,7 @@ public static class HeapScan
     /// Measured to the NEAR EDGE rather than to the start, so a large region beginning below
     /// the anchor and ending above it is not pushed to the back of the queue by its own size.
     /// </remarks>
-    private static ulong Distance(MemoryRegion region, ulong anchor)
+    internal static ulong Distance(MemoryRegion region, ulong anchor)
     {
         if (anchor == 0)
         {

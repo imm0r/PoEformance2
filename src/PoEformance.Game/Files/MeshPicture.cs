@@ -341,7 +341,7 @@ public static class MeshPicture
         internal ShadowMap? Shadow { get; set; }
 
         /// <inheritdoc cref="Shadow"/>
-        internal (SkinnedMesh Mesh, Vector3 Direction)? ShadowFor { get; set; }
+        internal (SkinnedMesh Mesh, Vector3 Direction, int Side)? ShadowFor { get; set; }
 
         internal byte[] Pixels { get; }
 
@@ -760,7 +760,7 @@ public static class MeshPicture
         var eye = new Vector4(view.M13, view.M23, view.M33, view.M43);
         SceneLight? scene = canvas.Light;
         ShadowMap? shadow = scene is { SunShadows: true } && scene.SunColour != Vector3.Zero
-            ? Shadowed(canvas, mesh, places, positions == mesh.Positions, triangles, scene.SunDirection, palette)
+            ? Shadowed(canvas, mesh, places, positions == mesh.Positions, triangles, scene.SunDirection, scene.ShadowSide, palette)
             : null;
         var drawn = new Drawn(mesh, triangles, lamp, ink, palette, translucent, programs, stride, places, turns, ticking, clocked, eye)
         {
@@ -977,9 +977,10 @@ public static class MeshPicture
     /// every frame with new numbers in it, so a map keyed on it could not tell one pose from the next.
     /// </remarks>
     private static ShadowMap? Shadowed(
-        Canvas canvas, SkinnedMesh mesh, Vector3[] places, bool still, int triangles, Vector3 direction, Mipmaps?[] palette)
+        Canvas canvas, SkinnedMesh mesh, Vector3[] places, bool still, int triangles, Vector3 direction, int side, Mipmaps?[] palette)
     {
-        if (still && canvas.ShadowFor is { } was && ReferenceEquals(was.Mesh, mesh) && was.Direction == direction && canvas.Shadow is not null)
+        if (still && canvas.ShadowFor is { } was && ReferenceEquals(was.Mesh, mesh) && was.Direction == direction && was.Side == side
+            && canvas.Shadow is not null)
         {
             return canvas.Shadow;
         }
@@ -992,9 +993,10 @@ public static class MeshPicture
             places, mesh.Indices, triangles, direction,
             one => !Translucent(blends[one]),
             one => blends[one] == MaterialBlend.Cutout && coordinated && palette[wears[one]] is { } skin ? (skin, coordinates) : null,
-            canvas.Threads);
+            canvas.Threads,
+            side);
         canvas.Shadow = map;
-        canvas.ShadowFor = still ? (mesh, direction) : null;
+        canvas.ShadowFor = still ? (mesh, direction, side) : null;
         return map;
     }
 

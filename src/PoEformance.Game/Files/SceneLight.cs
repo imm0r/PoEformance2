@@ -231,6 +231,67 @@ public sealed class SceneLight
         YThenZ,
     }
 
+    /// <summary>
+    /// How the area's ground runs on the game's screen: where one unit along x and one along y land, as right and up.
+    /// </summary>
+    /// <remarks>
+    /// FOR SAYING A DIRECTION THE WAY A PLAYER SEES IT - "the shadows fall to the lower right" can be
+    /// held against the game at a glance, where a vector cannot. The live camera's matrix gives it
+    /// exactly (EntityOverlay projects the player and a step from it); without a game the map's own
+    /// transform stands in (<see cref="Map"/>), which turns the ground the same way and tilts it by
+    /// the map's angle rather than the camera's.
+    /// </remarks>
+    /// <param name="X">Where a step along the area's x lands on the screen: right, up.</param>
+    /// <param name="Y">Where a step along y lands.</param>
+    public readonly record struct GroundOnScreen(Vector2 X, Vector2 Y)
+    {
+        /// <summary>
+        /// The in-game map's transform - MapView.Project: a step (dx, dy) lands at ((dx - dy) cos, -(dx + dy) sin) with y down, so x runs up-right and y up-left.
+        /// </summary>
+        public static GroundOnScreen Map { get; } = new(
+            new Vector2(MathF.Cos((float)Ui.MapView.CameraAngle), MathF.Sin((float)Ui.MapView.CameraAngle)),
+            new Vector2(-MathF.Cos((float)Ui.MapView.CameraAngle), MathF.Sin((float)Ui.MapView.CameraAngle)));
+
+        /// <summary>Whether the two steps span the screen - a projection that flattened the ground does not.</summary>
+        public bool Ready => MathF.Abs(Cross) > 1e-6f;
+
+        private float Cross => (X.X * Y.Y) - (X.Y * Y.X);
+
+        /// <summary>The way a direction runs on the screen, right and up, unit length - nought for one straight up or down.</summary>
+        public Vector2 Way(Vector3 direction)
+        {
+            Vector2 way = (direction.X * X) + (direction.Y * Y);
+            return way.LengthSquared() > 1e-12f ? Vector2.Normalize(way) : Vector2.Zero;
+        }
+
+        /// <summary>The ground direction that runs the given way on the screen, unit length - the inverse of <see cref="Way"/> on the ground.</summary>
+        public Vector2 Ground(Vector2 screen)
+        {
+            float cross = Cross;
+            if (MathF.Abs(cross) <= 1e-6f)
+            {
+                return Vector2.UnitX;
+            }
+
+            var ground = new Vector2(((screen.X * Y.Y) - (screen.Y * Y.X)) / cross, ((X.X * screen.Y) - (X.Y * screen.X)) / cross);
+            return ground.LengthSquared() > 1e-12f ? Vector2.Normalize(ground) : Vector2.UnitX;
+        }
+
+        /// <summary>A screen way as a bearing: nought up, ninety right, clockwise - in degrees, nought to 360.</summary>
+        public static float Bearing(Vector2 way)
+        {
+            float degrees = MathF.Atan2(way.X, way.Y) * 180f / MathF.PI;
+            return degrees < 0f ? degrees + 360f : degrees;
+        }
+
+        /// <summary>The screen way of a bearing - the inverse of <see cref="Bearing"/>.</summary>
+        public static Vector2 OfBearing(float degrees)
+        {
+            float radians = degrees * MathF.PI / 180f;
+            return new Vector2(MathF.Sin(radians), MathF.Cos(radians));
+        }
+    }
+
     /// <summary>The player's light: where, what colour (its colour times its intensity), how far.</summary>
     public readonly record struct PlayerLamp(Vector3 Position, Vector3 Colour, float Radius);
 
@@ -273,6 +334,14 @@ public sealed class SceneLight
     /// <summary>The colour is multiplied by this before it is shown - max(1, camera.exposure); one for none.</summary>
     public float Exposure { get; init; } = 1f;
 
+    /// <summary>The environment's colour grade, applied after the exposure - see <see cref="ColourGrade"/>; null for none.</summary>
+    public ColourGrade? Grade { get; init; }
+
+    /// <summary>
+    /// How many texels the sun's shadow map is across - <see cref="ShadowMap.Usual"/>, or <see cref="ShadowMap.Coarse"/> while the sun is being moved.
+    /// </summary>
+    public int ShadowSide { get; init; } = ShadowMap.Usual;
+
     /// <summary>The way a sun with these angles shines, as the reading takes them - unit length, the way the light travels.</summary>
     public static Vector3 SunFrom(float phi, float theta, SunReading reading)
     {
@@ -294,6 +363,22 @@ public sealed class SceneLight
         // POINTING AT THE SUN, the light travels the other way.
         Vector3 travels = falling ? pointing : -pointing;
         return travels.LengthSquared() > 0f ? Vector3.Normalize(travels) : new Vector3(0f, 0f, 1f);
+    }
+
+    /// <summary>The way the light travels from a sun standing round the area's x axis by <paramref name="round"/> and above the ground by <paramref name="height"/>, both in radians.</summary>
+    /// <remarks>Up is minus z, the game's own - so a sun above the ground shines with plus z.</remarks>
+    public static Vector3 SunToward(float round, float height)
+    {
+        float across = MathF.Cos(height);
+        return Vector3.Normalize(new Vector3(-across * MathF.Cos(round), -across * MathF.Sin(round), MathF.Sin(height)));
+    }
+
+    /// <summary>Where a sun stands for the way its light travels: round the area's x axis and above the ground, in radians - the inverse of <see cref="SunToward"/>.</summary>
+    public static (float Round, float Height) SunStands(Vector3 travels)
+    {
+        float height = MathF.Asin(Math.Clamp(travels.Z, -1f, 1f));
+        float round = travels.X == 0f && travels.Y == 0f ? 0f : MathF.Atan2(-travels.Y, -travels.X);
+        return (round, height);
     }
 
     /// <summary>env_map_rotation as the reading takes hor_angle and vert_angle.</summary>
@@ -392,7 +477,8 @@ public sealed class SceneLight
             shine += new Vector3(level * bias) + (level * scale * specular);
         }
 
-        return (colour + shine) * Exposure;
+        Vector3 exposed = (colour + shine) * Exposure;
+        return Grade is null ? exposed : Grade.Apply(exposed);
     }
 
     /// <summary>One light's diffuse and specular share at one pixel - ComputeDiffuse and the GGX lobe of ComputeLight.</summary>
