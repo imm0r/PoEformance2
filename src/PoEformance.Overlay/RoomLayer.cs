@@ -406,7 +406,7 @@ public sealed class RoomLayer
         // The route follows the pin, because pinning a room is saying "I want to go there".
         // Only on the click, though: coming back to an area restores the marker and leaves the
         // routes off, which is the planner's own rule for crossing an area boundary.
-        _planner.Toggle(room.Id, room.GridX * MapView.WorldToGrid, room.GridY * MapView.WorldToGrid);
+        _planner.Toggle(room.Id, room.GridX * MapView.WorldToGrid, room.GridY * MapView.WorldToGrid, room.Name);
 
         _resolved = null;
         Changed?.Invoke();

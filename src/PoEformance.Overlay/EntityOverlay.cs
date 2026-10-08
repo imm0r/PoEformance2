@@ -3326,6 +3326,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             MonsterName = Called,
         };
 
+        // A PAGE OF ITS OWN for everything about routes but their looks, which stay on Markers -
+        // see PoiLayer.DrawRoutesTab. Beside the markers in the order, which is where somebody
+        // looking for "how routes work" would look next.
+        PoiLayer poi = _poi;
+        _tools.Add(69, "routes", "Routes", poi.DrawRoutesTab);
+
         // Attached with the places rather than beside them: pinning a room is asking for a
         // route to it, so the room layer wants the same planner and is useless without one.
         _rooms = new RoomLayer(planner)
@@ -5107,19 +5113,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     {
         OverlayLayout.Group("What Is Drawn");
 
-        // Not a page like the rest: routing is done WHILE playing, so the picker keeps its own
-        // small window - see the note where it is drawn.
-        if (_poi is not null)
-        {
-            bool picking = _poi.ShowPicker;
-            if (OverlayLayout.Toggle("Points of Interest", ref picking))
-            {
-                _poi.ShowPicker = picking;
-                SettingsChanged?.Invoke();
-            }
-
-            OverlayLayout.Hint("The picker for routing, in its own small window beside the map.");
-        }
+        // The points-of-interest window's switch lives on the Routes page with the rest of the
+        // routing - see PoiLayer.DrawRoutesTab.
 
         if (_rooms is not null)
         {

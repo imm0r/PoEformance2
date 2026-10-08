@@ -397,6 +397,124 @@ public sealed class PoiLayer
         DrawStops(draw, map, snapshot, player);
     }
 
+    /// <summary>
+    /// The Routes tab: every switch the routing has, the routes as they stand, and what the mouse does on the large map.
+    /// </summary>
+    /// <remarks>
+    /// ONE PLACE FOR ALL OF IT, asked for once the routes had grown three ways to start them -
+    /// the places window, the map's room names, the tile book's room outlines - and stops on top.
+    /// Their switches had ended up wherever each was built: the window's on the status page, the
+    /// arrows inside the window, the routes themselves nowhere at all. What a route LOOKS like
+    /// stays with the other colours on the markers page.
+    ///
+    /// THE PLACES WINDOW STAYS A WINDOW: it is clicked in while playing, beside the map, which a
+    /// tab of the tool's main window is not. Its switch is here.
+    /// </remarks>
+    public void DrawRoutesTab()
+    {
+        OverlayLayout.Group("On the Map");
+
+        bool routes = ShowRoutes;
+        if (OverlayLayout.Toggle("Draw the Routes", ref routes))
+        {
+            ShowRoutes = routes;
+            Changed?.Invoke();
+        }
+
+        OverlayLayout.Hint("The walkable line to every chosen place, each in its route's colour. Off keeps the routes and only stops drawing them.");
+
+        bool arrows = ShowArrows;
+        if (OverlayLayout.Toggle("Arrows Along Them", ref arrows))
+        {
+            ShowArrows = arrows;
+            Changed?.Invoke();
+        }
+
+        OverlayLayout.Hint("Chevrons along each route on the large map, pointing the way it runs.");
+
+        bool picking = ShowPicker;
+        if (OverlayLayout.Toggle("Points of Interest Window", ref picking))
+        {
+            ShowPicker = picking;
+            Changed?.Invoke();
+        }
+
+        OverlayLayout.Hint("The places worth walking to, in a small window of their own beside the map - click one to draw the way there.");
+
+        OverlayLayout.Group("Routes Now");
+        DrawRouteList();
+
+        OverlayLayout.Group("On the Large Map");
+        OverlayLayout.Note(
+            "Ctrl + click a room's name: the map's own names pin the room with a route, the tile book's room outlines route to the room"
+            + " - that one goes as soon as you stand in it.\n"
+            + "Ctrl + shift + click anywhere: a stop on the newest route, passed in the order they were set, up to "
+            + RoutePlanner.MaxStops.ToString(CultureInfo.InvariantCulture)
+            + " - or, with no route, a route to that point.\n"
+            + "A route goes when you reach its end, a stop when you reach it; leaving the area drops them all. At most "
+            + RoutePlanner.MaxRoutes.ToString(CultureInfo.InvariantCulture) + " at once - a new one replaces the oldest.");
+    }
+
+    /// <summary>The routes as they stand, one row each: its colour, what it leads to, how far or why not, its stops, and buttons to drop them.</summary>
+    private void DrawRouteList()
+    {
+        IReadOnlyList<RouteTarget> targets = _planner.Targets;
+        if (targets.Count == 0)
+        {
+            OverlayLayout.Note("None - choose a place in the window above, or ctrl + click a room's name on the large map.");
+            return;
+        }
+
+        ImGui.TextColored(DimText, $"{targets.Count} of {RoutePlanner.MaxRoutes}");
+        ImGui.SameLine();
+        if (ImGui.SmallButton("Clear All##routes-clear"))
+        {
+            _planner.Clear();
+            return;
+        }
+
+        foreach (RouteTarget target in targets)
+        {
+            ImGui.PushID(target.Target.ToString("X", CultureInfo.InvariantCulture));
+            ImGui.ColorButton(
+                "##colour",
+                ImGui.ColorConvertU32ToFloat4(RouteColour(target.Target)),
+                ImGuiColorEditFlags.NoTooltip | ImGuiColorEditFlags.NoPicker,
+                new Vector2(ImGui.GetTextLineHeight()));
+            ImGui.SameLine();
+
+            RouteView? route = _planner.For(target.Target);
+            string how = route is null
+                ? "finding the way..."
+                : route.Status.Length > 0 ? route.Status : $"{route.LengthCells:F0} walk";
+            string stops = target.Via.Count switch
+            {
+                0 => string.Empty,
+                1 => "  -  1 stop",
+                _ => $"  -  {target.Via.Count} stops",
+            };
+            string name = target.Name.Length > 0 ? target.Name : "a chosen place";
+            ImGui.TextUnformatted($"{name}  -  {how}{stops}");
+
+            ImGui.SameLine();
+            if (ImGui.SmallButton("drop"))
+            {
+                _planner.Remove(target.Target);
+            }
+
+            if (target.Via.Count > 0)
+            {
+                ImGui.SameLine();
+                if (ImGui.SmallButton("drop stops"))
+                {
+                    _planner.ClearStops(target.Target);
+                }
+            }
+
+            ImGui.PopID();
+        }
+    }
+
     /// <summary>The stops' numbers, made once - a route holds at most <see cref="RoutePlanner.MaxStops"/>.</summary>
     private static readonly string[] StopNumbers =
         [.. Enumerable.Range(1, RoutePlanner.MaxStops).Select(one => one.ToString(CultureInfo.InvariantCulture))];
@@ -944,21 +1062,11 @@ public sealed class PoiLayer
             {
                 _planner.Clear();
             }
-
-            bool arrows = ShowArrows;
-            ImGui.SameLine();
-            if (ImGui.Checkbox("arrows", ref arrows))
-            {
-                ShowArrows = arrows;
-                Changed?.Invoke();
-            }
         }
         else
         {
             ImGui.TextColored(DimText, "click places to draw the way there - several at once");
         }
-
-        ImGui.TextColored(DimText, "ctrl + shift + click the large map: a stop on the newest route");
 
         ImGui.Separator();
 
@@ -1015,7 +1123,7 @@ public sealed class PoiLayer
 
             if (clicked)
             {
-                _planner.Toggle(place.Id, place.WorldX, place.WorldY);
+                _planner.Toggle(place.Id, place.WorldX, place.WorldY, place.Name);
             }
         }
     }

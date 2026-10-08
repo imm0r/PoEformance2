@@ -101,6 +101,7 @@ public static class RoomRoute
         return new RouteTarget(IdFor(room, where), (end.X + 0.5f) * MapView.WorldToGrid, (end.Y + 0.5f) * MapView.WorldToGrid)
         {
             Zone = new RouteZone(grid.TilesX, tiles),
+            Name = TerrainRooms.NameFor(room),
         };
     }
 }

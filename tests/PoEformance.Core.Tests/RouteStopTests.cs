@@ -115,6 +115,29 @@ public class RouteStopTests
         Assert.Equal(Vector2.Zero, planner.Targets[1].Via[0]);
     }
 
+    /// <summary>The Routes tab's buttons: one route dropped leaves the others, stops dropped leave the route - and each keeps the name it was chosen by.</summary>
+    [Fact]
+    public void THETABSButtonsDropOneRouteOrItsStopsAndTheNamesStay()
+    {
+        var planner = new RoutePlanner(RoutePlanner.Immediate);
+        planner.Toggle(1, 10f, 10f, "Waypoint");
+        planner.Toggle(2, 20f, 20f, "Boss arena");
+        planner.AddVia(15f, 15f);
+
+        planner.ClearStops(2);
+        Assert.Equal(["Waypoint", "Boss arena"], planner.Targets.Select(one => one.Name));
+        Assert.All(planner.Targets, one => Assert.Empty(one.Via));
+
+        planner.Remove(1);
+        Assert.Equal([2UL], planner.Targets.Select(one => one.Target));
+        planner.Remove(99);
+        Assert.Single(planner.Targets);
+
+        var bare = new RoutePlanner(RoutePlanner.Immediate);
+        bare.AddVia(5f, 5f);
+        Assert.Equal("a point on the map", Assert.Single(bare.Targets).Name);
+    }
+
     /// <summary>A room is arrived at on its first tile, far from where its line ends; next door it is not.</summary>
     [Fact]
     public void AROOMIsReachedOnItsFirstTile()
@@ -148,6 +171,7 @@ public class RouteStopTests
         int cellY = (int)(target.WorldY / W);
         Assert.True(grid.IsWalkable(cellX, cellY));
         Assert.Equal(9, target.Zone!.Count);
+        Assert.Equal(TerrainRooms.NameFor("rooms/a.arm"), target.Name);
         Assert.True(target.Zone.Holds(target.WorldX, target.WorldY));
         Assert.False(target.Zone.Holds(Side * W + W, 5 * W));
 

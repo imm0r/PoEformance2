@@ -18,6 +18,9 @@ public sealed record RouteTarget(ulong Target, float WorldX, float WorldY)
 
     /// <summary>Where arriving counts, for a destination bigger than a point - a room - or null for the radius around the point.</summary>
     public RouteZone? Zone { get; init; }
+
+    /// <summary>What the place was called when it was chosen, for the list of routes - empty where whatever chose it had no name to give.</summary>
+    public string Name { get; init; } = string.Empty;
 }
 
 /// <summary>
@@ -203,7 +206,8 @@ public sealed class RoutePlanner
     /// Appends rather than inserting, so the existing routes keep their order - and with it
     /// their colours, which is what makes a second route readable next to the first.
     /// </remarks>
-    public void Toggle(ulong address, float worldX, float worldY) => Toggle(new RouteTarget(address, worldX, worldY));
+    public void Toggle(ulong address, float worldX, float worldY, string name = "")
+        => Toggle(new RouteTarget(address, worldX, worldY) { Name = name });
 
     /// <summary>
     /// Adds a destination as given - with its zone, for a room - or drops the one with its identity if it is already a destination.
@@ -247,7 +251,7 @@ public sealed class RoutePlanner
         if (targets.Count == 0)
         {
             ulong point = 0xC000_0000_0000_0000UL | (ulong)Interlocked.Increment(ref _points);
-            targets.Add(new RouteTarget(point, worldX, worldY));
+            targets.Add(new RouteTarget(point, worldX, worldY) { Name = "a point on the map" });
         }
         else
         {
@@ -261,6 +265,28 @@ public sealed class RoutePlanner
         }
 
         Request(new RouteRequest(targets));
+    }
+
+    /// <summary>Drops one destination, whatever chose it - the list of routes' button. Nothing where it is not one.</summary>
+    public void Remove(ulong address)
+    {
+        List<RouteTarget> targets = [.. Targets];
+        if (targets.RemoveAll(t => t.Target == address) > 0)
+        {
+            Request(new RouteRequest(targets));
+        }
+    }
+
+    /// <summary>Drops a route's stops and keeps the route - the line goes straight to its destination again.</summary>
+    public void ClearStops(ulong address)
+    {
+        List<RouteTarget> targets = [.. Targets];
+        int at = targets.FindIndex(t => t.Target == address);
+        if (at >= 0 && targets[at].Via.Count > 0)
+        {
+            targets[at] = targets[at] with { Via = [] };
+            Request(new RouteRequest(targets));
+        }
     }
 
     /// <summary>Finds the routes if any are wanted and out of date. Called on the reader thread.</summary>
