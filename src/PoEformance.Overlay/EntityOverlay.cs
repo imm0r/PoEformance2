@@ -1439,6 +1439,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     }
 
     /// <summary>The tile the player stands on, for the tile book's "around you" row, or null.</summary>
+    /// <summary>The player's place in the world and the area's terrain height under it - what a laid room's heights are counted in - or null.</summary>
+    private (float X, float Y, float Ground)? PlayerGround()
+        => _snapshot.Player is WorldEntity player && _snapshot.Terrain is TerrainGrid grid
+            ? (player.WorldX, player.WorldY, grid.HeightAt((int)(player.WorldX / MapView.WorldToGrid), (int)(player.WorldY / MapView.WorldToGrid)))
+            : null;
+
     private (int X, int Y)? PlayerTile()
         => _snapshot.Player is WorldEntity player
             ? ((int)(player.WorldX / MapView.WorldToGrid) / TerrainGrid.CellsPerTile, (int)(player.WorldY / MapView.WorldToGrid) / TerrainGrid.CellsPerTile)
@@ -3294,8 +3300,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         var catalog = new TilesetCatalog(readFile, () => TileSets);
         _areaRooms = readFile is null ? null : new AreaRooms(readFile);
         _capture.Read = readFile;
+        var lighting = new SceneLightPanel(readFile, () => EnvironmentFiles, () => _snapshot.Area.Environment, PlayerGround);
         var window = new TileBookWindow(() => TileFiles, TilesHere)
         {
+            Lighting = lighting,
             AllRooms = _areaRooms,
             RoomsOnMap = roomsOnMap,
             Changed = () => SettingsChanged?.Invoke(),
@@ -3325,6 +3333,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 Materials = () => MaterialFiles,
                 Environments = () => EnvironmentFiles,
                 Loaded = () => LoadedFiles?.Invoke() ?? [],
+                SceneLit = lighting.For,
             },
         };
 

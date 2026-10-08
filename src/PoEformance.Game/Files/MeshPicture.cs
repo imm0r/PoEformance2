@@ -328,6 +328,21 @@ public static class MeshPicture
         /// </remarks>
         public LayerTally? Tally { get; set; }
 
+        /// <summary>
+        /// How the next drawing is lit the game's way, or null for the picture's own lamp and ambient - see <see cref="SceneLight"/>.
+        /// </summary>
+        /// <remarks>
+        /// ON THE CANVAS LIKE THE CLOCK: set it, then draw. Null is the usual and changes nothing - every
+        /// picture but a lit room is drawn exactly as before.
+        /// </remarks>
+        public SceneLight? Light { get; set; }
+
+        /// <summary>The last sun's shadow map and what it was drawn for, kept while neither changes - see <see cref="ShadowMap"/>.</summary>
+        internal ShadowMap? Shadow { get; set; }
+
+        /// <inheritdoc cref="Shadow"/>
+        internal (SkinnedMesh Mesh, Vector3 Direction)? ShadowFor { get; set; }
+
         internal byte[] Pixels { get; }
 
         internal float[] Depth { get; }
@@ -743,7 +758,15 @@ public static class MeshPicture
 
         // A POINT'S DEPTH IS THE VIEW'S THIRD COLUMN, the way into the picture - see ShadeProgram.Eye.
         var eye = new Vector4(view.M13, view.M23, view.M33, view.M43);
-        var drawn = new Drawn(mesh, triangles, lamp, ink, palette, translucent, programs, stride, places, turns, ticking, clocked, eye);
+        SceneLight? scene = canvas.Light;
+        ShadowMap? shadow = scene is { SunShadows: true } && scene.SunColour != Vector3.Zero
+            ? Shadowed(canvas, mesh, places, positions == mesh.Positions, triangles, scene.SunDirection, palette)
+            : null;
+        var drawn = new Drawn(mesh, triangles, lamp, ink, palette, translucent, programs, stride, places, turns, ticking, clocked, eye)
+        {
+            Scene = scene,
+            Shadow = shadow,
+        };
         PixelProbe? probe = canvas.Probe is { } asked && asked.X >= 0 && asked.X < size && asked.Y >= 0 && asked.Y < size ? asked : null;
         probe?.Clear();
         LayerTally? tally = canvas.Tally;
@@ -937,7 +960,46 @@ public static class MeshPicture
     /// <param name="Eye">The way into the picture in the model's space and the origin's depth - see ShadeProgram.Eye.</param>
     internal sealed record Drawn(
         SkinnedMesh Mesh, int Triangles, Vector3 Lamp, Vector3 Ink, Mipmaps?[] Palette, bool Translucent,
-        ShadeProgram[] Programs, int Stride, Vector3[] Places, Vector3[] Turns, bool[] Ticking, int Clocked, Vector4 Eye);
+        ShadeProgram[] Programs, int Stride, Vector3[] Places, Vector3[] Turns, bool[] Ticking, int Clocked, Vector4 Eye)
+    {
+        /// <summary>The game's light the drawing is lit by, or null for the picture's own - see <see cref="Canvas.Light"/>.</summary>
+        public SceneLight? Scene { get; init; }
+
+        /// <summary>The sun's shadow map, where the scene's sun casts shadows.</summary>
+        public ShadowMap? Shadow { get; init; }
+    }
+
+    /// <summary>
+    /// The sun's shadow map for this mesh, the canvas's own where it was drawn for the same mesh and sun.
+    /// </summary>
+    /// <remarks>
+    /// KEPT ONLY FOR A MESH STANDING STILL: a pose arrives in the canvas's one buffer, the same array
+    /// every frame with new numbers in it, so a map keyed on it could not tell one pose from the next.
+    /// </remarks>
+    private static ShadowMap? Shadowed(
+        Canvas canvas, SkinnedMesh mesh, Vector3[] places, bool still, int triangles, Vector3 direction, Mipmaps?[] palette)
+    {
+        if (still && canvas.ShadowFor is { } was && ReferenceEquals(was.Mesh, mesh) && was.Direction == direction && canvas.Shadow is not null)
+        {
+            return canvas.Shadow;
+        }
+
+        MaterialBlend[] blends = canvas.Blends;
+        int[] wears = canvas.Wears;
+        Vector2[] coordinates = mesh.Coordinates;
+        bool coordinated = mesh.Coordinated;
+        ShadowMap? map = ShadowMap.Build(
+            places, mesh.Indices, triangles, direction,
+            one => !Translucent(blends[one]),
+            one => blends[one] == MaterialBlend.Cutout && coordinated && palette[wears[one]] is { } skin ? (skin, coordinates) : null,
+            canvas.Threads);
+        canvas.Shadow = map;
+        canvas.ShadowFor = still ? (mesh, direction) : null;
+        return map;
+    }
+
+    /// <summary>Whether a triangle is drawn in the second pass - mixed or added, not solid or cut out.</summary>
+    private static bool Translucent(MaterialBlend blend) => blend is MaterialBlend.Alpha or MaterialBlend.Additive;
 
     /// <summary>The rows in one band - see <see cref="InBands"/>.</summary>
     private const int BandRows = 8;
@@ -1382,6 +1444,13 @@ public static class MeshPicture
         private readonly PixelProbe? _probe;
         private readonly int _probeAt;
 
+        /// <summary>The game's light, or null for the picture's own - see <see cref="Scened"/>.</summary>
+        private readonly SceneLight? _scene;
+        private readonly ShadowMap? _shadow;
+
+        /// <summary>The way to the eye in the model's space, which is where the scene's lights are.</summary>
+        private readonly Vector3 _toEye;
+
         public Drawing(Canvas canvas, Drawn drawn, PixelProbe? probe)
         {
             SkinnedMesh mesh = drawn.Mesh;
@@ -1423,6 +1492,13 @@ public static class MeshPicture
             _owners = canvas.Owners;
             _stamps = canvas.Stamps;
             _translucent = drawn.Translucent;
+            _scene = drawn.Scene;
+            _shadow = drawn.Scene is { } scene && scene.SunColour != Vector3.Zero ? drawn.Shadow : null;
+
+            // THE VIEW'S THIRD COLUMN IS THE WAY INTO THE PICTURE in model space - the view is a turn,
+            // so its inverse is its transpose - and the eye is the other way.
+            var into = new Vector3(drawn.Eye.X, drawn.Eye.Y, drawn.Eye.Z);
+            _toEye = into.LengthSquared() > 0f ? -Vector3.Normalize(into) : -Vector3.UnitZ;
         }
 
         /// <summary>Draws every triangle's part that falls in the rows from <paramref name="top"/> up to <paramref name="end"/>.</summary>
@@ -1549,7 +1625,8 @@ public static class MeshPicture
             Vector3 p0 = default, p1 = default, p2 = default, n0 = default, n1 = default, n2 = default;
             Vector4 v0 = default, v1 = default, v2 = default;
             bool tinted = program is { UsesVertexColour: true };
-            if (program is not null)
+            bool scened = _scene is not null;
+            if (program is not null || scened)
             {
                 p0 = _places[i0];
                 p1 = _places[i1];
@@ -1673,7 +1750,10 @@ public static class MeshPicture
                             }
 
                             _stamps[at] = owner;
-                            Over(at, blend, new Vector4(Lit(program, mixed, mixedSpecular, mixedGloss, (first * f0) + (second * f1) + (third * f2)), cover));
+                            Vector3 lit = scened
+                                ? Scened(program, mixed, mixedSpecular, mixedGloss, (first * p0) + (second * p1) + (third * p2), (first * n0) + (second * n1) + (third * n2))
+                                : Lit(program, mixed, mixedSpecular, mixedGloss, (first * f0) + (second * f1) + (third * f2));
+                            Over(at, blend, new Vector4(lit, cover));
                             if (here)
                             {
                                 _probe!.Add(new ProbeFragment(one, blend == MaterialBlend.Additive ? Seen.Added : Seen.Mixed, away, held, cover));
@@ -1779,7 +1859,9 @@ public static class MeshPicture
                         _probe!.Add(new ProbeFragment(one, Seen.Solid, away, held, 0f));
                     }
 
-                    Vector3 shown = Lit(program, colour, specular, gloss, (first * f0) + (second * f1) + (third * f2));
+                    Vector3 shown = scened
+                        ? Scened(program, colour, specular, gloss, (first * p0) + (second * p1) + (third * p2), (first * n0) + (second * n1) + (third * n2))
+                        : Lit(program, colour, specular, gloss, (first * f0) + (second * f1) + (third * f2));
                     _pixels[at * 4] = Byte(shown.X);
                     _pixels[(at * 4) + 1] = Byte(shown.Y);
                     _pixels[(at * 4) + 2] = Byte(shown.Z);
@@ -1816,6 +1898,38 @@ public static class MeshPicture
             }
 
             return colour * shade;
+        }
+
+        /// <summary>One pixel under the game's light - see <see cref="SceneLight.Shade"/> - sRGB nought to one, like <see cref="Lit"/>.</summary>
+        /// <param name="program">The program the colour came from, or null for a texture's or the ink.</param>
+        /// <param name="colour">The colour, sRGB nought to one.</param>
+        /// <param name="specular">The program's specular colour, linear.</param>
+        /// <param name="gloss">The program's gloss.</param>
+        /// <param name="place">The pixel's place in model space, interpolated.</param>
+        /// <param name="turn">Its normal in model space, interpolated.</param>
+        /// <remarks>
+        /// TWO-SIDED LIKE THE PICTURE'S OWN LIGHT: a normal turned from the eye is turned round, which
+        /// is what a two-sided material does in the game and what keeps a face seen from behind from
+        /// going black. A specular colour without a gloss is laid on the albedo as <see cref="Flat"/> lays it.
+        /// </remarks>
+        private Vector3 Scened(ShadeProgram? program, Vector3 colour, Vector3 specular, float gloss, Vector3 place, Vector3 turn)
+        {
+            Vector3 normal = turn.LengthSquared() > 1e-12f ? Vector3.Normalize(turn) : _toEye;
+            if (Vector3.Dot(normal, _toEye) < 0f)
+            {
+                normal = -normal;
+            }
+
+            var albedo = new Vector3(ShadeProgram.Linear(colour.X), ShadeProgram.Linear(colour.Y), ShadeProgram.Linear(colour.Z));
+            bool glossy = program is { HasSpecular: true, HasGloss: true };
+            if (program is { HasSpecular: true, HasGloss: false })
+            {
+                albedo += Vector3.Max(specular - new Vector3(ShadeProgram.Dielectric), Vector3.Zero);
+            }
+
+            float sun = _shadow?.Lit(place, normal) ?? 1f;
+            Vector3 lit = _scene!.Shade(albedo, place, normal, _toEye, sun, glossy, specular, gloss);
+            return new Vector3(ShadeProgram.Srgb(lit.X), ShadeProgram.Srgb(lit.Y), ShadeProgram.Srgb(lit.Z));
         }
 
         /// <summary>
@@ -1861,9 +1975,6 @@ public static class MeshPicture
             ShadeProgram.Srgb(ShadeProgram.Linear(colour.X) + MathF.Max(specular.X - ShadeProgram.Dielectric, 0f)),
             ShadeProgram.Srgb(ShadeProgram.Linear(colour.Y) + MathF.Max(specular.Y - ShadeProgram.Dielectric, 0f)),
             ShadeProgram.Srgb(ShadeProgram.Linear(colour.Z) + MathF.Max(specular.Z - ShadeProgram.Dielectric, 0f)));
-
-        /// <summary>Whether a triangle is drawn in the second pass - mixed or added, not solid or cut out.</summary>
-        private static bool Translucent(MaterialBlend blend) => blend is MaterialBlend.Alpha or MaterialBlend.Additive;
 
         /// <summary>
         /// Puts one translucent pixel over what is already at <paramref name="at"/>.

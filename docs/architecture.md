@@ -296,6 +296,22 @@ byte, and that is what pays for the higher rung. A single draw is cheap even at 
 cap has no business binding the resting size, which it used to, and showed as a picture that
 would not grow with its pane.
 
+**A room can be lit the game's way** (`SceneLight`, set on the canvas like the clock). The arithmetic
+is the game's shaders' line for line - `ComputePointLightParamsNew` for a point light,
+`ComputeDiffuse` and the GGX lobe per light, `AddDiffuseEnvironmentLight` for the cube, the PoE2
+branch of `ApplyToneMapping` for the exposure - and is lit per pixel in the model's space, where
+the room's lights are. A room's lights come from its doodads' `.ao` Lights blocks (`RoomLights`,
+gathered while `RoomModels.Lay` places them, fixed_ao pieces and bone lights included), the rest
+from the area's `.env` (`EnvironmentSettings`) and its diffuse cube, which is BC6H (`Bc6h`, ported
+from bcdec and held against it block for block; `CubeMap`). The sun's shadows are a second
+drawing of the mesh along its light (`ShadowMap`), kept until the sun or the mesh changes. What
+no file says - how phi and theta make the sun's direction, how hor_angle and vert_angle make the
+cube's turn, which number a room light's `light_position_data.a` is, the player light's radius and
+height - is offered as candidate readings in the tile book's *light* section (`SceneLightPanel`).
+Null, the usual, leaves every picture exactly as it was. Measured at 1024 square on four threads
+against 180,000 triangles: 26 ms plain, 53 with sixty point lights, 76 with the sun and its
+shadows; drawing the shadow map is 280 ms, once per sun.
+
 It lives in a **pane of its own**, on the far right, folded away by the `Model` button and
 remembered as `monsterModel` — the same button-and-setting pair as the facet rail, and a third
 `PaneSplit` for the boundary. That is worth a paragraph because it replaced four rounds of trying

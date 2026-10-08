@@ -170,7 +170,8 @@ public static class RoomModels
 
         var paints = new MonsterModels.Paints { Progress = progress };
         var pile = new ModelPile();
-        Doodads laid = Lay(room, Counted, paints, pile, doodads, tools, beyond: null, heights);
+        var lights = new RoomLights.Gathered(Counted);
+        Doodads laid = Lay(room, Counted, paints, pile, doodads, tools, beyond: null, heights, lights);
 
         SkinnedMesh joined = SkinnedMesh.Joined(pile.Joins);
         if (!joined.Ready)
@@ -195,6 +196,8 @@ public static class RoomModels
             Bytes = bytes,
             Files = files,
             Move = string.Join("; ", said),
+            Lights = lights.Lights,
+            LightsSaid = lights.Said(),
         };
 
         // THE GRAPHS ONCE, OVER THE JOINED ROOM: every doodad's materials are in the one list, and a
@@ -244,7 +247,8 @@ public static class RoomModels
         int doodads,
         bool tools,
         Func<RoomDoodad, Matrix4x4>? beyond,
-        DoodadHeight heights = DoodadHeight.File)
+        DoodadHeight heights = DoodadHeight.File,
+        RoomLights.Gathered? lights = null)
     {
         var models = new Dictionary<string, MonsterModel>(StringComparer.OrdinalIgnoreCase);
         float size = CellSize;
@@ -269,6 +273,26 @@ public static class RoomModels
                 continue;
             }
 
+            float scale = one.Scale > 0f ? one.Scale : 1f;
+            Matrix4x4 place = Matrix4x4.CreateScale(scale)
+                * Matrix4x4.CreateRotationZ(one.Turn)
+                * Matrix4x4.CreateTranslation(one.X * size, one.Y * size, 0f);
+            if (beyond is not null)
+            {
+                // THE ROOM AS LAID SETS ITS OWN HEIGHT, from the area's ground under the doodad.
+                place *= beyond(one);
+            }
+            else if (heights != DoodadHeight.Ground && one.Height is { } height)
+            {
+                // ON ITS OWN THE ROOM'S GROUND IS NOUGHT, so the height and the ground plus it are one.
+                place *= Matrix4x4.CreateTranslation(0f, 0f, height);
+            }
+
+            // THE LIGHTS WHETHER OR NOT THE DOODAD DRAWS: a light can be all a doodad is -
+            // grimtangle_ambientlight.ao has no mesh - and a doodad left out to keep the picture
+            // turnable still lights the room in the game.
+            lights?.Add(one.Ao, place);
+
             if (!models.TryGetValue(one.Ao, out MonsterModel? model))
             {
                 model = MonsterModels.OfFiles(counted, [one.Ao], wearing: true, paints);
@@ -290,21 +314,6 @@ public static class RoomModels
             {
                 capped++;
                 continue;
-            }
-
-            float scale = one.Scale > 0f ? one.Scale : 1f;
-            Matrix4x4 place = Matrix4x4.CreateScale(scale)
-                * Matrix4x4.CreateRotationZ(one.Turn)
-                * Matrix4x4.CreateTranslation(one.X * size, one.Y * size, 0f);
-            if (beyond is not null)
-            {
-                // THE ROOM AS LAID SETS ITS OWN HEIGHT, from the area's ground under the doodad.
-                place *= beyond(one);
-            }
-            else if (heights != DoodadHeight.Ground && one.Height is { } height)
-            {
-                // ON ITS OWN THE ROOM'S GROUND IS NOUGHT, so the height and the ground plus it are one.
-                place *= Matrix4x4.CreateTranslation(0f, 0f, height);
             }
 
             pile.Add(model, place, one.Ao);

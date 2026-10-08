@@ -257,6 +257,7 @@ public static class LaidRoomModels
         // THE DOODADS, where the corners were found and on the area's ground under them.
         Matrix3x2 laying = RoomFinder.Laying(room.Width, room.Height, turn);
         Matrix4x4 beyondFlat = Spatial(Matrix3x2.CreateScale(1f / TileModels.Side) * laying * Matrix3x2.CreateScale(TileModels.Side));
+        var lights = new RoomLights.Gathered(Counted);
         RoomModels.Doodads laid = RoomModels.Lay(room, Counted, paints, pile, doodads, tools, one =>
         {
             Vector2 at = Vector2.Transform(new Vector2(one.X, one.Y) / RoomModels.CellsPerTile, laying);
@@ -270,7 +271,7 @@ public static class LaidRoomModels
                 _ => ground,
             };
             return beyondFlat * Matrix4x4.CreateTranslation(0f, 0f, z);
-        });
+        }, heights, lights);
 
         SkinnedMesh joined = SkinnedMesh.Joined(pile.Joins);
         if (!joined.Ready)
@@ -312,6 +313,9 @@ public static class LaidRoomModels
             Bytes = bytes,
             Files = files,
             Move = string.Join("; ", said),
+            Lights = lights.Lights,
+            LightsSaid = lights.Said(),
+            AreaOrigin = new Vector2(x, y) * TileModels.Side,
         };
 
         return shaded ? MonsterModels.Shaded(Counted, model, paints) : model;
