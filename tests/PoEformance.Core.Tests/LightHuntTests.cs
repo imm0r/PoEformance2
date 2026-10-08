@@ -141,27 +141,41 @@ public class LightHuntTests
     // ---- the colour grade ----
 
     /// <summary>
-    /// A volume of R8G8B8A8 read whole: an identity table hands back the gamma-encoded colour, as the game's lookup by pow(colour, 1/2.2) does, and a colour past one keeps its brightness.
+    /// A neutral table of gamma-encoded texels is decoded as an sRGB view decodes it, and so hands the colour back unchanged - the game's picture is not washed out by a grade that changes nothing - and a colour past one keeps its brightness.
     /// </summary>
     [Fact]
-    public void ACOLOURGradeIsLookedUpByTheEncodedColourAndKeepsBrightness()
+    public void AGAMMANeutralTableIsDecodedAndHandsTheColourBack()
     {
         const int side = 16;
         ColourGrade grade = ColourGrade.Read(Volume(side, (r, g, b) => (r, g, b), srgb: false), out string why)!;
         Assert.True(why.Length == 0, why);
-        Assert.Contains("R8G8B8A8_UNORM 16 x 16 x 16", grade.Format, StringComparison.Ordinal);
+        Assert.Contains("R8G8B8A8_UNORM 16 x 16 x 16, held gamma-encoded", grade.Format, StringComparison.Ordinal);
+        Assert.True(grade.Decoded);
+        Assert.True(grade.FromGammaNeutral < 0.005f && grade.FromLinearNeutral > 0.1f, grade.Format);
 
-        // AN IDENTITY TABLE - each texel holding its own centre - hands back the coordinate itself.
+        // LOOKED UP BY pow(c, 1/2.2), DECODED BY THE sRGB CURVE: the two are not each other's inverse
+        // to the last digit, but near enough that a neutral table changes nothing a screen shows.
         var colour = new Vector3(0.2f, 0.5f, 0.05f);
         Vector3 graded = grade.Apply(colour);
-        Vector3 expected = new(MathF.Pow(0.2f, 1f / 2.2f), MathF.Pow(0.5f, 1f / 2.2f), MathF.Pow(0.05f, 1f / 2.2f));
-        Assert.True(Vector3.Distance(graded, expected) < 0.01f, $"{graded} against {expected}");
+        Assert.True(Vector3.Distance(graded, colour) < 0.015f, $"{graded} against {colour}");
 
-        // PAST ONE: divided by the brightest channel, looked up, multiplied back - the top clamped
-        // to the last texel's centre, as the game's clamping sampler clamps it.
+        // PAST ONE: divided by the brightest channel, looked up, multiplied back - the top clamped to
+        // the last texel's centre, as the game's clamping sampler clamps it.
         Vector3 bright = grade.Apply(new Vector3(4f, 2f, 1f));
-        Assert.True(MathF.Abs(bright.X - (4f * 15.5f / 16f)) < 0.03f, bright.ToString());
-        Assert.True(MathF.Abs(bright.Y - (4f * MathF.Pow(0.5f, 1f / 2.2f))) < 0.05f, bright.ToString());
+        float top = MathF.Pow((15.5f / 16f + 0.055f) / 1.055f, 2.4f);
+        Assert.True(MathF.Abs(bright.X - (4f * top)) < 0.05f, bright.ToString());
+        Assert.True(MathF.Abs(bright.Y - 2f) < 0.08f, bright.ToString());
+    }
+
+    /// <summary>A neutral table of linear texels - each the 2.2nd power of its place - is read as it stands, and hands the colour back too.</summary>
+    [Fact]
+    public void ALINEARNeutralTableIsReadAsItStands()
+    {
+        ColourGrade grade = ColourGrade.Read(Volume(16, (r, g, b) => (MathF.Pow(r, 2.2f), MathF.Pow(g, 2.2f), MathF.Pow(b, 2.2f)), srgb: false), out _)!;
+        Assert.False(grade.Decoded);
+        Assert.Contains("held as linear light", grade.Format, StringComparison.Ordinal);
+        var colour = new Vector3(0.2f, 0.5f, 0.3f);
+        Assert.True(Vector3.Distance(grade.Apply(colour), colour) < 0.02f, grade.Apply(colour).ToString());
     }
 
     /// <summary>An sRGB table is decoded to linear light as a card decodes it, and a flat picture is not a volume and says so.</summary>

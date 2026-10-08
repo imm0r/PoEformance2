@@ -60,6 +60,9 @@ public sealed class SceneLightPanel : IMovableSun
     /// <summary>Most environments the picker lists for a filter.</summary>
     private const int MostListed = 200;
 
+    /// <summary>Readings that light the ground closer together than this, in degrees, are said to hardly differ.</summary>
+    private const float SunsApart = 10f;
+
     /// <summary>The free sun's lowest and highest, in degrees: below the first the ground is all shadow.</summary>
     private const float LowestSun = 2f, HighestSun = 90f;
 
@@ -124,9 +127,11 @@ public sealed class SceneLightPanel : IMovableSun
     private string[] _sunLabels = [];
     private string _sunItems = string.Empty;
     private float _sunWidest;
-    private string[] _cubeLabels = [];
     private string _cubeItems = string.Empty;
     private float _cubeWidest;
+    private int[] _cubeRows = [0];
+    private int[] _cubeRowOf = [0, 0, 0, 0, 0];
+    private string _sunNote = string.Empty;
 
     private Task<FloatHuntResult>? _hunting;
     private LightHunt? _huntOf;
@@ -297,14 +302,7 @@ public sealed class SceneLightPanel : IMovableSun
         SunRow(right, start, frame);
 
         Label("sky", column);
-        Fitted(_cubeWidest, right);
-        if (ImGui.Combo("##scene-cube-reading", ref _cubeReading, _cubeItems))
-        {
-            _version++;
-        }
-
-        OverlayLayout.Hint("How environment_mapping's hor_angle and vert_angle turn the sky - the diffuse cube the ambient comes from - before it is read:"
-            + " env_map_rotation, worked out on the processor and in no file. Each reading turns it another way; \"find the readings\" below asks the game which.");
+        SkyRow();
 
         start = Label("lamps", column);
         Lamps(right, start);
@@ -428,6 +426,12 @@ public sealed class SceneLightPanel : IMovableSun
             OverlayLayout.Hint("How directional_light's phi and theta make the sun's direction - worked out on the processor, in no file - named by where"
                 + " each reading throws the shadows on the game's screen and how high it puts the sun. Pick the one whose shadows fall as the game's do,"
                 + " or let \"find the readings\" below ask the game.\nThis one: " + SunMeanings[Math.Clamp(_sunReading, 0, SunMeanings.Length - 1)] + ".");
+            if (_sunNote.Length > 0)
+            {
+                ImGui.SetCursorPosX(start);
+                ImGuiText.Wrapped(OverlayInk.Quiet, ImGuiText.Escape(_sunNote));
+            }
+
             ImGui.SetCursorPosX(start);
         }
 
@@ -670,43 +674,108 @@ public sealed class SceneLightPanel : IMovableSun
         EnvironmentSettings env = _environment;
         int count = Enum.GetValues<SceneLight.SunReading>().Length;
         _sunLabels = new string[count];
+        var lighting = new List<Vector3>(count);
         for (var reading = 0; reading < count; reading++)
         {
-            _sunLabels[reading] = env.Phi is { } phi && env.Theta is { } theta
-                ? string.Create(CultureInfo.InvariantCulture, $"reading {reading + 1}: {Throws(SceneLight.SunFrom(phi, theta, (SceneLight.SunReading)reading), frame)}")
-                : string.Create(CultureInfo.InvariantCulture, $"reading {reading + 1}: the environment gives no sun angles");
+            if (env.Phi is not { } phi || env.Theta is not { } theta)
+            {
+                _sunLabels[reading] = string.Create(CultureInfo.InvariantCulture, $"reading {reading + 1}: the environment gives no sun angles");
+                continue;
+            }
+
+            Vector3 travels = SceneLight.SunFrom(phi, theta, (SceneLight.SunReading)reading);
+            _sunLabels[reading] = string.Create(CultureInfo.InvariantCulture, $"reading {reading + 1}: {Throws(travels, frame)}");
+            if (travels.Z > 0f)
+            {
+                lighting.Add(travels);
+            }
         }
 
         _sunItems = string.Join('\0', _sunLabels) + "\0";
         _sunWidest = _sunLabels.Max(one => ComboWidth(one));
 
+        // HOW FAR APART THE READINGS THAT LIGHT THE GROUND ARE: where phi and theta are nearly equal -
+        // AzmerianRanges' 2.339 and 2.321 - swapping them changes almost nothing, and the picture
+        // hardly moves from one to the next. Said, so the choice is not mistaken for broken.
+        float spread = 0f;
+        for (var a = 0; a < lighting.Count; a++)
+        {
+            for (int b = a + 1; b < lighting.Count; b++)
+            {
+                spread = MathF.Max(spread, MathF.Acos(Math.Clamp(Vector3.Dot(lighting[a], lighting[b]), -1f, 1f)) * 180f / MathF.PI);
+            }
+        }
+
+        _sunNote = lighting.Count > 1 && spread < SunsApart
+            ? string.Create(CultureInfo.InvariantCulture,
+                $"here the {lighting.Count} readings that light the ground lie within {spread:0}° of each other - phi {env.Phi:0.###} and theta {env.Theta:0.###} are nearly equal, so the pick hardly shows")
+            : string.Empty;
+
+        // ONLY THE TURNS THAT DIFFER: with one of the two angles nought the four orders come to one or
+        // two turns, and offering four rows that draw the same picture read as a switch that did nothing.
         float horizontal = env.HorAngle ?? 0f, vertical = env.VertAngle ?? 0f;
         float h = horizontal * 180f / MathF.PI, v = vertical * 180f / MathF.PI;
-        bool turned = horizontal != 0f || vertical != 0f;
-        var turns = new List<Matrix4x4>();
+        var turns = new List<Matrix4x4> { Matrix4x4.Identity };
+        var rows = new List<int> { 0 };
+        var labels = new List<string> { "not turned" };
         int cubes = Enum.GetValues<SceneLight.CubeReading>().Length;
-        _cubeLabels = new string[cubes];
-        for (var reading = 0; reading < cubes; reading++)
+        _cubeRowOf = new int[cubes];
+        for (var reading = 1; reading < cubes; reading++)
         {
             Matrix4x4 turn = SceneLight.CubeTurnFrom(horizontal, vertical, (SceneLight.CubeReading)reading);
             int same = turns.FindIndex(one => Near(one, turn));
-            turns.Add(turn);
-            string how = (SceneLight.CubeReading)reading switch
+            if (same >= 0)
             {
-                SceneLight.CubeReading.ZThenX => string.Create(CultureInfo.InvariantCulture, $"turned {h:0}°, then tipped {v:0}° about x"),
-                SceneLight.CubeReading.XThenZ => string.Create(CultureInfo.InvariantCulture, $"tipped {v:0}° about x, then turned {h:0}°"),
-                SceneLight.CubeReading.ZThenY => string.Create(CultureInfo.InvariantCulture, $"turned {h:0}°, then tipped {v:0}° about y"),
-                SceneLight.CubeReading.YThenZ => string.Create(CultureInfo.InvariantCulture, $"tipped {v:0}° about y, then turned {h:0}°"),
-                _ => "not turned",
-            };
-            _cubeLabels[reading] = reading == 0 ? "not turned"
-                : !turned ? string.Create(CultureInfo.InvariantCulture, $"reading {reading + 1}: the environment does not turn its sky")
-                : same >= 0 ? string.Create(CultureInfo.InvariantCulture, $"reading {reading + 1}: {how} (= reading {same + 1} here)")
-                : string.Create(CultureInfo.InvariantCulture, $"reading {reading + 1}: {how}");
+                _cubeRowOf[reading] = same;
+                continue;
+            }
+
+            _cubeRowOf[reading] = turns.Count;
+            turns.Add(turn);
+            rows.Add(reading);
+            bool aboutX = (SceneLight.CubeReading)reading is SceneLight.CubeReading.ZThenX or SceneLight.CubeReading.XThenZ;
+            bool turnFirst = (SceneLight.CubeReading)reading is SceneLight.CubeReading.ZThenX or SceneLight.CubeReading.ZThenY;
+            string tip = string.Create(CultureInfo.InvariantCulture, $"tipped {v:0}° about {(aboutX ? "x" : "y")}");
+            string round = string.Create(CultureInfo.InvariantCulture, $"turned {h:0}° round");
+            string how = vertical == 0f ? round : horizontal == 0f ? tip : turnFirst ? $"{round}, then {tip}" : $"{tip}, then {round}";
+            labels.Add(string.Create(CultureInfo.InvariantCulture, $"{how} (reading {reading + 1})"));
         }
 
-        _cubeItems = string.Join('\0', _cubeLabels) + "\0";
-        _cubeWidest = _cubeLabels.Max(one => ComboWidth(one));
+        _cubeRows = [.. rows];
+        _cubeItems = string.Join('\0', labels) + "\0";
+        _cubeWidest = labels.Max(one => ComboWidth(one));
+    }
+
+    /// <summary>
+    /// The sky: the turns the environment's two angles can give it, or why there is nothing to choose - a cube that lights nothing here, or no turn at all.
+    /// </summary>
+    private void SkyRow()
+    {
+        EnvironmentSettings env = _environment;
+        string why = _ambient != (int)SceneAmbient.Cube ? "not used - the ambient is not the cube"
+            : _cube is null ? "no sky cube read - see details"
+            : env.GiEnvOcclusion is >= 1f ? string.Create(CultureInfo.InvariantCulture,
+                $"lights nothing here: gi_env_occlusion {env.GiEnvOcclusion:0.##} leaves all the light from around to the game's own GI, which is not drawn - the flat ambient stands in")
+            : _cubeRows.Length < 2 ? "not turned - the environment gives no hor_angle or vert_angle"
+            : string.Empty;
+        if (why.Length > 0)
+        {
+            ImGui.AlignTextToFramePadding();
+            ImGuiText.Wrapped(OverlayInk.Quiet, ImGuiText.Escape(why));
+            return;
+        }
+
+        int row = Math.Clamp(_cubeRowOf[Math.Clamp(_cubeReading, 0, _cubeRowOf.Length - 1)], 0, _cubeRows.Length - 1);
+        Fitted(_cubeWidest, ImGui.GetCursorScreenPos().X + ImGui.GetContentRegionAvail().X);
+        if (ImGui.Combo("##scene-cube-reading", ref row, _cubeItems))
+        {
+            _cubeReading = _cubeRows[Math.Clamp(row, 0, _cubeRows.Length - 1)];
+            _version++;
+        }
+
+        OverlayLayout.Hint("The sky is the light that comes from all around - the environment's cube - and the environment turns it by two angles:"
+            + " hor_angle round the up axis, vert_angle tipped over. In which order, and about which axis it tips, is worked out on the processor and"
+            + " written in no file, so the turns those orders give are offered - only the ones that differ. \"find the readings\" asks the game.");
     }
 
     /// <summary>What a sun shining this way does on the game's screen: where the shadows fall, and how high it stands.</summary>
@@ -721,7 +790,7 @@ public sealed class SceneLightPanel : IMovableSun
         Vector2 way = frame.Way(travels);
         return way == Vector2.Zero
             ? string.Create(CultureInfo.InvariantCulture, $"sun straight overhead")
-            : string.Create(CultureInfo.InvariantCulture, $"shadows fall {Way(way)}, sun {height:0}° high");
+            : string.Create(CultureInfo.InvariantCulture, $"shadows fall {Way(way)} ({SceneLight.GroundOnScreen.Bearing(way):0}°), sun {height:0}° high");
     }
 
     /// <summary>A screen way in words, by the nearest of eight.</summary>
