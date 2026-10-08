@@ -342,7 +342,9 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         {
             ImGui.SetTooltip("Every room this area loaded, outlined on the large map with its name - each where its search ranks it first,"
                 + " the surest first, unless a surer room already holds one of its tiles: then the next place on its own list that is free.\n"
-                + "Searched off the frame, one room at a time, whenever the area or its rooms change.");
+                + "Searched off the frame, one room at a time, whenever the area or its rooms change.\n"
+                + "Ctrl + click a room's name on the large map to route there - the route goes once you stand in the room;"
+                + " ctrl + shift + click anywhere on the map puts a stop on the newest route.");
         }
 
         if (!_roomsOnMap)
@@ -1008,9 +1010,9 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         + "Tiles: each of the room's slots against the tile laid where it falls - size, tag, edge and ground types, whichever way round.\n"
         + "Big: the slots bigger than one tile, which the ground leaves out and which make a room this room.\n"
         + "Places are ranked by their tiles, then their corners: where a room lies, the area lays its own tiles along the sides it joins the map by.\n"
-        + "On the map, red dots are corners that disagree and orange rings tiles that do; cyan marks the ones at a join -"
+        + "On the map, dots are corners that disagree and rings tiles that do (red and orange by default); a third colour marks the ones at a join -"
         + " a ring for a rim tile turned to walkable ground with walkable ground beyond it, a ring with a dot for a miss beside it,"
-        + " and a dot for its corners.\n"
+        + " and a dot for its corners. Their colours, the outline's and the name's are set under Markers, Places, Room outlines.\n"
         + "Joins: how many such runs; beside them: of the corners and tiles no join explains, how many agree.";
 
     /// <summary>A candidate in a row's words, with how its misses fall where they were sorted into joins.</summary>

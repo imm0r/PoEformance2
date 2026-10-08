@@ -672,6 +672,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private const string Combat = "combat";
     private const string Atlas = "atlas";
     private const string Markers = "markers";
+    private const string Routes = "routes";
     private const string Entities = "entities";
 
     /// <summary>
@@ -1172,6 +1173,119 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// <summary>Every room of the area searched and arranged, for the large map to outline all at once - see <see cref="AreaRooms"/>. Null without an install.</summary>
     private AreaRooms? _areaRooms;
 
+    /// <summary>One room outline name as drawn: its plate on screen, and the room and place it names.</summary>
+    private readonly record struct RoomLabel(Vector2 Min, Vector2 Max, string Room, RoomCandidate Where, RoomLayout? Layout);
+
+    /// <summary>The room outline names drawn on the frame before, topmost last - what a ctrl + click this frame lands on. See <see cref="MapClicks"/>.</summary>
+    private readonly List<RoomLabel> _roomLabels = [];
+
+    /// <summary>The outline name under the cursor while ctrl is held, drawn lit - or null.</summary>
+    private (string Room, RoomCandidate Where)? _roomLabelLit;
+
+    /// <summary>Ctrl and shift, as the system reports them - see <see cref="ScreenInput.IsDown"/>.</summary>
+    private const int VkControl = 0x11;
+    private const int VkShift = 0x10;
+
+    /// <summary>
+    /// The large map's clicks that are the overlay's: ctrl + click on a room outline's name routes to the room, ctrl + shift + click anywhere on the map puts a stop on the newest route. True where an outline name has the cursor.
+    /// </summary>
+    /// <remarks>
+    /// BEFORE ANY ROOM NAME IS DRAWN, on the frame before's plates. The map's own room names
+    /// answer ctrl + click as well, and they are drawn first; asked after them, one click on a name
+    /// lying over theirs would route to both. A frame's lag on where a plate is costs nothing a
+    /// person could aim at.
+    ///
+    /// THE MOUSE IS TAKEN ONLY WHILE IT IS WANTED, as RoomLayer does - see its remarks for why a
+    /// click needs that at all: ctrl over an outline name, or ctrl and shift over an uncovered part
+    /// of the map. Without them every click still reaches the game, so dragging and zooming the
+    /// map are untouched.
+    ///
+    /// A STOP GOES ON THE GROUND UNDER THE CURSOR: the map flattens height into the vertical, so
+    /// the point is found at the player's height first and again at the ground's height there,
+    /// which settles it - see MapView.Unproject.
+    /// </remarks>
+    private bool MapClicks(MapView map, WorldEntity player)
+    {
+        _roomLabelLit = null;
+        if (!map.IsLargeMap || _planner is not { } planner || _snapshot.Terrain is not TerrainGrid grid)
+        {
+            _roomLabels.Clear();
+            return false;
+        }
+
+        bool ctrl = ScreenInput.IsDown(VkControl);
+        bool shift = ScreenInput.IsDown(VkShift);
+        Vector2 mouse = ImGui.GetMousePos();
+        var covered = false;
+        if (ctrl && shift)
+        {
+            if (map.Contains(mouse))
+            {
+                ImGui.SetNextFrameWantCaptureMouse(true);
+                ImDrawListPtr front = ImGui.GetForegroundDrawList();
+                front.AddCircle(mouse, 7f, 0xFF_FFFFFF, 16, 2f);
+                front.AddText(mouse + new Vector2(11f, -7f), 0xFF_FFFFFF, planner.Targets.Count > 0 ? "stop on the newest route" : "route to here");
+                if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                {
+                    Vector2 at = OnGround(map, player, grid, mouse);
+                    planner.AddVia(at.X, at.Y);
+                }
+            }
+        }
+        else if (ctrl)
+        {
+            for (int one = _roomLabels.Count - 1; one >= 0; one--)
+            {
+                RoomLabel label = _roomLabels[one];
+                if (mouse.X < label.Min.X || mouse.Y < label.Min.Y || mouse.X > label.Max.X || mouse.Y > label.Max.Y)
+                {
+                    continue;
+                }
+
+                covered = true;
+                _roomLabelLit = (label.Room, label.Where);
+                ImGui.SetNextFrameWantCaptureMouse(true);
+                if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                {
+                    RouteToRoom(planner, grid, label);
+                }
+
+                break;
+            }
+        }
+
+        _roomLabels.Clear();
+        return covered;
+    }
+
+    /// <summary>Starts the route to a room outline's room, or drops it - see <see cref="RoomRoute"/>.</summary>
+    private static void RouteToRoom(RoutePlanner planner, TerrainGrid grid, RoomLabel label)
+    {
+        ulong id = RoomRoute.IdFor(label.Room, label.Where);
+        if (planner.IsTarget(id))
+        {
+            planner.Toggle(id, 0f, 0f);
+        }
+        else if (RoomRoute.For(grid, label.Room, label.Layout, label.Where) is { } target)
+        {
+            planner.Toggle(target);
+        }
+    }
+
+    /// <summary>The world position of the ground under a point on the large map - see <see cref="MapClicks"/>.</summary>
+    private static Vector2 OnGround(MapView map, WorldEntity player, TerrainGrid grid, Vector2 screen)
+    {
+        float height = player.TerrainHeight;
+        Vector2 at = map.Unproject(screen, height, player.WorldX, player.WorldY, player.TerrainHeight);
+        for (var again = 0; again < 2; again++)
+        {
+            height = grid.HeightAt((int)(at.X / MapView.WorldToGrid), (int)(at.Y / MapView.WorldToGrid));
+            at = map.Unproject(screen, height, player.WorldX, player.WorldY, player.TerrainHeight);
+        }
+
+        return at;
+    }
+
     /// <summary>The area's rooms, by file, made again only when the tile book's "here" list is a new one.</summary>
     private string[] AreaRoomFiles()
     {
@@ -1210,17 +1324,57 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             return;
         }
 
-        uint colour = Style.Colour(StyleCatalogue.Keys.Room);
-        float width = Math.Max(1.5f, Style.Width(StyleCatalogue.Keys.Room, 2f) * 0.75f);
+        (uint outline, uint name, uint plate) = RoomInks();
+        if ((outline | name) == 0)
+        {
+            return;
+        }
+
+        float width = Math.Max(1f, Style.Width(StyleCatalogue.Keys.RoomOutline, 2f) * 0.75f);
+        float font = RoomFont();
         Span<Vector2> corners = stackalloc Vector2[4];
         foreach (RoomLaid room in arranged.Laid)
         {
-            Outlined(draw, map, player, grid, room.Where, colour, width, corners);
-            Labelled(draw, corners, room.Room, colour);
+            Outlined(draw, map, player, grid, room.Where, outline, width, corners);
+            Named(draw, corners, room.Room, room.Where, room.Layout, name, plate, font);
         }
     }
 
-    /// <summary>A room's footprint outlined at the ground's height - the map is isometric, so a rhombus - its four corners on screen left in <paramref name="corners"/>.</summary>
+    /// <summary>A room outline's name, lit where ctrl has the cursor on it, kept for the next frame's ctrl + click - see <see cref="MapClicks"/>.</summary>
+    private void Named(
+        ImDrawListPtr draw, ReadOnlySpan<Vector2> corners, string room, RoomCandidate where, RoomLayout? layout, uint name, uint plate, float font)
+    {
+        bool lit = _roomLabelLit is { } on && on.Where == where && string.Equals(on.Room, room, StringComparison.Ordinal);
+        if (Labelled(draw, corners, room, name, plate, font) is not { } box)
+        {
+            return;
+        }
+
+        _roomLabels.Add(new RoomLabel(box.Min, box.Max, room, where, layout));
+        if (!lit)
+        {
+            return;
+        }
+
+        // LIT: an edge round the plate, and what the click will do written under it.
+        draw.AddRect(box.Min, box.Max, name, 3f, ImDrawFlags.None, 1.5f);
+        string said = _planner?.IsTarget(RoomRoute.IdFor(room, where)) == true ? "ctrl + click: drop the route" : "ctrl + click: route here";
+        draw.AddText(new Vector2(box.Min.X, box.Max.Y + 2f), name, said);
+    }
+
+    /// <summary>The room outlines' name size: the interface's font size times the "Name" row's scale.</summary>
+    private float RoomFont() => Style.Sized(StyleCatalogue.Keys.RoomOutlineName, ImGui.GetFontSize());
+
+    /// <summary>
+    /// The room outlines' three inks from the style - nought for one switched off, which the drawing reads as "leave it out". Once per frame, not per room.
+    /// </summary>
+    private (uint Outline, uint Name, uint Plate) RoomInks()
+        => (Ink(StyleCatalogue.Keys.RoomOutline), Ink(StyleCatalogue.Keys.RoomOutlineName), Ink(StyleCatalogue.Keys.RoomOutlinePlate));
+
+    /// <summary>A style entry's colour, or nought where its row is switched off.</summary>
+    private uint Ink(string key) => Style.Visible(key) ? Style.Colour(key) : 0u;
+
+    /// <summary>A room's footprint outlined at the ground's height - the map is isometric, so a rhombus - its four corners on screen left in <paramref name="corners"/>; no line where <paramref name="colour"/> is nought.</summary>
     private static void Outlined(
         ImDrawListPtr draw, MapView map, WorldEntity player, TerrainGrid grid, RoomCandidate where, uint colour, float width, Span<Vector2> corners)
     {
@@ -1232,21 +1386,38 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             corners[one] = Grounded(grid, map, player, cellX, cellY);
         }
 
+        if (colour == 0)
+        {
+            return;
+        }
+
         for (var one = 0; one < 4; one++)
         {
             draw.AddLine(corners[one], corners[(one + 1) & 3], colour, width);
         }
     }
 
-    /// <summary>A room's name on a plate in the middle of its outline.</summary>
-    private static void Labelled(ImDrawListPtr draw, ReadOnlySpan<Vector2> corners, string room, uint colour)
+    /// <summary>A room's name at <paramref name="font"/> pixels on a plate in the middle of its outline - no name where <paramref name="colour"/> is nought, no plate where <paramref name="plate"/> is.</summary>
+    private static (Vector2 Min, Vector2 Max)? Labelled(ImDrawListPtr draw, ReadOnlySpan<Vector2> corners, string room, uint colour, uint plate, float font)
     {
+        if (colour == 0)
+        {
+            return null;
+        }
+
         Vector2 middle = (corners[0] + corners[1] + corners[2] + corners[3]) * 0.25f;
         string name = TerrainRooms.NameFor(room);
-        Vector2 size = ImGui.CalcTextSize(name);
+        float scale = font / ImGui.GetFontSize();
+        Vector2 size = ImGui.CalcTextSize(name) * scale;
         Vector2 at = middle - (size * 0.5f);
-        draw.AddRectFilled(at - new Vector2(3f, 1f), at + size + new Vector2(3f, 1f), 0xB4_1A1614, 3f);
-        draw.AddText(at, colour, name);
+        var pad = new Vector2(3f, 1f) * scale;
+        if (plate != 0)
+        {
+            draw.AddRectFilled(at - pad, at + size + pad, plate, 3f * scale);
+        }
+
+        draw.AddText(ImGui.GetFont(), font, at, colour, name);
+        return (at - pad, at + size + pad);
     }
 
     /// <summary>The tile the player stands on, for the tile book's "around you" row, or null.</summary>
@@ -1284,45 +1455,58 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         const int Cells = TerrainGrid.CellsPerTile;
         Span<Vector2> corners = stackalloc Vector2[4];
-        uint colour = Style.Colour(StyleCatalogue.Keys.Room);
-        float width = Math.Max(2f, Style.Width(StyleCatalogue.Keys.Room, 2f));
-        Outlined(draw, map, player, ghost.Grid, ghost.Where, colour, width, corners);
+        (uint outline, uint name, uint plate) = RoomInks();
+        float width = Math.Max(1f, Style.Width(StyleCatalogue.Keys.RoomOutline, 2f));
+        Outlined(draw, map, player, ghost.Grid, ghost.Where, outline, width, corners);
 
-        // WHERE IT PARTS WITH THE AREA: a red dot on each corner whose ground is not the room's, an
-        // orange ring on each tile whose definition is not what its slot asks for - and those a join
-        // explains drawn over in cyan, the same mark a touch larger, so no lookup is needed per mark.
-        // See RoomMisses for what counts as a join.
+        // WHERE IT PARTS WITH THE AREA: a dot on each corner whose ground is not the room's, a ring
+        // on each tile whose definition is not what its slot asks for - and those a join explains
+        // drawn over in a third colour, the same mark a touch larger, so no lookup is needed per
+        // mark. Each kind is its own style row; one switched off is not drawn. See RoomMisses for
+        // what counts as a join.
         RoomMisses misses = ghost.Misses;
-        foreach ((int x, int y) in misses.Corners)
+        uint corner = Ink(StyleCatalogue.Keys.RoomOutlineCorner);
+        if (corner != 0)
         {
-            draw.AddCircleFilled(Grounded(ghost.Grid, map, player, x * Cells, y * Cells), 3.5f, 0xFF_3030E0);
+            foreach ((int x, int y) in misses.Corners)
+            {
+                draw.AddCircleFilled(Grounded(ghost.Grid, map, player, x * Cells, y * Cells), 3.5f, corner);
+            }
         }
 
-        foreach ((int x, int y) in misses.Tiles)
+        uint tile = Ink(StyleCatalogue.Keys.RoomOutlineTile);
+        if (tile != 0)
         {
-            draw.AddCircle(Grounded(ghost.Grid, map, player, (x * Cells) + (Cells / 2), (y * Cells) + (Cells / 2)), 5f, 0xFF_2090F0, 12, 2f);
+            foreach ((int x, int y) in misses.Tiles)
+            {
+                draw.AddCircle(Grounded(ghost.Grid, map, player, (x * Cells) + (Cells / 2), (y * Cells) + (Cells / 2)), 5f, tile, 12, 2f);
+            }
         }
 
-        const uint Joined = 0xFF_E0C030;
-        foreach ((int x, int y) in misses.JoinCorners)
+        uint joined = Ink(StyleCatalogue.Keys.RoomOutlineJoin);
+        if (joined != 0)
         {
-            draw.AddCircleFilled(Grounded(ghost.Grid, map, player, x * Cells, y * Cells), 4f, Joined);
+            foreach ((int x, int y) in misses.JoinCorners)
+            {
+                draw.AddCircleFilled(Grounded(ghost.Grid, map, player, x * Cells, y * Cells), 4f, joined);
+            }
+
+            foreach ((int x, int y) in misses.Openings)
+            {
+                draw.AddCircle(Grounded(ghost.Grid, map, player, (x * Cells) + (Cells / 2), (y * Cells) + (Cells / 2)), 5f, joined, 12, 2.5f);
+            }
+
+            // A CAP, the tile beside an opening, the same ring with a dot in it.
+            foreach ((int x, int y) in misses.Caps)
+            {
+                Vector2 cap = Grounded(ghost.Grid, map, player, (x * Cells) + (Cells / 2), (y * Cells) + (Cells / 2));
+                draw.AddCircle(cap, 5f, joined, 12, 2.5f);
+                draw.AddCircleFilled(cap, 1.75f, joined);
+            }
         }
 
-        foreach ((int x, int y) in misses.Openings)
-        {
-            draw.AddCircle(Grounded(ghost.Grid, map, player, (x * Cells) + (Cells / 2), (y * Cells) + (Cells / 2)), 5f, Joined, 12, 2.5f);
-        }
-
-        // A CAP, the tile beside an opening, the same ring with a dot in it.
-        foreach ((int x, int y) in misses.Caps)
-        {
-            Vector2 cap = Grounded(ghost.Grid, map, player, (x * Cells) + (Cells / 2), (y * Cells) + (Cells / 2));
-            draw.AddCircle(cap, 5f, Joined, 12, 2.5f);
-            draw.AddCircleFilled(cap, 1.75f, Joined);
-        }
-
-        Labelled(draw, corners, ghost.Room, colour);
+        RoomLayout? layout = _areaRooms?.Last?.Layouts.GetValueOrDefault(ghost.Room);
+        Named(draw, corners, ghost.Room, ghost.Where, layout, name, plate, RoomFont());
     }
 
     /// <summary>
@@ -3143,6 +3327,20 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             MonsterName = Called,
         };
 
+        // A PAGE OF ITS OWN for everything about routes but their looks, which stay on Markers -
+        // see PoiLayer.DrawRouteSettings. Beside the markers in the order, which is where somebody
+        // looking for "how routes work" would look next. The list first, as on the atlas page's
+        // routing: it is what the page is opened for once the switches are set.
+        PoiLayer poi = _poi;
+        _tools.Add(
+            69, "routes-active", "Active Routes", () => poi.DrawActiveRoutes(_snapshot),
+            page: Routes, pageLabel: "Routes", live: () => poi.ActiveRoutesLabel);
+        _tools.Add(69, "routes-settings", "Settings", poi.DrawRouteSettings, page: Routes, pageLabel: "Routes");
+
+        // TABS, the atlas page's reason: the list is watched while playing, the switches are set
+        // once - never both on screen at the same time.
+        _tools.AsTabs(Routes);
+
         // Attached with the places rather than beside them: pinning a room is asking for a
         // route to it, so the room layer wants the same planner and is useless without one.
         _rooms = new RoomLayer(planner)
@@ -4924,19 +5122,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     {
         OverlayLayout.Group("What Is Drawn");
 
-        // Not a page like the rest: routing is done WHILE playing, so the picker keeps its own
-        // small window - see the note where it is drawn.
-        if (_poi is not null)
-        {
-            bool picking = _poi.ShowPicker;
-            if (OverlayLayout.Toggle("Points of Interest", ref picking))
-            {
-                _poi.ShowPicker = picking;
-                SettingsChanged?.Invoke();
-            }
-
-            OverlayLayout.Hint("The picker for routing, in its own small window beside the map.");
-        }
+        // The points-of-interest window's switch lives on the Routes page with the rest of the
+        // routing - see PoiLayer.DrawRouteSettings.
 
         if (_rooms is not null)
         {
@@ -5341,8 +5528,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // the one that stays legible.
         _ground.DrawOnMap(draw, map, _snapshot, player);
 
+        // BEFORE the room names - see MapClicks.
+        bool outlineHovered = MapClicks(map, player);
+
         if (_rooms is not null)
         {
+            _rooms.Covered = outlineHovered;
             _rooms.DrawOnMap(draw, map, _snapshot, player);
 
             if (_poi is not null)

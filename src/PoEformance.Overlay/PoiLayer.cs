@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Numerics;
 using System.Runtime.Versioning;
 using ImGuiNET;
@@ -390,6 +391,272 @@ public sealed class PoiLayer
             if (Style.Visible(key))
             {
                 DrawRoute(draw, map, snapshot, player, route, Style.Colour(key), Style.Width(key, 0f));
+            }
+        }
+
+        DrawStops(draw, map, snapshot, player);
+    }
+
+    /// <summary>
+    /// The Routes page's settings: every switch the routing has, and what the mouse does on the large map.
+    /// </summary>
+    /// <remarks>
+    /// ONE PLACE FOR ALL OF IT, asked for once the routes had grown three ways to start them -
+    /// the places window, the map's room names, the tile book's room outlines - and stops on top.
+    /// Their switches had ended up wherever each was built: the window's on the status page, the
+    /// arrows inside the window, the routes themselves nowhere at all. What a route LOOKS like
+    /// stays with the other colours on the markers page.
+    ///
+    /// THE PLACES WINDOW STAYS A WINDOW: it is clicked in while playing, beside the map, which a
+    /// tab of the tool's main window is not. Its switch is here.
+    /// </remarks>
+    public void DrawRouteSettings()
+    {
+        OverlayLayout.Group("On the Map");
+
+        bool routes = ShowRoutes;
+        if (OverlayLayout.Toggle("Draw the Routes", ref routes))
+        {
+            ShowRoutes = routes;
+            Changed?.Invoke();
+        }
+
+        OverlayLayout.Hint("The walkable line to every chosen place, each in its route's colour. Off keeps the routes and only stops drawing them.");
+
+        bool arrows = ShowArrows;
+        if (OverlayLayout.Toggle("Arrows Along Them", ref arrows))
+        {
+            ShowArrows = arrows;
+            Changed?.Invoke();
+        }
+
+        OverlayLayout.Hint("Chevrons along each route on the large map, pointing the way it runs.");
+
+        bool picking = ShowPicker;
+        if (OverlayLayout.Toggle("Points of Interest Window", ref picking))
+        {
+            ShowPicker = picking;
+            Changed?.Invoke();
+        }
+
+        OverlayLayout.Hint("The places worth walking to, in a small window of their own beside the map - click one to draw the way there.");
+
+        OverlayLayout.Group("The Mouse on the Large Map");
+        OverlayLayout.Note(
+            "Ctrl + click a room's name: the map's own names pin the room with a route, the tile book's room outlines route to the room"
+            + " - that one goes as soon as you stand in it.\n"
+            + "Ctrl + shift + click anywhere: a stop on the newest route, passed in the order they were set, up to "
+            + RoutePlanner.MaxStops.ToString(CultureInfo.InvariantCulture)
+            + " - or, with no route, a route to that point.\n"
+            + "A route goes when you reach its end, a stop when you reach it; leaving the area drops them all. At most "
+            + RoutePlanner.MaxRoutes.ToString(CultureInfo.InvariantCulture) + " at once - a new one replaces the oldest.");
+    }
+
+    /// <summary>The Routes page's list section, with how many routes there are in its tab - see <see cref="DrawActiveRoutes"/>.</summary>
+    public string ActiveRoutesLabel => _planner.Targets.Count switch
+    {
+        0 => "Active Routes###routes-active",
+        int count => string.Create(CultureInfo.InvariantCulture, $"Active Routes ({count})###routes-active"),
+    };
+
+    /// <summary>
+    /// Every route as it stands, with the world coordinates of where you are and of where each one leads.
+    /// </summary>
+    /// <remarks>
+    /// A SECTION OF ITS OWN, the atlas page's reason: it is a list, read and acted on, not a setting
+    /// glanced at and left. ONE list rather than a short one beside a coordinate one - the same routes
+    /// twice is two places to look for the button.
+    ///
+    /// WORLD UNITS, as every position in the tool is held - the ones the entity browser and the
+    /// dissector show, so a route's end can be put beside an entity's. A route ends where it was
+    /// asked to, except a room's, which ends on the room's own ground (see RoomRoute) - so a room
+    /// row shows that point, not the room's middle. The stops are under the pointer on their count;
+    /// the copy button takes the lot as text.
+    /// </remarks>
+    public void DrawActiveRoutes(WorldSnapshot snapshot)
+    {
+        ArgumentNullException.ThrowIfNull(snapshot);
+        IReadOnlyList<RouteTarget> targets = _planner.Targets;
+        WorldEntity? player = snapshot.Player;
+
+        ImGui.TextColored(DimText, "you stand at");
+        ImGui.SameLine();
+        ImGui.TextUnformatted(player is null
+            ? "-  (no player read)"
+            : string.Create(CultureInfo.InvariantCulture, $"x {player.WorldX:F0}   y {player.WorldY:F0}"));
+
+        if (targets.Count == 0)
+        {
+            OverlayLayout.Note("No routes - choose a place in the points of interest window, ctrl + click a room's name on the large map,"
+                + " or ctrl + shift + click the map for a route to that point.");
+            return;
+        }
+
+        ImGui.TextColored(DimText, string.Create(CultureInfo.InvariantCulture, $"{targets.Count} of {RoutePlanner.MaxRoutes}"));
+        ImGui.SameLine();
+        if (ImGui.SmallButton("Clear All##routes-clear"))
+        {
+            _planner.Clear();
+            return;
+        }
+
+        ImGui.SameLine();
+        if (ImGui.SmallButton("copy##routes-copy"))
+        {
+            ImGui.SetClipboardText(RoutesSaid(targets, player));
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("Copies where you stand and every route below - its end and its stops - in world units.");
+        }
+
+        if (!ImGui.BeginTable("##routes-active", 7, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg))
+        {
+            return;
+        }
+
+        try
+        {
+            ImGui.TableSetupColumn("##colour");
+            ImGui.TableSetupColumn("leads to");
+            ImGui.TableSetupColumn("x");
+            ImGui.TableSetupColumn("y");
+            ImGui.TableSetupColumn("walk");
+            ImGui.TableSetupColumn("stops");
+            ImGui.TableSetupColumn("##drop");
+            ImGui.TableHeadersRow();
+
+            foreach (RouteTarget target in targets)
+            {
+                ImGui.PushID(target.Target.ToString("X", CultureInfo.InvariantCulture));
+                ImGui.TableNextRow();
+
+                ImGui.TableNextColumn();
+                ImGui.ColorButton(
+                    "##colour",
+                    ImGui.ColorConvertU32ToFloat4(RouteColour(target.Target)),
+                    ImGuiColorEditFlags.NoTooltip | ImGuiColorEditFlags.NoPicker,
+                    new Vector2(ImGui.GetTextLineHeight()));
+
+                ImGui.TableNextColumn();
+                ImGui.TextUnformatted(target.Name.Length > 0 ? target.Name : "a chosen place");
+
+                ImGui.TableNextColumn();
+                ImGui.TextUnformatted(target.WorldX.ToString("F0", CultureInfo.InvariantCulture));
+                ImGui.TableNextColumn();
+                ImGui.TextUnformatted(target.WorldY.ToString("F0", CultureInfo.InvariantCulture));
+
+                ImGui.TableNextColumn();
+                RouteView? route = _planner.For(target.Target);
+                ImGui.TextUnformatted(route is null
+                    ? "finding the way..."
+                    : route.Status.Length > 0 ? route.Status : route.LengthCells.ToString("F0", CultureInfo.InvariantCulture));
+
+                ImGui.TableNextColumn();
+                ImGui.TextUnformatted(target.Via.Count.ToString(CultureInfo.InvariantCulture));
+                if (target.Via.Count > 0 && ImGui.IsItemHovered())
+                {
+                    ImGui.SetTooltip(StopsSaid(target));
+                }
+
+                ImGui.TableNextColumn();
+                if (ImGui.SmallButton("drop"))
+                {
+                    _planner.Remove(target.Target);
+                }
+
+                if (target.Via.Count > 0)
+                {
+                    ImGui.SameLine();
+                    if (ImGui.SmallButton("drop stops"))
+                    {
+                        _planner.ClearStops(target.Target);
+                    }
+                }
+
+                ImGui.PopID();
+            }
+        }
+        finally
+        {
+            ImGui.EndTable();
+        }
+    }
+
+    /// <summary>A route's stops, one line each, in world units.</summary>
+    private static string StopsSaid(RouteTarget target)
+    {
+        var said = new System.Text.StringBuilder();
+        for (int stop = 0; stop < target.Via.Count; stop++)
+        {
+            said.Append(CultureInfo.InvariantCulture, $"stop {stop + 1}:  x {target.Via[stop].X:F0}   y {target.Via[stop].Y:F0}").Append('\n');
+        }
+
+        return said.ToString().TrimEnd();
+    }
+
+    /// <summary>Where you stand and every route, as the copy button puts it on the clipboard.</summary>
+    private string RoutesSaid(IReadOnlyList<RouteTarget> targets, WorldEntity? player)
+    {
+        var said = new System.Text.StringBuilder();
+        said.Append(player is null
+            ? "you: not read"
+            : string.Create(CultureInfo.InvariantCulture, $"you: x {player.WorldX:F0}  y {player.WorldY:F0}")).Append('\n');
+        foreach (RouteTarget target in targets)
+        {
+            RouteView? route = _planner.For(target.Target);
+            string walk = route is null ? "finding the way" : route.Status.Length > 0 ? route.Status : $"{route.LengthCells:F0} walk";
+            said.Append(CultureInfo.InvariantCulture,
+                $"{(target.Name.Length > 0 ? target.Name : "a chosen place")}: x {target.WorldX:F0}  y {target.WorldY:F0}  -  {walk}").Append('\n');
+            for (int stop = 0; stop < target.Via.Count; stop++)
+            {
+                said.Append(CultureInfo.InvariantCulture, $"  stop {stop + 1}: x {target.Via[stop].X:F0}  y {target.Via[stop].Y:F0}").Append('\n');
+            }
+        }
+
+        return said.ToString().TrimEnd();
+    }
+
+    /// <summary>The stops' numbers, made once - a route holds at most <see cref="RoutePlanner.MaxStops"/>.</summary>
+    private static readonly string[] StopNumbers =
+        [.. Enumerable.Range(1, RoutePlanner.MaxStops).Select(one => one.ToString(CultureInfo.InvariantCulture))];
+
+    /// <summary>
+    /// The stops each route still has to pass, as rings in its colour - numbered on the large map - so a stop set is seen to be set.
+    /// </summary>
+    /// <remarks>
+    /// From the destinations rather than the found routes: a stop is there the moment it is
+    /// clicked, while the search that bends the line through it runs off the frame.
+    /// </remarks>
+    private void DrawStops(ImDrawListPtr draw, MapView map, WorldSnapshot snapshot, WorldEntity player)
+    {
+        TerrainGrid? grid = snapshot.Terrain;
+        float radius = map.IsLargeMap ? 6f : 4f;
+        foreach (RouteTarget target in _planner.Targets)
+        {
+            if (target.Via.Count == 0)
+            {
+                continue;
+            }
+
+            string key = StyleCatalogue.ForRoute(RouteSlot(target.Target));
+            if (!Style.Visible(key))
+            {
+                continue;
+            }
+
+            uint colour = Style.Colour(key);
+            for (int stop = 0; stop < target.Via.Count; stop++)
+            {
+                Vector2 via = target.Via[stop];
+                float height = grid?.HeightAt((int)(via.X / MapView.WorldToGrid), (int)(via.Y / MapView.WorldToGrid)) ?? player.TerrainHeight;
+                Vector2 at = map.Project(via.X, via.Y, height, player.WorldX, player.WorldY, player.TerrainHeight);
+                draw.AddCircle(at, radius, colour, 12, 2f);
+                if (map.IsLargeMap && stop < StopNumbers.Length)
+                {
+                    draw.AddText(at + new Vector2(radius + 2f, -radius - 2f), colour, StopNumbers[stop]);
+                }
             }
         }
     }
@@ -898,14 +1165,6 @@ public sealed class PoiLayer
             {
                 _planner.Clear();
             }
-
-            bool arrows = ShowArrows;
-            ImGui.SameLine();
-            if (ImGui.Checkbox("arrows", ref arrows))
-            {
-                ShowArrows = arrows;
-                Changed?.Invoke();
-            }
         }
         else
         {
@@ -967,7 +1226,7 @@ public sealed class PoiLayer
 
             if (clicked)
             {
-                _planner.Toggle(place.Id, place.WorldX, place.WorldY);
+                _planner.Toggle(place.Id, place.WorldX, place.WorldY, place.Name);
             }
         }
     }

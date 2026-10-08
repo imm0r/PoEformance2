@@ -300,6 +300,25 @@ public class StyleCatalogueTests
         Assert.Equal(claimed.Count, claimed.Distinct().Count());
         Assert.Equal([.. real.Order(StringComparer.Ordinal)], claimed.Order(StringComparer.Ordinal));
     }
+
+    /// <summary>
+    /// The room outlines' rows default to the colours drawn before they existed, so nobody's map changes until they change a row.
+    /// </summary>
+    /// <remarks>
+    /// The outline and its name borrowed the "Room name" row; the plate and the three marks were
+    /// constants in the drawing code, written here as they were, ABGR.
+    /// </remarks>
+    [Fact]
+    public void THERoomOutlineRowsStartAtTheColoursDrawnBefore()
+    {
+        uint roomName = StyleCatalogue.Fallback(StyleCatalogue.Keys.Room);
+        Assert.Equal(roomName, StyleCatalogue.Fallback(StyleCatalogue.Keys.RoomOutline));
+        Assert.Equal(roomName, StyleCatalogue.Fallback(StyleCatalogue.Keys.RoomOutlineName));
+        Assert.Equal(0xB4_1A1614u, StyleCatalogue.Fallback(StyleCatalogue.Keys.RoomOutlinePlate));
+        Assert.Equal(0xFF_3030E0u, StyleCatalogue.Fallback(StyleCatalogue.Keys.RoomOutlineCorner));
+        Assert.Equal(0xFF_2090F0u, StyleCatalogue.Fallback(StyleCatalogue.Keys.RoomOutlineTile));
+        Assert.Equal(0xFF_E0C030u, StyleCatalogue.Fallback(StyleCatalogue.Keys.RoomOutlineJoin));
+    }
 }
 
 /// <summary>The chosen appearance has to survive a restart, and only it.</summary>

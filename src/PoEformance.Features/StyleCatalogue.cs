@@ -118,6 +118,27 @@ public static class StyleCatalogue
         new("map.edge.small", "Map", "Edge indicators (minimap)", StyleTraits.Scale, Rgb(255, 255, 255)),
         new("map.edge.large", "Map", "Edge indicators (large map)", StyleTraits.Scale, Rgb(255, 255, 255)),
 
+        // ── Room outlines ───────────────────────────────────────────────────
+        // The tile book's rooms on the large map: the row picked in a room's list, and every
+        // room of the area with "rooms on map". A group of their own rather than the "Room name"
+        // row, which they borrowed until now - that one colours the names the map writes at
+        // every room's centre, a different picture with a different job, and a choice made for
+        // one should not move the other. The defaults are the colours drawn before these rows
+        // existed, so nothing changes until somebody changes it.
+        //
+        // The three marks keep a colour EACH because the colour is what says which they are: a
+        // corner whose ground is not the room's, a tile that is not what the room's slot asks
+        // for, and either of those where a join explains it - drawn over the other two, the same
+        // shape a touch larger. Width on the outline is the picked room's; every room of the
+        // area is drawn at three quarters of it, so the picked one stays the one on top. Scale
+        // on the name is its font size against the interface's, and the backing grows with it.
+        new("room.outline", "Room outlines", "Outline", Line, Rgb(184, 208, 232, 210)),
+        new("room.outline.name", "Room outlines", "Name", StyleTraits.Colour | StyleTraits.Scale, Rgb(184, 208, 232, 210)),
+        new("room.outline.plate", "Room outlines", "Backing under the name", StyleTraits.Colour, Rgb(20, 22, 26, 180)),
+        new("room.outline.corner", "Room outlines", "Corner that disagrees", StyleTraits.Colour, Rgb(224, 48, 48, 255)),
+        new("room.outline.tile", "Room outlines", "Tile that disagrees", StyleTraits.Colour, Rgb(240, 144, 32, 255)),
+        new("room.outline.join", "Room outlines", "Explained by a join", StyleTraits.Colour, Rgb(48, 192, 224, 255)),
+
         // ── Health bars ─────────────────────────────────────────────────────
         // The BAR takes its colour from the monster's rarity entry above, so that one choice
         // covers the dot and the bar together. What is here is everything the rarity cannot
@@ -231,6 +252,12 @@ public static class StyleCatalogue
         public const string Heat = "map.heat";
         public const string Room = "map.room";
         public const string Ground = "map.ground";
+        public const string RoomOutline = "room.outline";
+        public const string RoomOutlineName = "room.outline.name";
+        public const string RoomOutlinePlate = "room.outline.plate";
+        public const string RoomOutlineCorner = "room.outline.corner";
+        public const string RoomOutlineTile = "room.outline.tile";
+        public const string RoomOutlineJoin = "room.outline.join";
         public const string EdgeSmall = "map.edge.small";
         public const string EdgeLarge = "map.edge.large";
         public const string HealthBar = "healthbar";
@@ -263,6 +290,7 @@ public static class StyleCatalogue
         public static IReadOnlyList<string> All { get; } =
         [
             DotOutline, DotLabel, Player, PlaceLabel, RouteArrow, Terrain, Unwalked, Heat, Room, Ground,
+            RoomOutline, RoomOutlineName, RoomOutlinePlate, RoomOutlineCorner, RoomOutlineTile, RoomOutlineJoin,
             PreloadBannerBack, PreloadListBack, PreloadCard,
             AtlasLabel, AtlasPlate, AtlasContent, AtlasWeb, AtlasRoute, AtlasEntry,
             HealthBar, HealthBarBack, HealthBarShield,
@@ -321,7 +349,7 @@ public static class StyleCatalogue
         public static readonly string[] MarkerEntities = ["Monsters", "Drops", "Other entities"];
 
         /// <summary>What is drawn on the GROUND: places, the layout, the routes between them.</summary>
-        public static readonly string[] MarkerPlaces = ["Places", "Map", "Routes"];
+        public static readonly string[] MarkerPlaces = ["Places", "Map", "Room outlines", "Routes"];
 
         /// <summary>The bars over a monster's head.</summary>
         public static readonly string[] MarkerHealth = ["Health bars"];
