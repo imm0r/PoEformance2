@@ -86,7 +86,7 @@ PoEformance.App --overlay --config       # in-game overlay + config window, side
 PoEformance.App --overlay --debug        # plus the projection diagnostics and calibration aids
 ```
 
-In the overlay, **F9** (rebindable under Appearance → Capture for Diagnosis) writes everything
+In the overlay, **F9** (rebindable under Appearance → Keys → Capture for Diagnosis) writes everything
 about the spot you stand on into `captures/<time> <area>/` beside the tool: a picture with and one
 without the overlay, the rooms around you with their light data, every entity, the area's loaded
 files, and a memory recording that `--replay` reads. Inside that recording everything the tool can

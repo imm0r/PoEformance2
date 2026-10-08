@@ -385,7 +385,7 @@ internal sealed class CaptureKey
         ImGui.GetForegroundDrawList().AddText(new Vector2(12, 30), ok ? 0xFFFFFFFFu : 0xFF5050FFu, text);
     }
 
-    /// <summary>The Appearance row that shows and rebinds the key, and says what the game does with it.</summary>
+    /// <summary>The row on Appearance → Keys that shows and rebinds the key, and says what the game does with it.</summary>
     public void DrawControls()
     {
         OverlayLayout.Group("Capture for Diagnosis");
