@@ -531,6 +531,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 ? tilePanes
                 : basis.TilePanes,
             TileRail = _tileBook?.RailOpen ?? basis.TileRail,
+            TileSections = _tileBook?.SectionsOpen ?? basis.TileSections,
             RoomDoodads = _tileBook is { } tiles
                 ? tiles.Doodads == RoomModels.UsualDoodads ? 0 : tiles.Doodads
                 : basis.RoomDoodads,
@@ -3168,7 +3169,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // without it the book simply shows no model, which is the ordinary case on a machine
             // that has the tool and not the game. The unpacker is the install's own Oodle, which
             // is what an animation's keyframes come out of the skeleton file through.
-            Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize, unpack),
+            Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize, unpack) { Book = "monster" },
         };
 
         window.Show(columns, rail, model, columnWidths, panes);
@@ -3215,6 +3216,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Changed = () => SettingsChanged?.Invoke(),
             Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize, unpack)
             {
+                Book = "item",
                 Shaded = true,
             },
         };
@@ -3255,6 +3257,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Changed = () => SettingsChanged?.Invoke(),
             Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize, unpack)
             {
+                Book = "effect",
                 ShowShaders = true,
                 Translucent = true,
                 Shaded = true,
@@ -3293,7 +3296,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         int roomDoodads = 0,
         bool roomTools = false,
         bool roomAnywhere = false,
-        bool roomsOnMap = false)
+        bool roomsOnMap = false,
+        IReadOnlyList<string>? tileSections = null)
     {
         // ONE INDEX OF WHICH TILESETS PLACE WHICH TILE, built off the frame on first ask: the pane's
         // tileset choice and the dump both read it, and building it twice would read every tileset twice.
@@ -3320,6 +3324,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Here = PlayerTile,
             Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize)
             {
+                Book = "tile",
                 Load = (read, _, key, _, progress) => TileBookWindow.Load(read, key, () => _snapshot.Terrain as TerrainGrid, progress, () => _snapshot.Entities),
                 Ink = TileBookWindow.GroundInk,
                 Shaded = true,
@@ -3338,6 +3343,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         };
 
         window.Show(columns, rail, columnWidths, panes);
+        window.Sections(tileSections);
         Capture(window.Model);
         _tileBook = window;
 

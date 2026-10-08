@@ -95,7 +95,11 @@ read is read once more from nothing - the terrain, every entity with every switc
 files - plus the raw bytes of the game's root objects, one hop beyond them, and every component of
 the entities around you; `memory.txt` beside it says what sits at which address.
 
-The Tile Book's picture of a room can be **lit the game's way** (its *light* section, *game light*):
+Every book shows its model in a **window of its own** - drag to turn, the wheel zooms - which opens
+when a row is chosen; the book keeps the switches. The Tile Book's are in folds: Drawing, Where it
+lies in this area, Light, View & export, Files & surveys.
+
+The Tile Book's picture of a room can be **lit the game's way** (its *Light* fold, *game light*):
 the area's own `.env` - or any other picked from the install - gives the sun, the player's light,
 the environment's diffuse cube and the exposure; the room's doodads give their point lights from
 their `.ao` Lights blocks. Each part has its own switch, and where no file says how the game turns
@@ -123,7 +127,7 @@ Once the boss is down the marker switches to the Inactive art, the way the game'
 do. The switch is on the Markers → Map & Places tab.
 
 **Where the game draws no icon for a boss, one is made from the boss itself.** The Monster Book's
-model pane reads the mesh, skins and rig out of the game's own bundles — **skins**, plural, because
+model window reads the mesh, skins and rig out of the game's own bundles — **skins**, plural, because
 a monster is built of parts and each part wears its own sheet: the `.ao` files a material under
 every shape's name and `SkinnedMesh` carries the same names, so body, cloak and wings are painted
 from their own textures. One texture over the whole mesh is what drew Bahlak the Sky Seer black

@@ -3,6 +3,7 @@ using System.Numerics;
 using System.Runtime.Versioning;
 using ImGuiNET;
 using PoEformance.Features;
+using PoEformance.Game.Entities;
 
 namespace PoEformance.Overlay;
 
@@ -157,6 +158,39 @@ public abstract class BookWindow<TBook>
 
     /// <summary>Told when somebody changes the layout, so the choice can be kept.</summary>
     public Action? Changed { get; set; }
+
+    /// <summary>
+    /// The model of the chosen row: shown in its own window, with the book keeping the window's switch, the export row and the files.
+    /// </summary>
+    /// <remarks>
+    /// ONE PLACE FOR WHAT EVERY BOOK DOES WITH ITS MODEL, now that the picture is a window of its own -
+    /// see MonsterPortrait.Show. The two folds are closed until opened; their state is ImGui's.
+    /// </remarks>
+    /// <param name="subject">What to show, or null for nothing.</param>
+    /// <param name="key">What tells one subject from another.</param>
+    /// <param name="title">What the window's title calls it.</param>
+    protected void ModelTools(MonsterVariety? subject, string key, string title)
+    {
+        if (Model is not { } model)
+        {
+            ImGui.TextDisabled("No model viewer attached.");
+            return;
+        }
+
+        model.Show(subject, key, title);
+        model.DrawOpener();
+        if (OverlayLayout.Subsection($"view & export##{_prefix}-model-export"))
+        {
+            model.DrawExport();
+        }
+
+        if (OverlayLayout.Subsection($"files & surveys##{_prefix}-model-files"))
+        {
+            model.DrawFiles();
+        }
+
+        model.DrawWindow();
+    }
 
     /// <summary>Which columns are showing, by name, for whoever writes the settings file.</summary>
     public IReadOnlyList<string> Columns => [.. _columns.Select(one => Page.Store.Columns[one].Name)];

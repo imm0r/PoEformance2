@@ -312,10 +312,19 @@ Null, the usual, leaves every picture exactly as it was. Measured at 1024 square
 against 180,000 triangles: 26 ms plain, 53 with sixty point lights, 76 with the sun and its
 shadows; drawing the shadow map is 280 ms, once per sun.
 
-It lives in a **pane of its own**, on the far right, folded away by the `Model` button and
-remembered as `monsterModel` — the same button-and-setting pair as the facet rail, and a third
-`PaneSplit` for the boundary. That is worth a paragraph because it replaced four rounds of trying
-to put it *inside* the detail pane: a picture placed in a column of text has to know how wide the
+It lives in a **window of its own** now, in every book (`MonsterPortrait.DrawWindow`): the
+picture, its animation row, the buttons on it, and its lines folded under it. The book keeps the
+rest - `Show` says what to load, `DrawOpener` is the window's switch with the load's state beside
+it, `DrawExport` the floor/grey/backdrop/PNG row and `DrawFiles` the dump and the surveys. It was a
+pane of the book's before, and sharing the book's width with every switch the book has left it a
+corner; asked for from the live client. Choosing a row opens the window again; the Monster Book's
+`Model` button opens and closes it, remembered as `monsterModel`. The window is begun from inside
+the book's draw, which ImGui allows, so it is there while its book's tab is and goes with it.
+The Tile Book's own pane is a heading and five folds - Drawing, Where it lies in this area,
+Light, View & export, Files & surveys - each kept open or closed in `tileSections`.
+
+The window replaced a pane that had replaced four rounds of trying
+to put the picture *inside* the detail pane: a picture placed in a column of text has to know how wide the
 words will come out before they are drawn, ImGui has no text flow to answer that, and every
 approximation of it failed differently — the section headers' hit boxes stole the drag, a group
 containing one measured as the whole pane, and the width the lists reported moved the picture

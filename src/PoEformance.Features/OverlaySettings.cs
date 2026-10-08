@@ -173,6 +173,10 @@ public sealed record OverlaySettings(
     [property: JsonPropertyName("tilePanes")] IReadOnlyDictionary<string, double>? TilePanes = null,
     [property: JsonPropertyName("tileRail")] bool TileRail = true,
 
+    // Which of the tile book's folds are open, by their ids - null until somebody opens or closes
+    // one, so the usual ones stand. See TileBookWindow.Sections.
+    [property: JsonPropertyName("tileSections")] IReadOnlyList<string>? TileSections = null,
+
     // How many doodads the tile book lets a room place. ZERO MEANS "NOT SET", so the usual count lives
     // in the code (RoomModels.UsualDoodads) for everybody who never moved the slider.
     [property: JsonPropertyName("roomDoodads")] int RoomDoodads = 0,

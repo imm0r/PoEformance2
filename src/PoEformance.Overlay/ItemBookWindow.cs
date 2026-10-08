@@ -154,12 +154,6 @@ public sealed class ItemBookWindow : BookWindow<ItemBook>
 
         ImGui.Separator();
 
-        if (Model is not { } model)
-        {
-            ImGui.TextDisabled("No model viewer attached.");
-            return;
-        }
-
         string key = one.Path + "|" + ao;
         if (!string.Equals(key, _subjectKey, StringComparison.Ordinal))
         {
@@ -167,7 +161,6 @@ public sealed class ItemBookWindow : BookWindow<ItemBook>
             _subject = new MonsterVariety(Name: one.Name, AoFiles: [ao]);
         }
 
-        Vector2 room = ImGui.GetContentRegionAvail();
-        model.Draw(_subject, _subjectKey, room.X, room.Y);
+        ModelTools(_subject, _subjectKey, one.Name);
     }
 }

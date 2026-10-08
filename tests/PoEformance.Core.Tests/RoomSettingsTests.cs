@@ -106,6 +106,28 @@ public class RoomSettingsTests
         }
     }
 
+    /// <summary>The tile book's open folds survive the file; a file that never named them leaves them null, so the usual ones stand.</summary>
+    [Fact]
+    public void THETILEBOOKSOpenFoldsSurviveTheSettingsFile()
+    {
+        string path = Path.Combine(Path.GetTempPath(), $"poeformance-folds-{Guid.NewGuid():N}.json");
+        try
+        {
+            var written = new OverlaySettings(ItemRarity.Magic) { TileSections = ["light", "files"] };
+            Assert.True(OverlaySettingsStore.Save(written, path));
+            Assert.Equal(["light", "files"], OverlaySettingsStore.Load(path).TileSections);
+
+            Assert.True(OverlaySettingsStore.Save(new OverlaySettings(ItemRarity.Magic) { TileSections = [] }, path));
+            Assert.Equal([], OverlaySettingsStore.Load(path).TileSections!);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+
+        Assert.Null(new OverlaySettings(ItemRarity.Magic).TileSections);
+    }
+
     [Fact]
     public void AFileThatSaysNothingAboutRoomsGetsTheDefaults()
     {
