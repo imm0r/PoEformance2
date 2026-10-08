@@ -42,13 +42,14 @@ The schema is simultaneously:
 
 ### 2. Every memory read goes through `IMemoryReader` — so sessions are recordable
 
-`IMemoryReader` has one real method: `TryRead(address, span)`. Three implementations:
+`IMemoryReader` has one real method: `TryRead(address, span)`. Four implementations:
 
 | Implementation | Purpose |
 |---|---|
 | `LiveMemoryReader` | ReadProcessMemory against the running game (read-only handle) |
 | `RecordingMemoryReader` | wraps another reader, writes every successful read to a file |
 | `ReplayMemoryReader` | replays a recorded file as if it were the live process, with frame seeking |
+| `TapMemoryReader` | passes reads through, and records a few seconds of them on demand - the capture key's memory half |
 
 Consequences, in increasing order of importance:
 

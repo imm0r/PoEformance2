@@ -86,6 +86,11 @@ PoEformance.App --overlay --config       # in-game overlay + config window, side
 PoEformance.App --overlay --debug        # plus the projection diagnostics and calibration aids
 ```
 
+In the overlay, **F9** (rebindable under Appearance → Capture for Diagnosis) writes everything
+about the spot you stand on into `captures/<time> <area>/` beside the tool: a picture with and one
+without the overlay, the rooms around you with their light data, every entity, the area's loaded
+files, and three seconds of memory as a recording that `--replay` reads.
+
 The overlay draws the area's layout **on the game's own map** — including the parts not
 explored yet — and marks living monsters, chests, drops and NPCs on it. The large map when
 it is open, the minimap otherwise, clipped to whichever is on screen. It

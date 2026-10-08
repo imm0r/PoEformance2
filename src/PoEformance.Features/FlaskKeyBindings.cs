@@ -277,6 +277,104 @@ public static partial class FlaskKeyBindings
     }
 
     /// <summary>
+    /// The game's actions bound to a key, in the binding set it is using - for a key this tool listens for, which the game receives as well.
+    /// </summary>
+    /// <remarks>
+    /// THE TOOL OBSERVES ITS KEYS, IT NEVER SWALLOWS THEM, so a key it listens for also does
+    /// whatever the game binds to it. Which keys those are is in the player's own config rather
+    /// than in anybody's memory of the defaults, so this reads it.
+    ///
+    /// ONLY THE BINDING SECTIONS: everything else in the file is numbers too - a volume of 70
+    /// would read as the F key - and none of it is a key.
+    /// </remarks>
+    /// <param name="lines">The config's lines.</param>
+    /// <param name="key">The virtual-key code.</param>
+    public static List<string> ActionsOn(IEnumerable<string> lines, ushort key)
+    {
+        ArgumentNullException.ThrowIfNull(lines);
+        var bySection = new Dictionary<string, List<(string Action, ushort Key)>>(StringComparer.OrdinalIgnoreCase);
+        string section = string.Empty;
+        string inputMode = string.Empty;
+        foreach (string line in lines)
+        {
+            string trimmed = line.Trim().TrimStart('\uFEFF').Trim();
+            if (trimmed.Length == 0 || trimmed[0] == ';')
+            {
+                continue;
+            }
+
+            if (trimmed[0] == '[' && trimmed[^1] == ']')
+            {
+                section = trimmed[1..^1];
+                continue;
+            }
+
+            int equals = trimmed.IndexOf('=', StringComparison.Ordinal);
+            if (equals <= 0)
+            {
+                continue;
+            }
+
+            string name = trimmed[..equals].Trim();
+            string value = trimmed[(equals + 1)..];
+            if (name.Equals("user_input_mode", StringComparison.OrdinalIgnoreCase))
+            {
+                inputMode = value.Trim();
+                continue;
+            }
+
+            if (!section.EndsWith("ACTION_KEYS", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            if (!bySection.TryGetValue(section, out List<(string Action, ushort Key)>? bound))
+            {
+                bound = [];
+                bySection[section] = bound;
+            }
+
+            bound.Add((name, ToVirtualKey(value)));
+        }
+
+        string wanted = inputMode.Equals("wasd", StringComparison.OrdinalIgnoreCase) ? "WASD_ACTION_KEYS" : "ACTION_KEYS";
+        List<(string Action, ushort Key)>? live = bySection.GetValueOrDefault(wanted)
+            ?? bySection.GetValueOrDefault("ACTION_KEYS")
+            ?? bySection.Values.FirstOrDefault();
+        return live is null || key == 0 ? [] : [.. live.Where(one => one.Key == key).Select(one => one.Action)];
+    }
+
+    /// <summary>
+    /// What <see cref="ActionsOn(IEnumerable{string}, ushort)"/> says of the player's own config, in a line - or why it could not say.
+    /// </summary>
+    /// <param name="key">The virtual-key code.</param>
+    /// <param name="configPath">The config, or null for the one the game is using.</param>
+    public static string SayActionsOn(ushort key, string? configPath = null)
+    {
+        string path = configPath ?? FindConfigPath();
+        try
+        {
+            if (!File.Exists(path))
+            {
+                return $"no game config at {path} to check {Describe(key)} against";
+            }
+
+            List<string> actions = ActionsOn(File.ReadAllLines(path), key);
+            return actions.Count == 0
+                ? $"the game binds nothing to {Describe(key)}"
+                : $"the game ALSO uses {Describe(key)} for: {string.Join(", ", actions)}";
+        }
+        catch (IOException error)
+        {
+            return error.Message;
+        }
+        catch (UnauthorizedAccessException error)
+        {
+            return error.Message;
+        }
+    }
+
+    /// <summary>
     /// Picks the binding set the game is actually using.
     /// </summary>
     /// <remarks>

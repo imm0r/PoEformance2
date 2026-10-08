@@ -118,10 +118,10 @@ public class RoomArrangementTests
     }
 
     /// <summary>A three-by-three room of fill slots, every slot a tile.</summary>
-    private static RoomLayout Square() => Room(3, 3, "f 0 f 0 f 0", "f 0 f 0 f 0", "f 0 f 0 f 0");
+    internal static RoomLayout Square() => Room(3, 3, "f 0 f 0 f 0", "f 0 f 0 f 0", "f 0 f 0 f 0");
 
     /// <summary>A version 36 room of the given size whose grid is the given lines - only which slots are "n" matters here.</summary>
-    private static RoomLayout Room(int width, int height, params string[] lines)
+    internal static RoomLayout Room(int width, int height, params string[] lines)
     {
         string text = string.Join('\n', [
             "version 36", "0", "5 3", "0", "\"roomtag\"", "0",
@@ -136,10 +136,10 @@ public class RoomArrangementTests
     }
 
     /// <summary>A place as written, every corner and tile agreeing but <paramref name="missed"/> corners no join explains.</summary>
-    private static (RoomCandidate Where, RoomMisses Misses) Place(int x, int y, int width, int height, int missed = 0)
+    internal static (RoomCandidate Where, RoomMisses Misses) Place(int x, int y, int width, int height, int missed = 0)
         => (new RoomCandidate(x, y, 0, width, height, 10 - missed, 10) { Tiles = 4, TilesAgree = 4 },
             new RoomMisses([.. Enumerable.Range(0, missed).Select(one => (one, 0))], []) { Classified = true });
 
-    private static RoomSearch Search(params (RoomCandidate Where, RoomMisses Misses)[] places)
+    internal static RoomSearch Search(params (RoomCandidate Where, RoomMisses Misses)[] places)
         => new([.. places.Select(one => one.Where)], 10, 0, 0, string.Empty) { Misses = [.. places.Select(one => one.Misses)] };
 }

@@ -3,6 +3,7 @@ using System.Text;
 using PoEformance.Game.Diagnostics;
 using PoEformance.Game.Entities;
 using PoEformance.Game.Files;
+using PoEformance.Game.World;
 
 namespace PoEformance.Features;
 
@@ -370,7 +371,51 @@ public static partial class ModelDump
         ArgumentNullException.ThrowIfNull(room);
         var said = new StringBuilder();
         said.AppendLine("=== lighting");
+        Environments(read, [room], loaded, _ => "named by the room's .arm", said);
+        said.AppendLine();
+        Lights(read, RoomLayout.Read(read(Slashed(room))), said);
+        return said.ToString();
+    }
 
+    /// <summary>
+    /// The environments that could apply to some rooms, printed whole - the first half of <see cref="Lighting"/>, for several rooms at once.
+    /// </summary>
+    /// <remarks>
+    /// For the capture key, which writes the rooms around the player: their environments are
+    /// mostly the area's own, the same for every room, and printed once per room they would be
+    /// the bulk of the file.
+    /// </remarks>
+    /// <param name="read">How to get a file out of the install, by path.</param>
+    /// <param name="rooms">The rooms' .arm files.</param>
+    /// <param name="loaded">The files the current area loaded, or null.</param>
+    public static string Environments(Func<string, byte[]?> read, IReadOnlyList<string> rooms, IReadOnlyList<string>? loaded)
+    {
+        ArgumentNullException.ThrowIfNull(read);
+        ArgumentNullException.ThrowIfNull(rooms);
+        var said = new StringBuilder();
+        said.AppendLine("=== environments");
+        Environments(read, rooms, loaded, room => "named by " + TerrainRooms.NameFor(room), said);
+        return said.ToString();
+    }
+
+    /// <summary>
+    /// A room's doodads that carry lights, byte by byte - the second half of <see cref="Lighting"/>.
+    /// </summary>
+    /// <param name="read">How to get a file out of the install, by path.</param>
+    /// <param name="room">The room's .arm.</param>
+    public static string DoodadLights(Func<string, byte[]?> read, string room)
+    {
+        ArgumentNullException.ThrowIfNull(read);
+        ArgumentNullException.ThrowIfNull(room);
+        var said = new StringBuilder();
+        Lights(read, RoomLayout.Read(read(Slashed(room))), said);
+        return said.ToString();
+    }
+
+    /// <summary>Every .env the rooms, the area's loaded tilesets and its loaded files name, each printed whole.</summary>
+    private static void Environments(
+        Func<string, byte[]?> read, IReadOnlyList<string> rooms, IReadOnlyList<string>? loaded, Func<string, string> namedBy, StringBuilder said)
+    {
         var environments = new List<(string Path, string From)>();
         var named = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         void Name(string path, string from)
@@ -382,10 +427,13 @@ public static partial class ModelDump
             }
         }
 
-        string arm = Raw(read, room) ?? string.Empty;
-        foreach (System.Text.RegularExpressions.Match one in EnvNamed().Matches(arm))
+        foreach (string room in rooms)
         {
-            Name(one.Groups["path"].Value, "named by the room's .arm");
+            string arm = Raw(read, room) ?? string.Empty;
+            foreach (System.Text.RegularExpressions.Match one in EnvNamed().Matches(arm))
+            {
+                Name(one.Groups["path"].Value, namedBy(room));
+            }
         }
 
         IReadOnlyList<string> files = loaded ?? [];
@@ -431,10 +479,6 @@ public static partial class ModelDump
         {
             said.Append("(").Append(Say(environments.Count - MostEnvironments)).AppendLine(" more named, not printed)");
         }
-
-        said.AppendLine();
-        Lights(read, RoomLayout.Read(read(Slashed(room))), said);
-        return said.ToString();
     }
 
     /// <summary>

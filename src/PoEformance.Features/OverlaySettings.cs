@@ -262,7 +262,11 @@ public sealed record OverlaySettings(
     // The key that copies a picture of the overlay to the clipboard, as a Windows virtual-key
     // code. ZERO MEANS "NOT SET" like every number here, and resolves to Delete in the overlay:
     // the default lives in code so a release can move it for everybody who never chose one.
-    [property: JsonPropertyName("screenshotKey")] int ScreenshotKey = 0)
+    [property: JsonPropertyName("screenshotKey")] int ScreenshotKey = 0,
+
+    // The key that writes a capture of the spot the player stands on into its own folder - see
+    // CaptureReport. Zero is "not set" here too and resolves to F9 in the overlay.
+    [property: JsonPropertyName("captureKey")] int CaptureKey = 0)
 {
     /// <summary>How the tool's own windows look. The defaults until somebody says otherwise.</summary>
     /// <remarks>

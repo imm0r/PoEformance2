@@ -105,7 +105,9 @@ internal static class Program
             }
             else
             {
-                reader = live;
+                // Through a tap, so the capture key can record a few seconds of this session
+                // without anybody having asked for --record at launch - see TapMemoryReader.
+                reader = new TapMemoryReader(live);
             }
         }
 
@@ -465,7 +467,8 @@ internal static class Program
                 tracker: tracker, writeTracker: WriteTracker,
                 fileRoot: result.Statics.FirstOrDefault(s => s.Name == "FileRoot" && s.Found)?.Address ?? 0,
                 areaCounter: result.Statics.FirstOrDefault(s => s.Name == "AreaChangeCounter" && s.Found)?.Address ?? 0,
-                recorder: recorder);
+                recorder: recorder,
+                statics: [.. result.Statics.Where(s => s.Found)]);
         }
         else if (gameStatesAddress != 0 && options.ReplayPath is null
                  && (options.ShowConfig || options.AutoFlask))
@@ -2270,7 +2273,8 @@ internal static class Program
         // either silently discard the other's edits.
         PoEformance.Features.TrackerSettings tracker,
         Action<PoEformance.Features.TrackerSettings> writeTracker,
-        ulong fileRoot, ulong areaCounter, RecordingMemoryReader? recorder = null)
+        ulong fileRoot, ulong areaCounter, RecordingMemoryReader? recorder = null,
+        IReadOnlyList<ResolvedStatic>? statics = null)
     {
         // The rules FIRST, before any of the services below. Several of them are slow on a
         // cold start - the item-art store walks the game's own bundle index - and for as long
@@ -2762,6 +2766,9 @@ internal static class Program
         using var feed = new PoEformance.Features.SnapshotFeed(
             scale =>
             {
+                // The capture key's recording keeps the same clock, and ends itself on it.
+                (reader as TapMemoryReader)?.MarkFrame();
+
                 // The recording's clock, and its only one once the startup report is over.
                 // Without this every read the overlay ever makes lands in the same frame:
                 // a recording of a whole map clear replayed as one instant, with no way to
@@ -3112,6 +3119,27 @@ internal static class Program
         // and reads "local", which is the answer that keeps a version number from being
         // mistaken for a released one. See ToolVersion.
         overlay.Version = PoEformance.Features.ToolVersion.With(PoEformance.Features.BuildStamp.Load());
+
+        // The capture key's memory: a few seconds of this session, recorded on demand. The statics
+        // go in first, as --record writes them, or the recording could not be replayed.
+        if (reader is TapMemoryReader tap)
+        {
+            KeyValuePair<string, string>[] notes =
+            [
+                .. (statics ?? []).Select(one => new KeyValuePair<string, string>(
+                    RecordingFormat.StaticNotePrefix + one.Name,
+                    one.Address.ToString("X", System.Globalization.CultureInfo.InvariantCulture))),
+            ];
+            overlay.RecordMemory = path => tap.Recording
+                ? null
+                : tap.Start(File.Create(path), notes, PoEformance.Features.CaptureReport.MemoryFrames);
+        }
+        else
+        {
+            overlay.NoMemory = recorder is not null
+                ? "this session is recorded from launch already (--record), so the whole of it is in that file"
+                : "this session's reader cannot record on demand";
+        }
 
         // The effects debug switch, as a pair of callbacks: the overlay draws and has no other
         // business with the reader, and this is the one bit of it worth reaching from up there.

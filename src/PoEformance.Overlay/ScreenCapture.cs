@@ -233,6 +233,109 @@ public static partial class ScreenCapture
         }
     }
 
+    /// <summary>
+    /// The rectangle, in screen pixels, as rows of blue-green-red bytes top row first with no padding - or null when anything failed.
+    /// </summary>
+    /// <remarks>
+    /// For a picture written to a file rather than pasted: TOP-DOWN, which is a negative height
+    /// to GetDIBits and the order every encoder takes, and the rows closed up where a width that
+    /// is not a multiple of four left them padded. Twenty-four bits for the reason the clipboard
+    /// takes them: the screen's alpha byte is zero, and a PNG that kept it would be invisible.
+    /// </remarks>
+    public static unsafe byte[]? Grab(int x, int y, int width, int height)
+    {
+        if (width <= 0 || height <= 0)
+        {
+            return null;
+        }
+
+        nint screen = GetDC(0);
+        if (screen == 0)
+        {
+            return null;
+        }
+
+        nint bitmap = 0;
+        nint canvas = 0;
+        nint previous = 0;
+        try
+        {
+            canvas = CreateCompatibleDC(screen);
+            bitmap = CreateCompatibleBitmap(screen, width, height);
+            if (canvas == 0 || bitmap == 0)
+            {
+                return null;
+            }
+
+            previous = SelectObject(canvas, bitmap);
+            if (!BitBlt(canvas, 0, 0, width, height, screen, x, y, SrcCopy | CaptureBlt))
+            {
+                return null;
+            }
+
+            SelectObject(canvas, previous);
+            previous = 0;
+
+            int stride = ((width * 3) + 3) & ~3;
+            var pixels = new byte[stride * height];
+            var header = new BitmapInfoHeader
+            {
+                Size = (uint)Marshal.SizeOf<BitmapInfoHeader>(),
+                Width = width,
+                Height = -height,
+                Planes = 1,
+                BitCount = 24,
+                Compression = BiRgb,
+                SizeImage = (uint)pixels.Length,
+            };
+
+            int lines;
+            fixed (byte* bits = pixels)
+            {
+                lines = GetDIBits(screen, bitmap, 0, (uint)height, (nint)bits, ref header, DibRgbColours);
+            }
+
+            if (lines == 0)
+            {
+                return null;
+            }
+
+            int tight = width * 3;
+            if (stride != tight)
+            {
+                // Forward, row by row: each row moves towards the start, and BlockCopy is safe
+                // over the overlap that leaves.
+                for (var row = 1; row < height; row++)
+                {
+                    Buffer.BlockCopy(pixels, row * stride, pixels, row * tight, tight);
+                }
+
+                Array.Resize(ref pixels, tight * height);
+            }
+
+            return pixels;
+        }
+        finally
+        {
+            if (previous != 0)
+            {
+                SelectObject(canvas, previous);
+            }
+
+            if (bitmap != 0)
+            {
+                DeleteObject(bitmap);
+            }
+
+            if (canvas != 0)
+            {
+                DeleteDC(canvas);
+            }
+
+            ReleaseDC(0, screen);
+        }
+    }
+
     private static bool OpenWithRetry()
     {
         for (int attempt = 0; attempt < 5; attempt++)
