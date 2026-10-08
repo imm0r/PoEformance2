@@ -97,7 +97,8 @@ the entities around you; `memory.txt` beside it says what sits at which address.
 
 Every book shows its model in a **window of its own** - drag to turn, the wheel zooms - which opens
 when a row is chosen; the book keeps the switches. The Tile Book's are in folds: Drawing, Where it
-lies in this area, Light, View & export, Files & surveys.
+lies in this area, Light, View & export, Files & surveys; the Item and Effect books keep theirs in
+a bar under the list.
 
 The Tile Book's picture of a room can be **lit the game's way** (its *Light* fold, *game light*):
 the area's own `.env` - or any other picked from the install - gives the sun, the player's light,

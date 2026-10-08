@@ -90,15 +90,22 @@ public sealed class EffectBookWindow : BookWindow<EffectBook>
     protected override Vector4? Ink(int row) => Page.Projectiles[row] ? ProjectileInk : null;
 
     /// <summary>What the effect is and which of its files is drawn, then the model under it.</summary>
+    protected override bool PaneUnder => true;
+
+    /// <summary>
+    /// The bar under the list: the effect, which of its files, the model window's switch - then the file and the model's own switches.
+    /// </summary>
     protected override void Pane()
     {
         if (Chosen.Length == 0 || _of.Find(Chosen) is not { } one || one.Files.Count == 0)
         {
-            ImGui.TextDisabled("Choose an effect on the left.");
+            ImGui.TextDisabled("Choose an effect above.");
             return;
         }
 
+        ImGui.AlignTextToFramePadding();
         ImGui.TextUnformatted(one.Name);
+        ImGui.SameLine();
         ImGui.TextDisabled(ImGuiText.Escape(one.Kind));
 
         // THE ROW'S FILES ARE ITS VARIANTS AND ITS STATES - several art versions of one projectile,
@@ -114,6 +121,7 @@ public sealed class EffectBookWindow : BookWindow<EffectBook>
         _file = Math.Clamp(_file, 0, one.Files.Count - 1);
         if (one.Files.Count > 1)
         {
+            ImGui.SameLine();
             ImGui.SetNextItemWidth(MathF.Min(ImGui.GetContentRegionAvail().X, ImGui.GetFontSize() * 16f));
             if (ImGui.BeginCombo("##effect-file", ImGuiText.Escape(one.Files[_file].Label)))
             {
@@ -130,9 +138,6 @@ public sealed class EffectBookWindow : BookWindow<EffectBook>
         }
 
         string ao = one.Files[_file].Ao;
-        ImGui.TextDisabled(ImGuiText.Escape(ao));
-        ImGui.Separator();
-
         string key = one.Path + "|" + ao;
         if (!string.Equals(key, _subjectKey, StringComparison.Ordinal))
         {
@@ -140,6 +145,22 @@ public sealed class EffectBookWindow : BookWindow<EffectBook>
             _subject = new MonsterVariety(Name: one.Name, AoFiles: [ao]);
         }
 
-        ModelTools(_subject, _subjectKey, one.Name);
+        if (Model is { } model)
+        {
+            ImGui.SameLine();
+            model.Show(_subject, _subjectKey, one.Name);
+            model.DrawOpener();
+        }
+
+        // THE FILE'S NAME, its whole path on hover - the path alone ran past the bar.
+        ImGui.AlignTextToFramePadding();
+        ImGui.TextDisabled(ImGuiText.Escape(ao[(ao.Replace('\\', '/').LastIndexOf('/') + 1)..]));
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(ImGuiText.Escape(ao));
+        }
+
+        ImGui.SameLine();
+        ModelRow();
     }
 }

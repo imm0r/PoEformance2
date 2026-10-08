@@ -192,6 +192,23 @@ public abstract class BookWindow<TBook>
         model.DrawWindow();
     }
 
+    /// <summary>
+    /// The model's switches in one row for a bar under the list - the export row and the files, without folds - and its window.
+    /// </summary>
+    /// <remarks>Call after <see cref="MonsterPortrait.Show"/> has named the subject this frame.</remarks>
+    protected void ModelRow()
+    {
+        if (Model is not { } model)
+        {
+            return;
+        }
+
+        model.DrawExport();
+        ImGui.SameLine();
+        model.DrawFiles();
+        model.DrawWindow();
+    }
+
     /// <summary>Which columns are showing, by name, for whoever writes the settings file.</summary>
     public IReadOnlyList<string> Columns => [.. _columns.Select(one => Page.Store.Columns[one].Name)];
 
@@ -276,6 +293,20 @@ public abstract class BookWindow<TBook>
 
     /// <summary>One text line's worth of height held back under the panes, for a book with a footer.</summary>
     protected virtual float Reserved => 0f;
+
+    /// <summary>
+    /// Whether the pane beside the list is a bar under it instead, the list then taking the whole width.
+    /// </summary>
+    /// <remarks>
+    /// FOR A BOOK WHOSE PANE SAYS LITTLE, asked for from the live client: once the model had a window
+    /// of its own, the item and effect books' third column held a name, a path and a row of buttons,
+    /// and still took a third of the window's width. Two lines under the list hold the same.
+    /// </remarks>
+    protected virtual bool PaneUnder => false;
+
+    /// <summary>How tall the bar under the list is: three rows of controls - see <see cref="PaneUnder"/>.</summary>
+    protected virtual float PaneUnderHeight
+        => (ImGui.GetFrameHeightWithSpacing() * 3f) + (ImGui.GetStyle().WindowPadding.Y * 2f);
 
     /// <summary>
     /// The table as it stands this frame.
@@ -414,8 +445,19 @@ public abstract class BookWindow<TBook>
         // Handed to the GRIPS as well as to the panes: a pane asking for the rest of the height
         // would take a footer's line too and put it under the bottom of the window; so would a
         // grip, which is the half that was missed the first time - see PaneSplit.Bar.
-        float tall = MathF.Max(1f, ImGui.GetContentRegionAvail().Y - Reserved);
+        float under = PaneUnder ? PaneUnderHeight + ImGui.GetStyle().ItemSpacing.Y : 0f;
+        float tall = MathF.Max(1f, ImGui.GetContentRegionAvail().Y - Reserved - under);
         Body(tall);
+        if (PaneUnder)
+        {
+            if (ImGui.BeginChild($"##{_prefix}-under", new Vector2(0f, PaneUnderHeight), ImGuiChildFlags.Borders))
+            {
+                Pane();
+            }
+
+            ImGui.EndChild();
+        }
+
         Footer();
     }
 
@@ -430,6 +472,18 @@ public abstract class BookWindow<TBook>
     protected virtual void Body(float tall)
     {
         RailPaneDrawn(tall);
+        if (PaneUnder)
+        {
+            // THE LIST TAKES THE REST, the pane being a bar under it - see PaneUnder.
+            if (ImGui.BeginChild($"##{_prefix}-list", new Vector2(0f, tall), ImGuiChildFlags.Borders))
+            {
+                Grid();
+            }
+
+            ImGui.EndChild();
+            return;
+        }
+
         ListPaneDrawn(tall);
 
         if (ImGui.BeginChild($"##{_prefix}-model", new Vector2(0f, tall), ImGuiChildFlags.Borders))

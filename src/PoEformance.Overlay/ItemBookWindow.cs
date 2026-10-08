@@ -101,11 +101,16 @@ public sealed class ItemBookWindow : BookWindow<ItemBook>
     protected override Vector4? Ink(int row) => Page.Unique[row] ? UniqueInk : null;
 
     /// <summary>What the item is and which file it is drawn from, then the model under it.</summary>
+    protected override bool PaneUnder => true;
+
+    /// <summary>
+    /// The bar under the list: the item, which of its models, the model window's switch - then its file and the model's own switches.
+    /// </summary>
     protected override void Pane()
     {
         if (Chosen.Length == 0 || _of.Find(Chosen) is not { } one)
         {
-            ImGui.TextDisabled("Choose an item on the left.");
+            ImGui.TextDisabled("Choose an item above.");
             return;
         }
 
@@ -118,6 +123,7 @@ public sealed class ItemBookWindow : BookWindow<ItemBook>
             ImGui.TextUnformatted(one.Name);
         }
 
+        ImGui.SameLine();
         ImGui.TextDisabled(one.Unique
             ? "unique"
             : ImGuiText.Escape(string.Create(
@@ -131,6 +137,7 @@ public sealed class ItemBookWindow : BookWindow<ItemBook>
         bool second = both ? _second : one.Ao.Length == 0;
         if (both)
         {
+            ImGui.SameLine();
             if (ImGui.RadioButton("drop", !_second))
             {
                 _second = false;
@@ -146,14 +153,6 @@ public sealed class ItemBookWindow : BookWindow<ItemBook>
         }
 
         string ao = second ? one.Ao2 : one.Ao;
-        ImGui.TextDisabled(ImGuiText.Escape((second ? "held  " : "drop  ") + ao));
-        if (ImGui.IsItemHovered())
-        {
-            ImGui.SetTooltip(ImGuiText.Escape($"{one.Path}\nart {one.Art}\nicon {one.Icon}"));
-        }
-
-        ImGui.Separator();
-
         string key = one.Path + "|" + ao;
         if (!string.Equals(key, _subjectKey, StringComparison.Ordinal))
         {
@@ -161,6 +160,22 @@ public sealed class ItemBookWindow : BookWindow<ItemBook>
             _subject = new MonsterVariety(Name: one.Name, AoFiles: [ao]);
         }
 
-        ModelTools(_subject, _subjectKey, one.Name);
+        if (Model is { } model)
+        {
+            ImGui.SameLine();
+            model.Show(_subject, _subjectKey, one.Name);
+            model.DrawOpener();
+        }
+
+        // THE FILE'S NAME, its whole path and the item's art on hover - the path alone ran past the bar.
+        ImGui.AlignTextToFramePadding();
+        ImGui.TextDisabled(ImGuiText.Escape((second ? "held  " : "drop  ") + ao[(ao.Replace('\\', '/').LastIndexOf('/') + 1)..]));
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(ImGuiText.Escape($"{ao}\n{one.Path}\nart {one.Art}\nicon {one.Icon}"));
+        }
+
+        ImGui.SameLine();
+        ModelRow();
     }
 }

@@ -164,7 +164,12 @@ public sealed class SceneLightPanel
             return;
         }
 
-        Switch("room lights##scene-points", ref _points, "The point lights the room's doodads carry in their .ao Lights blocks, the default state of each.");
+        // A LABEL COLUMN, so the rows read as what they are: which lights, from where the rest of
+        // the light comes, which environment, and the readings no file settles.
+        float column = ImGui.CalcTextSize("environment").X + (ImGui.GetStyle().ItemSpacing.X * 3f);
+
+        Label("lights", column);
+        Switch("room##scene-points", ref _points, "The point lights the room's doodads carry in their .ao Lights blocks, the default state of each.");
         ImGui.SameLine();
         Switch("sun##scene-sun", ref _sun, "directional_light: its colour times its multiplier. Seepage's is nought.");
         ImGui.SameLine();
@@ -174,6 +179,7 @@ public sealed class SceneLightPanel
         ImGui.SameLine();
         Switch("exposure##scene-exposure", ref _exposure, "camera.exposure: the colour times max(1, exposure), the game's own tone mapping for PoE2. The colour grade (post_transform) is not applied.");
 
+        Label("ambient", column);
         ImGui.SetNextItemWidth(130f);
         if (ImGui.Combo("##scene-ambient", ref _ambient, Ambients))
         {
@@ -185,17 +191,32 @@ public sealed class SceneLightPanel
             + "flat: the picture's own, the same from every direction.\n"
             + "Where the .env gives gi_env_occlusion, that share of the cube is the game's GI instead, which is not drawn - the flat ambient stands in for it.");
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(120f);
-        if (ImGui.SliderFloat("flat##scene-flat", ref _flat, 0f, 0.5f, "%.3f"))
+        ImGui.AlignTextToFramePadding();
+        ImGui.TextDisabled("flat");
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(110f);
+        if (ImGui.SliderFloat("##scene-flat", ref _flat, 0f, 0.5f, "%.3f"))
         {
             _version++;
         }
 
         OverlayLayout.Hint("The flat ambient's light, linear. The picture's usual is 0.04 - 0.22 on the screen's value.");
 
+        Label("environment", column);
         Picker();
-        Readings();
+
+        Label("readings", column);
+        Readings(column);
+
         Said(model);
+    }
+
+    /// <summary>A row's label in the label column, the row's controls after it.</summary>
+    private static void Label(string text, float column)
+    {
+        ImGui.AlignTextToFramePadding();
+        ImGui.TextDisabled(text);
+        ImGui.SameLine(column);
     }
 
     private void Switch(string label, ref bool value, string hint)
@@ -208,25 +229,13 @@ public sealed class SceneLightPanel
         OverlayLayout.Hint(hint);
     }
 
-    /// <summary>The environment: the area's own, or one picked from the install's by a filter.</summary>
+    /// <summary>The environment: the area's own, or one picked from the install's by a filter - its file's name, the path on hover.</summary>
     private void Picker()
     {
-        string area = _areaEnvironment();
-        ImGui.TextDisabled(_picked.Length == 0
-            ? "environment: the area's own" + (area.Length > 0 ? string.Empty : " (none known - pick one)")
-            : "environment: picked");
-        if (_picked.Length > 0)
-        {
-            ImGui.SameLine();
-            if (ImGui.SmallButton("area's##scene-area"))
-            {
-                _picked = string.Empty;
-                _version++;
-            }
-        }
-
-        ImGui.SetNextItemWidth(Math.Min(ImGui.GetContentRegionAvail().X, 360f));
-        if (ImGui.BeginCombo("##scene-env", ImGuiText.Escape(Chosen().Length > 0 ? Chosen() : "(no environment)")))
+        string chosen = Chosen();
+        string shown = chosen.Length > 0 ? chosen[(chosen.Replace('\\', '/').LastIndexOf('/') + 1)..] : "(none known - pick one)";
+        ImGui.SetNextItemWidth(Math.Clamp(ImGui.GetContentRegionAvail().X - 90f, 120f, 300f));
+        if (ImGui.BeginCombo("##scene-env", ImGuiText.Escape(shown)))
         {
             ImGui.SetNextItemWidth(320f);
             ImGui.InputTextWithHint("##scene-env-filter", "filter...", ref _filter, 128);
@@ -253,13 +262,36 @@ public sealed class SceneLightPanel
 
             ImGui.EndCombo();
         }
+
+        if (chosen.Length > 0 && ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(ImGuiText.Escape(chosen));
+        }
+
+        ImGui.SameLine();
+        if (_picked.Length > 0)
+        {
+            if (ImGui.SmallButton("area's##scene-area"))
+            {
+                _picked = string.Empty;
+                _version++;
+            }
+
+            OverlayLayout.Hint("Back to the area's own environment - its WorldAreas row's.");
+        }
+        else
+        {
+            ImGui.AlignTextToFramePadding();
+            ImGui.TextDisabled("the area's");
+        }
     }
 
-    /// <summary>The candidate readings, and the player light's two numbers no file gives.</summary>
-    private void Readings()
+    /// <summary>The candidate readings, and the player light's two numbers no file gives - two rows under one label.</summary>
+    private void Readings(float column)
     {
-        ImGui.SetNextItemWidth(250f);
-        if (ImGui.Combo("sun##scene-sun-reading", ref _sunReading, SunReadings))
+        Named("sun");
+        ImGui.SetNextItemWidth(240f);
+        if (ImGui.Combo("##scene-sun-reading", ref _sunReading, SunReadings))
         {
             _version++;
         }
@@ -267,16 +299,19 @@ public sealed class SceneLightPanel
         OverlayLayout.Hint("How directional_light's phi and theta make the sun's direction - worked out on the processor, in no file."
             + " Up is minus z, the game's own. Pick the one whose shadows fall as the game's do.");
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(200f);
-        if (ImGui.Combo("cube##scene-cube-reading", ref _cubeReading, CubeReadings))
+        Named("cube");
+        ImGui.SetNextItemWidth(190f);
+        if (ImGui.Combo("##scene-cube-reading", ref _cubeReading, CubeReadings))
         {
             _version++;
         }
 
         OverlayLayout.Hint("How environment_mapping's hor_angle and vert_angle make env_map_rotation, the turn the normal takes before the cube is read.");
 
-        ImGui.SetNextItemWidth(200f);
-        if (ImGui.Combo("core##scene-core", ref _pointShape, PointShapes))
+        ImGui.SetCursorPosX(ImGui.GetCursorPosX() + column);
+        Named("core");
+        ImGui.SetNextItemWidth(190f);
+        if (ImGui.Combo("##scene-core", ref _pointShape, PointShapes))
         {
             _version++;
         }
@@ -284,16 +319,18 @@ public sealed class SceneLightPanel
         OverlayLayout.Hint("Which number is a room light's light_position_data.a - the shader turns it into how sharp the light's core is,"
             + " lerp(1/sqrt(0.02), 100, a). No line in a Lights block is named for it. It changes the light near the lamp, hardly at all past its radius.");
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(110f);
-        if (ImGui.SliderFloat("radius##scene-player-radius", ref _playerRadius, 50f, 2000f, "%.0f"))
+        Named("player radius");
+        ImGui.SetNextItemWidth(90f);
+        if (ImGui.SliderFloat("##scene-player-radius", ref _playerRadius, 50f, 2000f, "%.0f"))
         {
             _version++;
         }
 
         OverlayLayout.Hint("The player light's radius. No file read so far gives it - a candidate to match against a screenshot.");
         ImGui.SameLine();
-        ImGui.SetNextItemWidth(110f);
-        if (ImGui.SliderFloat("height##scene-player-height", ref _playerHeight, 0f, 500f, "%.0f"))
+        Named("height");
+        ImGui.SetNextItemWidth(80f);
+        if (ImGui.SliderFloat("##scene-player-height", ref _playerHeight, 0f, 500f, "%.0f"))
         {
             _version++;
         }
@@ -301,7 +338,21 @@ public sealed class SceneLightPanel
         OverlayLayout.Hint("How far above the ground the player light stands. Not in any file read so far either.");
     }
 
-    /// <summary>What the light came to: the environment's numbers, what was assumed, the lights, the cube.</summary>
+    /// <summary>A control's name before it, quiet.</summary>
+    private static void Named(string text)
+    {
+        ImGui.AlignTextToFramePadding();
+        ImGui.TextDisabled(text);
+        ImGui.SameLine();
+    }
+
+    /// <summary>
+    /// What the light came to - the environment's numbers, what was assumed, the lights, the cube - folded under a one-line summary.
+    /// </summary>
+    /// <remarks>
+    /// FOLDED, because these are what to read when the picture and the game disagree, not while
+    /// switching: open, they were a paragraph longer than the switches above them.
+    /// </remarks>
     private void Said(MonsterModel? model)
     {
         EnvironmentSettings env = _environment;
@@ -312,10 +363,12 @@ public sealed class SceneLightPanel
             lines.Add("assumed: " + string.Join("; ", assumed));
         }
 
+        string sunSaid = !env.Ready ? "no environment" : env.SunLight == Vector3.Zero ? "no sun" : "sun";
         if (_sun && env.Ready && env.SunLight != Vector3.Zero)
         {
             Vector3 travels = SceneLight.SunFrom(env.Phi ?? 0f, env.Theta ?? 0f, (SceneLight.SunReading)_sunReading);
             float height = MathF.Asin(Math.Clamp(travels.Z, -1f, 1f)) * 180f / MathF.PI;
+            sunSaid = string.Create(CultureInfo.InvariantCulture, $"sun {height:0}° high{(height < 0f ? " - BELOW the ground" : string.Empty)}");
             lines.Add(string.Create(CultureInfo.InvariantCulture,
                 $"sun: light travels {travels.X:0.##} {travels.Y:0.##} {travels.Z:0.##} - the sun {height:0}° above the ground{(height < 0f ? ", BELOW it in this reading" : string.Empty)}"));
             if (model?.AreaOrigin is null)
@@ -347,10 +400,20 @@ public sealed class SceneLightPanel
             lines.Add("colour grade not applied: " + env.PostTransform);
         }
 
+        string summary = string.Create(
+            CultureInfo.InvariantCulture,
+            $"details: {sunSaid} · {model?.Lights.Count ?? 0} room lights · {assumed.Count} assumed###scene-details");
+        if (!ImGui.TreeNodeEx(summary, ImGuiTreeNodeFlags.SpanAvailWidth))
+        {
+            return;
+        }
+
         foreach (string line in lines.Where(one => one.Length > 0))
         {
             ImGuiText.Wrapped(OverlayInk.Quiet, ImGuiText.Escape(line));
         }
+
+        ImGui.TreePop();
     }
 
     /// <summary>The .env in use: the picked one, else the area's.</summary>

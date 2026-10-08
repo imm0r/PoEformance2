@@ -321,7 +321,10 @@ corner; asked for from the live client. Choosing a row opens the window again; t
 `Model` button opens and closes it, remembered as `monsterModel`. The window is begun from inside
 the book's draw, which ImGui allows, so it is there while its book's tab is and goes with it.
 The Tile Book's own pane is a heading and five folds - Drawing, Where it lies in this area,
-Light, View & export, Files & surveys - each kept open or closed in `tileSections`.
+Light, View & export, Files & surveys - each kept open or closed in `tileSections`. The Item and
+Effect books, whose pane was left with a name, a path and a row of buttons once the picture moved
+out, have no third column at all: their list takes the width and the pane is a two-line bar under
+it (`BookWindow.PaneUnder`).
 
 The window replaced a pane that had replaced four rounds of trying
 to put the picture *inside* the detail pane: a picture placed in a column of text has to know how wide the
