@@ -164,8 +164,13 @@ internal sealed class CaptureKey
                 _run = null;
                 if (written.IsCompletedSuccessfully)
                 {
-                    Last = run.Folder;
-                    Say("capture saved: " + run.Folder, true, now);
+                    Last = run.Packed.Length > 0 ? run.Packed : run.Folder;
+                    Say(
+                        run.LeftOut.Count == 0
+                            ? "capture saved and packed: " + Last
+                            : $"capture saved: {run.Folder} - packed without {string.Join(", ", run.LeftOut)}",
+                        run.LeftOut.Count == 0,
+                        now);
                 }
                 else
                 {
@@ -296,24 +301,34 @@ internal sealed class CaptureKey
             near = CaptureReport.RoomsNear(arranged, tileX, tileY);
         }
 
-        if (near is null || read is null)
+        if (read is null)
         {
-            string why = read is null ? "no install to read the rooms from" : run.RoomsNote.Length > 0 ? run.RoomsNote : "the player was not read";
-            parts.Add($"{CaptureReport.EnvironmentsFile}, {CaptureReport.RoomsFile}  not written: {why}");
+            parts.Add($"{CaptureReport.EnvironmentsFile}, {CaptureReport.RoomsFile}  not written: no install to read them from");
         }
         else
         {
-            string[] rooms = [.. near.Select(one => one.Laid.Room).Distinct(StringComparer.OrdinalIgnoreCase)];
+            // The environments whether or not the rooms were found: the area's own is known from
+            // its row, and it is the one that certainly applies.
+            string[] rooms = near is null ? [] : [.. near.Select(one => one.Laid.Room).Distinct(StringComparer.OrdinalIgnoreCase)];
+            string area = run.Snapshot.Area.Environment;
             Part(CaptureReport.EnvironmentsFile, () =>
             {
-                File.WriteAllText(At(CaptureReport.EnvironmentsFile), ModelDump.Environments(read, rooms, run.Loaded));
-                return $"the environments of {rooms.Length} rooms and of the area";
+                File.WriteAllText(At(CaptureReport.EnvironmentsFile), ModelDump.Environments(read, rooms, run.Loaded, area));
+                return $"the area's environment ({(area.Length > 0 ? area : "did not resolve")}) and those of {rooms.Length} rooms";
             });
-            Part(CaptureReport.RoomsFile, () =>
+
+            if (near is null)
             {
-                File.WriteAllText(At(CaptureReport.RoomsFile), CaptureReport.Rooms(read, near));
-                return $"{near.Count} rooms within {CaptureReport.RoomReach} tiles, their doodads' lights, and the file of each room the player stands in";
-            });
+                parts.Add($"{CaptureReport.RoomsFile}  not written: {(run.RoomsNote.Length > 0 ? run.RoomsNote : "the player was not read")}");
+            }
+            else
+            {
+                Part(CaptureReport.RoomsFile, () =>
+                {
+                    File.WriteAllText(At(CaptureReport.RoomsFile), CaptureReport.Rooms(read, near));
+                    return $"{near.Count} rooms within {CaptureReport.RoomReach} tiles, their doodads' lights and the pieces attached to them, and the file of each room the player stands in";
+                });
+            }
         }
 
         // Last, so the recording has had the time the rest took. It closes once its ticks are
@@ -336,9 +351,23 @@ internal sealed class CaptureKey
             parts.Add($"{CaptureReport.MemoryFile}  not recorded: {run.MemoryNote}");
         }
 
+        parts.Add($"{Path.GetFileName(run.Folder)}.zip  beside this folder: every file here, packed to send");
         File.WriteAllText(
             At(CaptureReport.SummaryFile),
             CaptureReport.Summary(run.Snapshot, run.Local, version, (client.X, client.Y, client.Width, client.Height), near, parts));
+
+        // LAST, so the zip holds the summary and the closed recording. A zip that cannot be made
+        // leaves the folder as it is - every file in it was written - and says why.
+        try
+        {
+            (string zip, List<string> leftOut) = CaptureReport.Pack(run.Folder);
+            run.Packed = zip;
+            run.LeftOut = leftOut;
+        }
+        catch (Exception failed) when (failed is IOException or UnauthorizedAccessException)
+        {
+            run.LeftOut = [$"everything ({failed.Message})"];
+        }
     }
 
     private static string Png(byte[]? pixels, ClientRect client, string path, string what)
@@ -491,5 +520,9 @@ internal sealed class CaptureKey
         public string RoomsNote { get; set; } = string.Empty;
 
         public Task? Writing { get; set; }
+
+        public string Packed { get; set; } = string.Empty;
+
+        public List<string> LeftOut { get; set; } = [];
     }
 }

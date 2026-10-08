@@ -100,6 +100,7 @@ public static class CaptureMemory
         said.Append("=== a fresh world read, every switch on: ").AppendLine(Ms(started));
         said.Append("state ").Append(snapshot.State).Append(", in game ").Append(snapshot.InGame ? "yes" : "no")
             .Append(", area ").Append(snapshot.Area.Id).Append(" hash 0x").AppendLine(snapshot.AreaHash.ToString("X8", CultureInfo.InvariantCulture));
+        said.Append("environment ").AppendLine(snapshot.Area.Environment.Length > 0 ? snapshot.Area.Environment : "(did not resolve)");
         said.Append(Say(snapshot.Entities.Count)).AppendLine(" entities read");
         foreach (IGrouping<EntityKind, WorldEntity> kind in snapshot.Entities.GroupBy(one => one.Kind).OrderByDescending(group => group.Count()))
         {
