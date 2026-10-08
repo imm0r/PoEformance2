@@ -1217,13 +1217,17 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         }
 
         float width = Math.Max(1f, Style.Width(StyleCatalogue.Keys.RoomOutline, 2f) * 0.75f);
+        float font = RoomFont();
         Span<Vector2> corners = stackalloc Vector2[4];
         foreach (RoomLaid room in arranged.Laid)
         {
             Outlined(draw, map, player, grid, room.Where, outline, width, corners);
-            Labelled(draw, corners, room.Room, name, plate);
+            Labelled(draw, corners, room.Room, name, plate, font);
         }
     }
+
+    /// <summary>The room outlines' name size: the interface's font size times the "Name" row's scale.</summary>
+    private float RoomFont() => Style.Sized(StyleCatalogue.Keys.RoomOutlineName, ImGui.GetFontSize());
 
     /// <summary>
     /// The room outlines' three inks from the style - nought for one switched off, which the drawing reads as "leave it out". Once per frame, not per room.
@@ -1257,8 +1261,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         }
     }
 
-    /// <summary>A room's name on a plate in the middle of its outline - no name where <paramref name="colour"/> is nought, no plate where <paramref name="plate"/> is.</summary>
-    private static void Labelled(ImDrawListPtr draw, ReadOnlySpan<Vector2> corners, string room, uint colour, uint plate)
+    /// <summary>A room's name at <paramref name="font"/> pixels on a plate in the middle of its outline - no name where <paramref name="colour"/> is nought, no plate where <paramref name="plate"/> is.</summary>
+    private static void Labelled(ImDrawListPtr draw, ReadOnlySpan<Vector2> corners, string room, uint colour, uint plate, float font)
     {
         if (colour == 0)
         {
@@ -1267,14 +1271,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         Vector2 middle = (corners[0] + corners[1] + corners[2] + corners[3]) * 0.25f;
         string name = TerrainRooms.NameFor(room);
-        Vector2 size = ImGui.CalcTextSize(name);
+        float scale = font / ImGui.GetFontSize();
+        Vector2 size = ImGui.CalcTextSize(name) * scale;
         Vector2 at = middle - (size * 0.5f);
         if (plate != 0)
         {
-            draw.AddRectFilled(at - new Vector2(3f, 1f), at + size + new Vector2(3f, 1f), plate, 3f);
+            var pad = new Vector2(3f, 1f) * scale;
+            draw.AddRectFilled(at - pad, at + size + pad, plate, 3f * scale);
         }
 
-        draw.AddText(at, colour, name);
+        draw.AddText(ImGui.GetFont(), font, at, colour, name);
     }
 
     /// <summary>The tile the player stands on, for the tile book's "around you" row, or null.</summary>
@@ -1362,7 +1368,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             }
         }
 
-        Labelled(draw, corners, ghost.Room, name, plate);
+        Labelled(draw, corners, ghost.Room, name, plate, RoomFont());
     }
 
     /// <summary>
