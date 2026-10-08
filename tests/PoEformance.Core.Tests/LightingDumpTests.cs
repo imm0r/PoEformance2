@@ -69,7 +69,70 @@ public class LightingDumpTests
     {
         string said = ModelDump.Lighting(_ => null, Room, null);
         Assert.Contains("no loaded-file list to hand", said, StringComparison.Ordinal);
-        Assert.Contains("(no .env named by the room, by a loaded tileset, or among the area's loaded files)", said, StringComparison.Ordinal);
+        Assert.Contains("(no .env named by the area, by the room, by a loaded tileset, or among the area's loaded files)", said, StringComparison.Ordinal);
         Assert.Contains("0 doodad files read", said, StringComparison.Ordinal);
+    }
+}
+
+/// <summary>
+/// What the capture of Seepage showed the lighting section was missing: the light a doodad attaches rather than owns, the noise of empty Lights blocks, and the area's own environment.
+/// </summary>
+public class LightingFollowUpTests
+{
+    private const string Room = "Metadata/Terrain/Rooms/channel_1open_01.arm";
+    private const string Child = "Metadata/Terrain/Doodads/Lights/BrazierFire_01.ao";
+
+    private static string Fixture(params string[] parts)
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir is not null && !Directory.Exists(Path.Combine(dir.FullName, "tests")))
+        {
+            dir = dir.Parent;
+        }
+
+        Assert.NotNull(dir);
+        return Path.Combine([dir.FullName, "tests", "fixtures", .. parts]);
+    }
+
+    /// <summary>
+    /// A doodad that attaches a lit piece through an AOSet's fixed_ao has that piece followed and printed with where it hangs; a doodad whose only Lights block is empty is counted, not listed.
+    /// </summary>
+    [Fact]
+    public void ANATTACHEDPiecesLightIsFollowedAndEmptyBlocksAreCounted()
+    {
+        byte[] arm = File.ReadAllBytes(Fixture("rooms", "channel_1open_01.arm"));
+        string[] doodads = [.. RoomLayout.Read(arm).Doodads.Select(one => one.Ao).Where(one => one.Length > 0).Distinct(StringComparer.OrdinalIgnoreCase)];
+        Assert.True(doodads.Length >= 2);
+        string parent = doodads[0], dull = doodads[1];
+
+        byte[]? Read(string path) => path switch
+        {
+            Room => arm,
+            Child => Encoding.UTF8.GetBytes(
+                "version 3\nclient\n{\n\tLights\n\t{\n\t\tlight = point_light\n\t\tcolour = \"2.2 0.7 0.08\"\n\t\tradius = 400\n\t}\n}\n"),
+            _ when path == parent => Encoding.UTF8.GetBytes(
+                "version 2\nAOSet\n{\n\tfixed_ao = \"10.8 0 -25 0 0 -1.5708 1 0 " + Child + "\"\n}\n"),
+            _ when path == dull => Encoding.UTF8.GetBytes("version 3\nclient\n{\n\tLights\n\t{\n\t}\n}\n"),
+            _ => null,
+        };
+
+        string said = ModelDump.DoodadLights(Read, Room);
+        Assert.Contains($"--- {Child}  (attached to {parent} at 10.8 0 -25 0 0 -1.5708 1 0)", said, StringComparison.Ordinal);
+        Assert.Contains("  ao: Lights (client)  colour = 2.2 0.7 0.08", said, StringComparison.Ordinal);
+        Assert.Contains("  ao: Lights (client)  radius = 400", said, StringComparison.Ordinal);
+        Assert.DoesNotContain("--- " + dull, said, StringComparison.Ordinal);
+        Assert.Contains("3 doodad files read (attached pieces included), 1 with lights; 1 more carry only an empty Lights block", said, StringComparison.Ordinal);
+    }
+
+    /// <summary>The area's own environment comes first and says where it came from, ahead of anything a room or a tileset names.</summary>
+    [Fact]
+    public void THEAREASOwnEnvironmentComesFirst()
+    {
+        const string Area = "Metadata/EnvironmentSettings/Maps/Seepage.env";
+        byte[]? Read(string path) => path == Area ? Encoding.UTF8.GetBytes("{ \"sun\": 1 }") : null;
+
+        string said = ModelDump.Environments(Read, [], null, Area);
+        Assert.Contains($"=== .env {Area}  (the area's own: its WorldAreas row's Environments row)", said, StringComparison.Ordinal);
+        Assert.Contains("{ \"sun\": 1 }", said, StringComparison.Ordinal);
     }
 }

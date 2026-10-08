@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.IO.Compression;
 using System.Text;
 using PoEformance.Game.Files;
 using PoEformance.Game.Ui;
@@ -164,6 +165,7 @@ public static class CaptureReport
             .Append(", act ").Append(Say(area.Act)).Append(", level ").Append(Say(snapshot.AreaLevel))
             .Append(", hash 0x").Append(snapshot.AreaHash.ToString("X8", CultureInfo.InvariantCulture))
             .Append(", state ").AppendLine(snapshot.State.ToString());
+        said.Append("light    ").AppendLine(area.Environment.Length > 0 ? area.Environment : "(the area's environment did not resolve)");
         said.Append("screen   game client at ").Append(Say(client.X)).Append(", ").Append(Say(client.Y))
             .Append(", ").Append(Say(client.Width)).Append(" x ").AppendLine(Say(client.Height));
 
@@ -301,6 +303,44 @@ public static class CaptureReport
         }
 
         return said.ToString();
+    }
+
+    /// <summary>
+    /// Every file of a capture packed into one zip beside its folder, named like it - what gets sent. Returns the zip's path and the files left out.
+    /// </summary>
+    /// <remarks>
+    /// ASKED FOR because a capture is nine files and the place they are sent to takes five.
+    ///
+    /// THE PICTURES AND THE RECORDING ARE STORED, NOT COMPRESSED: a PNG and a Brotli stream are
+    /// compressed already, and squeezing them again is seconds of work for nothing. The text files
+    /// are compressed, and they are where it pays - the loaded-file list shrinks to a tenth.
+    ///
+    /// A file that cannot be opened is left out and named, not allowed to sink the rest: the only
+    /// one that can be is a recording still being written, and the folder keeps it either way.
+    /// </remarks>
+    /// <param name="folder">The capture's folder.</param>
+    public static (string Zip, List<string> LeftOut) Pack(string folder)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(folder);
+        string zip = Path.TrimEndingDirectorySeparator(folder) + ".zip";
+        var leftOut = new List<string>();
+        using FileStream file = File.Create(zip);
+        using var archive = new ZipArchive(file, ZipArchiveMode.Create);
+        foreach (string path in Directory.EnumerateFiles(folder).Order(StringComparer.OrdinalIgnoreCase))
+        {
+            string name = Path.GetFileName(path);
+            bool packed = name.EndsWith(".png", StringComparison.OrdinalIgnoreCase) || name.EndsWith(".rec", StringComparison.OrdinalIgnoreCase);
+            try
+            {
+                archive.CreateEntryFromFile(path, name, packed ? CompressionLevel.NoCompression : CompressionLevel.Optimal);
+            }
+            catch (IOException)
+            {
+                leftOut.Add(name);
+            }
+        }
+
+        return (zip, leftOut);
     }
 
     /// <summary>The area's loaded files, one to a line, as the game listed them.</summary>

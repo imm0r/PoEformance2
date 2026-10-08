@@ -1601,7 +1601,7 @@ public sealed class WorldReader
         // firing on a number nobody produced.
         ulong playerComponent = localPlayer?.Component("Player") ?? 0;
         int playerLevel = playerComponent != 0
-            ? _reader.Read<int>(playerComponent + (ulong)_playerLevelField)
+            ? _reader.Read<byte>(playerComponent + (ulong)_playerLevelField)
             : 0;
         int areaLevel = _reader.Read<int>(chain.AreaInstance + (ulong)_areaLevel);
 

@@ -388,13 +388,14 @@ public static partial class ModelDump
     /// <param name="read">How to get a file out of the install, by path.</param>
     /// <param name="rooms">The rooms' .arm files.</param>
     /// <param name="loaded">The files the current area loaded, or null.</param>
-    public static string Environments(Func<string, byte[]?> read, IReadOnlyList<string> rooms, IReadOnlyList<string>? loaded)
+    /// <param name="area">The .env the area's own row names (AreaInfo.Environment), or null - printed first, being the one known to apply.</param>
+    public static string Environments(Func<string, byte[]?> read, IReadOnlyList<string> rooms, IReadOnlyList<string>? loaded, string? area = null)
     {
         ArgumentNullException.ThrowIfNull(read);
         ArgumentNullException.ThrowIfNull(rooms);
         var said = new StringBuilder();
         said.AppendLine("=== environments");
-        Environments(read, rooms, loaded, room => "named by " + TerrainRooms.NameFor(room), said);
+        Environments(read, rooms, loaded, room => "named by " + TerrainRooms.NameFor(room), said, area);
         return said.ToString();
     }
 
@@ -414,7 +415,7 @@ public static partial class ModelDump
 
     /// <summary>Every .env the rooms, the area's loaded tilesets and its loaded files name, each printed whole.</summary>
     private static void Environments(
-        Func<string, byte[]?> read, IReadOnlyList<string> rooms, IReadOnlyList<string>? loaded, Func<string, string> namedBy, StringBuilder said)
+        Func<string, byte[]?> read, IReadOnlyList<string> rooms, IReadOnlyList<string>? loaded, Func<string, string> namedBy, StringBuilder said, string? area = null)
     {
         var environments = new List<(string Path, string From)>();
         var named = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -425,6 +426,11 @@ public static partial class ModelDump
             {
                 environments.Add((file, from));
             }
+        }
+
+        if (!string.IsNullOrEmpty(area))
+        {
+            Name(area, "the area's own: its WorldAreas row's Environments row");
         }
 
         foreach (string room in rooms)
@@ -466,13 +472,13 @@ public static partial class ModelDump
 
         if (environments.Count == 0)
         {
-            said.AppendLine("(no .env named by the room, by a loaded tileset, or among the area's loaded files)");
+            said.AppendLine("(no .env named by the area, by the room, by a loaded tileset, or among the area's loaded files)");
         }
 
         foreach ((string path, string from) in environments.Take(MostEnvironments))
         {
             said.AppendLine().Append("=== .env ").Append(path).Append("  (").Append(from).AppendLine(")");
-            said.AppendLine(Printed(read(path)));
+            said.AppendLine(Printed(read(path), MostEnvironmentHex));
         }
 
         if (environments.Count > MostEnvironments)
@@ -487,16 +493,25 @@ public static partial class ModelDump
     private static void Lights(Func<string, byte[]?> read, RoomLayout layout, StringBuilder said)
     {
         said.AppendLine("=== doodad lights");
+
+        // ATTACHED PIECES TOO. A doodad's light is often not its own: VaalPotCluster01_Light hangs
+        // BrazierFire_01.ao on itself through an AOSet's fixed_ao, and the light is the brazier's.
+        // So every piece an AOSet attaches is followed, once, saying where it was attached.
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        int looked = 0, lit = 0;
+        var queue = new Queue<(string Ao, string Via)>();
         foreach (RoomDoodad doodad in layout.Doodads)
         {
-            if (doodad.Ao.Length == 0 || !seen.Add(doodad.Ao))
+            if (doodad.Ao.Length > 0 && seen.Add(doodad.Ao))
             {
-                continue;
+                queue.Enqueue((doodad.Ao, string.Empty));
             }
+        }
 
-            AnimatedObject ao = AnimatedObject.Read(read(Slashed(doodad.Ao)));
+        int looked = 0, lit = 0, emptyOnly = 0;
+        while (queue.Count > 0)
+        {
+            (string path, string via) = queue.Dequeue();
+            AnimatedObject ao = AnimatedObject.Read(read(Slashed(path)));
             if (!ao.Ready)
             {
                 continue;
@@ -505,28 +520,42 @@ public static partial class ModelDump
             looked++;
             List<AnimatedObject> chain = Whole(read, ao);
             var words = new List<string>();
+            bool lights = false, empty = false;
             foreach (AoStruct block in chain.SelectMany(one => one.Structs))
             {
                 bool lightBlock = block.Name.Contains("light", StringComparison.OrdinalIgnoreCase);
                 foreach (AoEntry entry in block.Entries.SelectMany(one => one.Walk()))
                 {
+                    if (entry.Key.Equals("fixed_ao", StringComparison.OrdinalIgnoreCase) && Attached(entry.Value) is { } piece)
+                    {
+                        if (seen.Add(piece.Path) && seen.Count <= MostAttachedPieces)
+                        {
+                            queue.Enqueue((piece.Path, $"attached to {path} at {piece.Where}"));
+                        }
+
+                        words.Add($"{block.Name}  attaches {piece.Path} at {piece.Where}");
+                        continue;
+                    }
+
                     if (lightBlock || entry.Key.Contains("light", StringComparison.OrdinalIgnoreCase)
                         || entry.Value.Contains("light", StringComparison.OrdinalIgnoreCase))
                     {
                         words.Add($"{block.Name}{(block.Client ? " (client)" : string.Empty)}  {entry.Key} = {entry.Value}");
+                        lights |= lightBlock;
                     }
                 }
 
-                if (lightBlock && block.Entries.Count == 0)
-                {
-                    words.Add($"{block.Name}{(block.Client ? " (client)" : string.Empty)}  (empty)");
-                }
+                empty |= lightBlock && block.Entries.Count == 0;
             }
 
             string skeleton = Entryed(chain, "ClientAnimationController", "skeleton");
             AnimationSkeleton rig = skeleton.Length > 0 ? AnimationSkeleton.Read(read(Slashed(skeleton))) : AnimationSkeleton.None;
-            if (rig.Lights.Count == 0 && words.Count == 0)
+
+            // AN EMPTY Lights BLOCK IS NOT A LIGHT. Most doodads inherit one from a common base, and
+            // listing each of them buried the three that do light the room - so they are counted.
+            if (rig.Lights.Count == 0 && !lights)
             {
+                emptyOnly += empty ? 1 : 0;
                 continue;
             }
 
@@ -536,7 +565,8 @@ public static partial class ModelDump
                 break;
             }
 
-            said.Append("--- ").AppendLine(doodad.Ao);
+            said.Append("--- ").Append(path);
+            said.AppendLine(via.Length > 0 ? $"  ({via})" : string.Empty);
             if (skeleton.Length > 0)
             {
                 said.Append("  rig ").Append(skeleton).Append("  version ").Append(Say(rig.Version))
@@ -567,12 +597,37 @@ public static partial class ModelDump
             }
         }
 
-        said.Append(Say(looked)).Append(" doodad files read, ").Append(Say(Math.Min(lit, MostLitDoodads)))
-            .AppendLine(" with lights or with light in their .ao");
+        said.Append(Say(looked)).Append(" doodad files read (attached pieces included), ").Append(Say(Math.Min(lit, MostLitDoodads)))
+            .Append(" with lights; ").Append(Say(emptyOnly)).AppendLine(" more carry only an empty Lights block");
     }
 
+    /// <summary>Pieces an AOSet may attach before the rest are left out - a guard, not a count anybody has met.</summary>
+    private const int MostAttachedPieces = 512;
+
+    /// <summary>
+    /// What an AOSet's fixed_ao line attaches, and where: its last word is the piece's .ao, and the words before it place it.
+    /// </summary>
+    /// <remarks>
+    /// Seen as "10.8696 0 -25 9.68575e-08 -0.134839 -1.5708 1 0 Metadata/Terrain/Doodads/Lights/BrazierFire_01.ao":
+    /// what reads as a position, a turn and two more numbers. Printed as the file has them rather than named, until a
+    /// light drawn at its parent's position plus these can be held against the game.
+    /// </remarks>
+    private static (string Path, string Where)? Attached(string value)
+    {
+        string[] words = value.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (words.Length == 0 || !words[^1].Trim('"').EndsWith(".ao", StringComparison.OrdinalIgnoreCase))
+        {
+            return null;
+        }
+
+        return (words[^1].Trim('"'), string.Join(' ', words[..^1]));
+    }
+
+    /// <summary>How much of an environment that is not text is printed as hex - the whole of any one seen so far would fit.</summary>
+    private const int MostEnvironmentHex = 16 * 1024;
+
     /// <summary>A file as text where it is text, or its first bytes as hex where it is not.</summary>
-    private static string Printed(byte[]? content)
+    private static string Printed(byte[]? content, int mostHex = MostHex)
     {
         if (content is not { Length: > 0 })
         {
@@ -588,8 +643,8 @@ public static partial class ModelDump
 
         var said = new StringBuilder();
         said.Append("(not text: ").Append(Say(content.Length)).Append(" bytes, the first ")
-            .Append(Say(Math.Min(MostHex, content.Length))).AppendLine(" as hex)");
-        Hexed(content.AsSpan(0, Math.Min(MostHex, content.Length)), string.Empty, said);
+            .Append(Say(Math.Min(mostHex, content.Length))).AppendLine(" as hex)");
+        Hexed(content.AsSpan(0, Math.Min(mostHex, content.Length)), string.Empty, said);
         return said.ToString().TrimEnd();
     }
 

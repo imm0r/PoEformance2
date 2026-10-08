@@ -40,6 +40,13 @@ public sealed class StyleWindow
     /// </remarks>
     public Action? TabList { get; set; }
 
+    /// <summary>Draws the rows that bind the tool's own keys - the screenshot key and the capture key.</summary>
+    /// <remarks>
+    /// Here rather than among the Status page's switches, where they sat before: a key is set once
+    /// and looked for later, and this is the page somebody looks on for how the tool is set up.
+    /// </remarks>
+    public Action? Keys { get; set; }
+
     /// <summary>
     /// How the tool's own windows are drawn, when somebody has offered it for editing.
     /// </summary>
@@ -125,6 +132,11 @@ public sealed class StyleWindow
         if (TabList is not null && OverlayLayout.Subsection("Tabs", openByDefault: true))
         {
             TabList();
+        }
+
+        if (Keys is not null && OverlayLayout.Subsection("Keys", openByDefault: true))
+        {
+            Keys();
         }
     }
 

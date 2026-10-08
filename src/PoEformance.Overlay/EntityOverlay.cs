@@ -1843,6 +1843,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // This page hosts the list, so it is the page the list must never offer to
             // hide - see DrawHideList.
             TabList = () => _tools.DrawHideList("style"),
+            Keys = () =>
+            {
+                DrawScreenshotControls();
+                _capture.DrawControls();
+            },
         };
 
         // What is drawn on the game WORLD - markers, routes, the layout, the aids - has no
@@ -2327,7 +2332,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         }
     }
 
-    /// <summary>The Appearance row that shows and rebinds the screenshot key.</summary>
+    /// <summary>The row on Appearance → Keys that shows and rebinds the screenshot key.</summary>
     private void DrawScreenshotControls()
     {
         OverlayLayout.Group("Screenshot");
@@ -5355,9 +5360,6 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         }
 
         OverlayLayout.Hint("Only the windows actually lying on top of the open panel.");
-
-        DrawScreenshotControls();
-        _capture.DrawControls();
 
         _keepOut.DrawControls();
     }
