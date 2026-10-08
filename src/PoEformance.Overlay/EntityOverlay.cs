@@ -1210,17 +1210,31 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             return;
         }
 
-        uint colour = Style.Colour(StyleCatalogue.Keys.Room);
-        float width = Math.Max(1.5f, Style.Width(StyleCatalogue.Keys.Room, 2f) * 0.75f);
+        (uint outline, uint name, uint plate) = RoomInks();
+        if ((outline | name) == 0)
+        {
+            return;
+        }
+
+        float width = Math.Max(1f, Style.Width(StyleCatalogue.Keys.RoomOutline, 2f) * 0.75f);
         Span<Vector2> corners = stackalloc Vector2[4];
         foreach (RoomLaid room in arranged.Laid)
         {
-            Outlined(draw, map, player, grid, room.Where, colour, width, corners);
-            Labelled(draw, corners, room.Room, colour);
+            Outlined(draw, map, player, grid, room.Where, outline, width, corners);
+            Labelled(draw, corners, room.Room, name, plate);
         }
     }
 
-    /// <summary>A room's footprint outlined at the ground's height - the map is isometric, so a rhombus - its four corners on screen left in <paramref name="corners"/>.</summary>
+    /// <summary>
+    /// The room outlines' three inks from the style - nought for one switched off, which the drawing reads as "leave it out". Once per frame, not per room.
+    /// </summary>
+    private (uint Outline, uint Name, uint Plate) RoomInks()
+        => (Ink(StyleCatalogue.Keys.RoomOutline), Ink(StyleCatalogue.Keys.RoomOutlineName), Ink(StyleCatalogue.Keys.RoomOutlinePlate));
+
+    /// <summary>A style entry's colour, or nought where its row is switched off.</summary>
+    private uint Ink(string key) => Style.Visible(key) ? Style.Colour(key) : 0u;
+
+    /// <summary>A room's footprint outlined at the ground's height - the map is isometric, so a rhombus - its four corners on screen left in <paramref name="corners"/>; no line where <paramref name="colour"/> is nought.</summary>
     private static void Outlined(
         ImDrawListPtr draw, MapView map, WorldEntity player, TerrainGrid grid, RoomCandidate where, uint colour, float width, Span<Vector2> corners)
     {
@@ -1232,20 +1246,34 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             corners[one] = Grounded(grid, map, player, cellX, cellY);
         }
 
+        if (colour == 0)
+        {
+            return;
+        }
+
         for (var one = 0; one < 4; one++)
         {
             draw.AddLine(corners[one], corners[(one + 1) & 3], colour, width);
         }
     }
 
-    /// <summary>A room's name on a plate in the middle of its outline.</summary>
-    private static void Labelled(ImDrawListPtr draw, ReadOnlySpan<Vector2> corners, string room, uint colour)
+    /// <summary>A room's name on a plate in the middle of its outline - no name where <paramref name="colour"/> is nought, no plate where <paramref name="plate"/> is.</summary>
+    private static void Labelled(ImDrawListPtr draw, ReadOnlySpan<Vector2> corners, string room, uint colour, uint plate)
     {
+        if (colour == 0)
+        {
+            return;
+        }
+
         Vector2 middle = (corners[0] + corners[1] + corners[2] + corners[3]) * 0.25f;
         string name = TerrainRooms.NameFor(room);
         Vector2 size = ImGui.CalcTextSize(name);
         Vector2 at = middle - (size * 0.5f);
-        draw.AddRectFilled(at - new Vector2(3f, 1f), at + size + new Vector2(3f, 1f), 0xB4_1A1614, 3f);
+        if (plate != 0)
+        {
+            draw.AddRectFilled(at - new Vector2(3f, 1f), at + size + new Vector2(3f, 1f), plate, 3f);
+        }
+
         draw.AddText(at, colour, name);
     }
 
@@ -1284,45 +1312,57 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
         const int Cells = TerrainGrid.CellsPerTile;
         Span<Vector2> corners = stackalloc Vector2[4];
-        uint colour = Style.Colour(StyleCatalogue.Keys.Room);
-        float width = Math.Max(2f, Style.Width(StyleCatalogue.Keys.Room, 2f));
-        Outlined(draw, map, player, ghost.Grid, ghost.Where, colour, width, corners);
+        (uint outline, uint name, uint plate) = RoomInks();
+        float width = Math.Max(1f, Style.Width(StyleCatalogue.Keys.RoomOutline, 2f));
+        Outlined(draw, map, player, ghost.Grid, ghost.Where, outline, width, corners);
 
-        // WHERE IT PARTS WITH THE AREA: a red dot on each corner whose ground is not the room's, an
-        // orange ring on each tile whose definition is not what its slot asks for - and those a join
-        // explains drawn over in cyan, the same mark a touch larger, so no lookup is needed per mark.
-        // See RoomMisses for what counts as a join.
+        // WHERE IT PARTS WITH THE AREA: a dot on each corner whose ground is not the room's, a ring
+        // on each tile whose definition is not what its slot asks for - and those a join explains
+        // drawn over in a third colour, the same mark a touch larger, so no lookup is needed per
+        // mark. Each kind is its own style row; one switched off is not drawn. See RoomMisses for
+        // what counts as a join.
         RoomMisses misses = ghost.Misses;
-        foreach ((int x, int y) in misses.Corners)
+        uint corner = Ink(StyleCatalogue.Keys.RoomOutlineCorner);
+        if (corner != 0)
         {
-            draw.AddCircleFilled(Grounded(ghost.Grid, map, player, x * Cells, y * Cells), 3.5f, 0xFF_3030E0);
+            foreach ((int x, int y) in misses.Corners)
+            {
+                draw.AddCircleFilled(Grounded(ghost.Grid, map, player, x * Cells, y * Cells), 3.5f, corner);
+            }
         }
 
-        foreach ((int x, int y) in misses.Tiles)
+        uint tile = Ink(StyleCatalogue.Keys.RoomOutlineTile);
+        if (tile != 0)
         {
-            draw.AddCircle(Grounded(ghost.Grid, map, player, (x * Cells) + (Cells / 2), (y * Cells) + (Cells / 2)), 5f, 0xFF_2090F0, 12, 2f);
+            foreach ((int x, int y) in misses.Tiles)
+            {
+                draw.AddCircle(Grounded(ghost.Grid, map, player, (x * Cells) + (Cells / 2), (y * Cells) + (Cells / 2)), 5f, tile, 12, 2f);
+            }
         }
 
-        const uint Joined = 0xFF_E0C030;
-        foreach ((int x, int y) in misses.JoinCorners)
+        uint joined = Ink(StyleCatalogue.Keys.RoomOutlineJoin);
+        if (joined != 0)
         {
-            draw.AddCircleFilled(Grounded(ghost.Grid, map, player, x * Cells, y * Cells), 4f, Joined);
+            foreach ((int x, int y) in misses.JoinCorners)
+            {
+                draw.AddCircleFilled(Grounded(ghost.Grid, map, player, x * Cells, y * Cells), 4f, joined);
+            }
+
+            foreach ((int x, int y) in misses.Openings)
+            {
+                draw.AddCircle(Grounded(ghost.Grid, map, player, (x * Cells) + (Cells / 2), (y * Cells) + (Cells / 2)), 5f, joined, 12, 2.5f);
+            }
+
+            // A CAP, the tile beside an opening, the same ring with a dot in it.
+            foreach ((int x, int y) in misses.Caps)
+            {
+                Vector2 cap = Grounded(ghost.Grid, map, player, (x * Cells) + (Cells / 2), (y * Cells) + (Cells / 2));
+                draw.AddCircle(cap, 5f, joined, 12, 2.5f);
+                draw.AddCircleFilled(cap, 1.75f, joined);
+            }
         }
 
-        foreach ((int x, int y) in misses.Openings)
-        {
-            draw.AddCircle(Grounded(ghost.Grid, map, player, (x * Cells) + (Cells / 2), (y * Cells) + (Cells / 2)), 5f, Joined, 12, 2.5f);
-        }
-
-        // A CAP, the tile beside an opening, the same ring with a dot in it.
-        foreach ((int x, int y) in misses.Caps)
-        {
-            Vector2 cap = Grounded(ghost.Grid, map, player, (x * Cells) + (Cells / 2), (y * Cells) + (Cells / 2));
-            draw.AddCircle(cap, 5f, Joined, 12, 2.5f);
-            draw.AddCircleFilled(cap, 1.75f, Joined);
-        }
-
-        Labelled(draw, corners, ghost.Room, colour);
+        Labelled(draw, corners, ghost.Room, name, plate);
     }
 
     /// <summary>
