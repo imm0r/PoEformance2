@@ -215,6 +215,11 @@ public sealed class TileBookWindow : BookWindow<TileBook>
 
     private bool _roomsOnMap;
 
+    /// <summary>
+    /// Which tiles two rooms on the map may both hold, as the "rims shared" box has it - for this session only, like the doodad heights; see RoomArrangement.
+    /// </summary>
+    public RoomOverlap RoomsOverlap { get; private set; } = RoomOverlap.Rims;
+
     /// <summary>The area's rooms searched and arranged, for the header's line - the overlay asks it every frame while the box is ticked. Null leaves the box out.</summary>
     public AreaRooms? AllRooms { get; init; }
 
@@ -222,6 +227,13 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     private RoomArrangement? _roomsSaidOf;
     private string _roomsSaid = string.Empty;
     private string _roomsDetail = string.Empty;
+
+    /// <summary>The outlined row held against the rooms on the map, made once per arrangement and pick.</summary>
+    private RoomArrangement? _sharedOf;
+    private RoomCandidate? _sharedFor;
+    private string? _sharedRoom;
+    private string _sharedHeader = string.Empty;
+    private string[] _sharedLines = [];
 
     /// <inheritdoc/>
     protected override string Caption => "Search for any terrain tile or room";
@@ -336,6 +348,22 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         if (!_roomsOnMap)
         {
             return;
+        }
+
+        ImGui.SameLine();
+        bool rims = RoomsOverlap == RoomOverlap.Rims;
+        if (ImGui.Checkbox("rims shared##roomsrims", ref rims))
+        {
+            RoomsOverlap = rims ? RoomOverlap.Rims : RoomOverlap.None;
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("On: two rooms may both hold a tile on the outermost row or column of their footprints - where rooms join -"
+                + " but a tile inside a footprint is one room's alone.\n"
+                + "Off: no tile is two rooms', the first rule, which pushed rooms that join off their first place. Kept to compare;"
+                + " switching arranges the rooms again without searching.\n"
+                + "Pick a row of a room's list to see the tiles it shares with each room on the map.");
         }
 
         ImGui.SameLine();
@@ -795,7 +823,90 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         }
 
         ImGui.EndChild();
+        Sharing(room, found);
         Parting(found);
+    }
+
+    /// <summary>The row the map outlines, or null for none.</summary>
+    private RoomCandidate? Picked(RoomSearch found)
+        => _ghosted >= 0 && _ghosted < found.Candidates.Count
+            ? found.Candidates[_ghosted]
+            : _ghosted == GhostAround ? _around?.Where : null;
+
+    /// <summary>
+    /// The outlined row held against every room the map draws: the tiles it shares with each, on both rims and elsewhere, and how many it touches - with a button to copy them.
+    /// </summary>
+    /// <remarks>
+    /// WHAT THE ARRANGEMENT'S RULE RESTS ON. Rooms that join either lay their rims on one row - those
+    /// tiles held by both, nothing inside - or on two rows side by side, sharing nothing and touching
+    /// along the join. Held against a room known to be right, this says which; and on a room pushed off
+    /// its first row, which room held the tiles. Both halves are printed - the room's own place as
+    /// arranged first - so nothing has to be read off the map. Worked out once per pick.
+    /// </remarks>
+    private void Sharing(string room, RoomSearch found)
+    {
+        if (!_roomsOnMap || AllRooms?.Last is not { } arranged || Picked(found) is not { } candidate)
+        {
+            return;
+        }
+
+        if (!ReferenceEquals(arranged, _sharedOf) || _sharedFor != candidate || !string.Equals(room, _sharedRoom, StringComparison.Ordinal))
+        {
+            _sharedOf = arranged;
+            _sharedFor = candidate;
+            _sharedRoom = room;
+            string rule = arranged.Rule == RoomOverlap.Rims ? "rims shared" : "no tile shared";
+            if (!arranged.Layouts.TryGetValue(room, out RoomLayout? layout))
+            {
+                _sharedHeader = $"against the rooms on the map ({rule}): this room is not among them##roomshared";
+                _sharedLines = [];
+            }
+            else
+            {
+                IReadOnlyList<RoomShared> shared = arranged.Sharing(layout, candidate, except: room);
+                RoomLaid? self = arranged.Laid.FirstOrDefault(one => string.Equals(one.Room, room, StringComparison.OrdinalIgnoreCase));
+                var lines = new List<string>(shared.Count + 1)
+                {
+                    self is null
+                        ? "this room on the map: crowded out - every place on its list covers a tile a surer room holds"
+                        : string.Create(CultureInfo.InvariantCulture,
+                            $"this room on the map: tile {self.Where.X}, {self.Where.Y}, {RoomFinder.Said(self.Where.Turn)}, row {self.Rank + 1} of its list")
+                            + (self.Where == candidate ? " - the row picked" : string.Empty),
+                };
+                foreach (RoomShared one in shared)
+                {
+                    lines.Add(string.Create(CultureInfo.InvariantCulture,
+                        $"{TerrainRooms.NameFor(one.Laid.Room)} at tile {one.Laid.Where.X}, {one.Laid.Where.Y}, {RoomFinder.Said(one.Laid.Where.Turn)}:"
+                        + $" {one.Rims} tiles on both rims, {one.Elsewhere} elsewhere, {one.Touching} touching"));
+                }
+
+                int sharing = shared.Count(one => one.Rims + one.Elsewhere > 0);
+                _sharedHeader = string.Create(CultureInfo.InvariantCulture,
+                    $"against the rooms on the map ({rule}): tile {candidate.X}, {candidate.Y} shares tiles with {sharing}, touches {shared.Count - sharing} more##roomshared");
+                _sharedLines = [.. lines];
+            }
+        }
+
+        if (!ImGui.CollapsingHeader(_sharedHeader))
+        {
+            return;
+        }
+
+        if (ImGui.SmallButton("copy##roomsharedcopy"))
+        {
+            ImGui.SetClipboardText(string.Join('\n', _sharedLines));
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("Copies every line below. A tile on both rims lies on the outermost row or column of both footprints;"
+                + " elsewhere is inside either; touching is a tile of this row's beside one of the other room's, across a side.");
+        }
+
+        foreach (string line in _sharedLines)
+        {
+            ImGui.TextUnformatted(line);
+        }
     }
 
     /// <summary>

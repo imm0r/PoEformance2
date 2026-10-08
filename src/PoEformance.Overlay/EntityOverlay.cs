@@ -1204,7 +1204,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             return;
         }
 
-        RoomArrangement? arranged = _areaRooms.Arranged(grid, AreaRoomFiles());
+        RoomArrangement? arranged = _areaRooms.Arranged(grid, AreaRoomFiles(), _tileBook.RoomsOverlap);
         if (arranged is null || !map.IsLargeMap)
         {
             return;

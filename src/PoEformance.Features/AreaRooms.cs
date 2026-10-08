@@ -21,14 +21,17 @@ namespace PoEformance.Features;
 ///
 /// AGAIN ONLY WHEN THE AREA OR ITS ROOMS CHANGE: the grid by reference, as everywhere, and the rooms
 /// by their count - the loaded-file list only ever grows within an area, and a room arriving late is
-/// a new arrangement.
+/// a new arrangement. The searches are kept, so a change of RoomOverlap rule arranges them again on
+/// the spot: placing the rooms down their lists only looks up the tiles each place covers, where the
+/// searches took seconds.
 /// </remarks>
 public sealed class AreaRooms
 {
     private readonly Func<string, byte[]?> _read;
     private TerrainGrid? _grid;
     private int _rooms = -1;
-    private Task<RoomArrangement>? _running;
+    private Task<List<(string Room, RoomLayout Layout, RoomSearch Search)>>? _running;
+    private List<(string Room, RoomLayout Layout, RoomSearch Search)>? _searched;
     private RoomArrangement? _arranged;
 
     /// <summary>The running search's count of rooms done - one array per search, so one left to run out cannot count into the next.</summary>
@@ -56,7 +59,8 @@ public sealed class AreaRooms
     /// </summary>
     /// <param name="grid">The current area, or null where none is read.</param>
     /// <param name="rooms">The rooms the area loaded, by file.</param>
-    public RoomArrangement? Arranged(TerrainGrid? grid, IReadOnlyCollection<string> rooms)
+    /// <param name="rule">Which tiles two rooms may both hold.</param>
+    public RoomArrangement? Arranged(TerrainGrid? grid, IReadOnlyCollection<string> rooms, RoomOverlap rule)
     {
         ArgumentNullException.ThrowIfNull(rooms);
         if (grid?.Ground is not { } ground)
@@ -69,6 +73,7 @@ public sealed class AreaRooms
             // LET THE OLD ONE RUN OUT: it reads nothing this one changes, and its answer is dropped.
             _grid = grid;
             _rooms = rooms.Count;
+            _searched = null;
             _arranged = null;
             int[] done = [0];
             _done = done;
@@ -77,16 +82,21 @@ public sealed class AreaRooms
             _running = Task.Run(() => Search(files, grid, ground, done));
         }
 
-        if (_arranged is null && _running is { IsCompleted: true } finished)
+        if (_searched is null && _running is { IsCompleted: true } finished)
         {
-            _arranged = finished.IsCompletedSuccessfully ? finished.Result : RoomArrangement.None;
+            _searched = finished.IsCompletedSuccessfully ? finished.Result : [];
+        }
+
+        if (_searched is not null && (_arranged is null || _arranged.Rule != rule))
+        {
+            _arranged = RoomArrangement.Arrange(_searched, grid.TilesX, grid.TilesY, rule);
         }
 
         return _arranged;
     }
 
-    /// <summary>Every room searched in turn, then arranged.</summary>
-    private RoomArrangement Search(string[] files, TerrainGrid grid, TerrainGroundTypes ground, int[] done)
+    /// <summary>Every room searched in turn.</summary>
+    private List<(string Room, RoomLayout Layout, RoomSearch Search)> Search(string[] files, TerrainGrid grid, TerrainGroundTypes ground, int[] done)
     {
         // EACH TILE FILE ONCE across every room - the same cache the tile book keeps per area.
         var known = new ConcurrentDictionary<string, TileIdentity?>(StringComparer.OrdinalIgnoreCase);
@@ -101,6 +111,6 @@ public sealed class AreaRooms
             Interlocked.Increment(ref done[0]);
         }
 
-        return RoomArrangement.Arrange(searched, grid.TilesX, grid.TilesY);
+        return searched;
     }
 }
