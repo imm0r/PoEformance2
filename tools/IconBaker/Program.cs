@@ -58,11 +58,17 @@ internal static class Program
     };
 
     /// <summary>Contiguous, so the sheet's pixels are one span. See IconCache.Contiguous.</summary>
+    /// <remarks>
+    /// AND PNG ONLY. Everything this reads is a PNG - the sheet and the exports, which are found
+    /// as *.png - and the exports are files somebody else's overlay uploaded to the boss-icons
+    /// branch, so no other decoder is given the chance to run on them. That is also what keeps
+    /// this tool out of reach of the TIFF advisories suppressed in Directory.Build.props.
+    /// </remarks>
     private static readonly Configuration Contiguous = Contiguously();
 
     private static Configuration Contiguously()
     {
-        Configuration configuration = Configuration.Default.Clone();
+        var configuration = new Configuration(new PngConfigurationModule());
         configuration.PreferContiguousImageBuffers = true;
         return configuration;
     }

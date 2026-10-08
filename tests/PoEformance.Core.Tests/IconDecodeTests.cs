@@ -124,6 +124,62 @@ public class IconDecodeTests
         }
     }
 
+    /// <summary>A call that DECODES a file or a stream - not one that wraps pixels already in hand - and its arguments.</summary>
+    private static readonly Regex DecodesBytes =
+        new(@"Image\.(?:Load|Identify|DetectFormat)(?:Async)?(?:<\w+>)?\((?<args>[^()]*)\)", RegexOptions.Compiled);
+
+    /// <summary>
+    /// No picture is decoded by a configuration that knows TIFF - the ground the ImageSharp audit suppression in Directory.Build.props stands on.
+    /// </summary>
+    /// <remarks>
+    /// THE SUPPRESSION IS ONLY AS TRUE AS THIS. One of the advisories it sets aside is the BigTIFF
+    /// reader looping on a malformed file, and it does not reach the tool because every decode
+    /// names a configuration built without TIFF. A bare Image.Load takes the default one, which
+    /// has it - and would pass the build, the tests and the audit without a word.
+    /// </remarks>
+    [Fact]
+    public void NOPictureIsDecodedByAConfigurationThatKnowsTiff()
+    {
+        string[] files =
+        [
+            .. Directory.EnumerateFiles(OverlaySources, "*.cs", SearchOption.AllDirectories),
+            .. Directory.EnumerateFiles(Path.Combine(RepositoryRoot, "tools", "IconBaker"), "*.cs", SearchOption.TopDirectoryOnly),
+        ];
+
+        var found = 0;
+        foreach (string file in files)
+        {
+            string source = File.ReadAllText(file);
+            MatchCollection calls = DecodesBytes.Matches(source);
+            if (calls.Count == 0)
+            {
+                continue;
+            }
+
+            // A file that decodes builds its configurations without the default's format list.
+            Assert.DoesNotContain("Configuration.Default", source, StringComparison.Ordinal);
+            Assert.DoesNotContain("new TiffConfigurationModule(", source, StringComparison.Ordinal);
+            foreach (Match call in calls)
+            {
+                found++;
+                string args = call.Groups["args"].Value;
+                Assert.True(
+                    args.Contains("DecoderOptions", StringComparison.Ordinal),
+                    $"{Path.GetFileName(file)} decodes with the default configuration, which reads TIFF: Image.Load({args}). "
+                    + "Name IconCache.Contiguous or another configuration built without TIFF.");
+            }
+        }
+
+        // The icon cache's two, the exports' one, the portrait's one and the baker's two. A floor,
+        // so a rename that leaves the pattern matching nothing fails rather than passes.
+        Assert.True(found >= 6, $"found {found} decode calls, expected at least 6");
+
+        string iconCache = File.ReadAllText(Path.Combine(OverlaySources, "IconCache.cs"));
+        Assert.Contains("Configuration configuration = WithoutTiff();", iconCache, StringComparison.Ordinal);
+        string portrait = File.ReadAllText(Path.Combine(OverlaySources, "MonsterPortrait.cs"));
+        Assert.Contains("Configuration configuration = IconCache.WithoutTiff();", portrait, StringComparison.Ordinal);
+    }
+
     /// <summary>
     /// The portrait rests on rungs past the size where this matters, and plays at it under the usual cap.
     /// </summary>

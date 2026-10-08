@@ -271,7 +271,8 @@ public sealed class MonsterPortrait
     /// files on the spelling "_upload(", and this class writes "_upload!(". Playing draws at the
     /// cap now, and a cap raised past 1024 splits while playing too; the configuration covers it.
     ///
-    /// A cloned configuration rather than the global default, for the reason IconCache gives.
+    /// A configuration of its own rather than the global default, and without TIFF, for the
+    /// reasons IconCache gives.
     /// </remarks>
     private static readonly Configuration Contiguous = Contiguously();
 
@@ -3664,7 +3665,7 @@ public sealed class MonsterPortrait
 
     private static Configuration Contiguously()
     {
-        Configuration configuration = Configuration.Default.Clone();
+        Configuration configuration = IconCache.WithoutTiff();
         configuration.PreferContiguousImageBuffers = true;
         return configuration;
     }
