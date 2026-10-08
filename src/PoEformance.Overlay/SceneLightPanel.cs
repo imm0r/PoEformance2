@@ -21,19 +21,19 @@ public interface IMovableSun
 }
 
 /// <summary>
-/// The tile book's switches for lighting a picture the game's way: which lights, which environment, and the candidate readings where no file says.
+/// The tile book's switches for lighting a picture the game's way: which lights, which environment, and the sky's turn where no file says.
 /// </summary>
 /// <remarks>
 /// EVERY PART HAS ITS OWN SWITCH, as asked: the room's point lights, the sun, its shadows, the player's
 /// light, the ambient (none, the picture's flat one, the environment's cube), the exposure and the
 /// colour grade - so each can be held against a screenshot from the game on its own.
 ///
-/// THE CANDIDATE READINGS ARE CHOICES, NOT SETTINGS: how the sun's phi and theta, and the cube's two
-/// angles, become directions is worked out on the game's processor and written nowhere a file shows.
-/// Each reading is named for what it does to the picture - where the shadows fall on the game's
-/// screen, how high the sun stands - so the one that matches the game can be seen; the technical
-/// meaning is in its hint and in the hunt's report. "find the readings" asks the game itself which
-/// one it holds (<see cref="LightHunt"/>) and takes the answer when there is exactly one.
+/// THE SUN IS NO LONGER A CHOICE: how phi and theta become its direction was found in the game's
+/// memory (<see cref="SceneLight.GameSun"/>), and the row says where it throws the shadows on the
+/// game's screen and how high it stands. The sky's turn is still a candidate - its matrix was not
+/// found - offered only where it can change the picture and only as the turns that differ. "find the
+/// readings" asks the game (<see cref="LightHunt"/>): it checks the sun against the reading drawn,
+/// takes a sky turn found alone, and reports what lies beside the sun's vector.
 ///
 /// THE FREE SUN stands anywhere: two sliders - its bearing on the game's screen and its height - and
 /// shift + drag in the model window (<see cref="IMovableSun"/>). While it moves its shadows are drawn
@@ -59,9 +59,6 @@ public sealed class SceneLightPanel : IMovableSun
 
     /// <summary>Most environments the picker lists for a filter.</summary>
     private const int MostListed = 200;
-
-    /// <summary>Readings that light the ground closer together than this, in degrees, are said to hardly differ.</summary>
-    private const float SunsApart = 10f;
 
     /// <summary>The free sun's lowest and highest, in degrees: below the first the ground is all shadow.</summary>
     private const float LowestSun = 2f, HighestSun = 90f;
@@ -100,7 +97,6 @@ public sealed class SceneLightPanel : IMovableSun
     private bool _exposure = true;
     private bool _grade = true;
     private int _ambient = (int)SceneAmbient.Cube;
-    private int _sunReading;
     private int _cubeReading;
     private int _pointShape;
     private float _playerRadius = UsualPlayerRadius;
@@ -124,14 +120,11 @@ public sealed class SceneLightPanel : IMovableSun
 
     private string _labelsFor = "\0";
     private SceneLight.GroundOnScreen _labelsFrame;
-    private string[] _sunLabels = [];
-    private string _sunItems = string.Empty;
-    private float _sunWidest;
+    private string _sunSaid = string.Empty;
     private string _cubeItems = string.Empty;
     private float _cubeWidest;
     private int[] _cubeRows = [0];
     private int[] _cubeRowOf = [0, 0, 0, 0, 0];
-    private string _sunNote = string.Empty;
 
     private Task<FloatHuntResult>? _hunting;
     private LightHunt? _huntOf;
@@ -205,7 +198,6 @@ public sealed class SceneLightPanel : IMovableSun
         }
 
         EnvironmentSettings env = _environment;
-        var reading = (SceneLight.SunReading)_sunReading;
 
         // A FREE SUN IN AN ENVIRONMENT WITHOUT ONE shines white at one, or there would be nothing to move.
         Vector3 sunColour = !_sun ? Vector3.Zero : env.SunLight != Vector3.Zero ? env.SunLight : _freeSun ? Vector3.One : Vector3.Zero;
@@ -215,7 +207,7 @@ public sealed class SceneLightPanel : IMovableSun
             _playerLight ? new SceneLight.PlayerLamp(player, env.PlayerLight, _playerRadius) : null)
         {
             SunColour = sunColour,
-            SunDirection = _freeSun ? SceneLight.SunToward(_freeRound, _freeHeight) : SceneLight.SunFrom(env.Phi ?? 0f, env.Theta ?? 0f, reading),
+            SunDirection = _freeSun ? SceneLight.SunToward(_freeRound, _freeHeight) : SceneLight.SunFrom(env.Phi ?? 0f, env.Theta ?? 0f, SceneLight.GameSun),
             SunShadows = _shadows,
             ShadowSide = _moving ? ShadowMap.Coarse : ShadowMap.Usual,
             Ambient = (SceneAmbient)_ambient,
@@ -417,21 +409,10 @@ public sealed class SceneLightPanel : IMovableSun
     {
         if (!_freeSun)
         {
-            Fitted(_sunWidest, right);
-            if (ImGui.Combo("##scene-sun-reading", ref _sunReading, _sunItems))
-            {
-                _version++;
-            }
-
-            OverlayLayout.Hint("How directional_light's phi and theta make the sun's direction - worked out on the processor, in no file - named by where"
-                + " each reading throws the shadows on the game's screen and how high it puts the sun. Pick the one whose shadows fall as the game's do,"
-                + " or let \"find the readings\" below ask the game.\nThis one: " + SunMeanings[Math.Clamp(_sunReading, 0, SunMeanings.Length - 1)] + ".");
-            if (_sunNote.Length > 0)
-            {
-                ImGui.SetCursorPosX(start);
-                ImGuiText.Wrapped(OverlayInk.Quiet, ImGuiText.Escape(_sunNote));
-            }
-
+            ImGui.AlignTextToFramePadding();
+            ImGuiText.Wrapped(OverlayInk.Quiet, ImGuiText.Escape(_sunSaid));
+            OverlayLayout.Hint("The environment's sun as the game reads its angles: phi is its height above the ground, theta its bearing -"
+                + " found in the game's memory, where that one reading's vector was kept and no other's (SceneLight.GameSun).");
             ImGui.SetCursorPosX(start);
         }
 
@@ -441,7 +422,7 @@ public sealed class SceneLightPanel : IMovableSun
             {
                 // FROM WHERE THE ENVIRONMENT'S STANDS, so freeing it moves nothing until it is moved.
                 EnvironmentSettings env = _environment;
-                (_freeRound, float stands) = SceneLight.SunStands(SceneLight.SunFrom(env.Phi ?? 0f, env.Theta ?? 0f, (SceneLight.SunReading)_sunReading));
+                (_freeRound, float stands) = SceneLight.SunStands(SceneLight.SunFrom(env.Phi ?? 0f, env.Theta ?? 0f, SceneLight.GameSun));
                 _freeHeight = stands * 180f / MathF.PI is >= LowestSun and <= HighestSun ? stands : MathF.PI / 4f;
             }
 
@@ -552,8 +533,8 @@ public sealed class SceneLightPanel : IMovableSun
 
         OverlayLayout.Hint(_hunt is null
             ? "Not attached to the game's memory in a way that can search it."
-            : "Works out every sun reading's vector and every sky reading's turn from the area's own .env, and searches the game's memory for them -"
-                + " the game keeps the one it uses. Where exactly one is found it is taken. A few seconds; stand in an area with a sun.");
+            : "Works out every sun reading's vector and every sky turn from the area's own .env and searches the game's memory for them - the game"
+                + " keeps the one it uses. The sun is checked against the reading the picture draws; a sky turn found alone is taken. A few seconds.");
         if (said.Length == 0)
         {
             return;
@@ -623,13 +604,6 @@ public sealed class SceneLightPanel : IMovableSun
         }
 
         _verdict = asked.Read(done.Result);
-        if (_verdict.Sun is { } sun)
-        {
-            _sunReading = sun;
-            _freeSun = false;
-            _version++;
-        }
-
         if (_verdict.Cube is { } cube)
         {
             _cubeReading = cube;
@@ -672,44 +646,11 @@ public sealed class SceneLightPanel : IMovableSun
         _labelsFor = path;
         _labelsFrame = frame;
         EnvironmentSettings env = _environment;
-        int count = Enum.GetValues<SceneLight.SunReading>().Length;
-        _sunLabels = new string[count];
-        var lighting = new List<Vector3>(count);
-        for (var reading = 0; reading < count; reading++)
-        {
-            if (env.Phi is not { } phi || env.Theta is not { } theta)
-            {
-                _sunLabels[reading] = string.Create(CultureInfo.InvariantCulture, $"reading {reading + 1}: the environment gives no sun angles");
-                continue;
-            }
-
-            Vector3 travels = SceneLight.SunFrom(phi, theta, (SceneLight.SunReading)reading);
-            _sunLabels[reading] = string.Create(CultureInfo.InvariantCulture, $"reading {reading + 1}: {Throws(travels, frame)}");
-            if (travels.Z > 0f)
-            {
-                lighting.Add(travels);
-            }
-        }
-
-        _sunItems = string.Join('\0', _sunLabels) + "\0";
-        _sunWidest = _sunLabels.Max(one => ComboWidth(one));
-
-        // HOW FAR APART THE READINGS THAT LIGHT THE GROUND ARE: where phi and theta are nearly equal -
-        // AzmerianRanges' 2.339 and 2.321 - swapping them changes almost nothing, and the picture
-        // hardly moves from one to the next. Said, so the choice is not mistaken for broken.
-        float spread = 0f;
-        for (var a = 0; a < lighting.Count; a++)
-        {
-            for (int b = a + 1; b < lighting.Count; b++)
-            {
-                spread = MathF.Max(spread, MathF.Acos(Math.Clamp(Vector3.Dot(lighting[a], lighting[b]), -1f, 1f)) * 180f / MathF.PI);
-            }
-        }
-
-        _sunNote = lighting.Count > 1 && spread < SunsApart
-            ? string.Create(CultureInfo.InvariantCulture,
-                $"here the {lighting.Count} readings that light the ground lie within {spread:0}° of each other - phi {env.Phi:0.###} and theta {env.Theta:0.###} are nearly equal, so the pick hardly shows")
-            : string.Empty;
+        _sunSaid = env.Phi is { } phi && env.Theta is { } theta
+            ? env.SunLight == Vector3.Zero
+                ? "the environment's sun has no light (its multiplier is nought)"
+                : Throws(SceneLight.SunFrom(phi, theta, SceneLight.GameSun), frame)
+            : "the environment gives no sun angles";
 
         // ONLY THE TURNS THAT DIFFER: with one of the two angles nought the four orders come to one or
         // two turns, and offering four rows that draw the same picture read as a switch that did nothing.
@@ -828,7 +769,7 @@ public sealed class SceneLightPanel : IMovableSun
         string sunSaid = !env.Ready ? "no environment" : env.SunLight == Vector3.Zero && !_freeSun ? "no sun" : "sun";
         if (_sun && (_freeSun || (env.Ready && env.SunLight != Vector3.Zero)))
         {
-            Vector3 travels = _freeSun ? SceneLight.SunToward(_freeRound, _freeHeight) : SceneLight.SunFrom(env.Phi ?? 0f, env.Theta ?? 0f, (SceneLight.SunReading)_sunReading);
+            Vector3 travels = _freeSun ? SceneLight.SunToward(_freeRound, _freeHeight) : SceneLight.SunFrom(env.Phi ?? 0f, env.Theta ?? 0f, SceneLight.GameSun);
             float height = MathF.Asin(Math.Clamp(travels.Z, -1f, 1f)) * 180f / MathF.PI;
             sunSaid = string.Create(CultureInfo.InvariantCulture, $"{(_freeSun ? "free sun" : "sun")} {height:0}° high{(height < 0f ? " - BELOW the ground" : string.Empty)}");
             lines.Add(string.Create(CultureInfo.InvariantCulture,

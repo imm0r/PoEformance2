@@ -9,7 +9,15 @@ namespace PoEformance.Core.Diagnostics;
 /// <param name="Name">What it is, for the report.</param>
 /// <param name="Values">The floats in order; a NaN is a place left unchecked - padding in a matrix row, say.</param>
 /// <param name="Tolerance">How far each float may be from its value; nought asks for the exact value.</param>
-public sealed record FloatNeedle(string Name, float[] Values, float Tolerance);
+/// <param name="Around">How many bytes either side of its first few places to read back with the result - nought for none. See <see cref="FloatDump"/>.</param>
+public sealed record FloatNeedle(string Name, float[] Values, float Tolerance, int Around = 0);
+
+/// <summary>The bytes read round a place a needle was found, for a person to see what the game keeps beside it.</summary>
+/// <param name="At">Where the needle was found.</param>
+/// <param name="Needle">Which needle.</param>
+/// <param name="From">The address of the first byte read.</param>
+/// <param name="Bytes">What was there.</param>
+public sealed record FloatDump(ulong At, int Needle, ulong From, byte[] Bytes);
 
 /// <summary>Where a needle was found.</summary>
 /// <param name="At">The address of its first float.</param>
@@ -35,6 +43,7 @@ public sealed class FloatHuntProgress
 /// <param name="Unsearched">The needles that could not be looked for: nothing in them but nought, one and blanks.</param>
 /// <param name="Truncated">True when the byte budget stopped it before the last region.</param>
 /// <param name="Took">How long it took.</param>
+/// <param name="Dumps">The bytes round the first places of the needles that asked for them, or null.</param>
 public sealed record FloatHuntResult(
     long RegionsWalked,
     long BytesScanned,
@@ -42,7 +51,8 @@ public sealed record FloatHuntResult(
     IReadOnlyList<int> Capped,
     IReadOnlyList<int> Unsearched,
     bool Truncated,
-    TimeSpan Took);
+    TimeSpan Took,
+    IReadOnlyList<FloatDump>? Dumps = null);
 
 /// <summary>
 /// Searches the whole of the target's memory for runs of floats near given values - a vector or a matrix the caller can work out, to learn where and in which form the game keeps it.
@@ -73,6 +83,12 @@ public static class FloatHunt
     /// <summary>The longest needle, in floats - a 4 by 4 matrix.</summary>
     public const int LongestNeedle = 16;
 
+    /// <summary>How many of a needle's places have their surroundings read back, where it asks.</summary>
+    public const int MostDumps = 4;
+
+    /// <summary>The most bytes read either side of a place.</summary>
+    public const int MostAround = 4096;
+
     /// <summary>
     /// Walks every readable region, nearest the anchor first, and reports where each needle lies.
     /// </summary>
@@ -82,13 +98,15 @@ public static class FloatHunt
     /// <param name="anchor">An address in the game's own heap to start from; nought keeps the enumeration order.</param>
     /// <param name="progress">Where to say how far it has got, or null.</param>
     /// <param name="cancel">Stops it between chunks.</param>
+    /// <param name="budget">The most bytes looked through - HeapScan's budget unless the caller wants further.</param>
     public static FloatHuntResult Run(
         IMemoryReader reader,
         IMemoryRegions regions,
         IReadOnlyList<FloatNeedle> needles,
         ulong anchor = 0,
         FloatHuntProgress? progress = null,
-        CancellationToken cancel = default)
+        CancellationToken cancel = default,
+        long budget = HeapScan.ByteBudget)
     {
         ArgumentNullException.ThrowIfNull(reader);
         ArgumentNullException.ThrowIfNull(regions);
@@ -124,6 +142,7 @@ public static class FloatHunt
         }
 
         Anchor[] sorted = [.. anchors.OrderBy(one => one.Low)];
+        float widest = sorted.Max(one => one.High - one.Low);
         ulong[] buckets = Buckets(sorted);
         int overlap = longest * sizeof(float);
         IEnumerable<MemoryRegion> order = anchor == 0
@@ -140,7 +159,7 @@ public static class FloatHunt
                     continue;
                 }
 
-                if (scanned >= HeapScan.ByteBudget)
+                if (scanned >= budget)
                 {
                     truncated = true;
                     break;
@@ -167,7 +186,7 @@ public static class FloatHunt
 
                     scanned += want;
                     progress?.Add(want);
-                    Sweep(buffer.AsSpan(0, (want + extra) & ~3), want, region.Address + taken, needles, sorted, buckets, found, capped, sightings);
+                    Sweep(buffer.AsSpan(0, (want + extra) & ~3), want, region.Address + taken, needles, sorted, widest, buckets, found, capped, sightings);
                 }
             }
         }
@@ -176,7 +195,32 @@ public static class FloatHunt
             ArrayPool<byte>.Shared.Return(buffer);
         }
 
-        return new FloatHuntResult(walked, scanned, sightings, [.. capped.Order()], unsearched, truncated, clock.Elapsed);
+        return new FloatHuntResult(walked, scanned, sightings, [.. capped.Order()], unsearched, truncated, clock.Elapsed, Dumps(reader, needles, sightings));
+    }
+
+    /// <summary>The bytes round the first places of each needle that asked for them, windows that overlap one already read left out.</summary>
+    private static List<FloatDump> Dumps(IMemoryReader reader, IReadOnlyList<FloatNeedle> needles, List<FloatSighting> sightings)
+    {
+        var dumps = new List<FloatDump>();
+        var taken = new int[needles.Count];
+        foreach (FloatSighting one in sightings.OrderBy(sighting => sighting.At))
+        {
+            int around = Math.Clamp(needles[one.Needle].Around, 0, MostAround);
+            if (around == 0 || taken[one.Needle] >= MostDumps || dumps.Exists(dump => one.At >= dump.From && one.At < dump.From + (ulong)dump.Bytes.Length))
+            {
+                continue;
+            }
+
+            ulong from = one.At > (ulong)around ? one.At - (ulong)around : 0;
+            var bytes = new byte[(2 * around) + (needles[one.Needle].Values.Length * sizeof(float))];
+            if (reader.TryRead(from, bytes))
+            {
+                taken[one.Needle]++;
+                dumps.Add(new FloatDump(one.At, one.Needle, from, bytes));
+            }
+        }
+
+        return dumps;
     }
 
     /// <summary>The float a needle is first looked for by: its largest that is not nought, one or a blank - null where it has none.</summary>
@@ -244,7 +288,7 @@ public static class FloatHunt
     /// most vectors hold one of the right size, and picking the lanes back out cost more than it saved.
     /// </remarks>
     private static void Sweep(
-        ReadOnlySpan<byte> chunk, int starts, ulong at, IReadOnlyList<FloatNeedle> needles, Anchor[] anchors, ulong[] buckets,
+        ReadOnlySpan<byte> chunk, int starts, ulong at, IReadOnlyList<FloatNeedle> needles, Anchor[] anchors, float widest, ulong[] buckets,
         int[] found, HashSet<int> capped, List<FloatSighting> into)
     {
         ReadOnlySpan<uint> words = MemoryMarshal.Cast<byte, uint>(chunk);
@@ -254,18 +298,37 @@ public static class FloatHunt
             uint bucket = words[index] >> 16;
             if ((marks[(int)(bucket >> 6)] & (1UL << (int)(bucket & 63))) != 0)
             {
-                Check(MemoryMarshal.Cast<byte, float>(chunk), index, starts, at, needles, anchors, found, capped, into);
+                Check(MemoryMarshal.Cast<byte, float>(chunk), index, starts, at, needles, anchors, widest, found, capped, into);
             }
         }
     }
 
+    /// <summary>
+    /// Compares the needles whose first float this one may be, found by a binary search on the anchors' lower bounds - there are hundreds of them when every turn of a matrix is looked for.
+    /// </summary>
     private static void Check(
-        ReadOnlySpan<float> floats, int index, int starts, ulong at, IReadOnlyList<FloatNeedle> needles, Anchor[] anchors,
+        ReadOnlySpan<float> floats, int index, int starts, ulong at, IReadOnlyList<FloatNeedle> needles, Anchor[] anchors, float widest,
         int[] found, HashSet<int> capped, List<FloatSighting> into)
     {
         float value = floats[index];
-        foreach (Anchor one in anchors)
+        int low = 0, high = anchors.Length;
+        float least = value - widest;
+        while (low < high)
         {
+            int middle = (low + high) >>> 1;
+            if (anchors[middle].Low < least)
+            {
+                low = middle + 1;
+            }
+            else
+            {
+                high = middle;
+            }
+        }
+
+        for (int place = low; place < anchors.Length; place++)
+        {
+            Anchor one = anchors[place];
             if (one.Low > value)
             {
                 break;

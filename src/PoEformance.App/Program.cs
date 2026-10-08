@@ -3124,10 +3124,12 @@ internal static class Program
         overlay.Version = PoEformance.Features.ToolVersion.With(PoEformance.Features.BuildStamp.Load());
 
         // THE LIGHT PANEL'S SEARCH of the game's memory, off the frame - see FloatHunt and LightHunt.
-        // Set before the books are attached, which take it as they are made.
+        // Set before the books are attached, which take it as they are made. Twice HeapScan's budget:
+        // the first hunt in AzmerianRanges stopped at eight gigabytes with the sky's turn not found.
         if (reader is IMemoryRegions space)
         {
-            overlay.HuntFloats = (needles, anchor, progress) => Task.Run(() => PoEformance.Core.Diagnostics.FloatHunt.Run(reader, space, needles, anchor, progress));
+            overlay.HuntFloats = (needles, anchor, progress) => Task.Run(() => PoEformance.Core.Diagnostics.FloatHunt.Run(
+                reader, space, needles, anchor, progress, budget: 2 * PoEformance.Core.Diagnostics.HeapScan.ByteBudget));
         }
 
         // The capture key's memory: a recording started on demand, and inside it ONE pass that reads
