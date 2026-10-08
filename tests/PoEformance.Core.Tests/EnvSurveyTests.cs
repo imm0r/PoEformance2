@@ -48,6 +48,42 @@ public class EnvSurveyTests
         Assert.DoesNotContain("Seepage.env", whole, StringComparison.Ordinal);
     }
 
+    /// <summary>The cube maps the environments name are tallied by how they are stored - the header is what says whether the picture can read them.</summary>
+    [Fact]
+    public void THECUBEMapsAreTalliedByTheirHeader()
+    {
+        const string Cube = "Art/2DArt/Cubemaps/seepagev2_diffuse.dds";
+        var files = new Dictionary<string, byte[]>
+        {
+            ["Metadata/EnvironmentSettings/Maps/Seepage.env"] = Encoding.UTF8.GetBytes(Seepage),
+            [Cube] = CubeHeader(32, 6, dxgi: 95),
+        };
+
+        string said = EnvSurvey.Of(path => files.GetValueOrDefault(path), ["Metadata/EnvironmentSettings/Maps/Seepage.env"]);
+
+        Assert.Contains("=== the cube maps the environments name, by how they are stored: 1 distinct", said, StringComparison.Ordinal);
+        Assert.Contains("1  diffuse_cube: 32x32 · 6 levels · pixel format flags 0x4 · fourCC DX10 · DXGI format 95 (BC6H_UF16) · cube x1  e.g. " + Cube, said, StringComparison.Ordinal);
+    }
+
+    /// <summary>A DX10 DDS header of a cube, nothing after it - all a header is asked for.</summary>
+    private static byte[] CubeHeader(int size, int levels, int dxgi)
+    {
+        var dds = new byte[148];
+        "DDS "u8.CopyTo(dds);
+        BitConverter.TryWriteBytes(dds.AsSpan(4), 124);
+        BitConverter.TryWriteBytes(dds.AsSpan(12), size);
+        BitConverter.TryWriteBytes(dds.AsSpan(16), size);
+        BitConverter.TryWriteBytes(dds.AsSpan(28), levels);
+        BitConverter.TryWriteBytes(dds.AsSpan(80), 0x4u);
+        "DX10"u8.CopyTo(dds.AsSpan(84));
+        BitConverter.TryWriteBytes(dds.AsSpan(112), 0x200u | 0xFC00u);
+        BitConverter.TryWriteBytes(dds.AsSpan(128), dxgi);
+        BitConverter.TryWriteBytes(dds.AsSpan(132), 3);
+        BitConverter.TryWriteBytes(dds.AsSpan(136), 0x4u);
+        BitConverter.TryWriteBytes(dds.AsSpan(140), 1);
+        return dds;
+    }
+
     [Fact]
     public void WITHNoInstallItSaysSo()
         => Assert.Equal("no install to read the environments from", EnvSurvey.Of(null, ["a.env"]));

@@ -60,6 +60,7 @@ public static class EnvSurvey
         }
 
         var keys = new SortedDictionary<string, Key>(StringComparer.Ordinal);
+        var cubes = new SortedDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         var failures = new List<string>();
         var lit = new List<(string Path, string Text, int Keys)>();
         int parsed = 0, missing = 0;
@@ -85,6 +86,10 @@ public static class EnvSurvey
                 parsed++;
                 var seen = new HashSet<string>(StringComparer.Ordinal);
                 Walk(document.RootElement, string.Empty, path, keys, seen);
+                foreach ((string kind, string cube) in Cubes(document.RootElement))
+                {
+                    cubes.TryAdd(cube, kind);
+                }
                 if (document.RootElement.ValueKind == JsonValueKind.Object
                     && document.RootElement.TryGetProperty("directional_light", out JsonElement sun)
                     && sun.ValueKind == JsonValueKind.Object
@@ -124,6 +129,8 @@ public static class EnvSurvey
             said.AppendLine();
         }
 
+        Formats(read, cubes, step, said);
+
         said.AppendLine().AppendLine("=== whole files with a sun, the most keys first");
         foreach ((string path, string text, _) in lit.OrderByDescending(one => one.Keys).ThenBy(one => one.Path, StringComparer.Ordinal).Take(MostWholeFiles))
         {
@@ -131,6 +138,77 @@ public static class EnvSurvey
         }
 
         return said.ToString();
+    }
+
+    /// <summary>The cube maps an environment names - its <c>environment_mapping</c>'s <c>*_cube</c> paths, by kind.</summary>
+    public static IEnumerable<(string Kind, string Path)> Cubes(JsonElement root)
+    {
+        if (root.ValueKind != JsonValueKind.Object
+            || !root.TryGetProperty("environment_mapping", out JsonElement mapping)
+            || mapping.ValueKind != JsonValueKind.Object)
+        {
+            yield break;
+        }
+
+        foreach (JsonProperty one in mapping.EnumerateObject())
+        {
+            if (one.Name.EndsWith("_cube", StringComparison.Ordinal) && one.Value.ValueKind == JsonValueKind.String
+                && one.Value.GetString() is { Length: > 0 } path)
+            {
+                yield return (one.Name, path);
+            }
+        }
+    }
+
+    /// <summary>The cube maps an environment's text names, or none where it is not JSON.</summary>
+    public static List<(string Kind, string Path)> Cubes(string text)
+    {
+        ArgumentNullException.ThrowIfNull(text);
+        try
+        {
+            using JsonDocument document = JsonDocument.Parse(text, Lenient);
+            return [.. Cubes(document.RootElement)];
+        }
+        catch (JsonException)
+        {
+            return [];
+        }
+    }
+
+    /// <summary>
+    /// What the cube maps are stored as: each distinct header, how many cubes have it, and some of them.
+    /// </summary>
+    /// <remarks>
+    /// THE AMBIENT LIGHT WAITS ON THIS. An area's diffuse cube is its ambient, and the picture cannot
+    /// sample one it cannot decode; the decoder in use reads the first face of a few block formats and
+    /// no HDR ones. The header says which formats - and sizes - are there to be read.
+    /// </remarks>
+    private static void Formats(Func<string, byte[]?> read, SortedDictionary<string, string> cubes, Action<string>? step, StringBuilder said)
+    {
+        said.AppendLine().Append("=== the cube maps the environments name, by how they are stored: ").Append(Say(cubes.Count)).AppendLine(" distinct");
+        var formats = new SortedDictionary<string, List<string>>(StringComparer.Ordinal);
+        int at = 0;
+        foreach ((string path, string kind) in cubes)
+        {
+            if (at++ % 50 == 0)
+            {
+                step?.Invoke($"cube {at} of {cubes.Count}");
+            }
+
+            string header = kind + ": " + ModelDump.Header(GameArt.ReadRaw(read, path));
+            if (!formats.TryGetValue(header, out List<string>? paths))
+            {
+                paths = [];
+                formats[header] = paths;
+            }
+
+            paths.Add(path);
+        }
+
+        foreach ((string header, List<string> paths) in formats.OrderByDescending(one => one.Value.Count))
+        {
+            said.Append(Say(paths.Count)).Append("  ").Append(header).Append("  e.g. ").AppendLine(string.Join(" | ", paths.Take(3)));
+        }
     }
 
     /// <summary>Every key under an element, by its dotted name - each file counted once per key.</summary>
