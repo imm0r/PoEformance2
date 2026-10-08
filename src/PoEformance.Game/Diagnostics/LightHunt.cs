@@ -46,6 +46,12 @@ public sealed class LightHunt
     /// <summary>How near an angle must sit to a vector or matrix to be said to be beside it, in bytes.</summary>
     public const int Beside = 4096;
 
+    /// <summary>How many bytes either side of the sun's vector are read back, to see what the game keeps beside it.</summary>
+    public const int Around = 256;
+
+    /// <summary>Most of the other arrangements of the cube's turn listed when found.</summary>
+    private const int MostArrangementsSaid = 24;
+
     private static readonly string[] CubeOrders = ["", "turned by hor, then tipped about x by vert", "tipped about x by vert, then turned by hor", "turned by hor, then tipped about y by vert", "tipped about y by vert, then turned by hor"];
 
     private readonly List<Entry> _entries;
@@ -96,7 +102,7 @@ public sealed class LightHunt
             {
                 Vector3 travels = SceneLight.SunFrom(phi, theta, reading);
                 entries.Add(new Entry(What.Sun, (int)reading, false, false,
-                    new FloatNeedle($"sun reading {(int)reading + 1}", [travels.X, travels.Y, travels.Z], Tolerance)));
+                    new FloatNeedle($"sun reading {(int)reading + 1}", [travels.X, travels.Y, travels.Z], Tolerance, Around)));
             }
 
             entries.Add(Angle("phi", phi));
@@ -134,6 +140,12 @@ public sealed class LightHunt
                 }
             }
 
+            // EVERY OTHER ARRANGEMENT OF THE SAME TWO TURNS: about any axis, either way round, after any
+            // swap or flip of the axes - the cube's own frame need not be the world's. The first hunt
+            // found no reading's turn in AzmerianRanges, as written or transposed, while the sun's
+            // vector was there nine times over.
+            entries.AddRange(Arrangements(horizontal, vertical, built.Select(one => one.Turn)));
+
             if (environment.HorAngle is { } h)
             {
                 entries.Add(Angle("hor_angle", h));
@@ -145,7 +157,7 @@ public sealed class LightHunt
             }
         }
 
-        if (!entries.Exists(one => one.What is What.Sun or What.Cube))
+        if (!entries.Exists(one => one.What is What.Sun or What.Cube or What.CubeOther))
         {
             why = "the environment gives neither a sun's angles nor a cube turn";
             return null;
@@ -211,6 +223,33 @@ public sealed class LightHunt
             }
 
             sun = sunFound.Count == 1 ? sunFound[0] : null;
+
+            // BOTH WAYS ROUND, SIDE BY SIDE, is how AzmerianRanges held it: each copy of a reading's
+            // vector had its negative sixteen bytes on. Which of the two is the light's way is then
+            // settled by the ground: the sun of a sunlit area stands above it, so its light travels
+            // down - plus z, the game's up being minus z.
+            if (sunFound.Count == 2 && Math.Abs(sunFound[0] - sunFound[1]) == 4 && env.Phi is { } phi && env.Theta is { } theta)
+            {
+                int first = _entries.FindIndex(one => one.What == What.Sun && one.Reading == sunFound[0]);
+                int second = _entries.FindIndex(one => one.What == What.Sun && one.Reading == sunFound[1]);
+                int beside = found[first].Count(place => found[second].Exists(other => Math.Abs((long)other - (long)place) == 16));
+                int[] lighting = [.. sunFound.Where(one => SceneLight.SunFrom(phi, theta, (SceneLight.SunReading)one).Z > 0f)];
+                report.Append(CultureInfo.InvariantCulture,
+                    $"  the two are each other's negatives, {beside} of {found[first].Count} copies side by side, sixteen bytes apart").AppendLine();
+                if (lighting.Length == 1)
+                {
+                    sun = lighting[0];
+                    report.Append(CultureInfo.InvariantCulture,
+                        $"  {_sunName(lighting[0])} is the one whose sun stands above the ground - its light travels down, plus z - so it is the light's way").AppendLine();
+                }
+            }
+
+            if (sun is { } settled)
+            {
+                report.AppendLine(settled == (int)SceneLight.GameSun
+                    ? "  that is the reading the picture draws the sun by (SceneLight.GameSun)"
+                    : $"  that is NOT the reading the picture draws the sun by - it draws {_sunName((int)SceneLight.GameSun)} (SceneLight.GameSun)");
+            }
         }
 
         foreach (int at in Enumerable.Range(0, _entries.Count).Where(one => _entries[one].What == What.Angle))
@@ -244,7 +283,24 @@ public sealed class LightHunt
                 report.Append(CultureInfo.InvariantCulture, $"  cube reading {reading + 1} is reading {same + 1}'s turn for these angles - one of them is nought - so the two cannot be told apart here").AppendLine();
             }
 
+            int arrangements = _entries.Count(one => one.What == What.CubeOther);
+            var arranged = Enumerable.Range(0, _entries.Count).Where(one => _entries[one].What == What.CubeOther && found[one].Count > 0).ToList();
+            report.Append(CultureInfo.InvariantCulture,
+                $"  every other arrangement of the same turns - about any axis, either way, after any swap or flip of the axes: {arrangements} looked for, {arranged.Count} found").AppendLine();
+            foreach (int at in arranged.Take(MostArrangementsSaid))
+            {
+                report.Append(CultureInfo.InvariantCulture, $"    {_entries[at].Needle.Name}: {Places(found[at], capped.Contains(at), false, angles)}").AppendLine();
+            }
+
             cube = cubeFound.Count == 1 ? cubeFound[0] : null;
+        }
+
+        // WHAT THE GAME KEEPS BESIDE THE SUN'S VECTOR, a row of eight floats at a time, the vector's
+        // own in brackets - the cube's turn and the light's other numbers may sit next to it.
+        foreach (FloatDump dump in result.Dumps ?? [])
+        {
+            report.Append(CultureInfo.InvariantCulture, $"beside {_entries[dump.Needle].Needle.Name} at 0x{dump.At:X}:").AppendLine();
+            Dumped(report, dump, _entries[dump.Needle].Needle.Values.Length);
         }
 
         string sunSaid = !_entries.Exists(one => one.What == What.Sun) ? "no sun angles"
@@ -267,6 +323,132 @@ public sealed class LightHunt
     }
 
     private static Entry Angle(string name, float value) => new(What.Angle, -1, false, false, new FloatNeedle(name, [value], 0f));
+
+    /// <summary>
+    /// Every arrangement of the environment's two turns but the readings' own: each turn about any of the three axes, either way, in either order, after any of the 48 swaps and flips of the axes - each matrix once, in both layouts.
+    /// </summary>
+    private static IEnumerable<Entry> Arrangements(float horizontal, float vertical, IEnumerable<Matrix4x4> readings)
+    {
+        var seen = new List<Matrix4x4>();
+        foreach (Matrix4x4 one in readings)
+        {
+            seen.Add(one);
+            seen.Add(Matrix4x4.Transpose(one));
+        }
+
+        string[] axes = ["x", "y", "z"];
+        var entries = new List<Entry>();
+        foreach ((Matrix4x4 swap, string swapSaid) in Swaps())
+        {
+            for (var first = 0; first < 3; first++)
+            {
+                for (var second = 0; second < 3; second++)
+                {
+                    if (second == first && vertical != 0f && horizontal != 0f)
+                    {
+                        continue;
+                    }
+
+                    foreach (float h in (ReadOnlySpan<float>)[horizontal, -horizontal])
+                    {
+                        foreach (float v in (ReadOnlySpan<float>)[vertical, -vertical])
+                        {
+                            foreach (bool horFirst in (ReadOnlySpan<bool>)[true, false])
+                            {
+                                Matrix4x4 round = Turn(first, h), tip = Turn(second, v);
+                                Matrix4x4 turn = swap * (horFirst ? round * tip : tip * round);
+                                if (seen.Exists(one => Near(one, turn)))
+                                {
+                                    continue;
+                                }
+
+                                seen.Add(turn);
+                                string byHor = string.Create(CultureInfo.InvariantCulture, $"about {axes[first]} by {(h < 0f ? "-" : "+")}hor");
+                                string byVert = string.Create(CultureInfo.InvariantCulture, $"about {axes[second]} by {(v < 0f ? "-" : "+")}vert");
+                                string turns = horizontal == 0f ? byVert : vertical == 0f ? byHor : horFirst ? $"{byHor}, then {byVert}" : $"{byVert}, then {byHor}";
+                                string said = $"axes {swapSaid}, turned {turns}";
+                                entries.Add(new Entry(What.CubeOther, -1, false, false, new FloatNeedle(said + ", 3 by 3", Rows(turn, padded: false), Tolerance)));
+                                entries.Add(new Entry(What.CubeOther, -1, false, true, new FloatNeedle(said + ", rows of four", Rows(turn, padded: true), Tolerance)));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return entries;
+    }
+
+    /// <summary>The 48 swaps and flips of three axes, each as the matrix a row vector is put through first, and how it is said.</summary>
+    private static IEnumerable<(Matrix4x4 Swap, string Said)> Swaps()
+    {
+        int[][] orders = [[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]];
+        string[] axes = ["x", "y", "z"];
+        foreach (int[] order in orders)
+        {
+            for (var signs = 0; signs < 8; signs++)
+            {
+                var m = Matrix4x4.Identity;
+                m.M11 = m.M22 = m.M33 = 0f;
+                var said = new StringBuilder();
+                for (var row = 0; row < 3; row++)
+                {
+                    float sign = (signs & (1 << row)) != 0 ? -1f : 1f;
+                    Set(ref m, row, order[row], sign);
+                    said.Append(axes[row]).Append('>').Append(sign < 0f ? "-" : string.Empty).Append(axes[order[row]]).Append(row < 2 ? " " : string.Empty);
+                }
+
+                yield return (m, said.ToString());
+            }
+        }
+    }
+
+    private static void Set(ref Matrix4x4 m, int row, int column, float value)
+    {
+        switch ((row * 3) + column)
+        {
+            case 0: m.M11 = value; break;
+            case 1: m.M12 = value; break;
+            case 2: m.M13 = value; break;
+            case 3: m.M21 = value; break;
+            case 4: m.M22 = value; break;
+            case 5: m.M23 = value; break;
+            case 6: m.M31 = value; break;
+            case 7: m.M32 = value; break;
+            default: m.M33 = value; break;
+        }
+    }
+
+    private static Matrix4x4 Turn(int axis, float angle) => axis switch
+    {
+        0 => Matrix4x4.CreateRotationX(angle),
+        1 => Matrix4x4.CreateRotationY(angle),
+        _ => Matrix4x4.CreateRotationZ(angle),
+    };
+
+    /// <summary>A dump as rows of eight floats, each row's first offset from the needle's place, the needle's own floats in brackets.</summary>
+    private static void Dumped(StringBuilder report, FloatDump dump, int length)
+    {
+        int count = dump.Bytes.Length / sizeof(float);
+        long origin = (long)(dump.At - dump.From);
+        for (var at = 0; at < count; at += 8)
+        {
+            long offset = (at * sizeof(float)) - origin;
+            report.Append(CultureInfo.InvariantCulture, $"  {(offset < 0 ? "-" : "+")}0x{Math.Abs(offset):X3}:");
+            for (int one = at; one < Math.Min(at + 8, count); one++)
+            {
+                float value = BitConverter.ToSingle(dump.Bytes, one * sizeof(float));
+                long place = (one * sizeof(float)) - origin;
+                bool own = place >= 0 && place < length * sizeof(float);
+                string said = float.IsFinite(value) && (value == 0f || MathF.Abs(value) is >= 1e-6f and < 1e7f)
+                    ? value.ToString("0.#####", CultureInfo.InvariantCulture)
+                    : string.Create(CultureInfo.InvariantCulture, $"#{BitConverter.ToUInt32(dump.Bytes, one * sizeof(float)):X8}");
+                report.Append(own ? " [" : "  ").Append(said).Append(own ? "]" : string.Empty);
+            }
+
+            report.AppendLine();
+        }
+    }
 
     /// <summary>A matrix's first three rows, each three wide - or four wide with the fourth left unchecked.</summary>
     private static float[] Rows(Matrix4x4 m, bool padded) => padded
@@ -346,6 +528,7 @@ public sealed class LightHunt
     {
         Sun,
         Cube,
+        CubeOther,
         Angle,
     }
 

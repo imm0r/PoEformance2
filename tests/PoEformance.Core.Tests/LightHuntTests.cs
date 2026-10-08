@@ -90,25 +90,50 @@ public class LightHuntTests
         Assert.Equal((int)SceneLight.SunReading.ElevationThetaFalling, verdict.Sun);
         Assert.Contains("reading 6", verdict.Summary, StringComparison.Ordinal);
         Assert.Contains("theta 60 bytes before", verdict.Report, StringComparison.Ordinal);
+        Assert.Contains("that is NOT the reading the picture draws the sun by", verdict.Report, StringComparison.Ordinal);
         Assert.Null(verdict.Cube);
+
+        // WHAT LIES BESIDE IT is read back, the vector's own floats in brackets.
+        Assert.Contains("beside sun reading 6 at 0x20000800:", verdict.Report, StringComparison.Ordinal);
+        Assert.Contains(string.Create(System.Globalization.CultureInfo.InvariantCulture, $"[{held.X:0.#####}]"), verdict.Report, StringComparison.Ordinal);
     }
 
-    /// <summary>A vector held both ways round settles nothing: the two readings differ only in which way it points.</summary>
+    /// <summary>
+    /// A vector held both ways round, side by side as AzmerianRanges held it, is settled by the ground: the reading whose sun stands above it is the light's way - and it is the one the picture draws.
+    /// </summary>
     [Fact]
-    public void AVECTORHeldBothWaysSettlesNothing()
+    public void AVECTORHeldBothWaysIsSettledByTheGround()
     {
         EnvironmentSettings env = Sunny();
         LightHunt hunt = LightHunt.For("Sunny.env", env, one => $"reading {one + 1}", out _)!;
-        Vector3 held = SceneLight.SunFrom(env.Phi!.Value, env.Theta!.Value, SceneLight.SunReading.PolarTheta);
+        Vector3 held = SceneLight.SunFrom(env.Phi!.Value, env.Theta!.Value, SceneLight.GameSun);
+        Assert.True(held.Z > 0f, "the game's reading puts this sun above the ground");
         var bytes = new byte[0x1000];
-        Floats(bytes, 0x100, held.X, held.Y, held.Z);
-        Floats(bytes, 0x200, -held.X, -held.Y, -held.Z);
+        Floats(bytes, 0x100, held.X, held.Y, held.Z, 0f, -held.X, -held.Y, -held.Z, 0f);
         (FakeMemoryReader memory, Space space) = Memory(bytes);
 
         LightHuntVerdict verdict = hunt.Read(FloatHunt.Run(memory, space, hunt.Needles));
 
-        Assert.Null(verdict.Sun);
-        Assert.Contains("both", verdict.Summary, StringComparison.Ordinal);
+        Assert.Equal((int)SceneLight.GameSun, verdict.Sun);
+        Assert.Contains("1 of 1 copies side by side, sixteen bytes apart", verdict.Report, StringComparison.Ordinal);
+        Assert.Contains("that is the reading the picture draws the sun by", verdict.Report, StringComparison.Ordinal);
+    }
+
+    /// <summary>A turn about an axis no reading turns about is found among the other arrangements, said, and not taken.</summary>
+    [Fact]
+    public void ACUBETurnInAnotherArrangementIsSaidAndNotTaken()
+    {
+        EnvironmentSettings env = Sunny();
+        LightHunt hunt = LightHunt.For("Sunny.env", env, one => $"reading {one + 1}", out _)!;
+        var turn = Matrix4x4.CreateRotationZ(env.VertAngle!.Value);
+        var bytes = new byte[0x1000];
+        Floats(bytes, 0x100, turn.M11, turn.M12, turn.M13, turn.M14, turn.M21, turn.M22, turn.M23, turn.M24, turn.M31, turn.M32, turn.M33, turn.M34);
+        (FakeMemoryReader memory, Space space) = Memory(bytes);
+
+        LightHuntVerdict verdict = hunt.Read(FloatHunt.Run(memory, space, hunt.Needles));
+
+        Assert.Null(verdict.Cube);
+        Assert.Contains("axes x>x y>y z>z, turned about z by +vert, rows of four: 1 place", verdict.Report, StringComparison.Ordinal);
     }
 
     /// <summary>A cube turn found as written is the cube's verdict; with one angle nought, the two orders that give the same turn are said to.</summary>

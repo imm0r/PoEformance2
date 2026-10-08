@@ -342,6 +342,23 @@ public sealed class SceneLight
     /// </summary>
     public int ShadowSide { get; init; } = ShadowMap.Usual;
 
+    /// <summary>
+    /// The reading the game uses: phi is the sun's height above the ground, theta its bearing round from x, and the vector they make points at the sun.
+    /// </summary>
+    /// <remarks>
+    /// FOUND IN THE GAME'S MEMORY, not chosen (LightHunt, AzmerianRanges, phi 2.33874 theta 2.32128):
+    /// of the eight readings' vectors only this one's and its negative were there, nine copies each,
+    /// every copy of one with the other sixteen bytes on - the game keeps the light's way and the way
+    /// to the light side by side. That settles which angle is the height and which the bearing, and
+    /// the ground settles the sign: of the two, only this reading puts the sun above the ground (its
+    /// light travels plus z, the game's up being minus z), and the area is lit by a sun. The other
+    /// one of the pair would light nothing but undersides.
+    ///
+    /// phi and theta nearly equal there, so the hunt's own words are what tell height from bearing:
+    /// the readings that swap them were not found, though they draw within a few degrees of this one.
+    /// </remarks>
+    public const SunReading GameSun = SunReading.ElevationPhi;
+
     /// <summary>The way a sun with these angles shines, as the reading takes them - unit length, the way the light travels.</summary>
     public static Vector3 SunFrom(float phi, float theta, SunReading reading)
     {

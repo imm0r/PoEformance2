@@ -305,11 +305,12 @@ gathered while `RoomModels.Lay` places them, fixed_ao pieces and bone lights inc
 from the area's `.env` (`EnvironmentSettings`) and its diffuse cube, which is BC6H (`Bc6h`, ported
 from bcdec and held against it block for block; `CubeMap`). The sun's shadows are a second
 drawing of the mesh along its light (`ShadowMap`), kept until the sun or the mesh changes. What
-no file says - how phi and theta make the sun's direction, how hor_angle and vert_angle make the
-cube's turn, which number a room light's `light_position_data.a` is, the player light's radius and
-height - is offered as candidate readings in the tile book's *light* section (`SceneLightPanel`),
-each named for what it does on the game's screen: where its shadows fall, by the live camera
-(`SceneLight.GroundOnScreen`, the map's transform without a game), and how high its sun stands.
+no file says - how hor_angle and vert_angle make the cube's turn, which number a room light's
+`light_position_data.a` is, the player light's radius and height - is offered as candidates in the
+tile book's *light* section (`SceneLightPanel`); how phi and theta make the sun's direction was one
+too, until the game's memory answered it (below). The sun's row says what it does on the game's
+screen: where its shadows fall, by the live camera (`SceneLight.GroundOnScreen`, the map's
+transform without a game), and how high it stands.
 Null, the usual, leaves every picture exactly as it was. Measured at 1024 square on four threads
 against 180,000 triangles: 26 ms plain, 53 with sixty point lights, 76 with the sun and its
 shadows; drawing the shadow map is 280 ms, once per sun.
@@ -322,7 +323,14 @@ bitmap of the buckets the needles' most telling floats fall in - about 2.7 GB a 
 core. What a find means comes from the shaders: the sun's shader input is the way the light
 travels (`direction = -light_direction_data`), and the cube is read by `mul(float4(dir, 0),
 env_map_rotation)`, System.Numerics' own order, the order the camera matrix is kept in. A reading
-found alone is taken; both signs of one vector settle nothing, and the report says so.
+found alone is taken. In AzmerianRanges (phi 2.33874, theta 2.32128) it found one reading's vector
+and its negative, nine copies each and every copy beside the other, sixteen bytes apart: phi is the
+sun's height and theta its bearing, and of the two signs only one puts the sun above the ground -
+`SceneLight.GameSun`, drawn ever since, the panel's choice gone. The sky's turn was not found, as
+written or transposed, so the hunt now also looks for every other arrangement of the same turns
+(each about any axis, either way, after any of the 48 swaps and flips of the axes - 587 needles for
+AzmerianRanges, found by a binary search over their first floats), reads back 256 bytes either side
+of the sun's vector to show what the game keeps beside it, and looks through 16 GB rather than 8.
 
 **The colour grade** (`ColourGrade`) is `post_transform`'s 3D table applied as `ApplyColorGrading`
 does with GGG_POE_1 off: divided by the brightest channel past one, looked up trilinearly by the
@@ -339,9 +347,7 @@ printed. Read as it stands, the first build's AzmerianRanges came out washed, th
 **A candidate that cannot change the picture says so instead of being offered.** The sky's readings
 are only the turns that differ - with one angle nought the four orders are one or two turns - and
 where the cube lights nothing (`gi_env_occlusion` 1, AzmerianRanges among them, or a flat ambient)
-the row says why. Where the sun readings that light the ground lie within ten degrees of each other -
-AzmerianRanges' phi 2.339 and theta 2.321, so swapping them changes nothing - a line under them says
-so, and each names its shadows' bearing in degrees.
+the row says why.
 
 **A free sun** stands where it is put - two sliders, its bearing on the game's screen and its
 height, or shift + drag in the model window (`IMovableSun`), the drag's direction measured through
