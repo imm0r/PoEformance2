@@ -685,6 +685,9 @@ public sealed class MonsterPortrait
     /// <summary>Every material the install has, for the graph survey - see GraphSurvey. Null leaves its button out.</summary>
     public Func<IReadOnlyList<string>>? Materials { get; set; }
 
+    /// <summary>Every environment the install has, for the env survey - see EnvSurvey. Null leaves its button out.</summary>
+    public Func<IReadOnlyList<string>>? Environments { get; set; }
+
     /// <summary>Whether a graph survey is running, so a second press does not start another.</summary>
     private int _surveying;
 
@@ -3008,6 +3011,22 @@ public sealed class MonsterPortrait
             }
         }
 
+        if (Environments is not null)
+        {
+            ImGui.SameLine();
+            if (ImGui.Button("envs##monster-envs"))
+            {
+                SurveyEnvironments();
+            }
+
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip("Reads every .env in the install - what lights an area - and writes every key they use, in how many"
+                    + " files, with its range and some values, and a few whole files that light their area with a sun - "
+                    + EnvSurvey.File + " beside the dumps.");
+            }
+        }
+
         if (_dumped.Length > 0)
         {
             PathLink.Line(_dumped);
@@ -3110,6 +3129,43 @@ public sealed class MonsterPortrait
             catch (Exception fault)
             {
                 _dumped = $"the graph survey failed - {fault.GetType().Name}: {fault.Message}";
+            }
+            finally
+            {
+                Interlocked.Exchange(ref _surveying, 0);
+            }
+        });
+    }
+
+    /// <summary>
+    /// Writes the env survey beside the dumps, off the frame, and says how far it has got while it runs.
+    /// </summary>
+    private void SurveyEnvironments()
+    {
+        IReadOnlyList<string> environments = Environments?.Invoke() ?? [];
+        if (environments.Count == 0)
+        {
+            _dumped = "no environments listed yet - the install's list is read shortly after start-up";
+            return;
+        }
+
+        if (Interlocked.Exchange(ref _surveying, 1) == 1)
+        {
+            return;
+        }
+
+        string at = Path.Combine(Folder, EnvSurvey.File);
+        Func<string, byte[]?>? install = _install;
+        _dumped = "surveying " + environments.Count + " environments";
+        _ = Task.Run(() =>
+        {
+            try
+            {
+                Write(at, () => EnvSurvey.Of(install, environments, step => _dumped = "surveying " + step));
+            }
+            catch (Exception fault)
+            {
+                _dumped = $"the env survey failed - {fault.GetType().Name}: {fault.Message}";
             }
             finally
             {
