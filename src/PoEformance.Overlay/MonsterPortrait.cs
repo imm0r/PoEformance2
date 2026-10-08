@@ -992,20 +992,31 @@ public sealed class MonsterPortrait
 
         OverlayLayout.Hint("The model in a window of its own: drag to turn it, the wheel zooms, a double click puts it back."
             + " Choosing another row opens it again.");
+        // SHORT: what the model is doing, in a few words - the whole account is the window's "info".
+        // A reason can run to a paragraph, so it is cut and given whole on hover.
         ImGui.SameLine();
         if (_loading is { IsCompleted: false })
         {
             ImGui.TextDisabled(_progress is { } progress ? ImGuiText.Escape(progress.Said()) : "building the model…");
         }
-        else if (Why.Length > 0)
+        else if (!_model.Ready && Why.Length > 0)
         {
-            ImGui.TextDisabled(ImGuiText.Escape(Why));
+            ImGui.TextDisabled(ImGuiText.Escape(Why.Length > ShortWhy ? "no model: " + Why[..ShortWhy] + "…" : "no model: " + Why));
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip(ImGuiText.Escape(Why));
+            }
         }
         else if (_model.Ready)
         {
-            ImGui.TextDisabled(ImGuiText.Escape(_cost.Length > 0 ? _cost : "ready"));
+            ImGui.TextDisabled(string.Create(
+                CultureInfo.InvariantCulture,
+                $"ready · {ByteCount.Said(_model.Bytes)} in {_model.Files} file{(_model.Files == 1 ? string.Empty : "s")}"));
         }
     }
+
+    /// <summary>How much of a reason the window's switch shows before cutting it - see <see cref="DrawOpener"/>.</summary>
+    private const int ShortWhy = 60;
 
     /// <summary>Takes a finished load, whether or not the window is open to draw it - the book's dump and export work from it.</summary>
     private void Adopted()
