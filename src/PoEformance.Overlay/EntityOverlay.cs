@@ -2386,6 +2386,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     public Func<IReadOnlyList<FloatNeedle>, ulong, FloatHuntProgress, Task<FloatHuntResult>?>? HuntFloats { get; set; }
 
     /// <summary>
+    /// Reads the area's entity maps once for the paths given - the rooms' doodad stubs - and where each stands; set by whoever owns the reader, before the tile book is attached. See SleepingDoodads.
+    /// </summary>
+    /// <remarks>The tile book's "doodads in this area" button runs it on its own task. Unset, there is no button.</remarks>
+    public Func<IReadOnlySet<string>, DoodadSurvey>? SurveyDoodads { get; set; }
+
+    /// <summary>
     /// Where the parsed environment keeps its dust colour, from the offset schema's ParsedEnvironment - set by whoever loaded the schema, before the tile book is attached.
     /// </summary>
     /// <remarks>Unset, the light panel's hunt does not read the dust colour beside the angles, and its report says why.</remarks>
@@ -3424,6 +3430,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         {
             Lighting = lighting,
             AllRooms = _areaRooms,
+            Survey = SurveyDoodads,
             RoomsOnMap = roomsOnMap,
             Changed = () => SettingsChanged?.Invoke(),
             Tilesets = catalog,
