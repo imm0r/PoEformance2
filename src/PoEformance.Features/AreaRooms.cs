@@ -30,8 +30,11 @@ public sealed class AreaRooms
     private readonly Func<string, byte[]?> _read;
     private TerrainGrid? _grid;
     private int _rooms = -1;
-    private Task<List<(string Room, RoomLayout Layout, RoomSearch Search)>>? _running;
+    private Task<(List<(string Room, RoomLayout Layout, RoomSearch Search)> Rooms, bool[] Walkable)>? _running;
     private List<(string Room, RoomLayout Layout, RoomSearch Search)>? _searched;
+
+    /// <summary>The walkable mask the searches ran with, kept so the arrangement counts each room's standing by the same tiles the search kept it for.</summary>
+    private bool[]? _walkable;
     private RoomArrangement? _arranged;
 
     /// <summary>The running search's count of rooms done - one array per search, so one left to run out cannot count into the next.</summary>
@@ -74,6 +77,7 @@ public sealed class AreaRooms
             _grid = grid;
             _rooms = rooms.Count;
             _searched = null;
+            _walkable = null;
             _arranged = null;
             int[] done = [0];
             _done = done;
@@ -84,19 +88,19 @@ public sealed class AreaRooms
 
         if (_searched is null && _running is { IsCompleted: true } finished)
         {
-            _searched = finished.IsCompletedSuccessfully ? finished.Result : [];
+            (_searched, _walkable) = finished.IsCompletedSuccessfully ? finished.Result : ([], null);
         }
 
         if (_searched is not null && (_arranged is null || _arranged.Rule != rule))
         {
-            _arranged = RoomArrangement.Arrange(_searched, grid.TilesX, grid.TilesY, rule);
+            _arranged = RoomArrangement.Arrange(_searched, grid.TilesX, grid.TilesY, rule, _walkable);
         }
 
         return _arranged;
     }
 
-    /// <summary>Every room searched in turn.</summary>
-    private List<(string Room, RoomLayout Layout, RoomSearch Search)> Search(string[] files, TerrainGrid grid, TerrainGroundTypes ground, int[] done)
+    /// <summary>Every room searched in turn, and the walkable mask they were searched with.</summary>
+    private (List<(string Room, RoomLayout Layout, RoomSearch Search)> Rooms, bool[] Walkable) Search(string[] files, TerrainGrid grid, TerrainGroundTypes ground, int[] done)
     {
         // EACH TILE FILE ONCE across every room - the same cache the tile book keeps per area.
         var known = new ConcurrentDictionary<string, TileIdentity?>(StringComparer.OrdinalIgnoreCase);
@@ -111,6 +115,6 @@ public sealed class AreaRooms
             Interlocked.Increment(ref done[0]);
         }
 
-        return searched;
+        return (searched, walkable);
     }
 }

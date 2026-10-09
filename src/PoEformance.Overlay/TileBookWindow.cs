@@ -376,6 +376,9 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         {
             ImGui.SetTooltip("Every room this area loaded, outlined on the large map with its name - each where its search ranks it first,"
                 + " the surest first, unless a surer room already holds one of its tiles: then the next place on its own list that is free.\n"
+                + "Each with its misses marked as a picked row's are: a dot on a corner whose ground is not the room's, a ring on a tile"
+                + " that is not what its slot asks for, and either in the join colour where a join explains it - rooms that join meet"
+                + " at those. One kind too many is switched off on its style row.\n"
                 + "Searched off the frame, one room at a time, whenever the area or its rooms change.\n"
                 + "Ctrl + click a room's name on the large map to route there - the route goes once you stand in the room;"
                 + " ctrl + shift + click anywhere on the map puts a stop on the newest route.");
@@ -430,8 +433,17 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             var lines = new List<string>(arranged.Laid.Count + arranged.Crowded.Count + arranged.Unfound.Count);
             foreach (RoomLaid one in arranged.Laid)
             {
+                // HOW MANY OF ITS TILES CAN BE WALKED, because the map draws the void and unexplored
+                // ground the same black: a room outlined in the black stands on ground or it does not,
+                // and this is where that is read rather than argued. See RoomLaid.Standing.
+                RoomMisses misses = one.Misses;
                 lines.Add(string.Create(CultureInfo.InvariantCulture,
                     $"{TerrainRooms.NameFor(one.Room)}: tile {one.Where.X}, {one.Where.Y}, {RoomFinder.Said(one.Where.Turn)}, {one.Beside}% beside the joins")
+                    + string.Create(CultureInfo.InvariantCulture,
+                        $" - {misses.Corners.Count} corners and {misses.Tiles.Count} tiles disagree, {misses.Corners.Count + misses.Tiles.Count - misses.Elsewhere} of those at a join")
+                    + (one.Standing is { } standing
+                        ? string.Create(CultureInfo.InvariantCulture, $" - stands on {standing} of its {one.Covers} tiles")
+                        : string.Create(CultureInfo.InvariantCulture, $" - {one.Covers} tiles, walkable ground not read"))
                     + (one.Rank > 0 ? string.Create(CultureInfo.InvariantCulture, $" - row {one.Rank + 1} of its list, the ones above it taken") : string.Empty));
             }
 

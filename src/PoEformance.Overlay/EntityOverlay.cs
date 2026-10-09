@@ -1343,9 +1343,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// </summary>
     /// <remarks>
     /// ASKED FOR ON ANY MAP, DRAWN ON THE LARGE ONE: the search starts while the minimap is up, so the
-    /// rooms are there by the time the large map is opened. Outline and name only - the misses a picked
-    /// room shows (RoomGhostOnMap) would be twenty rooms' worth of dots - and a touch thinner than the
-    /// picked one, which is drawn over it.
+    /// rooms are there by the time the large map is opened. Each a touch thinner than the picked one
+    /// (RoomGhostOnMap), which is drawn over it.
+    ///
+    /// WITH ITS MISSES MARKED, the same three marks the picked room gets. The first version left them
+    /// out as twenty rooms' worth of dots; they were asked for because they are what shows the rooms
+    /// fitting together: where two rooms join, each one's rim misses along the join, so the marks a
+    /// join explains sit on the seam between the two outlines like the teeth of a puzzle piece, and a
+    /// room whose marks lie anywhere else is a room placed wrong. Each kind is its own style row, so
+    /// a map that is too busy switches a kind off.
     /// </remarks>
     private void AllRoomsOnMap(ImDrawListPtr draw, MapView map, WorldEntity player)
     {
@@ -1361,7 +1367,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         }
 
         (uint outline, uint name, uint plate) = RoomInks();
-        if ((outline | name) == 0)
+        (uint corner, uint tile, uint joined) = MissInks();
+        if ((outline | name | corner | tile | joined) == 0)
         {
             return;
         }
@@ -1372,9 +1379,66 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         foreach (RoomLaid room in arranged.Laid)
         {
             Outlined(draw, map, player, grid, room.Where, outline, width, corners);
+            Missed(draw, map, player, grid, room.Misses, corner, tile, joined, 0.75f);
             Named(draw, corners, room.Room, room.Where, room.Layout, name, plate, font);
         }
     }
+
+    /// <summary>
+    /// Where a room parts with the area, marked on the large map: a dot on each corner whose ground is not the room's, a ring on each tile whose definition is not what its slot asks for - and those a join explains drawn over in a third colour, the same mark a touch larger, so no lookup is needed per mark. See RoomMisses for what counts as a join.
+    /// </summary>
+    /// <param name="corner">The ink for a corner that disagrees - nought leaves them out.</param>
+    /// <param name="tile">The ink for a tile that disagrees - nought leaves them out.</param>
+    /// <param name="joined">The ink for either where a join explains it - nought leaves them out.</param>
+    /// <param name="scale">The marks' size against the picked room's - every room of the area is drawn at three quarters, so the picked one stays the one on top.</param>
+    private static void Missed(
+        ImDrawListPtr draw, MapView map, WorldEntity player, TerrainGrid grid, RoomMisses misses, uint corner, uint tile, uint joined, float scale)
+    {
+        const int Cells = TerrainGrid.CellsPerTile;
+        const int Middle = Cells / 2;
+        if (corner != 0)
+        {
+            foreach ((int x, int y) in misses.Corners)
+            {
+                draw.AddCircleFilled(Grounded(grid, map, player, x * Cells, y * Cells), 3.5f * scale, corner);
+            }
+        }
+
+        if (tile != 0)
+        {
+            foreach ((int x, int y) in misses.Tiles)
+            {
+                draw.AddCircle(Grounded(grid, map, player, (x * Cells) + Middle, (y * Cells) + Middle), 5f * scale, tile, 12, 2f * scale);
+            }
+        }
+
+        if (joined == 0)
+        {
+            return;
+        }
+
+        foreach ((int x, int y) in misses.JoinCorners)
+        {
+            draw.AddCircleFilled(Grounded(grid, map, player, x * Cells, y * Cells), 4f * scale, joined);
+        }
+
+        foreach ((int x, int y) in misses.Openings)
+        {
+            draw.AddCircle(Grounded(grid, map, player, (x * Cells) + Middle, (y * Cells) + Middle), 5f * scale, joined, 12, 2.5f * scale);
+        }
+
+        // A CAP, the tile beside an opening, the same ring with a dot in it.
+        foreach ((int x, int y) in misses.Caps)
+        {
+            Vector2 cap = Grounded(grid, map, player, (x * Cells) + Middle, (y * Cells) + Middle);
+            draw.AddCircle(cap, 5f * scale, joined, 12, 2.5f * scale);
+            draw.AddCircleFilled(cap, 1.75f * scale, joined);
+        }
+    }
+
+    /// <summary>The three marks' inks from the style - nought for one switched off, which <see cref="Missed"/> reads as "leave it out". Once per frame, not per room.</summary>
+    private (uint Corner, uint Tile, uint Join) MissInks()
+        => (Ink(StyleCatalogue.Keys.RoomOutlineCorner), Ink(StyleCatalogue.Keys.RoomOutlineTile), Ink(StyleCatalogue.Keys.RoomOutlineJoin));
 
     /// <summary>A room outline's name, lit where ctrl has the cursor on it, kept for the next frame's ctrl + click - see <see cref="MapClicks"/>.</summary>
     private void Named(
@@ -1537,57 +1601,14 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             return;
         }
 
-        const int Cells = TerrainGrid.CellsPerTile;
         Span<Vector2> corners = stackalloc Vector2[4];
         (uint outline, uint name, uint plate) = RoomInks();
         float width = Math.Max(1f, Style.Width(StyleCatalogue.Keys.RoomOutline, 2f));
         Outlined(draw, map, player, ghost.Grid, ghost.Where, outline, width, corners);
 
-        // WHERE IT PARTS WITH THE AREA: a dot on each corner whose ground is not the room's, a ring
-        // on each tile whose definition is not what its slot asks for - and those a join explains
-        // drawn over in a third colour, the same mark a touch larger, so no lookup is needed per
-        // mark. Each kind is its own style row; one switched off is not drawn. See RoomMisses for
-        // what counts as a join.
-        RoomMisses misses = ghost.Misses;
-        uint corner = Ink(StyleCatalogue.Keys.RoomOutlineCorner);
-        if (corner != 0)
-        {
-            foreach ((int x, int y) in misses.Corners)
-            {
-                draw.AddCircleFilled(Grounded(ghost.Grid, map, player, x * Cells, y * Cells), 3.5f, corner);
-            }
-        }
-
-        uint tile = Ink(StyleCatalogue.Keys.RoomOutlineTile);
-        if (tile != 0)
-        {
-            foreach ((int x, int y) in misses.Tiles)
-            {
-                draw.AddCircle(Grounded(ghost.Grid, map, player, (x * Cells) + (Cells / 2), (y * Cells) + (Cells / 2)), 5f, tile, 12, 2f);
-            }
-        }
-
-        uint joined = Ink(StyleCatalogue.Keys.RoomOutlineJoin);
-        if (joined != 0)
-        {
-            foreach ((int x, int y) in misses.JoinCorners)
-            {
-                draw.AddCircleFilled(Grounded(ghost.Grid, map, player, x * Cells, y * Cells), 4f, joined);
-            }
-
-            foreach ((int x, int y) in misses.Openings)
-            {
-                draw.AddCircle(Grounded(ghost.Grid, map, player, (x * Cells) + (Cells / 2), (y * Cells) + (Cells / 2)), 5f, joined, 12, 2.5f);
-            }
-
-            // A CAP, the tile beside an opening, the same ring with a dot in it.
-            foreach ((int x, int y) in misses.Caps)
-            {
-                Vector2 cap = Grounded(ghost.Grid, map, player, (x * Cells) + (Cells / 2), (y * Cells) + (Cells / 2));
-                draw.AddCircle(cap, 5f, joined, 12, 2.5f);
-                draw.AddCircleFilled(cap, 1.75f, joined);
-            }
-        }
+        // WHERE IT PARTS WITH THE AREA, at full size: the same marks every room gets at three quarters.
+        (uint corner, uint tile, uint joined) = MissInks();
+        Missed(draw, map, player, ghost.Grid, ghost.Misses, corner, tile, joined, 1f);
 
         RoomLayout? layout = _areaRooms?.Last?.Layouts.GetValueOrDefault(ghost.Room);
         Named(draw, corners, ghost.Room, ghost.Where, layout, name, plate, RoomFont());
