@@ -70,7 +70,7 @@ internal sealed class CaptureKey
 
     private readonly Func<WorldSnapshot> _snapshot;
     private readonly Func<ClientRect> _client;
-    private readonly Func<RoomArrangement?> _rooms;
+    private readonly Func<IReadOnlyList<(string Room, RoomLayout Layout, RoomCandidate Where)>?> _standing;
     private readonly Func<bool> _roomsPossible;
     private readonly Func<(int Done, int Of)> _roomsProgress;
     private readonly Func<AreaRooms?> _areaRooms;
@@ -94,16 +94,16 @@ internal sealed class CaptureKey
 
     /// <param name="snapshot">The world, this frame.</param>
     /// <param name="client">The game's client area on the screen.</param>
-    /// <param name="rooms">The area's rooms arranged, or null while they are being searched for - asking starts the search.</param>
-    /// <param name="roomsPossible">Whether there is a search to wait for at all: an install to read and a terrain to search.</param>
-    /// <param name="roomsProgress">How far the search is.</param>
-    /// <param name="areaRooms">The area's rooms as searched and surveyed, for the doodad parts - or null where there is no install to read them from.</param>
+    /// <param name="standing">Where every room of the area stands, or null while that is being worked out - asking starts the work. See AreaRooms.Standing.</param>
+    /// <param name="roomsPossible">Whether there is anything to wait for at all: an install to read and a terrain to place the rooms on.</param>
+    /// <param name="roomsProgress">How far the rooms' reading or search is.</param>
+    /// <param name="areaRooms">The area's rooms as read, surveyed and placed, for the room parts - or null where there is no install to read them from.</param>
     /// <param name="loaded">The files the area loaded.</param>
     /// <param name="version">The version and build, as the title bar has them.</param>
     public CaptureKey(
         Func<WorldSnapshot> snapshot,
         Func<ClientRect> client,
-        Func<RoomArrangement?> rooms,
+        Func<IReadOnlyList<(string Room, RoomLayout Layout, RoomCandidate Where)>?> standing,
         Func<bool> roomsPossible,
         Func<(int Done, int Of)> roomsProgress,
         Func<AreaRooms?> areaRooms,
@@ -112,7 +112,7 @@ internal sealed class CaptureKey
     {
         _snapshot = snapshot;
         _client = client;
-        _rooms = rooms;
+        _standing = standing;
         _roomsPossible = roomsPossible;
         _roomsProgress = roomsProgress;
         _areaRooms = areaRooms;
@@ -302,7 +302,7 @@ internal sealed class CaptureKey
         _run = run;
     }
 
-    /// <summary>Waits for the room search and the doodad survey where a ticked part wants them, then hands everything to the pool.</summary>
+    /// <summary>Waits for the rooms to stand - the doodad survey, or the search where nothing reads the entities - where a ticked part wants them, then hands everything to the pool.</summary>
     private void Rooms(Run run, long now)
     {
         bool wantsRooms = On(CaptureParts.RoomsNear) || On(CaptureParts.RoomsArranged) || On(CaptureParts.Environments)
@@ -310,40 +310,33 @@ internal sealed class CaptureKey
         bool wantsSurvey = On(CaptureParts.Doodads) || On(CaptureParts.RoomsPlaced);
         bool sameArea = _snapshot().AreaHash == run.Snapshot.AreaHash;
         bool possible = wantsRooms && sameArea && _roomsPossible();
-        RoomArrangement? arranged = possible ? _rooms() : null;
-        bool waiting = now - run.Since < RoomWaitMs;
-        if (arranged is null && possible && waiting)
+        IReadOnlyList<(string Room, RoomLayout Layout, RoomCandidate Where)>? standing = possible ? _standing() : null;
+        AreaRooms? rooms = possible ? _areaRooms() : null;
+        if (standing is null && possible && now - run.Since < RoomWaitMs)
         {
+            run.Waiting = rooms is { Surveying: true } ? "the doodad survey" : rooms is { ReadDoodads: null } ? "the room search" : "the rooms to be read";
             return;
         }
 
-        // THE SURVEY AFTER THE SEARCH, on the same clock: it starts itself once the rooms are read,
-        // and is done when the rooms have their places - see AreaRooms.
-        AreaRooms? rooms = wantsSurvey && arranged is not null ? _areaRooms() : null;
-        if (rooms is { ReadDoodads: not null } && rooms.Placed is null && waiting)
-        {
-            run.Waiting = rooms.Surveying ? "the doodad survey" : "the doodad survey to start";
-            return;
-        }
-
-        run.Arranged = arranged;
-        run.RoomsNote = arranged is not null ? string.Empty
+        run.Standing = standing;
+        run.Arranged = rooms?.Last;
+        run.RoomsNote = standing is not null ? string.Empty
             : !wantsRooms ? "no ticked part wanted them"
-            : !sameArea ? "the area changed before the rooms were found"
-            : !_roomsPossible() ? "no install to read the rooms from, or no terrain to find them in"
-            : $"the room search was not done after {RoomWaitMs / 1000} s";
+            : !sameArea ? "the area changed before the rooms were placed"
+            : !_roomsPossible() ? "no install to read the rooms from, or no terrain to place them on"
+            : $"the rooms were not placed after {RoomWaitMs / 1000} s";
         if (rooms is not null)
         {
-            run.Searched = rooms.Searched;
+            run.Rooms = rooms.Rooms;
             run.Survey = rooms.Doodads;
             run.Placed = rooms.Placed;
         }
 
         run.SurveyNote = run.Survey is not null ? string.Empty
             : !wantsSurvey ? "no ticked part wanted it"
-            : arranged is null ? "the rooms were not found"
             : rooms is null || rooms.ReadDoodads is null ? "nothing can read the area's entities in this session"
-            : $"the doodad survey was not done after {RoomWaitMs / 1000} s";
+            : standing is null ? run.RoomsNote
+            : "the rooms stand by their ground and tiles, not their doodads";
         run.Stage = Stage.Writing;
         Func<string, byte[]?>? read = Read;
         string version = _version();
@@ -399,10 +392,10 @@ internal sealed class CaptureKey
         }
 
         List<RoomNearby>? near = null;
-        if (run.Arranged is { } arranged && run.Snapshot.Player is { } player)
+        if (run.Standing is { } standing && run.Snapshot.Player is { } player && run.Snapshot.Terrain is TerrainGrid terrain)
         {
             (_, _, int tileX, int tileY) = CaptureReport.Where(player.WorldX, player.WorldY);
-            near = CaptureReport.RoomsNear(arranged, tileX, tileY);
+            near = CaptureReport.RoomsNear(standing, terrain.TilesX, terrain.TilesY, tileX, tileY);
         }
 
         string noRooms = run.RoomsNote.Length > 0 ? run.RoomsNote : "the player was not read";
@@ -416,7 +409,7 @@ internal sealed class CaptureKey
             {
                 // The environments whether or not the rooms were found: the area's own is known from
                 // its row, and it is the one that certainly applies.
-                string[] rooms = near is null ? [] : [.. near.Select(one => one.Laid.Room).Distinct(StringComparer.OrdinalIgnoreCase)];
+                string[] rooms = near is null ? [] : [.. near.Select(one => one.Room).Distinct(StringComparer.OrdinalIgnoreCase)];
                 string area = run.Snapshot.Area.Environment;
                 Part(CaptureReport.EnvironmentsFile, () =>
                 {
@@ -476,7 +469,7 @@ internal sealed class CaptureKey
             }
             else
             {
-                parts.Add($"{CaptureReport.ArrangedFile}  not written: {run.RoomsNote}");
+                parts.Add($"{CaptureReport.ArrangedFile}  not written: {(run.RoomsNote.Length > 0 ? run.RoomsNote : "the rooms stand by their doodads - see " + CaptureReport.PlacedFile)}");
             }
         }
 
@@ -486,7 +479,7 @@ internal sealed class CaptureKey
             {
                 Part(CaptureReport.DoodadsFile, () =>
                 {
-                    (string said, string detail) = CaptureReport.Doodads(survey, run.Searched);
+                    (string said, string detail) = CaptureReport.Doodads(survey, run.Rooms);
                     File.WriteAllText(At(CaptureReport.DoodadsFile), CaptureReport.Lined((said, detail)) + "\n\n" + CaptureReport.Sightings(survey));
                     return said;
                 });
@@ -600,8 +593,8 @@ internal sealed class CaptureKey
         {
             (int done, int of) = _roomsProgress();
             text = run.Stage != Stage.Rooms ? "capturing... writing the files and reading memory"
-                : run.Waiting.Length > 0 ? $"capturing... waiting for {run.Waiting}"
-                : $"capturing... waiting for the room search ({done} of {of})";
+                : run.Waiting.Length > 0 ? $"capturing... waiting for {run.Waiting} ({done} of {of} rooms)"
+                : "capturing... waiting for the rooms";
         }
         else if (now < _saidUntil)
         {
@@ -764,14 +757,18 @@ internal sealed class CaptureKey
 
         public string MemoryNote { get; set; } = string.Empty;
 
+        /// <summary>Where every room stands, by whichever way placed them - see AreaRooms.Standing.</summary>
+        public IReadOnlyList<(string Room, RoomLayout Layout, RoomCandidate Where)>? Standing { get; set; }
+
+        /// <summary>The arrangement by ground and tiles - the fallback's, null in the doodad path.</summary>
         public RoomArrangement? Arranged { get; set; }
 
         public string RoomsNote { get; set; } = string.Empty;
 
-        /// <summary>What the line at the top says is being waited for, past the room search.</summary>
+        /// <summary>What the line at the top says is being waited for.</summary>
         public string Waiting { get; set; } = string.Empty;
 
-        public IReadOnlyList<(string Room, RoomLayout Layout, RoomSearch Search)>? Searched { get; set; }
+        public IReadOnlyList<(string Room, RoomLayout Layout)>? Rooms { get; set; }
 
         public DoodadSurvey? Survey { get; set; }
 

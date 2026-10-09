@@ -55,9 +55,30 @@ public class CaptureReportTests
             RoomOverlap.Rims);
         Assert.Equal(4, arranged.Laid.Count);
 
-        List<RoomNearby> near = CaptureReport.RoomsNear(arranged, 2, 1);
-        Assert.Equal([("boss.arm", 0), ("offices.arm", 0), ("near.arm", 3)], near.Select(room => (room.Laid.Room, room.Tiles)));
+        List<RoomNearby> near = CaptureReport.RoomsNear(Standing(arranged), 12, 4, 2, 1);
+        Assert.Equal([("boss.arm", 0), ("offices.arm", 0), ("near.arm", 3)], near.Select(room => (room.Room, room.Tiles)));
     }
+
+    /// <summary>A room laid twice stands twice, and each place is listed at its own distance.</summary>
+    [Fact]
+    public void AROOMLaidTwiceIsListedAtEachPlace()
+    {
+        RoomLayout one = RoomArrangementTests.Room(1, 1, "f 0");
+        (string Room, RoomLayout Layout, RoomCandidate Where)[] standing =
+        [
+            ("wall.arm", one, new RoomCandidate(4, 0, 0, 1, 1, 10, 10)),
+            ("wall.arm", one, new RoomCandidate(1, 0, 2, 1, 1, 10, 10)),
+            ("wall.arm", one, new RoomCandidate(9, 0, 0, 1, 1, 10, 10)),
+        ];
+
+        List<RoomNearby> near = CaptureReport.RoomsNear(standing, 12, 4, 2, 0);
+        Assert.Equal([(1, 1), (4, 2)], near.Select(room => (room.Where.X, room.Tiles)));
+        Assert.Equal("1 off  wall  at tile 1, 0, 1 x 1, turned 180  (wall.arm)", CaptureReport.Room(near[0]));
+    }
+
+    /// <summary>The arrangement's rooms as a standing list - what AreaRooms.Standing gives where the entities cannot be read.</summary>
+    private static List<(string Room, RoomLayout Layout, RoomCandidate Where)> Standing(RoomArrangement arranged)
+        => [.. arranged.Laid.Select(laid => (laid.Room, laid.Layout, laid.Where))];
 
     /// <summary>Standing in the notch an L-shaped room leaves empty is not standing in the room - its covered tiles decide, not its rectangle.</summary>
     [Fact]
@@ -70,7 +91,7 @@ public class CaptureReportTests
         int[] covered = RoomArrangement.Tiles(ell, where, 4, 4);
         int notch = new[] { 0, 1, 4, 5 }.Single(tile => !covered.Contains(tile));
 
-        Assert.Equal(1, Assert.Single(CaptureReport.RoomsNear(arranged, notch % 4, notch / 4)).Tiles);
+        Assert.Equal(1, Assert.Single(CaptureReport.RoomsNear(Standing(arranged), 4, 4, notch % 4, notch / 4)).Tiles);
     }
 
     /// <summary>The summary says when, which build, where the player stood, which rooms are around, and what each part of the capture holds.</summary>
@@ -80,7 +101,7 @@ public class CaptureReportTests
         var player = new WorldEntity(1, 0x1000, "Metadata/Characters/Int/IntFourb", EntityKind.Player, 10f, 20f, -5f, TerrainHeight: -5f);
         var snapshot = new WorldSnapshot(true, player, [player], new float[16], Area: new AreaInfo("G1_2", "Clearfell", 1, false, false), AreaHash: 0xABCD);
         RoomLayout square = RoomArrangementTests.Square();
-        var room = new RoomNearby(new RoomLaid("Metadata/Terrain/Rooms/boss_01.arm", new RoomCandidate(0, 0, 0, 3, 3, 10, 10), 0, 100, square), 0);
+        var room = new RoomNearby("Metadata/Terrain/Rooms/boss_01.arm", square, new RoomCandidate(0, 0, 0, 3, 3, 10, 10), 0);
 
         string said = CaptureReport.Summary(
             snapshot, new DateTime(2026, 10, 8, 14, 3, 22, DateTimeKind.Local), "v0.1.119 · local", (0, 0, 1920, 1080), [room], ["game.png  1920 x 1080"]);
@@ -92,7 +113,7 @@ public class CaptureReportTests
         Assert.Contains("player   world 10 20 -5, terrain height -5", said, StringComparison.Ordinal);
         Assert.Contains("grid cell 0, 1, tile 0, 0", said, StringComparison.Ordinal);
         Assert.Contains("tile     (no terrain read)", said, StringComparison.Ordinal);
-        Assert.Contains("  here   boss_01  at tile 0, 0, 3 x 3, turn 0, rank 0, 100% beside", said, StringComparison.Ordinal);
+        Assert.Contains("  here   boss_01  at tile 0, 0, 3 x 3, as written  (Metadata/Terrain/Rooms/boss_01.arm)", said, StringComparison.Ordinal);
         Assert.Contains("  game.png  1920 x 1080", said, StringComparison.Ordinal);
 
         Assert.Contains("(none arranged)", CaptureReport.Summary(snapshot, DateTime.Now, string.Empty, (0, 0, 1, 1), null, []), StringComparison.Ordinal);
@@ -119,8 +140,8 @@ public class CaptureReportTests
     public void ROOMSGetTheirLightsAndTheOnesStoodInTheirFile()
     {
         RoomLayout square = RoomArrangementTests.Square();
-        RoomNearby here = new(new RoomLaid("rooms/here.arm", new RoomCandidate(0, 0, 0, 3, 3, 10, 10), 0, 100, square), 0);
-        RoomNearby beside = new(new RoomLaid("rooms/beside.arm", new RoomCandidate(3, 0, 0, 3, 3, 10, 10), 0, 100, square), 2);
+        RoomNearby here = new("rooms/here.arm", square, new RoomCandidate(0, 0, 0, 3, 3, 10, 10), 0);
+        RoomNearby beside = new("rooms/beside.arm", square, new RoomCandidate(3, 0, 0, 3, 3, 10, 10), 2);
         byte[]? Read(string path) => path switch
         {
             "rooms/here.arm" => Encoding.UTF8.GetBytes("version 36\nthe here room"),
@@ -159,7 +180,7 @@ public class CaptureReportTests
         Assert.Contains("{ \"own\": 2 }", said, StringComparison.Ordinal);
     }
 
-    /// <summary>Every room file the area loaded is printed whole under its path, and nothing that is not a room.</summary>
+    /// <summary>Every room file the area may lay - the loaded list's and its room set's, once each in path order - is printed whole under its path, and nothing that is not a room.</summary>
     [Fact]
     public void ROOMFILESArePrintedWhole()
     {
@@ -167,12 +188,18 @@ public class CaptureReportTests
         {
             "rooms/a.arm" => Encoding.UTF8.GetBytes("version 36\nthe a room"),
             "rooms/b.arm" => Encoding.UTF8.GetBytes("version 36\nthe b room"),
+            "rooms/c.arm" => Encoding.UTF8.GetBytes("version 36\nthe c room"),
+            "Metadata/Terrain/Test/generate.rs" => Encoding.UTF8.GetBytes("version 2\n100 \"rooms/c.arm\" I\n\"rooms/A.arm\"\n"),
             _ => null,
         };
 
-        string said = CaptureReport.RoomFiles(Read, ["tiles/floor.tdt", "rooms/a.arm", "rooms/gone.arm", "rooms/b.arm"]).ReplaceLineEndings("\n");
-        Assert.StartsWith("3 room files the area loaded\n\n##### rooms/a.arm\nversion 36\nthe a room\n\n##### rooms/gone.arm\n(not in the install)\n\n##### rooms/b.arm\nversion 36\nthe b room\n", said, StringComparison.Ordinal);
+        string said = CaptureReport.RoomFiles(Read, ["tiles/floor.tdt", "rooms/a.arm", "Metadata/Terrain/Test/generate.rs", "rooms/gone.arm", "rooms/b.arm"]).ReplaceLineEndings("\n");
+        Assert.StartsWith(
+            "4 room files the area may lay - the loaded list's and its room sets'\n\n##### rooms/a.arm\nversion 36\nthe a room\n\n##### rooms/b.arm\nversion 36\nthe b room\n\n##### rooms/c.arm\nversion 36\nthe c room\n\n##### rooms/gone.arm\n(not in the install)\n",
+            said,
+            StringComparison.Ordinal);
         Assert.DoesNotContain("floor.tdt", said, StringComparison.Ordinal);
+        Assert.DoesNotContain("generate.rs", said, StringComparison.Ordinal);
     }
 
     /// <summary>Each place's entities are written by the id the sightings table carries, the yielded places marked.</summary>

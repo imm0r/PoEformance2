@@ -5,60 +5,70 @@ using PoEformance.Game.World;
 namespace PoEformance.Features;
 
 /// <summary>
-/// Every room the current area loaded: searched for off the frame by its ground and tiles, and placed by its doodads once the area's entities are read - for the large map to outline all at once.
+/// Every room the current area may have laid: read once per area, placed by its doodads once the area's entities are read - and, where nothing can read them, searched for by its ground and tiles - for the large map to outline all at once.
 /// </summary>
 /// <remarks>
 /// WHY THIS EXISTS. The tile book finds one room at a time and outlines the row a person picks; with
 /// twenty rooms in an area that is twenty picks to see the layout. Asked for: every room drawn at once,
 /// where it stands.
 ///
-/// TWO ANSWERS, AND WHICH ONE THE MAP TAKES. The ground-and-tile search (RoomFinder) ranks places by
-/// how well a room's slots agree with what the area laid, and RoomArrangement gives each room one place
-/// no surer room holds. That was the first answer and it is kept for the tile book, where a person
-/// reads a room's list; but it placed a floor module in the black beside the boss arena, because its
-/// best places lay inside the arena and the rule moved it, and it could never draw a wall module that
-/// the area lays four times. The second answer asks the area's entities: each doodad line of a room is
-/// an entity standing where the line put it, and RoomDoodadFinder finds every place the room's
-/// doodads stand. The map draws that wherever the entities can be read - see <see cref="Placed"/> -
-/// and the arrangement only where they cannot.
+/// THE ROOMS ARE THE AREA'S WHOLE SET - see AreaRoomSet - not the loaded list's few: The Assembly's
+/// list named ten of fifty-three, and neither the boss room nor the entrance.
 ///
-/// ONE SEARCH AT A TIME, ON ONE TASK. Each tries its room eight ways round at every tile corner of
-/// the area - cheap per try, not per area - and twenty of them at once would take every core from the
-/// game for the seconds they run. In turn they take one. The doodad survey follows on its own task
-/// once the rooms are read, since it needs their files for the stubs to look for; it is one walk of
-/// two entity maps, measured at 47 ms for an area of 1441 entities.
+/// TWO ANSWERS, AND WHICH ONE THE MAP TAKES. The doodads first, wherever the area's entities can be
+/// read: each doodad line of a room is an entity standing where the line put it, and RoomDoodadFinder
+/// finds every place the room's doodads stand - in milliseconds a room, which is what lets fifty rooms
+/// be placed. The tiles are then asked about each place found (RoomFinder.Scorer), since two variants
+/// that share every doodad differ only in their tiles. The ground-and-tile search (RoomFinder) over
+/// the whole area, seconds a room, runs only where the entities cannot be read, and RoomArrangement
+/// then gives each room one place; it placed a floor module in the black beside the boss arena and
+/// could never draw a wall module the area lays four times, which is why the doodads lead.
+///
+/// ONE TASK AT A TIME. Reading the files is quick; the survey is one walk of two entity maps (47 ms
+/// for an area of 1441 entities) and the finder after it; the fallback search tries its room eight
+/// ways round at every tile corner and takes every core it is given, so the rooms take it in turn.
 ///
 /// AGAIN ONLY WHEN THE AREA OR ITS ROOMS CHANGE: the grid by reference, as everywhere, and the rooms
 /// by their count - the loaded-file list only ever grows within an area, and a room arriving late is
-/// a new arrangement and a new survey. The searches are kept, so a change of RoomOverlap rule
-/// arranges them again on the spot.
+/// a new placing. The fallback's searches are kept, so a change of RoomOverlap rule arranges them again
+/// on the spot.
 /// </remarks>
 public sealed class AreaRooms
 {
     private readonly Func<string, byte[]?> _read;
     private TerrainGrid? _grid;
     private int _rooms = -1;
+
+    /// <summary>The area's room set, cached on the loaded list's identity - see <see cref="RoomSet"/>.</summary>
+    private IReadOnlyList<string>? _setOf;
+    private IReadOnlyList<string> _set = [];
+
+    /// <summary>The rooms' files being read, and read.</summary>
+    private Task<List<(string Room, RoomLayout Layout)>>? _reading;
+    private List<(string Room, RoomLayout Layout)>? _layouts;
+
+    /// <summary>The fallback: the ground-and-tile search of every room, and the arrangement made of it.</summary>
     private Task<(List<(string Room, RoomLayout Layout, RoomSearch Search)> Rooms, bool[] Walkable)>? _running;
     private List<(string Room, RoomLayout Layout, RoomSearch Search)>? _searched;
-
-    /// <summary>The walkable mask the searches ran with, kept so the arrangement counts each room's standing by the same tiles the search kept it for.</summary>
     private bool[]? _walkable;
     private RoomArrangement? _arranged;
+    private IReadOnlyList<(string Room, RoomLayout Layout, RoomCandidate Where)>? _arrangedStanding;
 
-    /// <summary>The stubs the area's rooms name, made once per search - see <see cref="Stubs"/>.</summary>
+    /// <summary>The stubs the area's rooms name, made once per read - see <see cref="Stubs"/>.</summary>
     private IReadOnlySet<string>? _stubs;
-    private List<(string Room, RoomLayout Layout, RoomSearch Search)>? _stubsOf;
+    private List<(string Room, RoomLayout Layout)>? _stubsOf;
 
     /// <summary>The survey of the area's entity maps for those stubs and the places it gives each room, running or run, and the answer once taken - see <see cref="Survey"/>.</summary>
-    private Task<(DoodadSurvey Survey, List<(string Room, RoomLayout Layout, RoomDoodadPlaces Places)> Placed)>? _survey;
+    private Task<(DoodadSurvey Survey, List<(string Room, RoomLayout Layout, RoomDoodadPlaces Places)> Placed, List<(string Room, RoomLayout Layout, RoomCandidate Where)> Standing)>? _survey;
     private DoodadSurvey? _surveyed;
     private List<(string Room, RoomLayout Layout, RoomDoodadPlaces Places)>? _placed;
+    private List<(string Room, RoomLayout Layout, RoomCandidate Where)>? _standing;
 
-    /// <summary>The running search's count of rooms done - one array per search, so one left to run out cannot count into the next.</summary>
+    /// <summary>The running task's count of rooms done - one array per task, so one left to run out cannot count into the next.</summary>
     private int[] _done = [0];
     private int _of;
 
-    /// <param name="read">How to read a file out of the install - each room's own, and the tiles' definitions.</param>
+    /// <param name="read">How to read a file out of the install - each room's own, the room sets, and the tiles' definitions.</param>
     public AreaRooms(Func<string, byte[]?> read)
     {
         ArgumentNullException.ThrowIfNull(read);
@@ -66,20 +76,23 @@ public sealed class AreaRooms
     }
 
     /// <summary>
-    /// Reads the area's entity maps once for the stubs given - see SleepingDoodads - set by whoever owns the game's memory. Null where nothing can, and the map falls back to the arrangement.
+    /// Reads the area's entity maps once for the stubs given - see SleepingDoodads - set by whoever owns the game's memory. Null where nothing can, and the map falls back to the search and the arrangement.
     /// </summary>
     public Func<IReadOnlySet<string>, DoodadSurvey>? ReadDoodads { get; set; }
 
-    /// <summary>How many of the area's rooms have been searched, and of how many - for a line saying it is under way.</summary>
+    /// <summary>How many of the area's rooms the running task has done, and of how many - for a line saying it is under way.</summary>
     public (int Done, int Of) Progress => (Volatile.Read(ref _done[0]), Volatile.Read(ref _of));
 
-    /// <summary>Whether a search is under way.</summary>
-    public bool Running => _running is { IsCompleted: false };
+    /// <summary>Whether the rooms are being read, or searched for by their ground and tiles.</summary>
+    public bool Running => _reading is { IsCompleted: false } || _running is { IsCompleted: false };
 
-    /// <summary>The last arrangement taken, or null while none is - for a line saying what was drawn.</summary>
+    /// <summary>The rooms with their files read - null while they are being read. See AreaRoomSet for which rooms.</summary>
+    public IReadOnlyList<(string Room, RoomLayout Layout)>? Rooms => _layouts;
+
+    /// <summary>The last arrangement by ground and tiles, or null while none is - the fallback where the entities cannot be read.</summary>
     public RoomArrangement? Last => _arranged;
 
-    /// <summary>The rooms searched, each with its file read and its search's answer - null while the search runs.</summary>
+    /// <summary>The rooms searched by their ground and tiles, each with its search's answer - null in the doodad path, or while the search runs.</summary>
     public IReadOnlyList<(string Room, RoomLayout Layout, RoomSearch Search)>? Searched => _searched;
 
     /// <summary>Whether a survey of the area's entity maps is under way - see <see cref="Survey"/>.</summary>
@@ -109,6 +122,57 @@ public sealed class AreaRooms
     }
 
     /// <summary>
+    /// Where every room stands, one entry a place - by the doodads where they are read, else by the arrangement - or null while neither has an answer. What the capture's "rooms around you" is read from.
+    /// </summary>
+    public IReadOnlyList<(string Room, RoomLayout Layout, RoomCandidate Where)>? Standing
+    {
+        get
+        {
+            Taken();
+            if (_standing is not null)
+            {
+                return _standing;
+            }
+
+            if (_arranged is { } arranged && _arrangedStanding is null)
+            {
+                _arrangedStanding = [.. arranged.Laid.Select(laid => (laid.Room, laid.Layout, laid.Where))];
+            }
+
+            return _arrangedStanding;
+        }
+    }
+
+    /// <summary>The room's file as read, or null where it is not one of the area's or not read yet.</summary>
+    public RoomLayout? LayoutOf(string room)
+    {
+        foreach ((string path, RoomLayout layout) in _layouts ?? [])
+        {
+            if (string.Equals(path, room, StringComparison.OrdinalIgnoreCase))
+            {
+                return layout;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Every room the area may have laid - the loaded list's <c>.arm</c> files and every room of its room sets - cached on the list's identity, which changes only with the area. See AreaRoomSet.
+    /// </summary>
+    public IReadOnlyList<string> RoomSet(IReadOnlyList<string> loaded)
+    {
+        ArgumentNullException.ThrowIfNull(loaded);
+        if (!ReferenceEquals(loaded, _setOf))
+        {
+            _setOf = loaded;
+            _set = AreaRoomSet.Files(loaded, _read);
+        }
+
+        return _set;
+    }
+
+    /// <summary>
     /// Every path the area's rooms name as a doodad's stub, compared without case - null while the rooms are still being read.
     /// </summary>
     /// <remarks>
@@ -119,15 +183,15 @@ public sealed class AreaRooms
     /// </remarks>
     public IReadOnlySet<string>? Stubs()
     {
-        if (_searched is not { } searched)
+        if (_layouts is not { } layouts)
         {
             return null;
         }
 
-        if (!ReferenceEquals(searched, _stubsOf))
+        if (!ReferenceEquals(layouts, _stubsOf))
         {
             var stubs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach ((_, RoomLayout layout, _) in searched)
+            foreach ((_, RoomLayout layout) in layouts)
             {
                 foreach (RoomDoodad doodad in layout.Doodads)
                 {
@@ -138,7 +202,7 @@ public sealed class AreaRooms
                 }
             }
 
-            _stubsOf = searched;
+            _stubsOf = layouts;
             _stubs = stubs;
         }
 
@@ -151,44 +215,60 @@ public sealed class AreaRooms
     /// <remarks>Started on its own once the rooms are read - see <see cref="Arranged"/>. The capture key takes the answer as it stands (CaptureParts.Doodads) rather than asking again: the survey is the area's, and the area does not change under it.</remarks>
     public bool Survey()
     {
-        if (ReadDoodads is not { } read || Surveying || _searched is not { } searched || Stubs() is not { } stubs || _grid is not { } grid)
+        if (ReadDoodads is not { } read || Surveying || _layouts is not { } layouts || Stubs() is not { } stubs || _grid is not { Ground: { } ground } grid)
         {
             return false;
         }
 
         int tilesX = grid.TilesX;
         int tilesY = grid.TilesY;
+        TerrainTiles? tiles = grid.Tiles;
+        Func<string, byte[]?> readFile = _read;
         _surveyed = null;
         _placed = null;
+        _standing = null;
         _survey = Task.Run(() =>
         {
             DoodadSurvey survey = read(stubs);
-            var found = new List<(string Room, RoomDoodadPlaces Places)>(searched.Count);
-            foreach ((string room, RoomLayout layout, RoomSearch search) in searched)
+            bool[] walkable = grid.WalkableTileMask();
+
+            // EACH TILE FILE ONCE across every room's places - the same cache the tile book keeps per area.
+            var known = new ConcurrentDictionary<string, TileIdentity?>(StringComparer.OrdinalIgnoreCase);
+            TileIdentity? Identity(string path) => known.GetOrAdd(path, one => TileIdentity.Of(TileModels.Defined(readFile, one).Definition));
+
+            var found = new List<(string Room, RoomDoodadPlaces Places)>(layouts.Count);
+            foreach ((string room, RoomLayout layout) in layouts)
             {
                 RoomDoodadPlaces places = RoomDoodadFinder.Find(layout.Doodads, layout.Width, layout.Height, survey.Found, tilesX, tilesY);
-                found.Add((room, places with { Places = Tiled(places.Places, search) }));
+                found.Add((room, places.Places.Count == 0 ? places : places with { Places = Tiled(places.Places, layout, ground, tilesX, tilesY, tiles, Identity, walkable) }));
             }
 
-            // ONE ROOM PER PLACE: the variants of a room all vote for the tile where the laid one stands.
+            // ONE ROOM PER DOODAD: the variants of a room all vote for the tile where the laid one stands.
             List<(string Room, RoomDoodadPlaces Places)> settled = RoomDoodadFinder.Settle(found, tilesX, tilesY);
-            var placed = new List<(string Room, RoomLayout Layout, RoomDoodadPlaces Places)>(searched.Count);
-            for (var one = 0; one < searched.Count; one++)
+            var placed = new List<(string Room, RoomLayout Layout, RoomDoodadPlaces Places)>(layouts.Count);
+            var standing = new List<(string Room, RoomLayout Layout, RoomCandidate Where)>();
+            for (var one = 0; one < layouts.Count; one++)
             {
-                placed.Add((searched[one].Room, searched[one].Layout, settled[one].Places));
+                (string room, RoomLayout layout) = layouts[one];
+                placed.Add((room, layout, settled[one].Places));
+                foreach (RoomDoodadPlace place in settled[one].Places.Places)
+                {
+                    standing.Add((room, layout, place.Where));
+                }
             }
 
-            return (survey, placed);
+            return (survey, placed, standing);
         });
         return true;
     }
 
     /// <summary>
-    /// The area's rooms arranged, or null while they are being searched for - starting the search where this area or its rooms are new, and the doodad survey once the search is done. Called every frame; cheap when nothing changed.
+    /// The area's rooms arranged by their ground and tiles, or null while they are not - starting whatever this area still needs: the files read where the area or its rooms are new, then the doodad survey, or the search where no entities can be read. Called every frame; cheap when nothing changed.
     /// </summary>
+    /// <remarks>Null is the ordinary answer in the doodad path, where <see cref="Placed"/> and <see cref="Standing"/> carry the rooms: the arrangement is the fallback's.</remarks>
     /// <param name="grid">The current area, or null where none is read.</param>
-    /// <param name="rooms">The rooms the area loaded, by file.</param>
-    /// <param name="rule">Which tiles two rooms may both hold.</param>
+    /// <param name="rooms">The rooms the area may have laid, by file - see <see cref="RoomSet"/>.</param>
+    /// <param name="rule">Which tiles two rooms may both hold, for the arrangement.</param>
     public RoomArrangement? Arranged(TerrainGrid? grid, IReadOnlyCollection<string> rooms, RoomOverlap rule)
     {
         ArgumentNullException.ThrowIfNull(rooms);
@@ -202,56 +282,94 @@ public sealed class AreaRooms
             // LET THE OLD ONE RUN OUT: it reads nothing this one changes, and its answer is dropped.
             _grid = grid;
             _rooms = rooms.Count;
+            _layouts = null;
             _searched = null;
             _walkable = null;
             _arranged = null;
+            _arrangedStanding = null;
+            _running = null;
 
             // A SURVEY IS THE AREA'S: one running for the old area runs out and is dropped like the search.
             _survey = null;
             _surveyed = null;
             _placed = null;
+            _standing = null;
             int[] done = [0];
             _done = done;
             Volatile.Write(ref _of, rooms.Count);
             string[] files = [.. rooms];
-            _running = Task.Run(() => Search(files, grid, ground, done));
+            Func<string, byte[]?> readFile = _read;
+            _reading = Task.Run(() =>
+            {
+                var layouts = new List<(string Room, RoomLayout Layout)>(files.Length);
+                foreach (string file in files)
+                {
+                    layouts.Add((file, RoomLayout.Read(readFile(file))));
+                    Interlocked.Increment(ref done[0]);
+                }
+
+                return layouts;
+            });
+        }
+
+        if (_layouts is null && _reading is { IsCompleted: true } reading)
+        {
+            _layouts = reading.IsCompletedSuccessfully ? reading.Result : [];
+
+            // THE DOODADS NEXT, without being asked, wherever they can be read: the map is drawn from
+            // them. Else the search, one room at a time.
+            if (ReadDoodads is not null)
+            {
+                Survey();
+            }
+            else
+            {
+                List<(string Room, RoomLayout Layout)> layouts = _layouts;
+                int[] done = [0];
+                _done = done;
+                Volatile.Write(ref _of, layouts.Count);
+                _running = Task.Run(() => Search(layouts, grid, ground, done));
+            }
         }
 
         if (_searched is null && _running is { IsCompleted: true } finished)
         {
             (_searched, _walkable) = finished.IsCompletedSuccessfully ? finished.Result : ([], null);
-
-            // THE DOODADS NEXT, without being asked: the map is drawn from them wherever they can be read.
-            Survey();
         }
 
         if (_searched is not null && (_arranged is null || _arranged.Rule != rule))
         {
             _arranged = RoomArrangement.Arrange(_searched, grid.TilesX, grid.TilesY, rule, _walkable);
+            _arrangedStanding = null;
         }
 
         return _arranged;
     }
 
     /// <summary>
-    /// Each place with the tiles the ground-and-tile search found agreeing at that very place, where it listed it - the tie-breaker between variants that share every doodad, see RoomDoodadFinder.Settle.
+    /// Each place with the tiles the area laid agreeing at that very place - the tie-breaker between variants that share every doodad, see RoomDoodadFinder.Settle - where the room can be scored against this area at all.
     /// </summary>
-    private static List<RoomDoodadPlace> Tiled(IReadOnlyList<RoomDoodadPlace> places, RoomSearch search)
+    private static List<RoomDoodadPlace> Tiled(
+        IReadOnlyList<RoomDoodadPlace> places,
+        RoomLayout layout,
+        TerrainGroundTypes ground,
+        int tilesX,
+        int tilesY,
+        TerrainTiles? tiles,
+        Func<string, TileIdentity?> identity,
+        bool[] walkable)
     {
+        (RoomScorer? scorer, _) = RoomFinder.Scorer(layout, ground, tilesX, tilesY, tiles, identity, walkable);
+        if (scorer is null || !scorer.Checks)
+        {
+            return [.. places];
+        }
+
         var tiled = new List<RoomDoodadPlace>(places.Count);
         foreach (RoomDoodadPlace place in places)
         {
-            int agree = -1;
-            foreach (RoomCandidate candidate in search.Candidates)
-            {
-                if (candidate.X == place.Where.X && candidate.Y == place.Where.Y && candidate.Turn == place.Where.Turn)
-                {
-                    agree = candidate.TilesAgree;
-                    break;
-                }
-            }
-
-            tiled.Add(place with { TilesAgree = agree });
+            RoomPlace? scored = scorer.Score(place.Where.X, place.Where.Y, place.Where.Turn);
+            tiled.Add(scored is null ? place : place with { TilesAgree = scored.Where.TilesAgree });
         }
 
         return tiled;
@@ -264,27 +382,28 @@ public sealed class AreaRooms
         {
             if (done.IsCompletedSuccessfully)
             {
-                (_surveyed, _placed) = done.Result;
+                (_surveyed, _placed, _standing) = done.Result;
             }
             else
             {
                 _surveyed = DoodadSurvey.Not("the read failed: " + (done.Exception?.GetBaseException().Message ?? "cancelled"));
                 _placed = [];
+                _standing = [];
             }
         }
     }
 
-    /// <summary>Every room searched in turn, and the walkable mask they were searched with.</summary>
-    private (List<(string Room, RoomLayout Layout, RoomSearch Search)> Rooms, bool[] Walkable) Search(string[] files, TerrainGrid grid, TerrainGroundTypes ground, int[] done)
+    /// <summary>Every room searched in turn by its ground and tiles, and the walkable mask they were searched with - the fallback where the entities cannot be read.</summary>
+    private (List<(string Room, RoomLayout Layout, RoomSearch Search)> Rooms, bool[] Walkable) Search(
+        List<(string Room, RoomLayout Layout)> layouts, TerrainGrid grid, TerrainGroundTypes ground, int[] done)
     {
         // EACH TILE FILE ONCE across every room - the same cache the tile book keeps per area.
         var known = new ConcurrentDictionary<string, TileIdentity?>(StringComparer.OrdinalIgnoreCase);
         TileIdentity? Identity(string path) => known.GetOrAdd(path, one => TileIdentity.Of(TileModels.Defined(_read, one).Definition));
         bool[] walkable = grid.WalkableTileMask();
-        var searched = new List<(string Room, RoomLayout Layout, RoomSearch Search)>(files.Length);
-        foreach (string file in files)
+        var searched = new List<(string Room, RoomLayout Layout, RoomSearch Search)>(layouts.Count);
+        foreach ((string file, RoomLayout layout) in layouts)
         {
-            RoomLayout layout = RoomLayout.Read(_read(file));
             RoomSearch search = RoomFinder.Find(layout, ground, grid.TilesX, grid.TilesY, grid.Tiles, Identity, walkable: walkable);
             searched.Add((file, layout, search));
             Interlocked.Increment(ref done[0]);

@@ -197,6 +197,12 @@ internal sealed class RoomPlacements
     /// <summary>Whether the placements are checked against the tiles laid.</summary>
     public bool Checks => _tiles is not null;
 
+    /// <summary>The area's tiles across, as scored.</summary>
+    public int TilesX => _tilesX;
+
+    /// <summary>The area's tiles down, as scored.</summary>
+    public int TilesY => _tilesY;
+
     /// <summary>The footprint's size laid one way.</summary>
     public (int Wide, int Tall) Size(int turn) => _size[turn];
 

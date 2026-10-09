@@ -262,6 +262,48 @@ public class RoomFinderTests
     }
 
     /// <summary>
+    /// A place found some other way - by the room's doodads - is scored on its own against the ground and the tiles, without the search over the area: the room's place with every tile agreeing, the decoy's with none, and nothing where the footprint would overhang the area.
+    /// </summary>
+    [Fact]
+    public void APLACEFoundElsewhereIsScoredWithoutTheSearch()
+    {
+        (TerrainGroundTypes ground, _) = Area(withRoom: true, decoy: true);
+        (TerrainTiles laid, Dictionary<string, TileIdentity> identities) = RoomAndDecoyTiles();
+        (RoomScorer? scorer, string why) = RoomFinder.Scorer(RoomLayout.Parse(Room(Pattern, 3, 2)), ground, TilesX, TilesY, laid, path => identities.GetValueOrDefault(path));
+
+        Assert.NotNull(scorer);
+        Assert.Equal(string.Empty, why);
+        Assert.True(scorer.Checks);
+        Assert.Equal((3, 2), scorer.Size(0));
+        Assert.Equal((2, 3), scorer.Size(5));
+
+        RoomPlace? room = scorer.Score(12, 4, 5);
+        Assert.NotNull(room);
+        Assert.Equal(new RoomCandidate(12, 4, 5, 2, 3, 12, 12) { Tiles = 6, TilesAgree = 6 }, room.Where);
+        Assert.Same(RoomMisses.None, room.Misses);
+
+        RoomPlace? decoy = scorer.Score(16, 1, 0);
+        Assert.NotNull(decoy);
+        Assert.Equal((12, 0, 6), (decoy.Where.Matched, decoy.Where.TilesAgree, decoy.Misses.Tiles.Count));
+
+        Assert.Null(scorer.Score(TilesX - 1, 0, 0));
+        Assert.Null(scorer.Score(0, TilesY - 1, 0));
+        Assert.Null(scorer.Score(-1, 0, 0));
+
+        // Without the tiles laid the corners alone are scored, and no tile can agree.
+        (RoomScorer? corners, _) = RoomFinder.Scorer(RoomLayout.Parse(Room(Pattern, 3, 2)), ground, TilesX, TilesY);
+        Assert.NotNull(corners);
+        Assert.False(corners.Checks);
+        Assert.Equal((12, 0), (corners.Score(12, 4, 5)!.Where.Matched, corners.Score(12, 4, 5)!.Where.TilesAgree));
+
+        // A room the area's ground cannot hold has no scorer, and says why - the search's own words.
+        string sand = Room(Pattern, 3, 2).Replace(FloorType, "Metadata/Terrain/Elsewhere/sand.gt", StringComparison.Ordinal);
+        (RoomScorer? none, string unheld) = RoomFinder.Scorer(RoomLayout.Parse(sand), ground, TilesX, TilesY);
+        Assert.Null(none);
+        Assert.Contains("sand.gt is not among this area's", unheld, StringComparison.Ordinal);
+    }
+
+    /// <summary>
     /// The room's slots as tiles under the room, mirrored and turned at (12, 4), and under the decoy, as written at (16, 1), with an edge the room never names.
     /// </summary>
     /// <remarks>The cells by hand: turned that way, slot (c, l) falls on cell (13 - l, 6 - c); as written, on (16 + c, 1 + l).</remarks>

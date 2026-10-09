@@ -7,10 +7,12 @@ using PoEformance.Game.World;
 
 namespace PoEformance.Features;
 
-/// <summary>A room laid near the player, and how many tiles off it is - nought for the room the player stands in.</summary>
-/// <param name="Laid">The room and where it was laid.</param>
+/// <summary>A room standing near the player, and how many tiles off it is - nought for the room the player stands in.</summary>
+/// <param name="Room">The room's file.</param>
+/// <param name="Layout">The room as read, for the tiles it covers.</param>
+/// <param name="Where">Where it stands.</param>
 /// <param name="Tiles">Tiles from the player's tile to the nearest the room covers, counted the long way round a diagonal.</param>
-public sealed record RoomNearby(RoomLaid Laid, int Tiles);
+public sealed record RoomNearby(string Room, RoomLayout Layout, RoomCandidate Where, int Tiles);
 
 /// <summary>
 /// The text half of the capture key: what one press writes into its folder beside the two pictures and the recording.
@@ -129,40 +131,53 @@ public static class CaptureReport
     private static int FloorDiv(int value, int by) => (value - (((value % by) + by) % by)) / by;
 
     /// <summary>
-    /// Every room laid within <paramref name="reach"/> tiles of a tile, nearest first - the rooms the player stands in at nought.
+    /// Every room standing within <paramref name="reach"/> tiles of a tile, nearest first - the rooms the player stands in at nought.
     /// </summary>
     /// <remarks>
     /// By the tiles each room COVERS (RoomArrangement.Tiles), not its footprint's rectangle: an
     /// L-shaped room's notch is somebody else's floor, and standing there is not standing in it.
-    /// Two rooms at nought is an ordinary answer where they share a rim.
+    /// Two rooms at nought is an ordinary answer where they share a rim, or where one stands inside
+    /// another - The Assembly's Expedition encounter inside a workshop.
     /// </remarks>
-    public static List<RoomNearby> RoomsNear(RoomArrangement arranged, int tileX, int tileY, int reach = RoomReach)
+    /// <param name="standing">Every room with where it stands - every place of a room laid more than once. See AreaRooms.Standing.</param>
+    /// <param name="tilesX">The area's tiles across.</param>
+    /// <param name="tilesY">The area's tiles down.</param>
+    /// <param name="tileX">The player's tile.</param>
+    /// <param name="tileY">The player's tile.</param>
+    /// <param name="reach">Tiles either side of the player's own a room may be and still be listed.</param>
+    public static List<RoomNearby> RoomsNear(
+        IReadOnlyList<(string Room, RoomLayout Layout, RoomCandidate Where)> standing, int tilesX, int tilesY, int tileX, int tileY, int reach = RoomReach)
     {
-        ArgumentNullException.ThrowIfNull(arranged);
+        ArgumentNullException.ThrowIfNull(standing);
         var near = new List<RoomNearby>();
-        foreach (RoomLaid laid in arranged.Laid)
+        foreach ((string room, RoomLayout layout, RoomCandidate where) in standing)
         {
             // The footprint first: a room whose rectangle is out of reach covers nothing in it.
-            RoomCandidate where = laid.Where;
             if (Gap(tileX, where.X, where.X + where.Width - 1) > reach || Gap(tileY, where.Y, where.Y + where.Height - 1) > reach)
             {
                 continue;
             }
 
             int nearest = int.MaxValue;
-            foreach (int tile in RoomArrangement.Tiles(laid.Layout, where, arranged.TilesX, arranged.TilesY))
+            foreach (int tile in RoomArrangement.Tiles(layout, where, tilesX, tilesY))
             {
-                int off = Math.Max(Math.Abs((tile % arranged.TilesX) - tileX), Math.Abs((tile / arranged.TilesX) - tileY));
+                int off = Math.Max(Math.Abs((tile % tilesX) - tileX), Math.Abs((tile / tilesX) - tileY));
                 nearest = Math.Min(nearest, off);
             }
 
             if (nearest <= reach)
             {
-                near.Add(new RoomNearby(laid, nearest));
+                near.Add(new RoomNearby(room, layout, where, nearest));
             }
         }
 
-        near.Sort((a, b) => a.Tiles != b.Tiles ? a.Tiles.CompareTo(b.Tiles) : a.Laid.Rank.CompareTo(b.Laid.Rank));
+        near.Sort((a, b) =>
+        {
+            int order = a.Tiles.CompareTo(b.Tiles);
+            order = order != 0 ? order : string.CompareOrdinal(a.Room, b.Room);
+            order = order != 0 ? order : a.Where.Y.CompareTo(b.Where.Y);
+            return order != 0 ? order : a.Where.X.CompareTo(b.Where.X);
+        });
         return near;
     }
 
@@ -277,10 +292,10 @@ public static class CaptureReport
     public static string Room(RoomNearby room)
     {
         ArgumentNullException.ThrowIfNull(room);
-        RoomCandidate where = room.Laid.Where;
+        RoomCandidate where = room.Where;
         return string.Create(
             CultureInfo.InvariantCulture,
-            $"{(room.Tiles == 0 ? "here " : $"{room.Tiles} off")}  {TerrainRooms.NameFor(room.Laid.Room)}  at tile {where.X}, {where.Y}, {where.Width} x {where.Height}, turn {where.Turn}, rank {room.Laid.Rank}, {room.Laid.Beside}% beside  ({room.Laid.Room})");
+            $"{(room.Tiles == 0 ? "here " : $"{room.Tiles} off")}  {TerrainRooms.NameFor(room.Room)}  at tile {where.X}, {where.Y}, {where.Width} x {where.Height}, {RoomFinder.Said(where.Turn)}  ({room.Room})");
     }
 
     /// <summary>
@@ -328,11 +343,11 @@ public static class CaptureReport
         foreach (RoomNearby room in rooms)
         {
             said.Append("##### ").AppendLine(Room(room));
-            said.Append(ModelDump.DoodadLights(read, room.Laid.Room));
+            said.Append(ModelDump.DoodadLights(read, room.Room));
             if (room.Tiles == 0)
             {
-                said.Append("=== ").Append(room.Laid.Room).AppendLine(" as the file has it");
-                byte[]? file = read(room.Laid.Room);
+                said.Append("=== ").Append(room.Room).AppendLine(" as the file has it");
+                byte[]? file = read(room.Room);
                 said.AppendLine(file is { Length: > 0 } ? StatDescriptionFiles.Decode(file).TrimEnd() : "(not in the install)");
             }
 
@@ -481,8 +496,8 @@ public static class CaptureReport
     /// A survey of the entity maps in a line and its detail: the three numbers, then each room's doodad lines against what was found, each path found and how many stand, and the paths found nowhere - see SleepingDoodads.
     /// </summary>
     /// <param name="done">The survey.</param>
-    /// <param name="searched">The rooms with their files read, or null while they are not.</param>
-    public static (string Said, string Detail) Doodads(DoodadSurvey done, IReadOnlyList<(string Room, RoomLayout Layout, RoomSearch Search)>? searched)
+    /// <param name="rooms">The rooms with their files read, or null while they are not.</param>
+    public static (string Said, string Detail) Doodads(DoodadSurvey done, IReadOnlyList<(string Room, RoomLayout Layout)>? rooms)
     {
         ArgumentNullException.ThrowIfNull(done);
         if (done.Why.Length > 0)
@@ -503,7 +518,7 @@ public static class CaptureReport
 
         var lines = new List<string>();
         var unfound = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
-        foreach ((string room, RoomLayout layout, _) in searched ?? [])
+        foreach ((string room, RoomLayout layout) in rooms ?? [])
         {
             var stubs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             int named = 0, found = 0, standing = 0;
@@ -547,37 +562,34 @@ public static class CaptureReport
     }
 
     /// <summary>
-    /// Every room file the area loaded, whole, each under its path - the lines a placing is checked against, beside the sightings they are checked against.
+    /// Every room file the area may have laid, whole, each under its path - the lines a placing is checked against, beside the sightings they are checked against.
     /// </summary>
     /// <remarks>
     /// WHAT THE FIRST ASSEMBLY CAPTURE LACKED: six rooms without a place, 844 sightings to hold them
     /// against, and not one of the rooms' doodad lines in the folder - rooms.txt prints a file only
     /// for the room the player stands in. The placing is pure (RoomDoodadFinder.Find takes the lines
     /// and the sightings and nothing else), so with the files here it runs again on any machine.
+    /// THE WHOLE SET, not the loaded list's rooms alone - see AreaRoomSet for the ten of fifty-three.
     /// </remarks>
     /// <param name="read">How to get a file out of the install, by path.</param>
-    /// <param name="loaded">The files the area loaded - the room files among them are printed.</param>
+    /// <param name="loaded">The files the area loaded - the room files among them and every room of its room sets are printed.</param>
     public static string RoomFiles(Func<string, byte[]?> read, IReadOnlyList<string> loaded)
     {
         ArgumentNullException.ThrowIfNull(read);
         ArgumentNullException.ThrowIfNull(loaded);
         var said = new StringBuilder();
-        int count = 0;
-        foreach (string path in loaded)
+        List<string> rooms = AreaRoomSet.Files(loaded, read);
+        said.Append(Say(rooms.Count)).AppendLine(" room files the area may lay - the loaded list's and its room sets'");
+        said.AppendLine();
+        foreach (string path in rooms)
         {
-            if (!path.EndsWith(".arm", StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
-            count++;
             said.Append("##### ").AppendLine(path);
             byte[]? file = read(path);
             said.AppendLine(file is { Length: > 0 } ? StatDescriptionFiles.Decode(file).TrimEnd() : "(not in the install)");
             said.AppendLine();
         }
 
-        return said.Insert(0, Say(count) + " room files the area loaded\n\n").ToString();
+        return said.ToString();
     }
 
     /// <summary>
