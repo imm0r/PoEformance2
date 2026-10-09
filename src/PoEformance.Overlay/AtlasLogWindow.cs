@@ -143,7 +143,7 @@ public sealed class AtlasLogWindow(Func<IReadOnlyList<string>> report)
         Table(rows);
     }
 
-    /// <summary>The section picker, the search box and the copy button, on one line.</summary>
+    /// <summary>The section picker and the search box, on one line.</summary>
     private void Controls()
     {
         ImGui.SetNextItemWidth(220f);
@@ -163,19 +163,11 @@ public sealed class AtlasLogWindow(Func<IReadOnlyList<string>> report)
         ImGui.SameLine();
         ImGui.SetNextItemWidth(260f);
         ImGui.InputTextWithHint("###atlas-log-find", "find in the text...", ref _search, SearchLength);
-
-        // COPY THE WHOLE THING, not the filtered view: what this is for is pasting a report into a
-        // conversation about it, and a report with the interesting part filtered out is worse than
-        // no report. The filter is for reading here.
-        ImGui.SameLine();
-        if (ImGui.Button("Copy all"))
-        {
-            ImGui.SetClipboardText(string.Join('\n', _raw));
-        }
-
         if (ImGui.IsItemHovered())
         {
-            ImGui.SetTooltip($"All {_lines.Count} lines to the clipboard, filter ignored.");
+            // THE WHOLE THING GOES INTO A CAPTURE, not the filtered view: a report with the
+            // interesting part filtered out is worse than no report. The filter is for reading here.
+            ImGui.SetTooltip($"For reading here. The capture key writes all {_lines.Count} lines to atlas-log.txt, filter ignored.");
         }
     }
 

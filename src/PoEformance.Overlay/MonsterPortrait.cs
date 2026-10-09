@@ -1427,11 +1427,11 @@ public sealed class MonsterPortrait
             ImGui.SetTooltip("Click the picture to list every surface under that pixel, nearest first: material, blend,\n"
                 + "what drew it, where it came from, and for a mixed layer how far in front of the solid behind it lies and its alpha.\n"
                 + "While on, every drawing also counts how each translucent material came out over the whole picture.\n"
-                + "\"copy probe\" puts the lines on the clipboard.");
+                + "The capture key writes the lines to model-probe.txt.");
         }
     }
 
-    /// <summary>The probe's lines under the picture, with a button that copies them - see <see cref="ProbeToggle"/>.</summary>
+    /// <summary>The probe's lines under the picture - see <see cref="ProbeToggle"/>; the capture key writes them, see <see cref="ProbeReport"/>.</summary>
     private void Probed()
     {
         if (!_probing)
@@ -1439,15 +1439,10 @@ public sealed class MonsterPortrait
             return;
         }
 
-        if (!ReferenceEquals(_probedModel, _model) || (_probeLines.Count == 0 && _layerLines.Count == 0))
+        if (!HasProbe)
         {
             ImGuiText.Wrapped(OverlayInk.Quiet, "probe: click the picture to see what that pixel is made of");
             return;
-        }
-
-        if (ImGui.SmallButton("copy probe##monster-probe-copy"))
-        {
-            ImGui.SetClipboardText(string.Join('\n', _probeLines.Concat(_layerLines)));
         }
 
         foreach (string line in _probeLines)
@@ -1460,6 +1455,12 @@ public sealed class MonsterPortrait
             ImGuiText.Wrapped(OverlayInk.Quiet, ImGuiText.Escape(line));
         }
     }
+
+    /// <summary>The probe's lines as they stand - the pixel's surfaces, then the layers' counts - for the capture key; null while the probe is off, has not been clicked, or is about another model.</summary>
+    public string? ProbeReport() => HasProbe ? string.Join('\n', _probeLines.Concat(_layerLines)) : null;
+
+    /// <summary>Whether the probe has lines about the model shown - the frame's own question, asked without building the text.</summary>
+    private bool HasProbe => _probing && ReferenceEquals(_probedModel, _model) && _probeLines.Count + _layerLines.Count > 0;
 
     /// <summary>Whether the probe is on - see <see cref="ProbeToggle"/>.</summary>
     private bool _probing;

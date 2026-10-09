@@ -68,23 +68,31 @@ public static class SleepingDoodads
     public const int MostNodes = 200_000;
 
     /// <summary>
-    /// Reads both entity maps of the area for the paths in <paramref name="paths"/>. Never throws on a bad read; a map that cannot be walked counts nought.
+    /// Reads both entity maps of the area for the paths in <paramref name="paths"/>, or for every entity with a path where none are given. Never throws on a bad read; a map that cannot be walked counts nought.
     /// </summary>
+    /// <remarks>
+    /// EVERY NAMED ENTITY is what the capture key's recording asks for, and the reason is timing: the
+    /// capture's pass runs the moment the key goes down, and the rooms whose stubs would filter this
+    /// may still be being read for seconds. Without a filter the read is a superset of any filtered
+    /// one - the same walk, the same path reads, and a position and model for every entity rather
+    /// than for the named few - so a replay of the recording can run the filtered read for any set of
+    /// rooms and find every read it makes. Measured against the filtered read it is the model chain
+    /// for the entities a room does not name, four reads each, and nothing more.
+    /// </remarks>
     /// <param name="reader">The game's memory.</param>
     /// <param name="schema">The offsets.</param>
     /// <param name="areaInstance">The area, as the last snapshot resolved it - nought outside the game.</param>
-    /// <param name="paths">The stubs the area's rooms name, compared without case - built with StringComparer.OrdinalIgnoreCase.</param>
-    public static DoodadSurvey Read(IMemoryReader reader, OffsetSchema schema, ulong areaInstance, IReadOnlySet<string> paths)
+    /// <param name="paths">The stubs the area's rooms name, compared without case - built with StringComparer.OrdinalIgnoreCase - or null for every entity with a path.</param>
+    public static DoodadSurvey Read(IMemoryReader reader, OffsetSchema schema, ulong areaInstance, IReadOnlySet<string>? paths)
     {
         ArgumentNullException.ThrowIfNull(reader);
         ArgumentNullException.ThrowIfNull(schema);
-        ArgumentNullException.ThrowIfNull(paths);
         if (!MemoryReaderExtensions.IsPlausiblePointer(areaInstance))
         {
             return DoodadSurvey.Not("not in an area");
         }
 
-        if (paths.Count == 0)
+        if (paths is { Count: 0 })
         {
             return DoodadSurvey.Not("the area's rooms name no doodad");
         }
@@ -129,8 +137,8 @@ public static class SleepingDoodads
     private readonly record struct Readers(
         IMemoryReader Memory, EntityMapReader Maps, EntityReader Entities, RenderReader Render, int ModelInfo, int ModelRecord, int RecordName);
 
-    /// <summary>One map walked: every node's path, and the position and model of every entity whose path is wanted. Returns how many nodes the walk reached.</summary>
-    private static int Walk(in Readers readers, ulong mapStruct, IReadOnlySet<string> paths, bool asleep, List<DoodadSighting> found, ref int named)
+    /// <summary>One map walked: every node's path, and the position and model of every entity whose path is wanted - every named one where no paths are given. Returns how many nodes the walk reached.</summary>
+    private static int Walk(in Readers readers, ulong mapStruct, IReadOnlySet<string>? paths, bool asleep, List<DoodadSighting> found, ref int named)
     {
         Dictionary<uint, ulong> pointers = readers.Maps.ReadEntityPointers(mapStruct, maxEntities: MostNodes, includeVisuals: true, mostVisits: MostNodes);
         foreach ((uint id, ulong address) in pointers)
@@ -144,7 +152,7 @@ public static class SleepingDoodads
             }
 
             named++;
-            if (!paths.Contains(known.Path))
+            if (paths is not null && !paths.Contains(known.Path))
             {
                 continue;
             }

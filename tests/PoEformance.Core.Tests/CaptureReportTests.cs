@@ -159,6 +159,81 @@ public class CaptureReportTests
         Assert.Contains("{ \"own\": 2 }", said, StringComparison.Ordinal);
     }
 
+    /// <summary>The arrangement's line counts what was drawn, moved, crowded out and not found, and its detail says where each room went and why.</summary>
+    [Fact]
+    public void THEARRANGEMENTIsSaidAsTheTileBookShowsIt()
+    {
+        RoomLayout square = RoomArrangementTests.Square();
+        RoomArrangement arranged = RoomArrangement.Arrange(
+            [
+                ("Metadata/Terrain/Rooms/boss_01.arm", square, RoomArrangementTests.Search(RoomArrangementTests.Place(0, 0, 3, 3))),
+                ("Metadata/Terrain/Rooms/lost.arm", square, RoomArrangementTests.Search()),
+            ],
+            6,
+            3,
+            RoomOverlap.Rims);
+
+        (string said, string detail) = CaptureReport.Arranged(arranged);
+        Assert.Equal("rooms: 1 drawn, 1 not found", said);
+        Assert.StartsWith("boss_01: tile 0, 0, as written, 100% beside the joins - 0 corners and 0 tiles disagree", detail, StringComparison.Ordinal);
+        Assert.EndsWith("lost: its search found nothing", detail, StringComparison.Ordinal);
+        Assert.Equal(said + '\n' + detail, CaptureReport.Lined((said, detail)));
+        Assert.Equal("alone", CaptureReport.Lined(("alone", string.Empty)));
+    }
+
+    /// <summary>The placing's line counts the rooms placed and their places, and its detail has each place's figures, what a room yielded, and why one has no place.</summary>
+    [Fact]
+    public void THEPLACINGIsSaidAsTheTileBookShowsIt()
+    {
+        RoomLayout square = RoomArrangementTests.Square();
+        var laid = new RoomDoodadPlace(new RoomCandidate(5, 7, 1, 3, 3, 12, 12), 12, 12, 4.2f, []) { TilesAgree = 9 };
+        var yielded = new RoomDoodadPlace(new RoomCandidate(5, 7, 1, 3, 3, 10, 12), 10, 12, 3f, []);
+        (string Room, RoomLayout Layout, RoomDoodadPlaces Places)[] placed =
+        [
+            ("Metadata/Terrain/Rooms/desert.arm", square, new RoomDoodadPlaces([laid], 12, 12, 12, string.Empty)),
+            ("Metadata/Terrain/Rooms/grass.arm", square, new RoomDoodadPlaces([], 12, 10, 10, "every place it found stands on another room's tiles")
+            {
+                Yielded = [(yielded, "Metadata/Terrain/Rooms/desert.arm")],
+            }),
+        ];
+
+        (string said, string detail) = CaptureReport.Placed(placed);
+        Assert.Equal("rooms: 1 placed by their doodads at 1 places, 1 with no place", said);
+        string[] lines = detail.Split('\n');
+        Assert.Equal("desert: 1 place, 12 of 12 doodads told by their model - tile 5, 7, turned 90: 12 of 12 doodads within a tile, off 4 on average, 9 tiles agree", lines[0]);
+        Assert.Equal(
+            "grass: no place - every place it found stands on another room's tiles; 10 of its 12 doodad lines stand in the area, 10 told by their model - yielded tile 5, 7, turned 90 (10 of 12) to desert",
+            lines[1]);
+    }
+
+    /// <summary>The survey's line has its three numbers, its detail each path with how many stand, and the sightings table every entity with its model and position.</summary>
+    [Fact]
+    public void THESURVEYIsSaidWithEverySighting()
+    {
+        const string Plain = "Metadata/MiscellaneousObjects/Doodad";
+        var survey = new DoodadSurvey(
+            1274, 1274, 167, 1300,
+            [
+                new DoodadSighting(7, Plain, "Metadata/Doodads/Pot_01.ao", 1250.5f, 2000f, -115f, true),
+                new DoodadSighting(9, Plain, string.Empty, 1300f, 2100f, 0f, false),
+                new DoodadSighting(12, "Metadata/Terrain/Doodads/Lamp", "Metadata/Doodads/Lamp.ao", 10f, 20f, -30f, true),
+            ],
+            47.3d,
+            string.Empty);
+
+        (string said, string detail) = CaptureReport.Doodads(survey, null);
+        Assert.Equal("doodads: 3 entities stand where the rooms name a doodad, on 2 paths - sleeping map 1274 of 1274 walked, awake 167, 1300 with a path, read in 47 ms", said);
+        Assert.Equal([Plain + ": 2 entities, 1 asleep", "Metadata/Terrain/Doodads/Lamp: 1 entities, 1 asleep"], detail.Split('\n'));
+
+        string[] table = CaptureReport.Sightings(survey).Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        Assert.Equal("3 sightings; position in world units, z the game's way up", table[0]);
+        Assert.Equal("id\tpath\tmodel\tx\ty\tz\tmap", table[1]);
+        Assert.Equal($"7\t{Plain}\tMetadata/Doodads/Pot_01.ao\t1250.5\t2000\t-115\tsleeping", table[2]);
+        Assert.Equal($"9\t{Plain}\t\t1300\t2100\t0\tawake", table[3]);
+
+        Assert.Equal(("doodads: not in an area", string.Empty), CaptureReport.Doodads(DoodadSurvey.Not("not in an area"), null));
+    }
+
     /// <summary>The capture key is kept with the rest of the settings.</summary>
     [Fact]
     public void THECAPTUREKeyIsSaved()

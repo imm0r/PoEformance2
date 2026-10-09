@@ -441,34 +441,12 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             return;
         }
 
+        // THE LINE AND ITS HOVER ARE THE CAPTURE'S TEXT - see CaptureReport.Arranged - so what a
+        // capture writes is what the window showed, word for word.
         if (!ReferenceEquals(arranged, _roomsSaidOf))
         {
             _roomsSaidOf = arranged;
-            int moved = arranged.Laid.Count(one => one.Rank > 0);
-            _roomsSaid = string.Create(CultureInfo.InvariantCulture, $"rooms: {arranged.Laid.Count} drawn")
-                + (moved > 0 ? string.Create(CultureInfo.InvariantCulture, $", {moved} off their first place") : string.Empty)
-                + (arranged.Crowded.Count > 0 ? string.Create(CultureInfo.InvariantCulture, $", {arranged.Crowded.Count} with no free place") : string.Empty)
-                + (arranged.Unfound.Count > 0 ? string.Create(CultureInfo.InvariantCulture, $", {arranged.Unfound.Count} not found") : string.Empty);
-            var lines = new List<string>(arranged.Laid.Count + arranged.Crowded.Count + arranged.Unfound.Count);
-            foreach (RoomLaid one in arranged.Laid)
-            {
-                // HOW MANY OF ITS TILES CAN BE WALKED, because the map draws the void and unexplored
-                // ground the same black: a room outlined in the black stands on ground or it does not,
-                // and this is where that is read rather than argued. See RoomLaid.Standing.
-                RoomMisses misses = one.Misses;
-                lines.Add(string.Create(CultureInfo.InvariantCulture,
-                    $"{TerrainRooms.NameFor(one.Room)}: tile {one.Where.X}, {one.Where.Y}, {RoomFinder.Said(one.Where.Turn)}, {one.Beside}% beside the joins")
-                    + string.Create(CultureInfo.InvariantCulture,
-                        $" - {misses.Corners.Count} corners and {misses.Tiles.Count} tiles disagree, {misses.Corners.Count + misses.Tiles.Count - misses.Elsewhere} of those at a join")
-                    + (one.Standing is { } standing
-                        ? string.Create(CultureInfo.InvariantCulture, $" - stands on {standing} of its {one.Covers} tiles")
-                        : string.Create(CultureInfo.InvariantCulture, $" - {one.Covers} tiles, walkable ground not read"))
-                    + (one.Rank > 0 ? string.Create(CultureInfo.InvariantCulture, $" - row {one.Rank + 1} of its list, the ones above it taken") : string.Empty));
-            }
-
-            lines.AddRange(arranged.Crowded.Select(one => TerrainRooms.NameFor(one) + ": every place on its list covers a tile a surer room holds"));
-            lines.AddRange(arranged.Unfound.Select(one => TerrainRooms.NameFor(one) + ": its search found nothing"));
-            _roomsDetail = string.Join('\n', lines);
+            (_roomsSaid, _roomsDetail) = CaptureReport.Arranged(arranged);
         }
 
         OverlayLayout.Flow(end, ImGui.CalcTextSize(_roomsSaid).X, right, 0f);
@@ -491,7 +469,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         {
             string waiting = rooms.Surveying
                 ? "rooms: searched - reading the area's doodads to place them..."
-                : "rooms: searched - the area's doodads are not read; press the button to read them";
+                : "rooms: searched - the area's doodads are not read";
             OverlayLayout.Flow(end, ImGui.CalcTextSize(waiting).X, right, 0f);
             ImGui.TextDisabled(waiting);
             return ImGui.GetItemRectMax().X;
@@ -500,44 +478,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         if (!ReferenceEquals(placed, _placedSaidOf))
         {
             _placedSaidOf = placed;
-            int places = 0, unplaced = 0;
-            var lines = new List<string>(placed.Count);
-            foreach ((string room, _, RoomDoodadPlaces found) in placed)
-            {
-                places += found.Places.Count;
-                unplaced += found.Places.Count == 0 ? 1 : 0;
-                string name = TerrainRooms.NameFor(room);
-                var said = new List<string>(found.Places.Count + found.Yielded.Count);
-                foreach (RoomDoodadPlace place in found.Places)
-                {
-                    said.Add(string.Create(CultureInfo.InvariantCulture,
-                        $"tile {place.Where.X}, {place.Where.Y}, {RoomFinder.Said(place.Where.Turn)}: {place.Hits} of {place.Lines} doodads within a tile, off {place.MeanOff:0} on average")
-                        + (place.TilesAgree >= 0 ? string.Create(CultureInfo.InvariantCulture, $", {place.TilesAgree} tiles agree") : ", not on the tile search's list"));
-                }
-
-                // WHAT IT GAVE UP, AND TO WHOM: a variant not laid votes for the laid one's tile - see RoomDoodadFinder.Settle.
-                foreach ((RoomDoodadPlace place, string to) in found.Yielded)
-                {
-                    said.Add(string.Create(CultureInfo.InvariantCulture,
-                        $"yielded tile {place.Where.X}, {place.Where.Y}, {RoomFinder.Said(place.Where.Turn)} ({place.Hits} of {place.Lines}) to {TerrainRooms.NameFor(to)}"));
-                }
-
-                if (found.Places.Count == 0)
-                {
-                    lines.Add(string.Create(CultureInfo.InvariantCulture,
-                        $"{name}: no place - {found.Why}; {found.Matchable} of its {found.Lines} doodad lines stand in the area, {found.ByModel} told by their model")
-                        + (said.Count > 0 ? " - " + string.Join("; ", said) : string.Empty));
-                    continue;
-                }
-
-                lines.Add(string.Create(CultureInfo.InvariantCulture,
-                    $"{name}: {found.Places.Count} place{(found.Places.Count == 1 ? string.Empty : "s")}, {found.ByModel} of {found.Matchable} doodads told by their model - ")
-                    + string.Join("; ", said));
-            }
-
-            _placedSaid = string.Create(CultureInfo.InvariantCulture, $"rooms: {placed.Count - unplaced} placed by their doodads at {places} places")
-                + (unplaced > 0 ? string.Create(CultureInfo.InvariantCulture, $", {unplaced} with no place") : string.Empty);
-            _placedDetail = string.Join('\n', lines);
+            (_placedSaid, _placedDetail) = CaptureReport.Placed(placed);
         }
 
         OverlayLayout.Flow(end, ImGui.CalcTextSize(_placedSaid).X, right, 0f);
@@ -552,39 +493,19 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     }
 
     /// <summary>
-    /// The "doodads in this area" button and the last survey's line - see SleepingDoodads for what it measures and why.
+    /// The last survey's line and its hover - see SleepingDoodads for what it measures and why.
     /// </summary>
     /// <remarks>
     /// A MEASUREMENT, NOT A FEATURE: whether the game keeps the rooms' doodads for the whole area and
-    /// what one read of them costs, read off three numbers before anything is built on them. Its
-    /// detail is copyable because the numbers are what gets sent, not the picture.
+    /// what one read of them costs, read off three numbers before anything is built on them. The
+    /// survey runs itself once the rooms are read (AreaRooms); the capture key writes its line, its
+    /// detail and every sighting to doodads.txt, which is how the numbers get sent.
     /// </remarks>
     private void DoodadsBox(AreaRooms rooms, float end, float right)
     {
         if (rooms.ReadDoodads is null)
         {
             return;
-        }
-
-        const string label = "doodads in this area";
-        OverlayLayout.Flow(end, ImGui.CalcTextSize(label).X + (2f * ImGui.GetStyle().FramePadding.X), right, 0f);
-        bool ready = !rooms.Surveying && rooms.Stubs() is not null;
-        ImGui.BeginDisabled(!ready);
-        bool pressed = ImGui.SmallButton(label + "##roomdoodads");
-        ImGui.EndDisabled();
-        end = ImGui.GetItemRectMax().X;
-        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
-        {
-            ImGui.SetTooltip("Reads the area's entity maps ONCE - the sleeping one, which is the rest of the area, and the awake one, which is"
-                + " the bubble round you - for every entity whose path is a doodad's stub in one of this area's room files, and where it stands.\n"
-                + "Nothing of the frame's read: it runs on its own task on the press, reads each entity's path, and only a named one's position.\n"
-                + "What it measures is whether the game keeps the rooms' doodads for the whole area and what one read costs, before any room"
-                + " is placed by them. Greyed while the rooms are still being read, or while a read runs.");
-        }
-
-        if (pressed)
-        {
-            rooms.Survey();
         }
 
         if (rooms.Surveying)
@@ -603,93 +524,63 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         if (!ReferenceEquals(done, _doodadsSaidOf))
         {
             _doodadsSaidOf = done;
-            (_doodadsSaid, _doodadsDetail) = SurveySaid(done, rooms.Searched);
+            (_doodadsSaid, _doodadsDetail) = CaptureReport.Doodads(done, rooms.Searched);
         }
 
         OverlayLayout.Flow(end, ImGui.CalcTextSize(_doodadsSaid).X, right, 0f);
         ImGuiText.Wrapped(OverlayInk.Quiet, ImGuiText.Escape(_doodadsSaid));
-        end = ImGui.GetItemRectMax().X;
         if (ImGui.IsItemHovered() && _doodadsDetail.Length > 0)
         {
             ImGui.SetTooltip(ImGuiText.Escape(_doodadsDetail));
         }
-
-        OverlayLayout.Flow(end, ImGui.CalcTextSize("copy").X + (2f * ImGui.GetStyle().FramePadding.X), right, 0f);
-        if (ImGui.SmallButton("copy##roomdoodadscopy"))
-        {
-            ImGui.SetClipboardText(_doodadsSaid + '\n' + _doodadsDetail);
-        }
-
-        if (ImGui.IsItemHovered())
-        {
-            ImGui.SetTooltip("Copies the line and every line of its hover: each room's share of doodads found, and each path found with how many entities carry it.");
-        }
     }
 
     /// <summary>
-    /// A survey in words: the line with its three numbers, and the detail - each room's doodad lines against what was found, then each path found and how many stand, then the paths found nowhere.
+    /// The picked row's two folds as one text - against the rooms on the map, and where it parts with the area - for the capture key; null while no row is picked.
     /// </summary>
-    private static (string Said, string Detail) SurveySaid(DoodadSurvey done, IReadOnlyList<(string Room, RoomLayout Layout, RoomSearch Search)>? searched)
+    /// <remarks>As the folds have it, headers included, so what is sent is what was read - see CaptureParts.RoomPick.</remarks>
+    public string? PickedReport()
     {
-        if (done.Why.Length > 0)
+        // ONLY WHAT IS ON SCREEN: the folds keep their last text after the row is unpicked or the
+        // book closed, and a capture must not send a row nobody is looking at as the one in question.
+        int frame = ImGui.GetFrameCount();
+        bool shared = _sharedFor is not null && frame - _sharedFrame <= 1;
+        bool parts = _partsFor is not null && frame - _partsFrame <= 1;
+        if (!shared && !parts)
         {
-            return ("doodads: " + done.Why, string.Empty);
+            return null;
         }
 
-        var byPath = new Dictionary<string, (int All, int Asleep)>(StringComparer.OrdinalIgnoreCase);
-        foreach (DoodadSighting one in done.Found)
+        var lines = new List<string>(_sharedLines.Length + _partLines.Length + 3);
+        if (shared)
         {
-            (int all, int asleep) = byPath.GetValueOrDefault(one.Path);
-            byPath[one.Path] = (all + 1, asleep + (one.Asleep ? 1 : 0));
+            lines.Add(Headed(_sharedHeader));
+            lines.AddRange(_sharedLines);
         }
 
-        string said = string.Create(CultureInfo.InvariantCulture,
-            $"doodads: {done.Found.Count} entities stand where the rooms name a doodad, on {byPath.Count} paths - sleeping map {done.SleepingNodes} of {done.SleepingSize} walked,"
-            + $" awake {done.AwakeNodes}, {done.Named} with a path, read in {done.Milliseconds:0} ms");
-
-        var lines = new List<string>();
-        var unfound = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
-        foreach ((string room, RoomLayout layout, _) in searched ?? [])
+        if (parts)
         {
-            var stubs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            int named = 0, found = 0, standing = 0;
-            foreach (RoomDoodad doodad in layout.Doodads)
+            if (lines.Count > 0)
             {
-                if (doodad.Stub.Length == 0)
-                {
-                    continue;
-                }
-
-                named++;
-                bool known = byPath.TryGetValue(doodad.Stub, out (int All, int Asleep) count);
-                found += known ? 1 : 0;
-                if (stubs.Add(doodad.Stub))
-                {
-                    standing += count.All;
-                    if (!known)
-                    {
-                        unfound.Add(doodad.Stub);
-                    }
-                }
+                lines.Add(string.Empty);
             }
 
-            lines.Add(named == 0
-                ? TerrainRooms.NameFor(room) + ": its doodad lines name no stub"
-                : string.Create(CultureInfo.InvariantCulture,
-                    $"{TerrainRooms.NameFor(room)}: {found} of its {named} doodad lines name a path found in the area, {standing} such entities over {stubs.Count} paths"));
+            lines.Add(Headed(_partsHeader));
+            lines.AddRange(_partLines);
         }
 
-        foreach ((string path, (int all, int asleep)) in byPath.OrderByDescending(one => one.Value.All).ThenBy(one => one.Key, StringComparer.OrdinalIgnoreCase))
-        {
-            lines.Add(string.Create(CultureInfo.InvariantCulture, $"{path}: {all} entities, {asleep} asleep"));
-        }
+        return string.Join('\n', lines);
+    }
 
-        if (unfound.Count > 0)
-        {
-            lines.Add("found nowhere: " + string.Join(", ", unfound));
-        }
+    /// <summary>The frame each fold was last drawn on - see <see cref="PickedReport"/>.</summary>
+    private int _sharedFrame = -2;
+    private int _partsFrame = -2;
 
-        return (said, string.Join('\n', lines));
+    /// <summary>A fold's header without the id ImGui keeps it apart by.</summary>
+    private static string Headed(string header)
+    {
+        int id = header.IndexOf("##", StringComparison.Ordinal);
+        return id >= 0 ? header[..id] : header;
     }
 
     /// <summary>
@@ -1328,20 +1219,18 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             }
         }
 
+        // DRAWN THIS FRAME, which is what lets the capture key take the fold's text only while it is
+        // on screen - see PickedReport.
+        _sharedFrame = ImGui.GetFrameCount();
         if (!ImGui.CollapsingHeader(_sharedHeader))
         {
             return;
         }
 
-        if (ImGui.SmallButton("copy##roomsharedcopy"))
-        {
-            ImGui.SetClipboardText(string.Join('\n', _sharedLines));
-        }
-
         if (ImGui.IsItemHovered())
         {
-            ImGui.SetTooltip("Copies every line below. A tile on both rims lies on the outermost row or column of both footprints;"
-                + " elsewhere is inside either; touching is a tile of this row's beside one of the other room's, across a side.");
+            ImGui.SetTooltip("A tile on both rims lies on the outermost row or column of both footprints; elsewhere is inside either;"
+                + " touching is a tile of this row's beside one of the other room's, across a side. The capture key writes these lines to room-pick.txt.");
         }
 
         foreach (string line in _sharedLines)
@@ -1351,7 +1240,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     }
 
     /// <summary>
-    /// Every place the outlined candidate parts with the area, one line each, with a button to copy them.
+    /// Every place the outlined candidate parts with the area, one line each - written out by the capture key.
     /// </summary>
     /// <remarks>
     /// THE DATA FOR WHAT IS NOT DECODED YET. Each tile names what the room asks for and what was laid,
@@ -1386,19 +1275,15 @@ public sealed class TileBookWindow : BookWindow<TileBook>
                 $"where tile {candidate.X}, {candidate.Y} ({RoomFinder.Said(candidate.Turn)}) parts with the area: {parts.Count} misses, {elsewhere} of them at no join##roomparts");
         }
 
+        _partsFrame = ImGui.GetFrameCount();
         if (!ImGui.CollapsingHeader(_partsHeader))
         {
             return;
         }
 
-        if (ImGui.SmallButton("copy##roompartscopy"))
-        {
-            ImGui.SetClipboardText(string.Join('\n', _partLines));
-        }
-
         if (ImGui.IsItemHovered())
         {
-            ImGui.SetTooltip("Copies every line below, to paste where the room's joins are being worked out.");
+            ImGui.SetTooltip("Every tile and corner where this row disagrees with the area, with the slot's own numbers - the capture key writes them to room-pick.txt.");
         }
 
         float rows = Math.Clamp(_partLines.Length, 1, 8);

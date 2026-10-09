@@ -86,14 +86,21 @@ PoEformance.App --overlay --config       # in-game overlay + config window, side
 PoEformance.App --overlay --debug        # plus the projection diagnostics and calibration aids
 ```
 
-In the overlay, **F9** (rebindable under Appearance → Keys → Capture for Diagnosis) writes everything
-about the spot you stand on into `captures/<time> <area>/` beside the tool: a picture with and one
-without the overlay, the rooms around you with their light data, every entity, the area's loaded
-files, and a memory recording that `--replay` reads - and packs it all into `<time> <area>.zip`
-beside the folder, ready to send. Inside that recording everything the tool can
-read is read once more from nothing - the terrain, every entity with every switch on, the loaded
-files - plus the raw bytes of the game's root objects, one hop beyond them, and every component of
-the entities around you; `memory.txt` beside it says what sits at which address.
+In the overlay, **F9** (rebindable under Appearance → Keys → Capture for Diagnosis) writes a capture
+of the spot you stand on into `captures/<time> <area>/` beside the tool and packs it into
+`<time> <area>.zip` beside the folder, ready to send. What goes in is a **catalogue of parts**, each
+with a box under the key - tick what the question is about: a picture with and one without the
+overlay; every entity; the area's loaded files and environments; the rooms around you with their
+light data, every room as the ground-and-tile search arranged it, and the Tile Book's picked row;
+the doodad survey with every sighting and every room as its doodads place it; what the diagnostic
+windows hold as the key goes down - the active routes, the light hunt's report, the model probe,
+the Memory Dissector's places and search, the atlas check; and a memory recording that `--replay`
+reads. Inside that recording the ticked parts are read once more from nothing - the world with
+every switch on for the entities, the loaded files, both entity maps with every named entity's
+model for the doodads - and, as a part of its own, the raw bytes of the game's root objects, one
+hop beyond them, and every component of the entities around you; `memory.txt` beside it says what
+the pass read where, and `capture.txt` what each part holds or why it was not written. The
+windows' own copy buttons are gone: a capture is the one way a diagnosis leaves the tool.
 
 Every book shows its model in a **window of its own** - drag to turn, the wheel zooms - which opens
 when a row is chosen; the book keeps the switches. The picture is **drawn on the graphics card**

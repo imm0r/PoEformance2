@@ -81,17 +81,48 @@ public class CaptureSweepTests
         replay.Seek(600);
 
         string said = CaptureMemory.Pass(
-            replay, RealSessionTests.Schema(), replay.ResolvedStatics["GameStates"], default, null, null, null, default, 0, 0);
+            replay, RealSessionTests.Schema(), replay.ResolvedStatics["GameStates"], default, null, null, null, default, 0, 0,
+            CaptureReads.World | CaptureReads.Loaded | CaptureReads.Sweep);
 
         int world = said.IndexOf("=== a fresh world read, every switch on: ", StringComparison.Ordinal);
         int files = said.IndexOf("=== the area's loaded files: the file root or the area counter did not resolve", StringComparison.Ordinal);
         int raw = said.IndexOf("=== raw: ", StringComparison.Ordinal);
         Assert.True(world >= 0 && files > world && raw > files, said);
+        Assert.DoesNotContain("=== both entity maps", said, StringComparison.Ordinal);
         Assert.Contains("in game yes", said, StringComparison.Ordinal);
         Assert.Matches(@"\n[1-9]\d* entities read", said);
         Assert.Contains("chain: state InGame", said, StringComparison.Ordinal);
         Assert.Contains("root AreaInstance at 0x", said, StringComparison.Ordinal);
         Assert.Contains("bytes read in all", said, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// The pass reads what it is asked and no more: the doodads alone walk the entity maps without a world read or a sweep, the sweep brings the world read it needs, and nothing asked is nothing read.
+    /// </summary>
+    [Fact]
+    public void THEPASSReadsOnlyWhatTheTickedPartsAsk()
+    {
+        string fixture = Path.Combine(
+            Directory.GetParent(RealSessionTests.SceneFixturePath)!.FullName, "session-2026-08-rotation-clickmove.rec");
+        using var replay = ReplayMemoryReader.Load(File.OpenRead(fixture));
+        replay.Seek(600);
+        ulong gameStates = replay.ResolvedStatics["GameStates"];
+
+        string doodads = CaptureMemory.Pass(replay, RealSessionTests.Schema(), gameStates, default, null, null, null, default, 0, 0, CaptureReads.Doodads);
+        Assert.StartsWith("the pass reads both entity maps with every named entity's model", doodads, StringComparison.Ordinal);
+        Assert.Contains("=== both entity maps, every named entity's path, position and model: ", doodads, StringComparison.Ordinal);
+        Assert.DoesNotContain("=== a fresh world read", doodads, StringComparison.Ordinal);
+        Assert.DoesNotContain("=== raw: ", doodads, StringComparison.Ordinal);
+
+        string sweep = CaptureMemory.Pass(replay, RealSessionTests.Schema(), gameStates, default, null, null, null, default, 0, 0, CaptureReads.Sweep);
+        Assert.Contains("=== a fresh world read", sweep, StringComparison.Ordinal);
+        Assert.Contains("=== raw: ", sweep, StringComparison.Ordinal);
+        Assert.DoesNotContain("=== the area's loaded files", sweep, StringComparison.Ordinal);
+
+        string nothing = CaptureMemory.Pass(replay, RealSessionTests.Schema(), gameStates, default, null, null, null, default, 0, 0, CaptureReads.None);
+        Assert.Equal("nothing more", CaptureMemory.Said(CaptureReads.None));
+        Assert.Contains("no ticked part asked for more", nothing, StringComparison.Ordinal);
+        Assert.DoesNotContain("===", nothing, StringComparison.Ordinal);
     }
 
     /// <summary>A recording waiting on something runs past its frames until that is done - and no further than its cap.</summary>

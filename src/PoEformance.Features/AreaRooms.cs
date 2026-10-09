@@ -148,7 +148,7 @@ public sealed class AreaRooms
     /// <summary>
     /// Starts a survey of the area's entity maps for the rooms' doodads and the placing of every room by them, on its own task - see SleepingDoodads and RoomDoodadFinder. False where nothing can read them, the rooms are not read yet, or one is under way.
     /// </summary>
-    /// <remarks>Started on its own once the rooms are read - see <see cref="Arranged"/> - and again on the tile book's button, for a person who wants the numbers fresh.</remarks>
+    /// <remarks>Started on its own once the rooms are read - see <see cref="Arranged"/>. The capture key takes the answer as it stands (CaptureParts.Doodads) rather than asking again: the survey is the area's, and the area does not change under it.</remarks>
     public bool Survey()
     {
         if (ReadDoodads is not { } read || Surveying || _searched is not { } searched || Stubs() is not { } stubs || _grid is not { } grid)
