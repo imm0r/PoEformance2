@@ -37,6 +37,14 @@ public sealed class AreaRooms
     private bool[]? _walkable;
     private RoomArrangement? _arranged;
 
+    /// <summary>The stubs the area's rooms name, made once per search - see <see cref="Stubs"/>.</summary>
+    private IReadOnlySet<string>? _stubs;
+    private List<(string Room, RoomLayout Layout, RoomSearch Search)>? _stubsOf;
+
+    /// <summary>The survey of the area's entity maps for those stubs, running or run, and its answer once taken - see <see cref="Survey"/>.</summary>
+    private Task<DoodadSurvey>? _survey;
+    private DoodadSurvey? _surveyed;
+
     /// <summary>The running search's count of rooms done - one array per search, so one left to run out cannot count into the next.</summary>
     private int[] _done = [0];
     private int _of;
@@ -56,6 +64,82 @@ public sealed class AreaRooms
 
     /// <summary>The last arrangement taken, or null while none is - for a line saying what was drawn.</summary>
     public RoomArrangement? Last => _arranged;
+
+    /// <summary>The rooms searched, each with its file read and its search's answer - null while the search runs.</summary>
+    public IReadOnlyList<(string Room, RoomLayout Layout, RoomSearch Search)>? Searched => _searched;
+
+    /// <summary>Whether a survey of the area's entity maps is under way - see <see cref="Survey"/>.</summary>
+    public bool Surveying => _survey is { IsCompleted: false };
+
+    /// <summary>The last survey of the area's entity maps for the rooms' doodads, or null while none has been taken - see SleepingDoodads.</summary>
+    public DoodadSurvey? Doodads
+    {
+        get
+        {
+            if (_surveyed is null && _survey is { IsCompleted: true } done)
+            {
+                _surveyed = done.IsCompletedSuccessfully
+                    ? done.Result
+                    : DoodadSurvey.Not("the read failed: " + (done.Exception?.GetBaseException().Message ?? "cancelled"));
+            }
+
+            return _surveyed;
+        }
+    }
+
+    /// <summary>
+    /// Every path the area's rooms name as a doodad's stub, compared without case - null while the rooms are still being read.
+    /// </summary>
+    /// <remarks>
+    /// THE STUB, NOT THE .ao: a doodad line names both, and the stub is the entity's own path where
+    /// the game makes an entity of it - see RoomDoodad.Stub. Most lines carry the plain
+    /// Metadata/MiscellaneousObjects/Doodad, which is kept in the set on purpose: whether the game
+    /// keeps THOSE as entities is one of the things a survey is for.
+    /// </remarks>
+    public IReadOnlySet<string>? Stubs()
+    {
+        if (_searched is not { } searched)
+        {
+            return null;
+        }
+
+        if (!ReferenceEquals(searched, _stubsOf))
+        {
+            var stubs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach ((_, RoomLayout layout, _) in searched)
+            {
+                foreach (RoomDoodad doodad in layout.Doodads)
+                {
+                    if (doodad.Stub.Length > 0)
+                    {
+                        stubs.Add(doodad.Stub);
+                    }
+                }
+            }
+
+            _stubsOf = searched;
+            _stubs = stubs;
+        }
+
+        return _stubs;
+    }
+
+    /// <summary>
+    /// Starts a survey of the area's entity maps for the rooms' doodads, on its own task - see SleepingDoodads. False where the rooms are not read yet or one is under way.
+    /// </summary>
+    /// <param name="read">The read itself - the overlay is handed it by whoever owns the game's memory.</param>
+    public bool Survey(Func<IReadOnlySet<string>, DoodadSurvey> read)
+    {
+        ArgumentNullException.ThrowIfNull(read);
+        if (Surveying || Stubs() is not { } stubs)
+        {
+            return false;
+        }
+
+        _surveyed = null;
+        _survey = Task.Run(() => read(stubs));
+        return true;
+    }
 
     /// <summary>
     /// The area's rooms arranged, or null while they are being searched for - starting the search where this area or its rooms are new. Called every frame; cheap when nothing changed.
@@ -79,6 +163,10 @@ public sealed class AreaRooms
             _searched = null;
             _walkable = null;
             _arranged = null;
+
+            // A SURVEY IS THE AREA'S: one running for the old area runs out and is dropped like the search.
+            _survey = null;
+            _surveyed = null;
             int[] done = [0];
             _done = done;
             Volatile.Write(ref _of, rooms.Count);

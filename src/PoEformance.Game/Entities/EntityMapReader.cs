@@ -47,6 +47,9 @@ public sealed class EntityMapReader
     /// <summary>Bytes covering Left..ValueEntityPtr, read in one go per node.</summary>
     private const int NodeReadSize = 0x30;
 
+    /// <summary>Most nodes a frame's walk visits - the bubble's map, where the budget is a guard and not a bound.</summary>
+    public const int UsualVisits = 8000;
+
     private readonly IMemoryReader _reader;
     private readonly int _mapHead;
     private readonly int _mapSize;
@@ -85,8 +88,12 @@ public sealed class EntityMapReader
     /// <param name="includeVisuals">
     /// Keep the high-id entities as well: the effects, the decorations and the projectiles.
     /// </param>
+    /// <param name="mostVisits">
+    /// Most nodes visited, whatever the map says it holds. The frame's walk keeps the usual guard;
+    /// a walk of the whole area's sleeping map (see World.SleepingDoodads) raises it, once, on a press.
+    /// </param>
     public Dictionary<uint, ulong> ReadEntityPointers(
-        ulong mapStructAddress, int maxEntities = 4096, bool includeVisuals = false)
+        ulong mapStructAddress, int maxEntities = 4096, bool includeVisuals = false, int mostVisits = UsualVisits)
     {
         var result = new Dictionary<uint, ulong>();
         if (!MemoryReaderExtensions.IsPlausiblePointer(mapStructAddress))
@@ -112,7 +119,7 @@ public sealed class EntityMapReader
         var visited = new HashSet<ulong>();
         queue.Enqueue(root);
 
-        long visitBudget = Math.Min((size * 2) + 20, 8000);
+        long visitBudget = Math.Min((size * 2) + 20, mostVisits);
         var nodeBuffer = new byte[NodeReadSize];
 
         // Counted apart from the results, and that is the whole point of it. The walk is

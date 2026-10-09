@@ -253,6 +253,14 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     /// <summary>The area's rooms searched and arranged, for the header's line - the overlay asks it every frame while the box is ticked. Null leaves the box out.</summary>
     public AreaRooms? AllRooms { get; init; }
 
+    /// <summary>Reads the area's entity maps once for the rooms' doodad stubs - see SleepingDoodads. Null leaves the "doodads in this area" button out.</summary>
+    public Func<IReadOnlySet<string>, DoodadSurvey>? Survey { get; init; }
+
+    /// <summary>The survey's line and its hover, made once per survey.</summary>
+    private DoodadSurvey? _doodadsSaidOf;
+    private string _doodadsSaid = string.Empty;
+    private string _doodadsDetail = string.Empty;
+
     /// <summary>The header's line about the arrangement and its hover, made once per arrangement.</summary>
     private RoomArrangement? _roomsSaidOf;
     private string _roomsSaid = string.Empty;
@@ -454,10 +462,154 @@ public sealed class TileBookWindow : BookWindow<TileBook>
 
         OverlayLayout.Flow(end, ImGui.CalcTextSize(_roomsSaid).X, right, 0f);
         ImGuiText.Wrapped(OverlayInk.Quiet, ImGuiText.Escape(_roomsSaid));
+        end = ImGui.GetItemRectMax().X;
         if (ImGui.IsItemHovered() && _roomsDetail.Length > 0)
         {
             ImGui.SetTooltip(ImGuiText.Escape(_roomsDetail));
         }
+
+        DoodadsBox(rooms, end, right);
+    }
+
+    /// <summary>
+    /// The "doodads in this area" button and the last survey's line - see SleepingDoodads for what it measures and why.
+    /// </summary>
+    /// <remarks>
+    /// A MEASUREMENT, NOT A FEATURE: whether the game keeps the rooms' doodads for the whole area and
+    /// what one read of them costs, read off three numbers before anything is built on them. Its
+    /// detail is copyable because the numbers are what gets sent, not the picture.
+    /// </remarks>
+    private void DoodadsBox(AreaRooms rooms, float end, float right)
+    {
+        if (Survey is not { } survey)
+        {
+            return;
+        }
+
+        const string label = "doodads in this area";
+        OverlayLayout.Flow(end, ImGui.CalcTextSize(label).X + (2f * ImGui.GetStyle().FramePadding.X), right, 0f);
+        bool ready = !rooms.Surveying && rooms.Stubs() is not null;
+        ImGui.BeginDisabled(!ready);
+        bool pressed = ImGui.SmallButton(label + "##roomdoodads");
+        ImGui.EndDisabled();
+        end = ImGui.GetItemRectMax().X;
+        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+        {
+            ImGui.SetTooltip("Reads the area's entity maps ONCE - the sleeping one, which is the rest of the area, and the awake one, which is"
+                + " the bubble round you - for every entity whose path is a doodad's stub in one of this area's room files, and where it stands.\n"
+                + "Nothing of the frame's read: it runs on its own task on the press, reads each entity's path, and only a named one's position.\n"
+                + "What it measures is whether the game keeps the rooms' doodads for the whole area and what one read costs, before any room"
+                + " is placed by them. Greyed while the rooms are still being read, or while a read runs.");
+        }
+
+        if (pressed)
+        {
+            rooms.Survey(survey);
+        }
+
+        if (rooms.Surveying)
+        {
+            const string reading = "doodads: reading the area's entity maps...";
+            OverlayLayout.Flow(end, ImGui.CalcTextSize(reading).X, right, 0f);
+            ImGui.TextDisabled(reading);
+            return;
+        }
+
+        if (rooms.Doodads is not { } done)
+        {
+            return;
+        }
+
+        if (!ReferenceEquals(done, _doodadsSaidOf))
+        {
+            _doodadsSaidOf = done;
+            (_doodadsSaid, _doodadsDetail) = SurveySaid(done, rooms.Searched);
+        }
+
+        OverlayLayout.Flow(end, ImGui.CalcTextSize(_doodadsSaid).X, right, 0f);
+        ImGuiText.Wrapped(OverlayInk.Quiet, ImGuiText.Escape(_doodadsSaid));
+        end = ImGui.GetItemRectMax().X;
+        if (ImGui.IsItemHovered() && _doodadsDetail.Length > 0)
+        {
+            ImGui.SetTooltip(ImGuiText.Escape(_doodadsDetail));
+        }
+
+        OverlayLayout.Flow(end, ImGui.CalcTextSize("copy").X + (2f * ImGui.GetStyle().FramePadding.X), right, 0f);
+        if (ImGui.SmallButton("copy##roomdoodadscopy"))
+        {
+            ImGui.SetClipboardText(_doodadsSaid + '\n' + _doodadsDetail);
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("Copies the line and every line of its hover: each room's share of doodads found, and each path found with how many entities carry it.");
+        }
+    }
+
+    /// <summary>
+    /// A survey in words: the line with its three numbers, and the detail - each room's doodad lines against what was found, then each path found and how many stand, then the paths found nowhere.
+    /// </summary>
+    private static (string Said, string Detail) SurveySaid(DoodadSurvey done, IReadOnlyList<(string Room, RoomLayout Layout, RoomSearch Search)>? searched)
+    {
+        if (done.Why.Length > 0)
+        {
+            return ("doodads: " + done.Why, string.Empty);
+        }
+
+        var byPath = new Dictionary<string, (int All, int Asleep)>(StringComparer.OrdinalIgnoreCase);
+        foreach (DoodadSighting one in done.Found)
+        {
+            (int all, int asleep) = byPath.GetValueOrDefault(one.Path);
+            byPath[one.Path] = (all + 1, asleep + (one.Asleep ? 1 : 0));
+        }
+
+        string said = string.Create(CultureInfo.InvariantCulture,
+            $"doodads: {done.Found.Count} entities stand where the rooms name a doodad, on {byPath.Count} paths - sleeping map {done.SleepingNodes} of {done.SleepingSize} walked,"
+            + $" awake {done.AwakeNodes}, {done.Named} with a path, read in {done.Milliseconds:0} ms");
+
+        var lines = new List<string>();
+        var unfound = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach ((string room, RoomLayout layout, _) in searched ?? [])
+        {
+            var stubs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            int named = 0, found = 0, standing = 0;
+            foreach (RoomDoodad doodad in layout.Doodads)
+            {
+                if (doodad.Stub.Length == 0)
+                {
+                    continue;
+                }
+
+                named++;
+                bool known = byPath.TryGetValue(doodad.Stub, out (int All, int Asleep) count);
+                found += known ? 1 : 0;
+                if (stubs.Add(doodad.Stub))
+                {
+                    standing += count.All;
+                    if (!known)
+                    {
+                        unfound.Add(doodad.Stub);
+                    }
+                }
+            }
+
+            lines.Add(named == 0
+                ? TerrainRooms.NameFor(room) + ": its doodad lines name no stub"
+                : string.Create(CultureInfo.InvariantCulture,
+                    $"{TerrainRooms.NameFor(room)}: {found} of its {named} doodad lines name a path found in the area, {standing} such entities over {stubs.Count} paths"));
+        }
+
+        foreach ((string path, (int all, int asleep)) in byPath.OrderByDescending(one => one.Value.All).ThenBy(one => one.Key, StringComparer.OrdinalIgnoreCase))
+        {
+            lines.Add(string.Create(CultureInfo.InvariantCulture, $"{path}: {all} entities, {asleep} asleep"));
+        }
+
+        if (unfound.Count > 0)
+        {
+            lines.Add("found nowhere: " + string.Join(", ", unfound));
+        }
+
+        return (said, string.Join('\n', lines));
     }
 
     /// <summary>

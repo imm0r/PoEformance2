@@ -811,6 +811,15 @@ public sealed class WorldReader
     /// <summary>The last resolved InGameState, for a hover re-read between snapshots.</summary>
     private ulong _lastInGameState;
 
+    /// <summary>The last resolved AreaInstance, for a read of the area off the frame - nought outside the game.</summary>
+    private ulong _lastAreaInstance;
+
+    /// <summary>
+    /// The area as the last snapshot resolved it, or nought outside the game - for a reader that walks the area once on a press, such as SleepingDoodads.
+    /// </summary>
+    /// <remarks>Kept beside <see cref="ReadHoveredNow"/>'s chain and for the same reason: resolving the chain again for one read would be the frame's work done twice.</remarks>
+    public ulong LastAreaInstance => _lastAreaInstance;
+
     /// <summary>
     /// Asks the game again what the cursor is on, without taking a whole snapshot.
     /// </summary>
@@ -1232,6 +1241,7 @@ public sealed class WorldReader
         // rather than reporting "not in an area" over a loading screen.
         if (!chain.InGame)
         {
+            _lastAreaInstance = 0;
             return WorldSnapshot.Empty with { State = chain.State };
         }
 
@@ -1258,6 +1268,7 @@ public sealed class WorldReader
         // the next snapshot would make the window tens of milliseconds - long enough for the
         // player's own hand to pull it off target. See WorldReader.ReadHoveredNow.
         _lastInGameState = chain.InGameState;
+        _lastAreaInstance = chain.AreaInstance;
 
         // The map struct sits INLINE in AreaInstance: pass its address, not a pointer read
         // from it (its first field is the head, which is why reading it as a pointer works

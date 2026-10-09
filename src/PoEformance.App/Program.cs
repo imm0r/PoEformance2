@@ -3141,6 +3141,11 @@ internal static class Program
                 reader, space, needles, reader.ModuleBase, progress, budget: 2 * PoEformance.Core.Diagnostics.HeapScan.ByteBudget));
         }
 
+        // THE ROOMS' DOODADS ACROSS THE WHOLE AREA, read once on a press - see SleepingDoodads. Off the
+        // frame, on the chain the last snapshot resolved, with readers of its own; the tile book runs it
+        // on its own task. Set before the books are attached, like the hunts.
+        overlay.SurveyDoodads = paths => PoEformance.Game.World.SleepingDoodads.Read(reader, schema, world.LastAreaInstance, paths);
+
         // The capture key's memory: a recording started on demand, and inside it ONE pass that reads
         // everything this tool can read from nothing - see CaptureMemory. The recording stays open
         // until the pass is done, and keeps reads as large as the terrain's. The statics go in
