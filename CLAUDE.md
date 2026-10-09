@@ -168,8 +168,8 @@ Both are shown, because they fail differently and a local build has only the ver
 
 ## Style
 
-- Layering is compiler-enforced: Core → Game → Features → Overlay/Config → App. Nothing
-  reaches backwards.
+- Layering is compiler-enforced: Core → Game → Features → Overlay/Config → App, with Gpu
+  (Game → Gpu → Overlay) beside Features. Nothing reaches backwards.
 - Comments explain WHY, especially where a subtlety cost time. Do not narrate what the code
   already says.
 - Analyzers are on and warnings are errors in spirit: keep the build at zero warnings.

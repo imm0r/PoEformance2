@@ -610,7 +610,7 @@ public static class MeshPicture
 
         if (ink == default)
         {
-            ink = new Vector3(0.78f, 0.75f, 0.70f);
+            ink = UsualInk;
         }
 
         Matrix4x4 view = camera.View;
@@ -620,9 +620,7 @@ public static class MeshPicture
         float[] depth = canvas.Depth;
         Array.Fill(depth, float.MaxValue);
 
-        // The light sits over the viewer's shoulder, which is the one placement that never leaves
-        // a face black: anything pointing at the camera is lit.
-        Vector3 lamp = Vector3.Normalize(new Vector3(-0.35f, -0.55f, -0.75f));
+        Vector3 lamp = Lamp;
 
         // The skin is only usable if it decoded AND the mesh carries coordinates to look it up
         // with - see SkinnedMesh.Coordinated for what an uncoordinated mesh would paint.
@@ -1007,7 +1005,16 @@ public static class MeshPicture
     private const int BandRows = 8;
 
     /// <summary>How much of a colour a face turned from the lamp keeps: the picture's ambient, on the sRGB value.</summary>
-    private const float Ambient = 0.22f;
+    /// <remarks>Public, with <see cref="Lamp"/> and <see cref="UsualInk"/>, so the graphics card's drawing lights with the same numbers.</remarks>
+    public const float Ambient = 0.22f;
+
+    /// <summary>
+    /// The picture's own light, in view space - over the viewer's shoulder, the one placement that never leaves a face black: anything pointing at the camera is lit.
+    /// </summary>
+    public static readonly Vector3 Lamp = Vector3.Normalize(new Vector3(-0.35f, -0.55f, -0.75f));
+
+    /// <summary>The colour a shape is drawn in where it has no texture and the caller names none.</summary>
+    public static readonly Vector3 UsualInk = new(0.78f, 0.75f, 0.70f);
 
     /// <summary>
     /// The ambient as light - the uniform environment the game's specular light is worked out under; see GlossLight.

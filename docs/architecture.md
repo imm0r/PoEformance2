@@ -161,18 +161,21 @@ frames (99.5%)** in a file 17% smaller than the one that lost the last ten minut
 
 ### 3. Layers the compiler enforces
 
-Six projects; references point strictly downward. Getting this wrong is a build
-error, not a review comment.
+Seven projects and one vendored library; references point strictly downward. Getting
+this wrong is a build error, not a review comment.
 
 ```
 PoEformance.App        composition root - wires everything BY HAND in Program.cs
    │
    ├── PoEformance.Overlay   ImGui in-game overlay        (net10.0-windows)
+   │        │                 └─ ClickableTransparentOverlay, vendored (see below)
    ├── PoEformance.Config    WebView2 config window        (net10.0-windows)
    │        │
    │        ▼
    ├── PoEformance.Features  radar/loot/alert/automation LOGIC - data in, data out
    │        │
+   │        ├── PoEformance.Gpu  models drawn on the graphics card (net10.0-windows;
+   │        │                    used by the Overlay only, knows the Game layer only)
    │        ▼
    ├── PoEformance.Game      PoE2 domain: entities, player, terrain, UI tree
    │        │
@@ -180,6 +183,13 @@ PoEformance.App        composition root - wires everything BY HAND in Program.cs
    └── PoEformance.Core      process attach, RPM, patterns, schema, record/replay
                              (plain net10.0 - builds and tests on any OS)
 ```
+
+**ClickableTransparentOverlay is vendored** (`src/ClickableTransparentOverlay`, 11.1.0, Apache
+2.0): the package keeps its Direct3D 11 device private and takes pictures only as pixels in
+memory, and the model panes now draw on that device. The files are upstream's except for the
+changes `NOTICE.md` lists, each marked `// PoEformance:` - the device and its context exposed to
+the overlay, a view the caller owns handed to ImGui and taken back, and the device asked for at
+feature level 11 where the card has it.
 
 - **Core** knows nothing about Path of Exile. It could attach to Notepad.
 - **Game** turns raw memory into typed snapshots using the schema. No UI, no features.
@@ -355,6 +365,21 @@ printed. Read as it stands, the first build's AzmerianRanges came out washed, th
 are only the turns that differ - with one angle nought the four orders are one or two turns - and
 where the cube lights nothing (`gi_env_occlusion` 1, AzmerianRanges among them, or a flat ambient)
 the row says why.
+
+**Pictures are drawn on the graphics card** (`PoEformance.Gpu`, `ModelGpu`) where it can draw
+the same picture as the processor, and on the processor where not - `MeshPicture` stays the
+reference. The camera is `MeshPicture.Camera` laid onto the card's clip space so a vertex lands on
+the very pixel position the processor gives it; depth is the processor's "nearer wins, the first
+drawn on a tie"; the solid and cut-out shapes go first in the mesh's order and the translucent
+ones after, testing depth and writing none, mixed and added in premultiplied terms into a float
+target that a last pass turns into straight bytes, truncated as `MeshPicture` truncates. Meshes
+and their textures - every level `Mipmaps` made - are uploaded once and kept while drawn. What the
+card cannot match exactly is small and said where it shows: an edge two triangles share is filled
+once rather than twice, and a texture is filtered with the card's own weights. Not on the card yet:
+shade programs, the game's light, and the probe and the grey, which read the processor's pixels -
+each sends the picture to the processor, and the pane's `card` button says why. The two pictures
+are held against each other on a Windows runner with WARP (`tests/PoEformance.Gpu.Tests`, the
+`gpu-test` job), the only place the shaders are compiled before they reach a player's machine.
 
 **A free sun** stands where it is put - two sliders, its bearing on the game's screen and its
 height, or shift + drag in the model window (`IMovableSun`), the drag's direction measured through

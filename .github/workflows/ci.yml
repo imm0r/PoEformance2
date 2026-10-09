@@ -29,6 +29,22 @@ jobs:
       - run: dotnet build --nologo
       - run: dotnet test --nologo --no-build
 
+  # THE GRAPHICS CARD'S PICTURES held against the processor's (src/PoEformance.Gpu against
+  # MeshPicture), on WARP - Windows' own Direct3D 11 run on the processor, which every Windows
+  # runner has and which draws exactly what the rules say a card must. The only place the card's
+  # shaders are compiled and run before they reach somebody's machine: the Linux job builds the
+  # code, but Direct3D and its shader compiler are Windows'. Its own job, after test, for the
+  # reasons the AOT job below gives.
+  gpu-test:
+    needs: test
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - run: dotnet test tests/PoEformance.Gpu.Tests --nologo
+
   # THE Native AOT gate - the deployment risk this project carries, measured on every
   # push instead of discovered at ship time. Publishing with PublishAot compiles the
   # whole dependency graph through ILC: the overlay stack (ClickableTransparentOverlay,

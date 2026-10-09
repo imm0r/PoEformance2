@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Layer 2b - pictures of models drawn on the graphics card, through the overlay's own Direct3D 11
+    device. Knows the game's files (Game) and nothing above them; the overlay hands it the device.
+    MeshPicture stays the reference: what this draws is held against it, pixel for pixel, on a
+    Windows runner with WARP (tests/PoEformance.Gpu.Tests).
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Vortice.D3DCompiler" Version="3.5.0" />
+    <PackageReference Include="Vortice.Direct3D11" Version="3.5.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PoEformance.Game\PoEformance.Game.csproj" />
+  </ItemGroup>
+</Project>

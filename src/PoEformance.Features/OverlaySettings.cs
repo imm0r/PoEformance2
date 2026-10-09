@@ -244,6 +244,10 @@ public sealed record OverlaySettings(
     // book, since it is the same question in each. See MonsterPortrait.FlatLight.
     [property: JsonPropertyName("modelFlatLight")] bool ModelFlatLight = false,
 
+    // Whether the model panes draw on the graphics card where it can draw the same picture as the
+    // processor. ON, the usual: it is the same picture, faster. One for every book. See CardPictures.
+    [property: JsonPropertyName("modelCard")] bool ModelCard = true,
+
     // Whether the monster book's facet rail has a pane of its own. ON by default, because a rail
     // nobody knows about is a rail nobody opens - and OFF is a real setting because this window is
     // read WHILE PLAYING: three panes wide enough to read is most of a monitor, and the game wants

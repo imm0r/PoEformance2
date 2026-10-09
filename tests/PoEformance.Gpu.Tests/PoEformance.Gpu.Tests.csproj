@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    The graphics card's pictures held against MeshPicture's, on WARP - Windows' own Direct3D 11 that
+    runs on the processor, so a CI runner with no card draws exactly what the rules say a card must.
+    Windows only: every test skips elsewhere, and the solution's Linux job does not run this project
+    at all - the Windows job in ci.yml does.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <IsAotCompatible>false</IsAotCompatible>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\PoEformance.Game\PoEformance.Game.csproj" />
+    <ProjectReference Include="..\..\src\PoEformance.Gpu\PoEformance.Gpu.csproj" />
+  </ItemGroup>
+</Project>

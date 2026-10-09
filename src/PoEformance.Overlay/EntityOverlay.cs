@@ -559,6 +559,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             ModelLight = _monsterBook?.Model?.Light ?? basis.ModelLight,
             ModelLightTarget = _monsterBook?.Model?.LightTarget ?? basis.ModelLightTarget,
             ModelFlatLight = _modelWants.ModelFlatLight,
+            ModelCard = _card.On,
             ShowProjectiles = _projectiles.Enabled,
             ProjectileTrails = _projectiles.ShowTrails,
             ProjectilePaths = _projectiles.ShowPaths,
@@ -734,6 +735,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// <summary>What the settings file said about the model pane, until there is a pane to say it to.</summary>
     private OverlaySettings _modelWants = OverlaySettings.Default;
 
+    /// <summary>The graphics card's drawing for every model pane - see CardPictures.</summary>
+    private readonly CardPictures _card;
+
     /// <summary>
     /// Puts the capture settings onto the model pane, wherever it has got to.
     /// </summary>
@@ -782,6 +786,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         {
             pane.LightTarget = _modelWants.ModelLightTarget;
         }
+
+        // ONE CARD FOR EVERY BOOK, and one switch: every pane holds the same one, so a press in one
+        // is the others' too, and only the settings need telling.
+        pane.Card = _card;
+        _card.On = _modelWants.ModelCard;
+        _card.Changed = on =>
+        {
+            _modelWants = _modelWants with { ModelCard = on };
+            SettingsChanged?.Invoke();
+        };
 
         // ONE CHOICE FOR EVERY BOOK: a press in one pane is carried to the others and kept.
         pane.FlatLight = _modelWants.ModelFlatLight;
@@ -2188,6 +2202,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // it needs, which is what keeps its projection maths testable away from a GPU.
         _terrain = new TerrainLayer(Upload, key => RemoveImage(key));
         _icons = new IconCache(Upload, key => RemoveImage(key));
+
+        // THE MODEL PANES' CARD, on this overlay's own device - asked for on the render thread the
+        // first time a pane draws, since the device does not exist yet. See CardPictures.
+        _card = new CardPictures(() => (Device, DeviceContext), AddView, DropView);
 
         // Both tables are set by whoever wires this up, in no fixed order against this
         // constructor, so the list reads them per draw rather than taking a copy of Empty.
@@ -3853,6 +3871,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         {
             _terrain.Dispose();
             _icons.Dispose();
+            _card.Dispose();
         }
 
         base.Dispose(disposing);

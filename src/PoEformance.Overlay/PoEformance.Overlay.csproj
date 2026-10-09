@@ -16,6 +16,8 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PoEformance.Features\PoEformance.Features.csproj" />
+    <!-- The model panes' pictures on the graphics card - see CardPictures. -->
+    <ProjectReference Include="..\PoEformance.Gpu\PoEformance.Gpu.csproj" />
     <!-- VENDORED, NOT THE PACKAGE: see src/ClickableTransparentOverlay/NOTICE.md. -->
     <ProjectReference Include="..\ClickableTransparentOverlay\ClickableTransparentOverlay.csproj" />
   </ItemGroup>
