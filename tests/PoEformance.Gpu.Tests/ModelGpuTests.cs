@@ -29,7 +29,7 @@ public sealed class GpuFactAttribute : FactAttribute
 /// </remarks>
 public class ModelGpuTests
 {
-    private const int Side = 192;
+    internal const int Side = 192;
 
     /// <summary>How far apart a channel may be and still count as the same, in levels of 255.</summary>
     private const int Levels = 4;
@@ -195,7 +195,7 @@ public class ModelGpuTests
             scene.Mesh, canvas, scene.Turn, scene.Tilt, scene.Ink, scene.Skin, scene.Zoom, scene.Pan, scene.Skins, scene.Blends);
         using ModelGpu? gpu = ModelGpu.Warp(out string why);
         Assert.True(gpu is not null, why);
-        Assert.True(gpu.Can(scene, null, out why), why);
+        Assert.True(gpu.Can(scene, out why), why);
         using ModelTarget target = gpu.Target(Side);
         for (var draw = 0; draw < draws; draw++)
         {
@@ -208,7 +208,7 @@ public class ModelGpuTests
     {
         using ModelGpu? gpu = ModelGpu.Warp(out string why);
         Assert.True(gpu is not null, why);
-        Assert.True(gpu.Can(scene, null, out why), why);
+        Assert.True(gpu.Can(scene, out why), why);
         using ModelTarget target = gpu.Target(Side);
         Assert.True(gpu.Draw(target, scene, out why), why);
         return gpu.Read(target);
@@ -217,9 +217,20 @@ public class ModelGpuTests
     /// <summary>
     /// Fewer than one pixel in fifty may be covered by one picture and not the other, and fewer than one in fifty of those both cover may differ by more than <see cref="Levels"/>.
     /// </summary>
-    private static void Compared(byte[] cpu, byte[] gpu)
+    internal static void Compared(byte[] cpu, byte[] gpu)
     {
-        Assert.Equal(cpu.Length, gpu.Length);
+        string? mismatch = Mismatch(cpu, gpu);
+        Assert.True(mismatch is null, mismatch);
+    }
+
+    /// <summary>What <see cref="Compared"/> asks, said rather than asserted - null where the two pictures agree.</summary>
+    internal static string? Mismatch(byte[] cpu, byte[] gpu)
+    {
+        if (cpu.Length != gpu.Length)
+        {
+            return $"the pictures are {cpu.Length} and {gpu.Length} bytes";
+        }
+
         int covered = 0, coverage = 0, colour = 0;
         var worst = new StringBuilder();
         for (var at = 0; at < cpu.Length; at += 4)
@@ -255,9 +266,10 @@ public class ModelGpuTests
             }
         }
 
-        Assert.True(covered > Side * Side / 20, $"too little drawn to compare: {covered} pixels");
-        Assert.True(coverage * 50 < covered, $"{coverage} of {covered} pixels covered by one picture only");
-        Assert.True(colour * 50 < covered, $"{colour} of {covered} pixels differ by more than {Levels}:{worst}");
+        return covered <= Side * Side / 20 ? $"too little drawn to compare: {covered} pixels"
+            : coverage * 50 >= covered ? $"{coverage} of {covered} pixels covered by one picture only"
+            : colour * 50 >= covered ? $"{colour} of {covered} pixels differ by more than {Levels}:{worst}"
+            : null;
     }
 
     /// <summary>A box two by two by two with a normal per face, twelve triangles - the shape every turn shows three faces of.</summary>
@@ -427,7 +439,7 @@ public class ModelGpuTests
     }
 
     /// <summary>One colour, alpha and all, a texel four square.</summary>
-    private static Mipmaps Plain(Vector4 colour)
+    internal static Mipmaps Plain(Vector4 colour)
     {
         var rgba = new byte[4 * 4 * 4];
         for (var at = 0; at < rgba.Length; at += 4)

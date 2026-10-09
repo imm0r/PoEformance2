@@ -17,6 +17,11 @@ namespace PoEformance.Overlay;
 /// </remarks>
 public sealed class CardPictures : IDisposable
 {
+    /// <summary>
+    /// The folder beside the tool that materials' compiled shaders are kept in - see ProgramShaders; deleting it costs only a recompile.
+    /// </summary>
+    public const string ShaderFolder = "shader-cache";
+
     private readonly Func<(ID3D11Device? Device, ID3D11DeviceContext? Context)> _device;
     private readonly Func<ID3D11ShaderResourceView, IntPtr> _show;
     private readonly Func<IntPtr, bool> _hide;
@@ -65,7 +70,7 @@ public sealed class CardPictures : IDisposable
                 _asked = true;
                 try
                 {
-                    _gpu = ModelGpu.Of(device, context, out string why);
+                    _gpu = ModelGpu.Of(device, context, Path.Combine(AppContext.BaseDirectory, ShaderFolder), out string why);
                     Why = why;
                 }
                 catch (Exception exception) when (exception is not (OutOfMemoryException or StackOverflowException))
