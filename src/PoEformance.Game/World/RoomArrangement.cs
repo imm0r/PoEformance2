@@ -8,7 +8,25 @@ namespace PoEformance.Game.World;
 /// <param name="Rank">Its place in the room's own list - nought for the search's first choice.</param>
 /// <param name="Beside">How much of it agrees that no join explains, as a whole percentage - see <see cref="RoomArrangement.Beside"/>.</param>
 /// <param name="Layout">The room's file read, for the tiles it covers.</param>
-public sealed record RoomLaid(string Room, RoomCandidate Where, int Rank, int Beside, RoomLayout Layout);
+public sealed record RoomLaid(string Room, RoomCandidate Where, int Rank, int Beside, RoomLayout Layout)
+{
+    /// <summary>Where the place parts with the area - the corners and tiles that disagree, and which of those a join explains - for the map to mark on every room at once.</summary>
+    public RoomMisses Misses { get; init; } = RoomMisses.None;
+
+    /// <summary>How many of the area's tiles the room covers at its place - see <see cref="RoomArrangement.Tiles"/>.</summary>
+    public int Covers { get; init; }
+
+    /// <summary>
+    /// How many of <see cref="Covers"/> hold ground anybody can stand on, or null where the walkable ground was not to hand.
+    /// </summary>
+    /// <remarks>
+    /// THE ONE NUMBER THAT TELLS THE VOID FROM UNEXPLORED GROUND: the large map draws both black, and a
+    /// room outlined in the black looks wrong either way. The search leaves out every placement covering
+    /// no walkable tile (RoomFinder, "only over walkable ground"), so a room drawn here stands on at
+    /// least one - and this says how many, so "it is outside the map" can be read off rather than argued.
+    /// </remarks>
+    public int? Standing { get; init; }
+}
 
 /// <summary>Which tiles two rooms of an area may both hold - see <see cref="RoomArrangement"/>.</summary>
 public enum RoomOverlap
@@ -101,14 +119,17 @@ public sealed record RoomArrangement(IReadOnlyList<RoomLaid> Laid, IReadOnlyList
     /// <param name="tilesX">The area's tiles across.</param>
     /// <param name="tilesY">The area's tiles down.</param>
     /// <param name="rule">Which tiles two rooms may both hold.</param>
+    /// <param name="walkable">Which tiles have ground anybody can stand on, row by row - the mask the searches ran with - for each room's <see cref="RoomLaid.Standing"/>; null leaves it unsaid.</param>
     public static RoomArrangement Arrange(
-        IReadOnlyList<(string Room, RoomLayout Layout, RoomSearch Search)> rooms, int tilesX, int tilesY, RoomOverlap rule)
+        IReadOnlyList<(string Room, RoomLayout Layout, RoomSearch Search)> rooms, int tilesX, int tilesY, RoomOverlap rule, bool[]? walkable = null)
     {
         ArgumentNullException.ThrowIfNull(rooms);
         if (tilesX <= 0 || tilesY <= 0)
         {
             return None;
         }
+
+        bool[]? mask = walkable is not null && walkable.Length >= tilesX * tilesY ? walkable : null;
 
         var unfound = new List<string>();
         var layouts = new Dictionary<string, RoomLayout>(StringComparer.OrdinalIgnoreCase);
@@ -151,6 +172,7 @@ public sealed record RoomArrangement(IReadOnlyList<RoomLaid> Laid, IReadOnlyList
                     continue;
                 }
 
+                int standing = 0;
                 foreach (int cell in cells)
                 {
                     if (!Rim(where, cell % tilesX, cell / tilesX))
@@ -161,9 +183,16 @@ public sealed record RoomArrangement(IReadOnlyList<RoomLaid> Laid, IReadOnlyList
                     {
                         held[cell] = OnRim;
                     }
+
+                    standing += mask is not null && mask[cell] ? 1 : 0;
                 }
 
-                laid.Add(new RoomLaid(room, where, rank, Key(search, rank).Beside, layout));
+                laid.Add(new RoomLaid(room, where, rank, Key(search, rank).Beside, layout)
+                {
+                    Misses = MissesOf(search, rank),
+                    Covers = cells.Count,
+                    Standing = mask is null ? null : standing,
+                });
                 placed = true;
             }
 
@@ -274,11 +303,14 @@ public sealed record RoomArrangement(IReadOnlyList<RoomLaid> Laid, IReadOnlyList
     private static bool Rim(RoomCandidate where, int x, int y)
         => x == where.X || x == where.X + where.Width - 1 || y == where.Y || y == where.Y + where.Height - 1;
 
+    /// <summary>Where a candidate parts with the area, as its search listed it - none for a search that did not say.</summary>
+    private static RoomMisses MissesOf(RoomSearch search, int rank) => rank < search.Misses.Count ? search.Misses[rank] : RoomMisses.None;
+
     /// <summary>A candidate's figures, best first: the share no join explains, the tiles agreeing, the corners agreeing.</summary>
     private static (int Beside, double Tiles, double Corners) Key(RoomSearch search, int rank)
     {
         RoomCandidate where = search.Candidates[rank];
-        RoomMisses misses = rank < search.Misses.Count ? search.Misses[rank] : RoomMisses.None;
+        RoomMisses misses = MissesOf(search, rank);
         int beside = misses.Classified ? Beside(where, misses) : 0;
         double tiles = where.Tiles > 0 ? (double)where.TilesAgree / where.Tiles : 0d;
         double corners = where.Corners > 0 ? (double)where.Matched / where.Corners : 0d;

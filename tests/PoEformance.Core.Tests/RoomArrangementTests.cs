@@ -24,6 +24,37 @@ public class RoomArrangementTests
         Assert.Empty(arranged.Unfound);
     }
 
+    /// <summary>A room laid carries the misses of the place it took - the row it was pushed to, not its first - and how many of its tiles can be walked.</summary>
+    [Fact]
+    public void ALAIDRoomCarriesItsPlacesMissesAndHowManyOfItsTilesCanBeWalked()
+    {
+        RoomLayout wide = Room(2, 1, "f 0 f 0");
+        (RoomCandidate Where, RoomMisses Misses) sure = Place(0, 0, 2, 1);
+        (RoomCandidate Where, RoomMisses Misses) first = Place(1, 0, 2, 1, missed: 1);
+        (RoomCandidate Where, RoomMisses Misses) second = Place(4, 0, 2, 1, missed: 2);
+        (string, RoomLayout, RoomSearch)[] rooms = [("b.arm", wide, Search(first, second)), ("a.arm", wide, Search(sure))];
+
+        // Tiles 0 and 4 walkable: a stands on one of its two, b - pushed to tile 4 - on one of its two.
+        bool[] walkable = new bool[10 * 4];
+        walkable[0] = true;
+        walkable[4] = true;
+        RoomArrangement arranged = RoomArrangement.Arrange(rooms, 10, 4, RoomOverlap.None, walkable);
+
+        RoomLaid a = arranged.Laid[0];
+        Assert.Same(sure.Misses, a.Misses);
+        Assert.Equal((2, 1), (a.Covers, a.Standing));
+
+        RoomLaid b = arranged.Laid[1];
+        Assert.Equal(1, b.Rank);
+        Assert.Same(second.Misses, b.Misses);
+        Assert.Equal(2, b.Misses.Corners.Count);
+        Assert.Equal((2, 1), (b.Covers, b.Standing));
+
+        // Without the mask the count is unsaid rather than nought; a mask too short for the area counts as none.
+        Assert.All(RoomArrangement.Arrange(rooms, 10, 4, RoomOverlap.None).Laid, one => Assert.Null(one.Standing));
+        Assert.All(RoomArrangement.Arrange(rooms, 10, 4, RoomOverlap.None, new bool[3]).Laid, one => Assert.Null(one.Standing));
+    }
+
     /// <summary>A slot the room leaves empty ("n") is no tile of its: another room may lie in its notch.</summary>
     [Fact]
     public void ANOTCHTheRoomLeavesEmptyHoldsAnotherRoom()

@@ -130,8 +130,9 @@ public static class StyleCatalogue
         // corner whose ground is not the room's, a tile that is not what the room's slot asks
         // for, and either of those where a join explains it - drawn over the other two, the same
         // shape a touch larger. Width on the outline is the picked room's; every room of the
-        // area is drawn at three quarters of it, so the picked one stays the one on top. Scale
-        // on the name is its font size against the interface's, and the backing grows with it.
+        // area is drawn at three quarters of it, its marks the same, so the picked one stays the
+        // one on top. Scale on the name is its font size against the interface's, and the backing
+        // grows with it.
         new("room.outline", "Room outlines", "Outline", Line, Rgb(184, 208, 232, 210)),
         new("room.outline.name", "Room outlines", "Name", StyleTraits.Colour | StyleTraits.Scale, Rgb(184, 208, 232, 210)),
         new("room.outline.plate", "Room outlines", "Backing under the name", StyleTraits.Colour, Rgb(20, 22, 26, 180)),
