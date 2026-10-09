@@ -64,6 +64,9 @@ public static class CaptureReport
     /// <summary>The Tile Book's picked row against the rooms on the map, and where it parts with the area.</summary>
     public const string PickFile = "room-pick.txt";
 
+    /// <summary>Every room file the area loaded, whole.</summary>
+    public const string RoomFilesFile = "room-files.txt";
+
     /// <summary>The survey of the entity maps for the rooms' doodads, and every sighting.</summary>
     public const string DoodadsFile = "doodads.txt";
 
@@ -534,6 +537,78 @@ public static class CaptureReport
         }
 
         return (said, string.Join('\n', lines));
+    }
+
+    /// <summary>
+    /// Every room file the area loaded, whole, each under its path - the lines a placing is checked against, beside the sightings they are checked against.
+    /// </summary>
+    /// <remarks>
+    /// WHAT THE FIRST ASSEMBLY CAPTURE LACKED: six rooms without a place, 844 sightings to hold them
+    /// against, and not one of the rooms' doodad lines in the folder - rooms.txt prints a file only
+    /// for the room the player stands in. The placing is pure (RoomDoodadFinder.Find takes the lines
+    /// and the sightings and nothing else), so with the files here it runs again on any machine.
+    /// </remarks>
+    /// <param name="read">How to get a file out of the install, by path.</param>
+    /// <param name="loaded">The files the area loaded - the room files among them are printed.</param>
+    public static string RoomFiles(Func<string, byte[]?> read, IReadOnlyList<string> loaded)
+    {
+        ArgumentNullException.ThrowIfNull(read);
+        ArgumentNullException.ThrowIfNull(loaded);
+        var said = new StringBuilder();
+        int count = 0;
+        foreach (string path in loaded)
+        {
+            if (!path.EndsWith(".arm", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            count++;
+            said.Append("##### ").AppendLine(path);
+            byte[]? file = read(path);
+            said.AppendLine(file is { Length: > 0 } ? StatDescriptionFiles.Decode(file).TrimEnd() : "(not in the install)");
+            said.AppendLine();
+        }
+
+        return said.Insert(0, Say(count) + " room files the area loaded\n\n").ToString();
+    }
+
+    /// <summary>
+    /// The entities each place hit, by id - so a place in rooms-placed.txt can be held against the sightings in doodads.txt entity by entity.
+    /// </summary>
+    /// <param name="placed">Every room with its places, as settled.</param>
+    /// <param name="survey">The survey the places were found in, whose sightings the places index.</param>
+    public static string PlacedEntities(IReadOnlyList<(string Room, RoomLayout Layout, RoomDoodadPlaces Places)> placed, DoodadSurvey survey)
+    {
+        ArgumentNullException.ThrowIfNull(placed);
+        ArgumentNullException.ThrowIfNull(survey);
+        var said = new StringBuilder();
+        said.AppendLine("=== the entities each place hit, by id, and the ones it yielded");
+        foreach ((string room, _, RoomDoodadPlaces found) in placed)
+        {
+            foreach (RoomDoodadPlace place in found.Places)
+            {
+                Entities(said, TerrainRooms.NameFor(room), place, survey);
+            }
+
+            foreach ((RoomDoodadPlace place, _) in found.Yielded)
+            {
+                Entities(said, TerrainRooms.NameFor(room) + " (yielded)", place, survey);
+            }
+        }
+
+        return said.ToString();
+    }
+
+    private static void Entities(StringBuilder said, string room, RoomDoodadPlace place, DoodadSurvey survey)
+    {
+        said.Append(room).Append(CultureInfo.InvariantCulture, $" tile {place.Where.X}, {place.Where.Y}, {RoomFinder.Said(place.Where.Turn)}: {place.Entities.Count} entities -");
+        foreach (int one in place.Entities)
+        {
+            said.Append(' ').Append(one >= 0 && one < survey.Found.Count ? survey.Found[one].Id.ToString(CultureInfo.InvariantCulture) : "?");
+        }
+
+        said.AppendLine();
     }
 
     /// <summary>

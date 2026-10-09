@@ -159,6 +159,44 @@ public class CaptureReportTests
         Assert.Contains("{ \"own\": 2 }", said, StringComparison.Ordinal);
     }
 
+    /// <summary>Every room file the area loaded is printed whole under its path, and nothing that is not a room.</summary>
+    [Fact]
+    public void ROOMFILESArePrintedWhole()
+    {
+        byte[]? Read(string path) => path switch
+        {
+            "rooms/a.arm" => Encoding.UTF8.GetBytes("version 36\nthe a room"),
+            "rooms/b.arm" => Encoding.UTF8.GetBytes("version 36\nthe b room"),
+            _ => null,
+        };
+
+        string said = CaptureReport.RoomFiles(Read, ["tiles/floor.tdt", "rooms/a.arm", "rooms/gone.arm", "rooms/b.arm"]).ReplaceLineEndings("\n");
+        Assert.StartsWith("3 room files the area loaded\n\n##### rooms/a.arm\nversion 36\nthe a room\n\n##### rooms/gone.arm\n(not in the install)\n\n##### rooms/b.arm\nversion 36\nthe b room\n", said, StringComparison.Ordinal);
+        Assert.DoesNotContain("floor.tdt", said, StringComparison.Ordinal);
+    }
+
+    /// <summary>Each place's entities are written by the id the sightings table carries, the yielded places marked.</summary>
+    [Fact]
+    public void PLACEDEntitiesAreWrittenById()
+    {
+        var survey = new DoodadSurvey(3, 3, 0, 3, [
+            new DoodadSighting(700, "p", "m", 0f, 0f, 0f, true),
+            new DoodadSighting(701, "p", "m", 1f, 0f, 0f, true),
+            new DoodadSighting(702, "p", "m", 2f, 0f, 0f, true),
+        ], 1d, string.Empty);
+        var kept = new RoomDoodadPlace(new RoomCandidate(1, 2, 0, 3, 3, 3, 3), 3, 3, 1f, []) { Entities = [0, 2] };
+        var gone = new RoomDoodadPlace(new RoomCandidate(1, 2, 0, 3, 3, 2, 3), 2, 3, 1f, []) { Entities = [1, 9] };
+        (string Room, RoomLayout Layout, RoomDoodadPlaces Places)[] placed =
+        [
+            ("rooms/one.arm", RoomArrangementTests.Square(), new RoomDoodadPlaces([kept], 3, 3, 3, string.Empty)),
+            ("rooms/two.arm", RoomArrangementTests.Square(), new RoomDoodadPlaces([], 3, 3, 3, "yielded") { Yielded = [(gone, "rooms/one.arm")] }),
+        ];
+
+        string[] lines = CaptureReport.PlacedEntities(placed, survey).Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        Assert.Equal("one tile 1, 2, as written: 2 entities - 700 702", lines[1]);
+        Assert.Equal("two (yielded) tile 1, 2, as written: 2 entities - 701 ?", lines[2]);
+    }
+
     /// <summary>The arrangement's line counts what was drawn, moved, crowded out and not found, and its detail says where each room went and why.</summary>
     [Fact]
     public void THEARRANGEMENTIsSaidAsTheTileBookShowsIt()

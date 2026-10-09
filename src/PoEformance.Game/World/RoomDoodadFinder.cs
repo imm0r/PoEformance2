@@ -16,6 +16,38 @@ public sealed record RoomDoodadPlace(RoomCandidate Where, int Hits, int Lines, f
     /// How many of the room's tiles the ground-and-tile search found agreeing at this very place, or -1 where that search did not list it - the tie-breaker where two variants share every doodad, see <see cref="RoomDoodadFinder.Settle"/>.
     /// </summary>
     public int TilesAgree { get; init; } = -1;
+
+    /// <summary>
+    /// The entities the hits are - as indices into the sightings the place was found in, ascending - so two rooms' places can be asked whether they stand on the same doodads. See <see cref="RoomDoodadFinder.Settle"/>.
+    /// </summary>
+    public IReadOnlyList<int> Entities { get; init; } = [];
+
+    /// <summary>How many of this place's entities another place also hit - the measure of whether the two are one room's doodads claimed twice.</summary>
+    public int Shared(RoomDoodadPlace other)
+    {
+        ArgumentNullException.ThrowIfNull(other);
+        IReadOnlyList<int> mine = Entities, theirs = other.Entities;
+        int shared = 0;
+        for (int a = 0, b = 0; a < mine.Count && b < theirs.Count;)
+        {
+            if (mine[a] == theirs[b])
+            {
+                shared++;
+                a++;
+                b++;
+            }
+            else if (mine[a] < theirs[b])
+            {
+                a++;
+            }
+            else
+            {
+                b++;
+            }
+        }
+
+        return shared;
+    }
 }
 
 /// <summary>Where a room's doodads say it stands - every place, since the area may lay a room more than once.</summary>
@@ -61,14 +93,22 @@ public sealed record RoomDoodadPlaces(IReadOnlyList<RoomDoodadPlace> Places, int
 /// controllers and markers, which the game does not make visible entities of - is left out of the
 /// count rather than counted against the room.
 ///
-/// ONE ROOM PER PLACE, SETTLED AFTER: Atziri's temple loads every variant of a room - five biome
+/// ONE ROOM PER DOODAD, SETTLED AFTER: Atziri's temple loads every variant of a room - five biome
 /// floors, four commander rooms - and the variants share most of their doodads, so each one's vote
 /// lands on the tile where the one the game laid stands, with the shared lines behind it. The
 /// entities there belong to one room, and it is the one whose doodads are all present: the laid
-/// variant hits every line it has, a variant not laid hits only the shared ones. So where places of
-/// different rooms stand on the same tiles, the place with the most hits keeps them, a tie going to
-/// the higher share, and the others yield - see <see cref="Settle"/>. Rims may be shared, as
-/// RoomArrangement allows, since rooms that join lay their rims on one row.
+/// variant hits every line it has, a variant not laid hits only the shared ones. So where two
+/// rooms' places stand on the same tiles AND on the same entities, the place with the most hits
+/// keeps them, a tie going to the higher share, and the other yields - see <see cref="Settle"/>.
+/// Rims may be shared, as RoomArrangement allows, since rooms that join lay their rims on one row.
+///
+/// THE ENTITIES DECIDE, NOT THE TILES ALONE. The first rule gave the tiles to the surest room and
+/// made every other place on them yield, and in The Assembly it took away the Expedition encounter:
+/// a room of fourteen doodads the game lays INSIDE another room - every one of them standing where
+/// its line put it, none of them the host's - and the rule handed it to the workshop it stood in,
+/// whose forty hits there were forty other entities. A place yields only to a place that stands on
+/// its doodads: half of them or more claimed by the other. Two rooms on one footprint with nothing
+/// in common are two rooms the game laid there, and the map draws both.
 ///
 /// AND WHERE THE DOODADS CANNOT TELL, THE TILES DO: the temple's commander rooms with three open
 /// sides and with four carry the same 97 doodads, every one of them standing at the one tile, and
@@ -268,7 +308,11 @@ public static class RoomDoodadFinder
                 }
             }
 
-            places.Add(new RoomDoodadPlace(new RoomCandidate(x, y, turn, wide, tall, hits, matchable), hits, matchable, off / hits, missing));
+            // WHICH ENTITIES, ascending, so Settle can ask whether another place stands on the same ones.
+            var entities = new int[hits];
+            entityTaken.CopyTo(entities);
+            Array.Sort(entities);
+            places.Add(new RoomDoodadPlace(new RoomCandidate(x, y, turn, wide, tall, hits, matchable), hits, matchable, off / hits, missing) { Entities = entities });
         }
 
         places.Sort((a, b) =>
@@ -294,9 +338,9 @@ public static class RoomDoodadFinder
     }
 
     /// <summary>
-    /// Settles the places of every room against one another: where two rooms' places stand on the same tiles, the one with more of its doodads there keeps them and the other yields - see the class remarks.
+    /// Settles the places of every room against one another: where two rooms' places stand on the same tiles and the same entities, the one with more of its doodads there keeps them and the other yields - see the class remarks.
     /// </summary>
-    /// <param name="rooms">Every room with the places its doodads found.</param>
+    /// <param name="rooms">Every room with the places its doodads found - found in ONE survey, so their entities compare.</param>
     /// <param name="tilesX">The area's tiles across.</param>
     /// <param name="tilesY">The area's tiles down.</param>
     /// <returns>The same rooms in the same order, each with the places it keeps and the ones it yielded, and to whom.</returns>
@@ -334,30 +378,21 @@ public static class RoomDoodadFinder
             return order != 0 ? order : a.Place.Where.Turn.CompareTo(b.Place.Where.Turn);
         });
 
-        // EACH TILE'S HOLDER, and whether it holds the tile inside its footprint or on its rim: a tile
-        // inside a kept footprint is nobody else's; one on its rim may be another room's rim too.
-        const byte Free = 0, OnRim = 1, Inside = 2;
-        var held = new byte[tilesX * tilesY];
-        var holder = new int[tilesX * tilesY];
+        // EACH PLACE AGAINST THE ONES KEPT BEFORE IT: it yields to the first that stands on its tiles
+        // past the rims and on half its entities or more. A few dozen places an area, so every pair
+        // is cheap; what the pair costs is the tiles' overlap, counted only where the rectangles meet.
+        var taken = new List<(int Room, RoomDoodadPlace Place)>();
         var kept = new List<RoomDoodadPlace>[rooms.Count];
         var yielded = new List<(RoomDoodadPlace Place, string To)>[rooms.Count];
         foreach ((int room, RoomDoodadPlace place) in all)
         {
-            RoomCandidate where = place.Where;
-            int x0 = Math.Max(0, where.X), x1 = Math.Min(tilesX, where.X + where.Width);
-            int y0 = Math.Max(0, where.Y), y1 = Math.Min(tilesY, where.Y + where.Height);
             int lostTo = -1;
-            for (int y = y0; y < y1 && lostTo < 0; y++)
+            foreach ((int other, RoomDoodadPlace theirs) in taken)
             {
-                for (int x = x0; x < x1; x++)
+                if (other != room && Overlap(place.Where, theirs.Where) && place.Shared(theirs) * 2 >= place.Entities.Count)
                 {
-                    int cell = (y * tilesX) + x;
-                    bool rim = x == where.X || x == where.X + where.Width - 1 || y == where.Y || y == where.Y + where.Height - 1;
-                    if (held[cell] != Free && (held[cell] == Inside || !rim) && holder[cell] != room)
-                    {
-                        lostTo = holder[cell];
-                        break;
-                    }
+                    lostTo = other;
+                    break;
                 }
             }
 
@@ -367,20 +402,7 @@ public static class RoomDoodadFinder
                 continue;
             }
 
-            for (int y = y0; y < y1; y++)
-            {
-                for (int x = x0; x < x1; x++)
-                {
-                    int cell = (y * tilesX) + x;
-                    bool rim = x == where.X || x == where.X + where.Width - 1 || y == where.Y || y == where.Y + where.Height - 1;
-                    if (!rim || held[cell] == Free)
-                    {
-                        held[cell] = rim ? OnRim : Inside;
-                        holder[cell] = room;
-                    }
-                }
-            }
-
+            taken.Add((room, place));
             (kept[room] ??= []).Add(place);
         }
 
@@ -408,10 +430,34 @@ public static class RoomDoodadFinder
             {
                 Places = ordered,
                 Yielded = yielded[one] ?? [],
-                Why = ordered.Count > 0 ? string.Empty : "every place it found stands on another room's tiles",
+                Why = ordered.Count > 0 ? string.Empty : "every place it found stands on another room's doodads",
             }));
         }
 
         return settled;
     }
+
+    /// <summary>
+    /// Whether two footprints share a tile past their rims: one inside either rectangle rather than on its outermost row or column, where rooms that join lay their rims on one row - see RoomArrangement.
+    /// </summary>
+    private static bool Overlap(RoomCandidate a, RoomCandidate b)
+    {
+        int x0 = Math.Max(a.X, b.X), x1 = Math.Min(a.X + a.Width, b.X + b.Width);
+        int y0 = Math.Max(a.Y, b.Y), y1 = Math.Min(a.Y + a.Height, b.Y + b.Height);
+        for (int y = y0; y < y1; y++)
+        {
+            for (int x = x0; x < x1; x++)
+            {
+                if (!Rim(a, x, y) || !Rim(b, x, y))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static bool Rim(RoomCandidate of, int x, int y)
+        => x == of.X || x == of.X + of.Width - 1 || y == of.Y || y == of.Y + of.Height - 1;
 }
