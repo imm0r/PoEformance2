@@ -375,11 +375,21 @@ ones after, testing depth and writing none, mixed and added in premultiplied ter
 target that a last pass turns into straight bytes, truncated as `MeshPicture` truncates. Meshes
 and their textures - every level `Mipmaps` made - are uploaded once and kept while drawn. What the
 card cannot match exactly is small and said where it shows: an edge two triangles share is filled
-once rather than twice, and a texture is filtered with the card's own weights. Not on the card yet:
-shade programs, the game's light, and the probe and the grey, which read the processor's pixels -
-each sends the picture to the processor, and the pane's `card` button says why. The two pictures
-are held against each other on a Windows runner with WARP (`tests/PoEformance.Gpu.Tests`, the
-`gpu-test` job), the only place the shaders are compiled before they reach a player's machine.
+once rather than twice, and a texture is filtered with the card's own weights. The game's light
+(`SceneLight`) is drawn the same way (`ModelGpu.Light.cs`): the sun's shadow map is drawn on the
+card on the texels `ShadowMap.Framed` lays out for the processor, the same casters - solid, cut-out
+through their texture, shadow-only - each texel keeping its nearest depth through a blend's minimum,
+kept while the mesh stands still; every lit pixel then runs `SceneLight.Shade` line for line, with
+the point lights looked up through the same grid and the cube, the grade and the sRGB and gamma
+tables handed over as the processor holds them and read texel by texel, not through the card's own
+filtering. Not on the card yet: shade programs, and the probe and the grey, which read the
+processor's pixels - each sends the picture to the processor, and the pane's `card` button says
+why. The two pictures are held against each other on a Windows runner with WARP
+(`tests/PoEformance.Gpu.Tests`, the `gpu-test` job), the only place fxc compiles the shaders before
+they reach a player's machine; on Linux DXC's `libdxcompiler.so` (in the `Vortice.Dxc.Native`
+package) at legacy HLSL 2018 is a fair syntax and type check of them, called straight through its
+COM vtable (`IDxcCompiler3::Compile` the fourth slot, arguments as four-byte `wchar_t`) - Vortice.Dxc's
+own wrapper answered only "invalid profile" there.
 
 **A free sun** stands where it is put - two sliders, its bearing on the game's screen and its
 height, or shift + drag in the model window (`IMovableSun`), the drag's direction measured through

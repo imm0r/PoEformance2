@@ -240,6 +240,9 @@ public sealed class CubeMap
         return Vector3.Lerp(top, bottom, fy);
     }
 
+    /// <summary>Every texel's red, green and blue, face after face in the order <see cref="Sample"/> numbers them - for a drawing that reads the cube elsewhere, the graphics card's.</summary>
+    public ReadOnlySpan<float> Texels => _texels;
+
     /// <summary>The average of the whole cube - what the status line calls its brightness.</summary>
     public Vector3 Average()
     {
