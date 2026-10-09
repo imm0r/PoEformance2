@@ -171,8 +171,68 @@ public class ProgramGpuTests(CardFixture card) : IClassFixture<CardFixture>
         return true;
     }
 
-    /// <summary>A program with a ramp for every sheet it reads.</summary>
-    private static ShadeProgram Bound(ShadeProgram program) => program.With([.. program.Textures.Select(one => (Mipmaps?)Ramp(one.Path))]);
+    /// <summary>A program with a sheet for every texture it reads - waves where it marches a parallax, ramps elsewhere.</summary>
+    /// <remarks>
+    /// THE LEVEL A READ TAKES IS THE ONE THING THE TWO PICTURES DECIDE DIFFERENTLY, by design: the card
+    /// per pixel from the screen's derivatives, as the game, the processor per triangle. Where the
+    /// coordinates are straight across a triangle the two agree, and a ramp's wrap - 220 back to 30 -
+    /// is drawn alike. After a parallax march they are not straight, and that seam is where the two
+    /// levels part: measured on the processor, forcing every read to the top level moves 2.4% of
+    /// Dung01c's pixels with ramps and 0.1% with waves, which have no seam and lose next to nothing to
+    /// the first few levels. A wave is not used for every material because a level changes it more far
+    /// down: RockyLedgec, tiled densely, moves 46% with ramps and 86% with waves under the same forcing,
+    /// and its straight coordinates draw alike either way.
+    /// </remarks>
+    private static ShadeProgram Bound(ShadeProgram program)
+        => program.With([.. program.Textures.Select(one => (Mipmaps?)(program.UsesTangents ? Wave(one.Path) : Ramp(one.Path)))]);
+
+    /// <summary>
+    /// A seamless wave, its own per path - red a cosine across, green a sine down, alpha one along the diagonal - so the wrap has no seam and the first levels hardly differ.
+    /// </summary>
+    private static Mipmaps Wave(string path)
+    {
+        lock (Sheets)
+        {
+            string key = path + "~wave";
+            if (Sheets.TryGetValue(key, out Mipmaps? had))
+            {
+                return had;
+            }
+
+            int seed = Seed(path);
+            const int side = 64;
+            float phase = (seed & 0xFF) / 255f * MathF.Tau;
+            float blue = 0.2f + (0.6f * (((seed >> 8) & 0xFF) / 255f));
+            var rgba = new byte[side * side * 4];
+            for (var y = 0; y < side; y++)
+            {
+                for (var x = 0; x < side; x++)
+                {
+                    int at = ((y * side) + x) * 4;
+                    float u = MathF.Tau * x / side, v = MathF.Tau * y / side;
+                    rgba[at] = (byte)(128 + (90 * MathF.Cos(u + phase)));
+                    rgba[at + 1] = (byte)(128 + (90 * MathF.Sin(v - phase)));
+                    rgba[at + 2] = (byte)(blue * 255f);
+                    rgba[at + 3] = (byte)(160 + (80 * MathF.Cos(u + v)));
+                }
+            }
+
+            Mipmaps made = Mipmaps.Of(new GamePicture(side, side, rgba))!;
+            Sheets[key] = made;
+            return made;
+        }
+    }
+
+    private static int Seed(string path)
+    {
+        var seed = 0;
+        foreach (char letter in path)
+        {
+            seed = unchecked((seed * 31) + letter);
+        }
+
+        return seed;
+    }
 
     /// <summary>
     /// A smooth ramp, its own per path - red across, green down, blue and alpha from the path - so a read at a nearby level is nearly the same colour.
@@ -186,12 +246,7 @@ public class ProgramGpuTests(CardFixture card) : IClassFixture<CardFixture>
                 return had;
             }
 
-            int seed = 0;
-            foreach (char letter in path)
-            {
-                seed = unchecked((seed * 31) + letter);
-            }
-
+            int seed = Seed(path);
             const int side = 64;
             float blue = 0.2f + (0.6f * ((seed & 0xFF) / 255f));
             var rgba = new byte[side * side * 4];
