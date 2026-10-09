@@ -490,7 +490,10 @@ public static class MonsterModels
         {
             step.Advance();
             string material = wearing[shape];
-            if (material.Length == 0 || MaterialFile.SelectorOf(material) >= 0)
+
+            // A SHAPE LEFT WITH NOTHING - every triangle of it hidden from the game's camera, see
+            // LaidRoomModels - is not compiled for: nothing of it is drawn.
+            if (material.Length == 0 || MaterialFile.SelectorOf(material) >= 0 || model.Mesh.Shapes[shape].Count == 0)
             {
                 continue;
             }

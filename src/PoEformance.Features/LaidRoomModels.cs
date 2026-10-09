@@ -83,6 +83,9 @@ public static class LaidRoomModels
     /// <param name="progress">Where the build says how far it has got, or null - see <see cref="ModelProgress"/>.</param>
     /// <param name="heights">How high a doodad whose line carries a height is set - see <see cref="DoodadHeight"/>.</param>
     /// <param name="entities">The area's entities in memory, to hold the room's doodads against - see <see cref="HeightsSaid"/> - or null.</param>
+    /// <param name="camera">The game's camera as last read, for what it can see of the room - see CameraSight - or null.</param>
+    /// <param name="sight">Whether what the camera cannot see from anywhere the player can stand is left out - see <see cref="Hiding"/>.</param>
+    /// <param name="cut">How far under the area's ground, in world units, everything is left out; nought or less leaves nothing out - see <see cref="Hiding"/>.</param>
     public static MonsterModel Of(
         Func<string, byte[]?>? read,
         string? path,
@@ -96,7 +99,10 @@ public static class LaidRoomModels
         bool atLevel = false,
         ModelProgress? progress = null,
         DoodadHeight heights = DoodadHeight.File,
-        IReadOnlyList<WorldEntity>? entities = null)
+        IReadOnlyList<WorldEntity>? entities = null,
+        CameraShot? camera = null,
+        bool sight = false,
+        int cut = 0)
     {
         if (read is null)
         {
@@ -254,6 +260,10 @@ public static class LaidRoomModels
             unturned += piece.Placement < 0 ? 1 : 0;
         }
 
+        // WHAT CAN BE SEEN, worked out before a doodad is read - see Hiding.
+        var origin = new Vector2(x, y) * TileModels.Side;
+        Hiding hiding = Hiding.Of(pile, grid, origin, new Vector2(wide, tall) * TileModels.Side, camera, sight, cut, progress);
+
         // THE DOODADS, where the corners were found and on the area's ground under them.
         Matrix3x2 laying = RoomFinder.Laying(room.Width, room.Height, turn);
         Matrix4x4 beyondFlat = Spatial(Matrix3x2.CreateScale(1f / TileModels.Side) * laying * Matrix3x2.CreateScale(TileModels.Side));
@@ -271,14 +281,15 @@ public static class LaidRoomModels
                 _ => ground,
             };
             return beyondFlat * Matrix4x4.CreateTranslation(0f, 0f, z);
-        }, heights, lights);
+        }, heights, lights, hiding.Sieve);
 
-        SkinnedMesh joined = SkinnedMesh.Joined(pile.Joins);
+        SkinnedMesh joined = hiding.Keep(SkinnedMesh.Joined(pile.Joins), pile);
         if (!joined.Ready)
         {
             return MonsterModel.None with
             {
-                Why = $"nothing to draw: {pieces.Count} pieces under the place, {laidPieces} laid, and {laid.Placed} doodads",
+                Why = $"nothing to draw: {pieces.Count} pieces under the place, {laidPieces} laid, and {laid.Placed} doodads"
+                    + string.Concat(hiding.Said().Select(one => "; " + one)),
                 Bytes = bytes,
                 Files = files,
             };
@@ -301,6 +312,7 @@ public static class LaidRoomModels
         }
 
         said.AddRange(laid.Said());
+        said.AddRange(hiding.Said());
         string held = HeightsSaid(room, laying, x, y, grid, entities);
         if (held.Length > 0)
         {
@@ -315,7 +327,7 @@ public static class LaidRoomModels
             Move = string.Join("; ", said),
             Lights = lights.Lights,
             LightsSaid = lights.Said(),
-            AreaOrigin = new Vector2(x, y) * TileModels.Side,
+            AreaOrigin = origin,
         };
 
         return shaded ? MonsterModels.Shaded(Counted, model, paints) : model;
@@ -942,5 +954,210 @@ public static class LaidRoomModels
             int square = (int)MathF.Floor(offset / step);
             return square < count ? Math.Max(square, 0) : offset <= (count * step) + 1e-2f ? count - 1 : -1;
         }
+    }
+
+    /// <summary>
+    /// What of a laid room is left out unseen: what the game's camera cannot see from anywhere the player can stand, and what lies further under the area's ground than the cut.
+    /// </summary>
+    /// <remarks>
+    /// ASKED FOR FROM THE LIVE CLIENT, over Azmerian Ranges: a room there is large enough that drawing
+    /// all of it takes thousands of doodads, and much of what was drawn lay under the ground the game
+    /// shows - rock bodies, cliff feet, doodads sunk past the surface. None of it reaches the game's
+    /// screen, and all of it cost loading, drawing, lighting and the sun's shadow map.
+    ///
+    /// IN TWO STEPS, the first before a doodad is read. The tiles are laid first, so the camera's
+    /// views are drawn from their solid shapes alone and every doodad's place is asked against them -
+    /// see RoomModels.Lay and CameraSight.BoxSeen - and a doodad file none of whose places can be seen
+    /// is never loaded. Then the whole room, doodads and all, is drawn into the views again, every
+    /// triangle asked, and the mesh rebuilt from what is seen - which is what the picture, its light
+    /// and its shadows are then worked out from.
+    ///
+    /// THE MARGIN IS A TILE, because before a doodad is read nothing says how big it is: a place
+    /// counts as seen where anything within a tile of it - times the doodad's scale - can be. A doodad
+    /// standing further than that from its own origin, every place of it under ground the tiles show,
+    /// is the one this can lose. A file that is read anyway has every place asked again with its own box.
+    ///
+    /// THE CUT COUNTS FROM THE AREA'S OWN GROUND under each vertex, the terrain heights a laid room is
+    /// set on, and down is plus z. A triangle goes where all three corners lie further under it than
+    /// the cut; a doodad before it is read where the top of its margin's box does, under the deepest
+    /// ground at its box's corners and middle.
+    ///
+    /// A SHADOW-ONLY CASTER IS KEPT UNLESS IT IS UNDER THE CUT: it is never seen, and casting where
+    /// it is not seen is what it is for. Anything else hidden from every view casts no shadow here
+    /// any more - something the camera can never see, that the sun would throw a shadow from onto
+    /// ground the camera does see, is the one shadow this can lose; the switch puts it back.
+    /// </remarks>
+    private sealed class Hiding
+    {
+        /// <summary>How far round a doodad's place the box reaches before the doodad is read, in world units, times its scale.</summary>
+        private const float Margin = TileModels.Side;
+
+        private readonly TerrainGrid _grid;
+        private readonly Vector2 _origin;
+        private readonly CameraSight? _sight;
+        private readonly bool _asked;
+        private readonly int _cut;
+        private readonly string _why;
+        private readonly ModelProgress? _progress;
+        private long _took;
+        private int _total;
+        private int _hidden;
+        private int _below;
+
+        private Hiding(TerrainGrid grid, Vector2 origin, CameraSight? sight, bool asked, int cut, string why, long took, ModelProgress? progress)
+        {
+            _progress = progress;
+            _grid = grid;
+            _origin = origin;
+            _sight = sight;
+            _asked = asked;
+            _cut = Math.Max(0, cut);
+            _why = why;
+            _took = took;
+            Sieve = sight is null && _cut == 0 ? null : new DoodadSieve(Kept, Margin);
+        }
+
+        /// <summary>What asks each doodad before it is laid, or null where nothing is left out.</summary>
+        public DoodadSieve? Sieve { get; }
+
+        /// <summary>
+        /// The camera's views drawn from what the pile holds so far - the tiles - or nothing where neither is asked for.
+        /// </summary>
+        /// <param name="pile">The tiles laid.</param>
+        /// <param name="grid">The area.</param>
+        /// <param name="origin">Where the room's corner lies in the world.</param>
+        /// <param name="size">How far the room reaches from it, x and y.</param>
+        /// <param name="camera">The game's camera, or null.</param>
+        /// <param name="sight">Whether what it cannot see is left out.</param>
+        /// <param name="cut">How far under the ground everything is left out; nought for nothing.</param>
+        /// <param name="progress">Where the build says how far it has got, or null.</param>
+        public static Hiding Of(
+            ModelPile pile, TerrainGrid grid, Vector2 origin, Vector2 size, CameraShot? camera, bool sight, int cut, ModelProgress? progress)
+        {
+            if (!sight)
+            {
+                return new Hiding(grid, origin, null, asked: false, cut, string.Empty, 0, progress);
+            }
+
+            using ModelProgress.Step step = ModelProgress.Begin(progress, "finding what the game's camera sees", 1);
+            long started = Environment.TickCount64;
+            CameraSight? seeing = CameraSight.Over(camera, grid, origin, Vector3.Zero, new Vector3(size, 0f), out string why);
+            if (seeing is not null)
+            {
+                (Vector3[] places, int[] indices) = pile.Solid();
+                seeing.See(places, indices, Environment.ProcessorCount);
+            }
+
+            step.Advance();
+            return new Hiding(grid, origin, seeing, asked: true, cut, why, Environment.TickCount64 - started, progress);
+        }
+
+        /// <summary>
+        /// The room's mesh with only what is kept - see the remarks - and the counts for the line under the picture.
+        /// </summary>
+        public SkinnedMesh Keep(SkinnedMesh joined, ModelPile pile)
+        {
+            if (!joined.Ready || (_sight is null && _cut == 0))
+            {
+                return joined;
+            }
+
+            using ModelProgress.Step step = ModelProgress.Begin(_progress, _sight is null ? "cutting under the ground" : "leaving out what the game's camera cannot see", 1);
+            long started = Environment.TickCount64;
+            int triangles = joined.Triangles;
+            MaterialBlend[] blends = pile.Blends(joined);
+            bool[]? below = _cut > 0 ? Below(joined) : null;
+            var hides = new bool[triangles];
+            var kept = new bool[triangles];
+            for (var t = 0; t < triangles; t++)
+            {
+                bool gone = below is not null && below[t];
+                hides[t] = !gone && blends[t] == MaterialBlend.Opaque;
+                kept[t] = !gone && (blends[t] == MaterialBlend.ShadowOnly || _sight is null);
+            }
+
+            bool[] keep = _sight is null ? kept : _sight.Seen(joined.Positions, joined.Indices, hides, kept, Environment.ProcessorCount);
+            int left = 0, under = 0;
+            for (var t = 0; t < triangles; t++)
+            {
+                if (below is not null && below[t])
+                {
+                    keep[t] = false;
+                    under++;
+                }
+                else if (!keep[t])
+                {
+                    left++;
+                }
+            }
+
+            _total = triangles;
+            _hidden = left;
+            _below = under;
+            _took += Environment.TickCount64 - started;
+            step.Advance();
+            return joined.Keeping(keep);
+        }
+
+        /// <summary>The lines under the picture: how much was left out, and why nothing was where it was asked for and could not be.</summary>
+        public IEnumerable<string> Said()
+        {
+            if (_asked)
+            {
+                yield return _sight is null
+                    ? $"nothing hidden left out: {_why}"
+                    : string.Create(CultureInfo.InvariantCulture,
+                        $"hidden from the game's camera: {_hidden} of {_total} triangles left out - its view from {_sight.Views} places the player can stand within its reach, {_sight.Step:0} units apart; {_took / 1000.0:0.0} s");
+            }
+
+            if (_cut > 0)
+            {
+                yield return string.Create(CultureInfo.InvariantCulture,
+                    $"{_below} triangles further than {_cut} units under the area's ground left out");
+            }
+        }
+
+        /// <summary>Whether anything in a box may be seen and lies above the cut.</summary>
+        private bool Kept(Vector3 least, Vector3 most)
+        {
+            if (_cut > 0)
+            {
+                // DOWN IS PLUS Z, so the box's top is its least z, and the deepest ground its most.
+                float deepest = MathF.Max(
+                    MathF.Max(Ground(least.X, least.Y), Ground(most.X, least.Y)),
+                    MathF.Max(MathF.Max(Ground(least.X, most.Y), Ground(most.X, most.Y)), Ground((least.X + most.X) * 0.5f, (least.Y + most.Y) * 0.5f)));
+                if (least.Z > deepest + _cut)
+                {
+                    return false;
+                }
+            }
+
+            return _sight is null || _sight.BoxSeen(least, most);
+        }
+
+        /// <summary>Per triangle, whether all three corners lie further under the area's ground than the cut.</summary>
+        private bool[] Below(SkinnedMesh mesh)
+        {
+            Vector3[] places = mesh.Positions;
+            var under = new bool[places.Length];
+            Parallel.For(0, places.Length, one =>
+            {
+                Vector3 place = places[one];
+                under[one] = place.Z > Ground(place.X, place.Y) + _cut;
+            });
+
+            int[] indices = mesh.Indices;
+            var below = new bool[mesh.Triangles];
+            for (var t = 0; t < below.Length; t++)
+            {
+                below[t] = under[indices[t * 3]] && under[indices[(t * 3) + 1]] && under[indices[(t * 3) + 2]];
+            }
+
+            return below;
+        }
+
+        /// <summary>The area's ground under a point of the room's own frame.</summary>
+        private float Ground(float x, float y)
+            => _grid.HeightAt((int)MathF.Floor((x + _origin.X) / RoomModels.CellSize), (int)MathF.Floor((y + _origin.Y) / RoomModels.CellSize));
     }
 }

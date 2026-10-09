@@ -515,6 +515,127 @@ public sealed class SkinnedMesh
         };
     }
 
+    /// <summary>
+    /// The mesh with only the triangles <paramref name="keep"/> says, and only the vertices they use - or this mesh where every one is kept.
+    /// </summary>
+    /// <remarks>
+    /// EVERY SHAPE KEEPS ITS PLACE IN THE LIST, one left with nothing at a count of nought: a model's
+    /// materials, skins, blends and shade programs are lists in step with the shapes, and dropping one
+    /// would put every shape after it in the next one's material. The box is the kept vertices', so a
+    /// picture frames what is left.
+    /// </remarks>
+    /// <param name="keep">Per triangle, whether it stays.</param>
+    public SkinnedMesh Keeping(bool[] keep)
+    {
+        ArgumentNullException.ThrowIfNull(keep);
+        int triangles = Triangles;
+        if (keep.Length < triangles)
+        {
+            throw new ArgumentException("one flag per triangle", nameof(keep));
+        }
+
+        var before = new int[triangles + 1];
+        for (var t = 0; t < triangles; t++)
+        {
+            before[t + 1] = before[t] + (keep[t] ? 1 : 0);
+        }
+
+        int kept = before[triangles];
+        if (kept == triangles)
+        {
+            return this;
+        }
+
+        int vertices = Positions.Length;
+        var into = new int[vertices];
+        Array.Fill(into, -1);
+        var indices = new int[kept * 3];
+        int count = 0, wrote = 0;
+        for (var t = 0; t < triangles; t++)
+        {
+            if (!keep[t])
+            {
+                continue;
+            }
+
+            for (var corner = 0; corner < 3; corner++)
+            {
+                int vertex = Indices[(t * 3) + corner];
+                if (into[vertex] < 0)
+                {
+                    into[vertex] = count++;
+                }
+
+                indices[wrote++] = into[vertex];
+            }
+        }
+
+        bool skinned = Bones.Length == vertices * 4 && Weights.Length == vertices * 4;
+        bool coloured = Colours.Length == vertices * 4;
+        bool some = Coloured.Length == vertices;
+        var positions = new Vector3[count];
+        var normals = new Vector3[count];
+        var coordinates = new Vector2[count];
+        byte[] bones = skinned ? new byte[count * 4] : [];
+        byte[] weights = skinned ? new byte[count * 4] : [];
+        byte[] colours = coloured ? new byte[count * 4] : [];
+        bool[] which = coloured && some ? new bool[count] : [];
+        Vector3 least = new(float.MaxValue), most = new(float.MinValue);
+        for (var vertex = 0; vertex < vertices; vertex++)
+        {
+            int to = into[vertex];
+            if (to < 0)
+            {
+                continue;
+            }
+
+            positions[to] = Positions[vertex];
+            normals[to] = Normals[vertex];
+            coordinates[to] = Coordinates[vertex];
+            least = Vector3.Min(least, Positions[vertex]);
+            most = Vector3.Max(most, Positions[vertex]);
+            if (skinned)
+            {
+                Bones.AsSpan(vertex * 4, 4).CopyTo(bones.AsSpan(to * 4));
+                Weights.AsSpan(vertex * 4, 4).CopyTo(weights.AsSpan(to * 4));
+            }
+
+            if (coloured)
+            {
+                Colours.AsSpan(vertex * 4, 4).CopyTo(colours.AsSpan(to * 4));
+                if (which.Length > 0)
+                {
+                    which[to] = Coloured[vertex];
+                }
+            }
+        }
+
+        var shapes = new MeshShape[Shapes.Count];
+        for (var one = 0; one < shapes.Length; one++)
+        {
+            MeshShape shape = Shapes[one];
+            int from = Math.Clamp(shape.From / 3, 0, triangles);
+            int end = Math.Clamp((shape.From + shape.Count) / 3, from, triangles);
+            shapes[one] = shape with { From = before[from] * 3, Count = (before[end] - before[from]) * 3 };
+        }
+
+        return new SkinnedMesh
+        {
+            Positions = positions,
+            Normals = normals,
+            Coordinates = coordinates,
+            Bones = bones,
+            Weights = weights,
+            Indices = indices,
+            Shapes = shapes,
+            Least = count > 0 ? least : Vector3.Zero,
+            Most = count > 0 ? most : Vector3.Zero,
+            Facts = Facts,
+            Colours = colours,
+            Coloured = which,
+        };
+    }
+
     /// <summary>A box through a transform, by its eight corners - the only way that holds under rotation.</summary>
     private static (Vector3 Least, Vector3 Most) Corners(Vector3 least, Vector3 most, Matrix4x4 through)
     {

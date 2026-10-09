@@ -538,6 +538,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             RoomTools = _tileBook?.Tools ?? basis.RoomTools,
             RoomAnywhere = _tileBook?.Anywhere ?? basis.RoomAnywhere,
             RoomsOnMap = _tileBook?.RoomsOnMap ?? basis.RoomsOnMap,
+            RoomSight = _tileBook?.Sight ?? basis.RoomSight,
+            RoomCut = _tileBook?.Cut ?? basis.RoomCut,
             EffectColumns = _effectBook?.Columns is { Count: > 0 } effectColumns
                 ? effectColumns
                 : basis.EffectColumns,
@@ -1463,6 +1465,21 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         Vector2? alongY = OnScreen(player.WorldX, player.WorldY + step, player.WorldZ, size);
         return origin is { } o && alongX is { } x && alongY is { } y
             ? new SceneLight.GroundOnScreen(x - o, y - o)
+            : null;
+    }
+
+    /// <summary>
+    /// The game's camera as the snapshot holds it, for a laid room to leave out what it cannot see - or null outside the game.
+    /// </summary>
+    /// <remarks>
+    /// ASKED OFF THE FRAME, by the tile book's load: the snapshot is swapped whole, so one read of it is
+    /// one frame's, and the matrix is copied because the next frame's may arrive in the same array.
+    /// </remarks>
+    private CameraShot? Shot()
+    {
+        WorldSnapshot snapshot = _snapshot;
+        return snapshot.InGame && snapshot.Player is WorldEntity player && snapshot.Matrix.Length >= 16
+            ? new CameraShot(snapshot.Matrix[..16], new Vector3(player.WorldX, player.WorldY, player.WorldZ))
             : null;
     }
 
@@ -3333,7 +3350,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         bool roomTools = false,
         bool roomAnywhere = false,
         bool roomsOnMap = false,
-        IReadOnlyList<string>? tileSections = null)
+        IReadOnlyList<string>? tileSections = null,
+        bool roomSight = true,
+        int roomCut = 0)
     {
         // ONE INDEX OF WHICH TILESETS PLACE WHICH TILE, built off the frame on first ask: the pane's
         // tileset choice and the dump both read it, and building it twice would read every tileset twice.
@@ -3359,6 +3378,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Doodads = roomDoodads,
             Tools = roomTools,
             Anywhere = roomAnywhere,
+            Sight = roomSight,
+            Cut = roomCut,
             Terrain = () => _snapshot.Terrain as TerrainGrid,
             Read = readFile,
             Ghost = ghost => _roomGhost = ghost,
@@ -3366,7 +3387,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize)
             {
                 Book = "tile",
-                Load = (read, _, key, _, progress) => TileBookWindow.Load(read, key, () => _snapshot.Terrain as TerrainGrid, progress, () => _snapshot.Entities),
+                Load = (read, _, key, _, progress) => TileBookWindow.Load(read, key, () => _snapshot.Terrain as TerrainGrid, progress, () => _snapshot.Entities, Shot),
                 Ink = TileBookWindow.GroundInk,
                 Shaded = true,
 

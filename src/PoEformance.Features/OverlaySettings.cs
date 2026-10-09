@@ -193,6 +193,15 @@ public sealed record OverlaySettings(
     // ranks it first unless a surer room holds that spot. Off, the usual. See AreaRooms.
     [property: JsonPropertyName("roomsOnMap")] bool RoomsOnMap = false,
 
+    // Whether a laid room in the tile book leaves out what the game's camera cannot see from anywhere
+    // the player can stand - under the ground, inside rock. ON, the usual: a large room is otherwise
+    // thousands of doodads nobody can see. See LaidRoomModels.Hiding.
+    [property: JsonPropertyName("roomSight")] bool RoomSight = true,
+
+    // How far under the area's ground a laid room leaves everything out, in world units. Zero, the
+    // usual, cuts nothing. See LaidRoomModels.Hiding.
+    [property: JsonPropertyName("roomCut")] int RoomCut = 0,
+
     // And the effect book's, kept apart for the same reason. See EffectBookWindow.
     [property: JsonPropertyName("effectColumns")] IReadOnlyList<string>? EffectColumns = null,
     [property: JsonPropertyName("effectColumnWidths")] IReadOnlyDictionary<string, int>? EffectColumnWidths = null,

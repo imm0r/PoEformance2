@@ -111,6 +111,14 @@ turn was found the same way - the cube's up is the world's, hor_angle turns it a
 how vert_angle tips it is still a candidate, offered where it can change the picture. A *free sun* stands
 anywhere - two sliders, or shift + drag in the model window, its shadows coarse while it moves.
 
+A room drawn as laid **leaves out what the game's camera cannot see** (*leave out the hidden*, on
+unless switched off): the camera is the game's own, read while you play and set over every place
+you could stand within its reach of the room, and what none of those views shows - ground under
+ground, the inside of rock, the far side of a cliff - is neither loaded nor drawn, lit or shadowed.
+A doodad is asked before it is read, so a large room loads what can be seen rather than everything
+it places. A second control cuts everything further than a set depth under the area's own ground.
+The line under the picture says how much was left out and how long finding it took.
+
 The overlay draws the area's layout **on the game's own map** — including the parts not
 explored yet — and marks living monsters, chests, drops and NPCs on it. The large map when
 it is open, the minimap otherwise, clipped to whichever is on screen. It

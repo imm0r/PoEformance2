@@ -16,9 +16,27 @@ namespace PoEformance.Features;
 /// <param name="Laid">Where the room is drawn as the area laid it - "x,y,turn,area" - or empty for the room as its file has it; see LaidRoomModels.</param>
 /// <param name="AtLevel">Whether a laid room's pieces are set at their tiles' own levels rather than fitted to the area's ground - see LaidRoomModels.</param>
 /// <param name="Heights">How high a doodad that carries a height in its line is set - see <see cref="DoodadHeight"/>.</param>
+/// <param name="Hidden">Whether a laid room keeps what the game's camera cannot see too - see LaidRoomModels.Hiding. Off, the usual, leaves it out.</param>
+/// <param name="Cut">How far under the area's ground a laid room leaves everything out, in world units; nought, the usual, leaves nothing out.</param>
 public readonly record struct RoomKey(
-    string Path, int Doodads = RoomModels.UsualDoodads, bool Tools = false, string Laid = "", bool AtLevel = false, DoodadHeight Heights = DoodadHeight.File)
+    string Path,
+    int Doodads = RoomModels.UsualDoodads,
+    bool Tools = false,
+    string Laid = "",
+    bool AtLevel = false,
+    DoodadHeight Heights = DoodadHeight.File,
+    bool Hidden = false,
+    int Cut = 0)
 {
+    /// <summary>The deepest cut the slider offers, in world units.</summary>
+    public const int MostCut = 2000;
+
+    /// <summary>The word saying a laid room keeps what the camera cannot see.</summary>
+    public const string HiddenWord = "hidden";
+
+    /// <summary>What starts the word naming the cut; its number follows.</summary>
+    public const string CutWord = "cut=";
+
     /// <summary>What starts the word naming the place the room is laid at.</summary>
     public const string LaidWord = "laid=";
 
@@ -37,12 +55,12 @@ public readonly record struct RoomKey(
     /// <summary>The key as a string - the bare path at the usual choices.</summary>
     public override string ToString()
     {
-        if (Doodads == RoomModels.UsualDoodads && !Tools && Laid.Length == 0 && !AtLevel && Heights == DoodadHeight.File)
+        if (Doodads == RoomModels.UsualDoodads && !Tools && Laid.Length == 0 && !AtLevel && Heights == DoodadHeight.File && !Hidden && Cut <= 0)
         {
             return Path;
         }
 
-        var words = new List<string>(5);
+        var words = new List<string>(7);
         if (Doodads != RoomModels.UsualDoodads)
         {
             words.Add(string.Create(CultureInfo.InvariantCulture, $"{DoodadsWord}{Doodads}"));
@@ -66,6 +84,16 @@ public readonly record struct RoomKey(
         if (Heights != DoodadHeight.File)
         {
             words.Add(HeightsWord + (Heights == DoodadHeight.Ground ? "ground" : "added"));
+        }
+
+        if (Hidden)
+        {
+            words.Add(HiddenWord);
+        }
+
+        if (Cut > 0)
+        {
+            words.Add(string.Create(CultureInfo.InvariantCulture, $"{CutWord}{Cut}"));
         }
 
         return string.Concat(Path, TileKey.Mark.ToString(), string.Join(TileKey.WordMark, words));
@@ -102,6 +130,8 @@ public readonly record struct RoomKey(
         var tools = false;
         var level = false;
         var heights = DoodadHeight.File;
+        var hidden = false;
+        var cut = 0;
         string laid = string.Empty;
         ReadOnlySpan<char> words = key.AsSpan(mark + 1);
         foreach (Range one in words.Split(TileKey.WordMark))
@@ -130,9 +160,19 @@ public readonly record struct RoomKey(
                 ReadOnlySpan<char> how = word[HeightsWord.Length..];
                 heights = how.SequenceEqual("ground") ? DoodadHeight.Ground : how.SequenceEqual("added") ? DoodadHeight.Added : DoodadHeight.File;
             }
+            else if (word.SequenceEqual(HiddenWord))
+            {
+                hidden = true;
+            }
+            else if (word.StartsWith(CutWord, StringComparison.Ordinal)
+                && int.TryParse(word[CutWord.Length..], NumberStyles.None, CultureInfo.InvariantCulture, out int deep)
+                && deep is > 0 and <= MostCut)
+            {
+                cut = deep;
+            }
         }
 
-        RoomKey read = new(key[..mark], doodads, tools, laid, level, heights);
+        RoomKey read = new(key[..mark], doodads, tools, laid, level, heights, hidden, cut);
         return read.Laid.Length == 0 || read.TryLaid(out _, out _, out _, out _) ? read : read with { Laid = string.Empty };
     }
 }

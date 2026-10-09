@@ -361,6 +361,30 @@ height, or shift + drag in the model window (`IMovableSun`), the drag's directio
 the picture's camera so the sun's mark follows the hand. While it moves its shadow map is 512
 square (`ShadowMap.Coarse`), and 2048 once it is let go.
 
+**What the game's camera cannot see is left out of a laid room** (`CameraSight`, run by
+`LaidRoomModels.Hiding`), asked for over Azmerian Ranges, whose rooms take thousands of doodads and
+much of what they drew lay under the ground the game shows. The camera follows the player at a fixed
+angle - the player is always mid-screen - so standing over another place is the matrix read now
+(`CameraShot`) moved by how far that place is from the player. The places are walkable cells, one
+per half of the screen's smaller side, out to the screen's reach past the room - 144 over a test area
+forty tiles square, at most 384 - each a perspective view with the game's own near plane, so a wall
+behind the camera hides nothing (an orthographic view along the camera's direction would have let a
+mountain at the room's far edge hide the valley in front of it). A view is a depth of one over w at
+216 rows; solid triangles write it, and a triangle is kept where at least one view shows it at a
+texel no further than 8 units behind what is there, or - smaller than a texel - at its middle against
+the furthest of the nine texels round it. Shadow-only casters are always kept. It runs twice: the
+tiles are laid first and drawn into a coarse copy of every view (90 rows, with halving levels of the
+furthest depth), and every doodad place is asked against it before anything is loaded - a box a tile
+across times its scale, then its own box once its file is read (`DoodadSieve`); a file none of whose
+places passes is never read. Then the whole room is drawn into the views and the mesh rebuilt from
+what is seen (`SkinnedMesh.Keeping`, every shape kept in its place so materials and blends stay in
+step); the picture, its light and the sun's shadow map are worked out from that. A cut under the
+area's ground drops triangles whose three corners all lie deeper than it, counted from the ground
+under each corner. Measured on four threads over that test area: 2.5 million triangles against 144
+views in about 1.3 s, 5000 doodad boxes in 0.2 s; drawing a triangle into every view it falls in was nearly all of
+it, which is why the places are half a screen apart and each row is solved for its span rather than
+tested texel by texel.
+
 It lives in a **window of its own** now, in every book (`MonsterPortrait.DrawWindow`): the
 picture, its animation row, the buttons on it, and its lines folded under it. The book keeps the
 rest - `Show` says what to load, `DrawOpener` is the window's switch with the load's state beside
