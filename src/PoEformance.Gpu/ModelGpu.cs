@@ -24,6 +24,7 @@ namespace PoEformance.Gpu;
 /// <param name="Blends">How each shape is put over what is behind it, or null for all solid.</param>
 /// <param name="Positions">The posed vertices, or null to draw the mesh standing still.</param>
 /// <param name="Normals">The posed normals, with <paramref name="Positions"/>.</param>
+/// <param name="Light">The game's light, or null for the picture's own lamp - see MeshPicture.Canvas.Light.</param>
 public readonly record struct ModelScene(
     SkinnedMesh Mesh,
     float Turn = 0f,
@@ -35,7 +36,8 @@ public readonly record struct ModelScene(
     IReadOnlyList<Mipmaps?>? Skins = null,
     IReadOnlyList<MaterialBlend>? Blends = null,
     Vector3[]? Positions = null,
-    Vector3[]? Normals = null);
+    Vector3[]? Normals = null,
+    SceneLight? Light = null);
 
 /// <summary>
 /// Pictures of models drawn on the graphics card - MeshPicture's pictures, at the card's speed.
@@ -59,10 +61,14 @@ public readonly record struct ModelScene(
 /// the same mesh every frame, and a room's textures are hundreds of megabytes the card should be sent
 /// once. What has not been drawn for a while is let go - see <see cref="Kept"/>.
 ///
-/// NOT YET: shade programs, the game's light (SceneLight) and the probe. A picture that needs any of
-/// them is drawn on the processor; the caller asks <see cref="Can"/>.
+/// THE GAME'S LIGHT (SceneLight) IS DRAWN AS MeshPicture DRAWS IT - see ModelGpu.Light.cs: the sun's
+/// shadow map drawn on the card along the sun, on the processor's own texels, and every pixel lit by
+/// the same numbers.
+///
+/// NOT YET: shade programs and the probe. A picture that needs either is drawn on the processor; the
+/// caller asks <see cref="Can"/>.
 /// </remarks>
-public sealed class ModelGpu : IDisposable
+public sealed partial class ModelGpu : IDisposable
 {
     /// <summary>How many draws an upload may go unused before it is let go.</summary>
     private const int Kept = 600;
@@ -74,15 +80,20 @@ public sealed class ModelGpu : IDisposable
     private readonly ID3D11PixelShader _solid;
     private readonly ID3D11PixelShader _mixed;
     private readonly ID3D11PixelShader _added;
+    private readonly ID3D11PixelShader _scened;
+    private readonly ID3D11VertexShader _casting;
+    private readonly ID3D11PixelShader _away;
     private readonly ID3D11VertexShader _whole;
     private readonly ID3D11PixelShader _straight;
     private readonly ID3D11InputLayout _layout;
     private readonly ID3D11Buffer _frame;
     private readonly ID3D11Buffer _part;
+    private readonly ID3D11Buffer _scene;
     private readonly ID3D11SamplerState _wrap;
     private readonly ID3D11BlendState _covers;
     private readonly ID3D11BlendState _mixes;
     private readonly ID3D11BlendState _adds;
+    private readonly ID3D11BlendState _least;
     private readonly ID3D11DepthStencilState _writes;
     private readonly ID3D11DepthStencilState _tests;
     private readonly ID3D11DepthStencilState _ignores;
@@ -102,23 +113,29 @@ public sealed class ModelGpu : IDisposable
         _solid = compiled.Solid;
         _mixed = compiled.Mixed;
         _added = compiled.Added;
+        _scened = compiled.Scened;
+        _casting = compiled.Casting;
+        _away = compiled.Away;
         _whole = compiled.Whole;
         _straight = compiled.Straight;
         _layout = compiled.Layout;
         _frame = device.CreateBuffer(Marshal.SizeOf<FrameConstants>(), BindFlags.ConstantBuffer, ResourceUsage.Dynamic, CpuAccessFlags.Write);
         _part = device.CreateBuffer(Marshal.SizeOf<Vector4>(), BindFlags.ConstantBuffer, ResourceUsage.Dynamic, CpuAccessFlags.Write);
+        _scene = device.CreateBuffer(Marshal.SizeOf<SceneConstants>(), BindFlags.ConstantBuffer, ResourceUsage.Dynamic, CpuAccessFlags.Write);
         _wrap = device.CreateSamplerState(new SamplerDescription(
             Filter.MinMagMipLinear, TextureAddressMode.Wrap, TextureAddressMode.Wrap, TextureAddressMode.Wrap,
             0f, 1, ComparisonFunction.Never, 0f, float.MaxValue));
         _covers = device.CreateBlendState(BlendDescription.Opaque);
         _mixes = device.CreateBlendState(new BlendDescription(Blend.One, Blend.InverseSourceAlpha, Blend.One, Blend.InverseSourceAlpha));
         _adds = device.CreateBlendState(new BlendDescription(Blend.One, Blend.One, Blend.One, Blend.One));
+        _least = device.CreateBlendState(Least());
         _writes = device.CreateDepthStencilState(new DepthStencilDescription(true, DepthWriteMask.All, ComparisonFunction.Less));
         _tests = device.CreateDepthStencilState(new DepthStencilDescription(true, DepthWriteMask.Zero, ComparisonFunction.Less));
         _ignores = device.CreateDepthStencilState(new DepthStencilDescription(false, DepthWriteMask.Zero, ComparisonFunction.Always));
         _raster = device.CreateRasterizerState(new RasterizerDescription(CullMode.None, FillMode.Solid));
         _largest = device.FeatureLevel >= FeatureLevel.Level_11_0 ? 16384 : 8192;
         FeatureLevel = device.FeatureLevel;
+        _tables = Tables(device);
     }
 
     /// <summary>The level the device was made at.</summary>
@@ -191,15 +208,14 @@ public sealed class ModelGpu : IDisposable
     /// <summary>
     /// Whether this can draw a picture as the processor would, or why not.
     /// </summary>
-    /// <param name="scene">The picture.</param>
+    /// <param name="scene">The picture, its light among it.</param>
     /// <param name="shades">The shade programs it would be drawn with, or null.</param>
-    /// <param name="light">The game's light it would be lit by, or null.</param>
     /// <param name="why">Why not, or empty.</param>
-    public bool Can(in ModelScene scene, IReadOnlyList<ShadeProgram?>? shades, SceneLight? light, out string why)
+    public bool Can(in ModelScene scene, IReadOnlyList<ShadeProgram?>? shades, out string why)
     {
-        if (light is not null)
+        if (scene.Light is { SunShadows: true } light && light.SunColour != Vector3.Zero && light.ShadowSide > _largest)
         {
-            why = "the game's light is not drawn on the graphics card yet";
+            why = $"the sun's shadow map is {light.ShadowSide} square, past the {_largest} this card takes";
             return false;
         }
 
@@ -248,7 +264,7 @@ public sealed class ModelGpu : IDisposable
         }
 
         MeshBuffers buffers = Buffers(mesh);
-        Vector3[] positions = mesh.Positions, normals = mesh.Normals;
+        Vector3[] positions = mesh.Positions;
         bool posed = scene.Positions is { } moved && moved.Length == mesh.Positions.Length
             && scene.Normals is { } turned && turned.Length == mesh.Normals.Length;
         if (posed)
@@ -256,7 +272,8 @@ public sealed class ModelGpu : IDisposable
             buffers.Pose(_device, context, scene.Positions!, scene.Normals!);
         }
 
-        Plan plan = buffers.Planned(scene, this);
+        Plan plan = buffers.Planned(scene);
+        Vector3[] placed = posed ? scene.Positions! : positions;
 
         // MESHPICTURE'S CAMERA ON THE CARD'S CLIP SPACE: a point the processor puts at pixel
         // (x, y) - its view x and y times the scale, plus the centre, in shares of the side - lands
@@ -282,8 +299,6 @@ public sealed class ModelGpu : IDisposable
         };
         Written(_frame, frame);
 
-        context.OMSetRenderTargets(target.AccumulatedTarget, target.Depth);
-        context.RSSetViewport(new Viewport(0f, 0f, target.Size, target.Size, 0f, 1f));
         context.RSSetState(_raster);
         context.IASetPrimitiveTopology(PrimitiveTopology.TriangleList);
         context.IASetInputLayout(_layout);
@@ -291,17 +306,27 @@ public sealed class ModelGpu : IDisposable
         context.IASetVertexBuffer(1, posed ? buffers.PosedNormals! : buffers.Normals, 12, 0);
         context.IASetVertexBuffer(2, buffers.Coordinates, 8, 0);
         context.IASetIndexBuffer(buffers.Indices, Format.R32_UInt, 0);
-        context.VSSetShader(_placed);
         context.VSSetConstantBuffer(0, _frame);
         context.PSSetConstantBuffer(0, _frame);
         context.PSSetConstantBuffer(1, _part);
         context.PSSetSampler(0, _wrap);
 
+        // THE SUN'S SHADOW MAP BEFORE THE PICTURE, into its own target - see Lit.
+        SceneLight? light = scene.Light;
+        if (light is not null)
+        {
+            Lit(light, buffers, plan, camera.View, placed, still: !posed);
+        }
+
+        context.OMSetRenderTargets(target.AccumulatedTarget, target.Depth);
+        context.RSSetViewport(new Viewport(0f, 0f, target.Size, target.Size, 0f, 1f));
+        context.VSSetShader(_placed);
+
         // THE SOLID AND CUT-OUT SHAPES FIRST, in the mesh's order, writing depth - then the translucent
         // ones in the mesh's order, testing it and writing none, as MeshPicture.Drawing.Band does.
         context.OMSetBlendState(_covers);
         context.OMSetDepthStencilState(_writes);
-        context.PSSetShader(_solid);
+        context.PSSetShader(light is null ? _solid : _scened);
         foreach (Run run in plan.Runs)
         {
             if (run.Blend is MaterialBlend.Opaque or MaterialBlend.Cutout)
@@ -322,6 +347,11 @@ public sealed class ModelGpu : IDisposable
                     Drawn(run, plan);
                 }
             }
+        }
+
+        if (light is not null)
+        {
+            Unlit();
         }
 
         Resolved(target);
@@ -378,19 +408,25 @@ public sealed class ModelGpu : IDisposable
 
         _meshes.Clear();
         _skins.Clear();
+        DisposeLight();
         _raster.Dispose();
         _ignores.Dispose();
         _tests.Dispose();
         _writes.Dispose();
+        _least.Dispose();
         _adds.Dispose();
         _mixes.Dispose();
         _covers.Dispose();
         _wrap.Dispose();
+        _scene.Dispose();
         _part.Dispose();
         _frame.Dispose();
         _layout.Dispose();
         _straight.Dispose();
         _whole.Dispose();
+        _away.Dispose();
+        _casting.Dispose();
+        _scened.Dispose();
         _added.Dispose();
         _mixed.Dispose();
         _solid.Dispose();
@@ -488,6 +524,8 @@ public sealed class ModelGpu : IDisposable
             one.Value.Dispose();
             _skins.Remove(one.Key);
         }
+
+        ForgetLight();
     }
 
     /// <summary>Every texture a picture may read.</summary>
@@ -505,17 +543,30 @@ public sealed class ModelGpu : IDisposable
 
     private static Compiled? Compile(ID3D11Device device, out string why)
     {
-        Blob? placed = Compiled.Code(ModelShaders.Model, "Placed", "vs_4_0", out why);
-        Blob? solid = placed is null ? null : Compiled.Code(ModelShaders.Model, "Solid", "ps_4_0", out why);
-        Blob? mixed = solid is null ? null : Compiled.Code(ModelShaders.Model, "Mixed", "ps_4_0", out why);
-        Blob? added = mixed is null ? null : Compiled.Code(ModelShaders.Model, "Added", "ps_4_0", out why);
-        Blob? whole = added is null ? null : Compiled.Code(ModelShaders.Resolve, "Whole", "vs_4_0", out why);
-        Blob? straight = whole is null ? null : Compiled.Code(ModelShaders.Resolve, "Straight", "ps_4_0", out why);
+        (string Source, string Entry, string Profile)[] wanted =
+        [
+            (ModelShaders.Model, "Placed", "vs_4_0"),
+            (ModelShaders.Model, "Solid", "ps_4_0"),
+            (ModelShaders.Model, "Mixed", "ps_4_0"),
+            (ModelShaders.Model, "Added", "ps_4_0"),
+            (ModelShaders.Model, "Scened", "ps_4_0"),
+            (ModelShaders.Model, "Casting", "vs_4_0"),
+            (ModelShaders.Model, "Away", "ps_4_0"),
+            (ModelShaders.Resolve, "Whole", "vs_4_0"),
+            (ModelShaders.Resolve, "Straight", "ps_4_0"),
+        ];
+
+        var blobs = new Blob?[wanted.Length];
         try
         {
-            if (straight is null)
+            why = string.Empty;
+            for (var at = 0; at < wanted.Length; at++)
             {
-                return null;
+                blobs[at] = Compiled.Code(wanted[at].Source, wanted[at].Entry, wanted[at].Profile, out why);
+                if (blobs[at] is null)
+                {
+                    return null;
+                }
             }
 
             InputElementDescription[] corners =
@@ -526,22 +577,23 @@ public sealed class ModelGpu : IDisposable
             ];
 
             return new Compiled(
-                device.CreateVertexShader(placed!),
-                device.CreatePixelShader(solid!),
-                device.CreatePixelShader(mixed!),
-                device.CreatePixelShader(added!),
-                device.CreateVertexShader(whole!),
-                device.CreatePixelShader(straight),
-                device.CreateInputLayout(corners, placed!));
+                device.CreateVertexShader(blobs[0]!),
+                device.CreatePixelShader(blobs[1]!),
+                device.CreatePixelShader(blobs[2]!),
+                device.CreatePixelShader(blobs[3]!),
+                device.CreatePixelShader(blobs[4]!),
+                device.CreateVertexShader(blobs[5]!),
+                device.CreatePixelShader(blobs[6]!),
+                device.CreateVertexShader(blobs[7]!),
+                device.CreatePixelShader(blobs[8]!),
+                device.CreateInputLayout(corners, blobs[0]!));
         }
         finally
         {
-            placed?.Dispose();
-            solid?.Dispose();
-            mixed?.Dispose();
-            added?.Dispose();
-            whole?.Dispose();
-            straight?.Dispose();
+            foreach (Blob? one in blobs)
+            {
+                one?.Dispose();
+            }
         }
     }
 
@@ -561,6 +613,9 @@ public sealed class ModelGpu : IDisposable
         ID3D11PixelShader Solid,
         ID3D11PixelShader Mixed,
         ID3D11PixelShader Added,
+        ID3D11PixelShader Scened,
+        ID3D11VertexShader Casting,
+        ID3D11PixelShader Away,
         ID3D11VertexShader Whole,
         ID3D11PixelShader Straight,
         ID3D11InputLayout Layout)
@@ -592,8 +647,12 @@ public sealed class ModelGpu : IDisposable
     /// <summary>A stretch of triangles in the mesh's order that wear one texture and blend one way.</summary>
     private readonly record struct Run(int First, int Count, int Wears, MaterialBlend Blend);
 
-    /// <summary>A picture's runs and textures, worked out once per mesh, textures and blends.</summary>
-    private sealed record Plan(Run[] Runs, Mipmaps?[] Palette, bool Translucent);
+    /// <summary>A picture's runs and textures, worked out once per mesh, textures and blends - and the runs that cast the sun's shadow.</summary>
+    /// <param name="Runs">Every run in the mesh's order, the shadow-only ones among them - the drawing's passes take the blends they draw.</param>
+    /// <param name="Casts">What casts a shadow - see <see cref="Casting"/>.</param>
+    /// <param name="Palette">The textures, none at nought.</param>
+    /// <param name="Translucent">Whether any run is mixed or added.</param>
+    private sealed record Plan(Run[] Runs, Run[] Casts, Mipmaps?[] Palette, bool Translucent);
 
     /// <summary>A mesh on the card: its vertices, normals, coordinates and indices, and a pose's where it moves.</summary>
     private sealed class MeshBuffers : IDisposable
@@ -626,6 +685,12 @@ public sealed class ModelGpu : IDisposable
 
         public ID3D11Buffer? PosedNormals { get; private set; }
 
+        /// <summary>The sun's shadow map last drawn for this mesh - see ModelGpu.Lit.</summary>
+        public ShadowTarget? Shadow { get; set; }
+
+        /// <summary>What <see cref="Shadow"/> was drawn for, kept only while the mesh stands still - the canvas's rule.</summary>
+        public (Vector3 Direction, int Side, ShadowFrame Frame)? ShadowFor { get; set; }
+
         /// <summary>A pose's vertices and normals written over the moving copies, made the first time.</summary>
         public void Pose(ID3D11Device device, ID3D11DeviceContext context, Vector3[] positions, Vector3[] normals)
         {
@@ -643,7 +708,7 @@ public sealed class ModelGpu : IDisposable
         /// KEPT WHILE THE LISTS ARE THE SAME, compared by reference as the portrait compares them: a
         /// room is a million triangles, and working this out per frame was per-frame garbage.
         /// </remarks>
-        public Plan Planned(in ModelScene scene, ModelGpu owner)
+        public Plan Planned(in ModelScene scene)
         {
             if (_planned is { } had && ReferenceEquals(had.Skin, scene.Skin) && ReferenceEquals(had.Skins, scene.Skins)
                 && ReferenceEquals(had.Blends, scene.Blends))
@@ -713,16 +778,13 @@ public sealed class ModelGpu : IDisposable
             {
                 if (at == triangles || wears[at] != wears[first] || blends[at] != blends[first])
                 {
-                    if (blends[first] != MaterialBlend.ShadowOnly)
-                    {
-                        runs.Add(new Run(first, at - first, wears[first], blends[first]));
-                    }
-
+                    runs.Add(new Run(first, at - first, wears[first], blends[first]));
                     first = at;
                 }
             }
 
-            return new Plan([.. runs], [.. palette], translucent);
+            Mipmaps?[] worn = [.. palette];
+            return new Plan([.. runs], Casting(runs, worn), worn, translucent);
         }
 
         private static void Fill<T>(T[] into, MeshShape shape, T value, int triangles)
@@ -741,6 +803,7 @@ public sealed class ModelGpu : IDisposable
 
         public void Dispose()
         {
+            Shadow?.Dispose();
             PosedNormals?.Dispose();
             PosedPositions?.Dispose();
             Indices.Dispose();

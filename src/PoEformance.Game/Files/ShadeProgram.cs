@@ -1880,6 +1880,15 @@ public sealed class ShadeProgram
         return new Vector4(Lit(one.X, other.X), Lit(one.Y, other.Y), Lit(one.Z, other.Z), Lit(one.W, other.W));
     }
 
+    /// <summary>The tables <see cref="Linear"/> and <see cref="Srgb"/> read, <see cref="TableSteps"/> entries each, indexed by the value times one less than that, rounded - read the same way elsewhere.</summary>
+    public static ReadOnlySpan<float> LinearTable => ToLinear;
+
+    /// <inheritdoc cref="LinearTable"/>
+    public static ReadOnlySpan<float> SrgbTable => ToSrgb;
+
+    /// <inheritdoc cref="LinearTable"/>
+    public static int TableSteps => Table;
+
     // NOT A NUMBER COMES OUT AS NOUGHT rather than as an index nowhere: a graph's square root of a
     // negative, or fmod by nought, is not a number on a graphics card too.
     /// <summary>An sRGB value, nought to one, as light - by table.</summary>

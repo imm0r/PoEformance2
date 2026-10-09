@@ -79,7 +79,51 @@ public sealed class ShadowMap
         Vector3[] places, int[] indices, int triangles, Vector3 direction, Func<int, bool> casts, Func<int, (Mipmaps Skin, Vector2[] Coordinates)?> cutout, int threads,
         int side = Usual)
     {
-        if (places.Length == 0 || triangles == 0 || !(direction.LengthSquared() > 0f) || side < 16)
+        if (triangles == 0 || Framed(places, direction, side) is not { } frame)
+        {
+            return null;
+        }
+
+        (Vector3 u, Vector3 v, Vector3 w, Vector2 least, float perUnit, float nearest, _) = frame;
+        var depth = new int[side * side];
+        Array.Fill(depth, int.MaxValue);
+        var corners = new Vector3[places.Length];
+        for (var at = 0; at < places.Length; at++)
+        {
+            Vector3 place = places[at];
+            corners[at] = new Vector3(
+                (Vector3.Dot(place, u) - least.X) * perUnit,
+                (Vector3.Dot(place, v) - least.Y) * perUnit,
+                Vector3.Dot(place, w) - nearest);
+        }
+
+        Parallel.For(
+            0, triangles,
+            new ParallelOptions { MaxDegreeOfParallelism = Math.Max(1, threads) },
+            one =>
+            {
+                if (casts(one))
+                {
+                    Draw(depth, side, corners, indices, one, cutout(one));
+                }
+            });
+
+        return new ShadowMap(depth, side, u, v, w, least, perUnit, nearest, w);
+    }
+
+    /// <summary>
+    /// Where a map of these places along this direction lies: its axes, its corner, how many texels a unit is and the depth it starts at - or null where there is no map to draw.
+    /// </summary>
+    /// <remarks>
+    /// THE ONE FRAME <see cref="Build"/> DRAWS IN, public so a map drawn elsewhere - the graphics
+    /// card's - lies on the same texels and is read by the same <see cref="ShadowFrame"/> arithmetic.
+    /// </remarks>
+    /// <param name="places">Every vertex, model space.</param>
+    /// <param name="direction">The way the light travels.</param>
+    /// <param name="side">How many texels across.</param>
+    public static ShadowFrame? Framed(ReadOnlySpan<Vector3> places, Vector3 direction, int side)
+    {
+        if (places.Length == 0 || !(direction.LengthSquared() > 0f) || side < 16)
         {
             return null;
         }
@@ -109,31 +153,7 @@ public sealed class ShadowMap
         float perUnit = (side - 2) / span;
         least -= new Vector2(1f / perUnit);
         nearest -= 1f;
-
-        var depth = new int[side * side];
-        Array.Fill(depth, int.MaxValue);
-        var corners = new Vector3[places.Length];
-        for (var at = 0; at < places.Length; at++)
-        {
-            Vector3 place = places[at];
-            corners[at] = new Vector3(
-                (Vector3.Dot(place, u) - least.X) * perUnit,
-                (Vector3.Dot(place, v) - least.Y) * perUnit,
-                Vector3.Dot(place, w) - nearest);
-        }
-
-        Parallel.For(
-            0, triangles,
-            new ParallelOptions { MaxDegreeOfParallelism = Math.Max(1, threads) },
-            one =>
-            {
-                if (casts(one))
-                {
-                    Draw(depth, side, corners, indices, one, cutout(one));
-                }
-            });
-
-        return new ShadowMap(depth, side, u, v, w, least, perUnit, nearest, w);
+        return new ShadowFrame(u, v, w, least, perUnit, nearest, side);
     }
 
     /// <summary>How much of the light reaches a point - one in the open, nought in full shadow, between along an edge.</summary>
@@ -233,3 +253,13 @@ public sealed class ShadowMap
         }
     }
 }
+
+/// <summary>Where a shadow map lies - see <see cref="ShadowMap.Framed"/>.</summary>
+/// <param name="U">The map's x axis, model space, unit length.</param>
+/// <param name="V">Its y axis.</param>
+/// <param name="W">The way the light travels - depth grows along it.</param>
+/// <param name="Least">The map's corner along <paramref name="U"/> and <paramref name="V"/>, a texel of margin in.</param>
+/// <param name="PerUnit">How many texels one unit covers.</param>
+/// <param name="Nearest">The depth the map starts at, a unit before the nearest place.</param>
+/// <param name="Side">How many texels across.</param>
+public readonly record struct ShadowFrame(Vector3 U, Vector3 V, Vector3 W, Vector2 Least, float PerUnit, float Nearest, int Side);

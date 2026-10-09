@@ -98,7 +98,7 @@ the entities around you; `memory.txt` beside it says what sits at which address.
 Every book shows its model in a **window of its own** - drag to turn, the wheel zooms - which opens
 when a row is chosen; the book keeps the switches. The picture is **drawn on the graphics card**
 where the card can draw the same picture the processor would, and on the processor where it cannot
-yet (materials' shader graphs, the game's light); the rate in the picture's corner says which drew
+yet (materials' shader graphs) - the game's light, shadows and all, is drawn on either; the rate in the picture's corner says which drew
 it, and the `card` button beside it switches the card off and says why a picture went to the processor. The Tile Book's are in folds: Drawing, Where it
 lies in this area, Light, View & export, Files & surveys; the Item and Effect books keep theirs in
 a bar under the list.

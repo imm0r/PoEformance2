@@ -3157,7 +3157,7 @@ public sealed class MonsterPortrait
     /// Draws the picture on the graphics card where it is switched on and can draw the same picture - false leaves it to the processor.
     /// </summary>
     /// <remarks>
-    /// THE PROCESSOR KEEPS WHAT THE CARD CANNOT DO YET - shade programs, the game's light - and what
+    /// THE PROCESSOR KEEPS WHAT THE CARD CANNOT DO YET - shade programs - and what
     /// reads the processor's own pixels: the probe, and the grey laid on them. Each says so on the
     /// card button rather than drawing something else. A card that fails mid-draw is not asked again;
     /// see <see cref="CardPictures.Fail"/>.
@@ -3184,8 +3184,8 @@ public sealed class MonsterPortrait
 
         var scene = new ModelScene(
             _model.Mesh, _turn, _tilt, Ink, _model.Skin, _zoom, _pan, _model.Skins, Blends(),
-            moving ? _posed : null, moving ? _posedNormals : null);
-        if (!gpu.Can(scene, ShadesOf(_model), _drawnLight, out string why))
+            moving ? _posed : null, moving ? _posedNormals : null, _drawnLight);
+        if (!gpu.Can(scene, ShadesOf(_model), out string why))
         {
             _cardWhy = why;
             return false;

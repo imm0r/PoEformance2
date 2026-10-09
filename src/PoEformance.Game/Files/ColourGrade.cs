@@ -68,6 +68,24 @@ public sealed class ColourGrade
         FromLinearNeutral = fromLinear;
     }
 
+    /// <summary>The table's texels across, down and deep, and the texels themselves, x fastest - for a drawing that grades elsewhere, the graphics card's.</summary>
+    public int Width => _width;
+
+    /// <inheritdoc cref="Width"/>
+    public int Height => _height;
+
+    /// <inheritdoc cref="Width"/>
+    public int Depth => _depth;
+
+    /// <inheritdoc cref="Width"/>
+    public ReadOnlySpan<Vector3> Texels => _texels;
+
+    /// <summary>The table <see cref="Encoded"/> reads pow(x, 1/2.2) from, <see cref="GammaSteps"/> steps and the end - read the same way elsewhere.</summary>
+    public static ReadOnlySpan<float> Encoding => Gamma;
+
+    /// <summary>How many steps <see cref="Encoding"/> has before its end.</summary>
+    public static int EncodingSteps => GammaSteps;
+
     /// <summary>What it was stored as and how big, and how its texels were taken, for the line that says what graded the picture.</summary>
     public string Format { get; }
 

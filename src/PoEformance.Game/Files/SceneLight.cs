@@ -58,7 +58,7 @@ public sealed class SceneLight
     /// <summary>The cells of the light grid each way, at most.</summary>
     private const int MostCells = 32;
 
-    private readonly Light[] _lights;
+    private readonly Point[] _lights;
     private readonly int[] _cellStarts;
     private readonly int[] _cellEntries;
     private readonly Vector3 _gridLeast;
@@ -71,7 +71,7 @@ public sealed class SceneLight
     public SceneLight(IReadOnlyList<PointLight> points, PointShape shape, PlayerLamp? player)
     {
         ArgumentNullException.ThrowIfNull(points);
-        var lights = new List<Light>(points.Count + 1);
+        var lights = new List<Point>(points.Count + 1);
         foreach (PointLight one in points)
         {
             float a = shape switch
@@ -110,7 +110,7 @@ public sealed class SceneLight
 
         Vector3 least = new(float.MaxValue), most = new(float.MinValue);
         float widest = 0f;
-        foreach (Light one in _lights)
+        foreach (Point one in _lights)
         {
             least = Vector3.Min(least, one.Position - new Vector3(one.Cutoff));
             most = Vector3.Max(most, one.Position + new Vector3(one.Cutoff));
@@ -132,7 +132,7 @@ public sealed class SceneLight
             int[] entries = pass == 1 ? new int[counts[cells]] : [];
             for (var at = 0; at < _lights.Length; at++)
             {
-                Light one = _lights[at];
+                Point one = _lights[at];
                 (int x0, int y0, int z0) = Cell(one.Position - new Vector3(one.Cutoff));
                 (int x1, int y1, int z1) = Cell(one.Position + new Vector3(one.Cutoff));
                 for (int z = z0; z <= z1; z++)
@@ -298,6 +298,18 @@ public sealed class SceneLight
 
     /// <summary>How many point lights are drawn, the player's included.</summary>
     public int PointCount { get; }
+
+    /// <summary>The point lights as <see cref="Shade"/> works with them, the player's included - for a drawing that lights elsewhere, the graphics card's.</summary>
+    public ReadOnlySpan<Point> Points => _lights;
+
+    /// <summary>The grid <see cref="Shade"/> looks the point lights up by: where it starts, how wide a cell is, and how many cells each way.</summary>
+    public LightCells Cells => new(_gridLeast, _cellSize, _cellsX, _cellsY, _cellsZ);
+
+    /// <summary>Where each cell's lights start in <see cref="CellEntries"/>, one more than there are cells - x fastest, then y, then z.</summary>
+    public ReadOnlySpan<int> CellStarts => _cellStarts;
+
+    /// <summary>Every cell's lights, as indices into <see cref="Points"/>, each cell's in the order <see cref="Shade"/> adds them.</summary>
+    public ReadOnlySpan<int> CellEntries => _cellEntries;
 
     /// <summary>The sun's light, its colour times its multiplier - zero for none.</summary>
     public Vector3 SunColour { get; init; }
@@ -473,7 +485,7 @@ public sealed class SceneLight
             {
                 for (int at = _cellStarts[cell], upto = _cellStarts[cell + 1]; at < upto; at++)
                 {
-                    ref readonly Light one = ref _lights[_cellEntries[at]];
+                    ref readonly Point one = ref _lights[_cellEntries[at]];
                     Vector3 offset = one.Position - place;
                     float squared = offset.LengthSquared();
                     if (squared >= one.Cutoff * one.Cutoff)
@@ -552,7 +564,7 @@ public sealed class SceneLight
     }
 
     /// <summary>A light's precomputed numbers - GetPointCutoffRadius and ComputePointLightParamsNew's constants - or null for one that adds nothing.</summary>
-    private static Light? Of(Vector3 position, Vector3 colour, float radius, float a)
+    private static Point? Of(Vector3 position, Vector3 colour, float radius, float a)
     {
         float intensity = MathF.Abs(colour.X) + MathF.Abs(colour.Y) + MathF.Abs(colour.Z);
         if (!(radius > 0f) || !(intensity > 0f))
@@ -562,7 +574,7 @@ public sealed class SceneLight
 
         float cutoff = radius * MathF.Sqrt(intensity * ZeroIntensity / ColourThreshold);
         float multiplier = float.Lerp(1f / MathF.Sqrt(0.02f), 100f, Math.Clamp(a, 0f, 1f));
-        return new Light(position, colour, cutoff, radius / multiplier, 10f * 0.02f * multiplier * multiplier);
+        return new Point(position, colour, cutoff, radius / multiplier, 10f * 0.02f * multiplier * multiplier);
     }
 
     private int CellIndex(Vector3 place)
@@ -592,5 +604,18 @@ public sealed class SceneLight
     }
 
     /// <summary>A point light ready to shade with: its cutoff, its core radius (median over multiplier), and its zero intensity.</summary>
-    private readonly record struct Light(Vector3 Position, Vector3 Colour, float Cutoff, float Core, float Zero);
+    /// <param name="Position">Where it is, model space.</param>
+    /// <param name="Colour">Its colour times its intensity.</param>
+    /// <param name="Cutoff">How far it reaches - GetPointCutoffRadius.</param>
+    /// <param name="Core">Its radius over the radius multiplier - ComputePointLightParamsNew's divisor.</param>
+    /// <param name="Zero">Its intensity at nought distance, before the fade - 0.2 m², and the ten it is capped at.</param>
+    public readonly record struct Point(Vector3 Position, Vector3 Colour, float Cutoff, float Core, float Zero);
+
+    /// <summary>The light grid's shape - see <see cref="Cells"/>.</summary>
+    /// <param name="Least">Its corner nearest minus infinity, model space.</param>
+    /// <param name="Size">A cell's side.</param>
+    /// <param name="X">How many cells along x.</param>
+    /// <param name="Y">How many along y.</param>
+    /// <param name="Z">How many along z.</param>
+    public readonly record struct LightCells(Vector3 Least, float Size, int X, int Y, int Z);
 }
