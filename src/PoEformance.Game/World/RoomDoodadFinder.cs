@@ -10,7 +10,13 @@ namespace PoEformance.Game.World;
 /// <param name="Lines">How many lines were matchable at all - those whose path and model stand somewhere in the area.</param>
 /// <param name="MeanOff">How far, on average in world units, a hit's entity stands from where its line puts it.</param>
 /// <param name="Missing">Where the matchable lines without an entity would stand, in world units - for the map to mark.</param>
-public sealed record RoomDoodadPlace(RoomCandidate Where, int Hits, int Lines, float MeanOff, IReadOnlyList<Vector2> Missing);
+public sealed record RoomDoodadPlace(RoomCandidate Where, int Hits, int Lines, float MeanOff, IReadOnlyList<Vector2> Missing)
+{
+    /// <summary>
+    /// How many of the room's tiles the ground-and-tile search found agreeing at this very place, or -1 where that search did not list it - the tie-breaker where two variants share every doodad, see <see cref="RoomDoodadFinder.Settle"/>.
+    /// </summary>
+    public int TilesAgree { get; init; } = -1;
+}
 
 /// <summary>Where a room's doodads say it stands - every place, since the area may lay a room more than once.</summary>
 /// <param name="Places">The places, most hits first.</param>
@@ -22,6 +28,9 @@ public sealed record RoomDoodadPlaces(IReadOnlyList<RoomDoodadPlace> Places, int
 {
     /// <summary>No place, and why.</summary>
     public static RoomDoodadPlaces Not(int lines, int matchable, string why) => new([], lines, matchable, 0, why);
+
+    /// <summary>The places given up to another room that stands on the same tiles with more of its doodads, each with that room - see <see cref="RoomDoodadFinder.Settle"/>.</summary>
+    public IReadOnlyList<(RoomDoodadPlace Place, string To)> Yielded { get; init; } = [];
 }
 
 /// <summary>
@@ -51,6 +60,20 @@ public sealed record RoomDoodadPlaces(IReadOnlyList<RoomDoodadPlace> Places, int
 /// WHAT IS NOT CONCLUDED: a line whose path and model stand nowhere in the area - the boss room's
 /// controllers and markers, which the game does not make visible entities of - is left out of the
 /// count rather than counted against the room.
+///
+/// ONE ROOM PER PLACE, SETTLED AFTER: Atziri's temple loads every variant of a room - five biome
+/// floors, four commander rooms - and the variants share most of their doodads, so each one's vote
+/// lands on the tile where the one the game laid stands, with the shared lines behind it. The
+/// entities there belong to one room, and it is the one whose doodads are all present: the laid
+/// variant hits every line it has, a variant not laid hits only the shared ones. So where places of
+/// different rooms stand on the same tiles, the place with the most hits keeps them, a tie going to
+/// the higher share, and the others yield - see <see cref="Settle"/>. Rims may be shared, as
+/// RoomArrangement allows, since rooms that join lay their rims on one row.
+///
+/// AND WHERE THE DOODADS CANNOT TELL, THE TILES DO: the temple's commander rooms with three open
+/// sides and with four carry the same 97 doodads, every one of them standing at the one tile, and
+/// differ only in the tiles along their sides. The ground-and-tile search already scored that place
+/// for both (RoomFinder), so its tile agreement is the next key after the share - RoomDoodadPlace.TilesAgree.
 /// </remarks>
 public static class RoomDoodadFinder
 {
@@ -268,5 +291,127 @@ public static class RoomDoodadFinder
         }
 
         return new RoomDoodadPlaces(kept, lines, matchable, byModel, kept.Count > 0 ? string.Empty : "no tile collects two thirds of its doodads");
+    }
+
+    /// <summary>
+    /// Settles the places of every room against one another: where two rooms' places stand on the same tiles, the one with more of its doodads there keeps them and the other yields - see the class remarks.
+    /// </summary>
+    /// <param name="rooms">Every room with the places its doodads found.</param>
+    /// <param name="tilesX">The area's tiles across.</param>
+    /// <param name="tilesY">The area's tiles down.</param>
+    /// <returns>The same rooms in the same order, each with the places it keeps and the ones it yielded, and to whom.</returns>
+    public static List<(string Room, RoomDoodadPlaces Places)> Settle(IReadOnlyList<(string Room, RoomDoodadPlaces Places)> rooms, int tilesX, int tilesY)
+    {
+        ArgumentNullException.ThrowIfNull(rooms);
+        var settled = new List<(string Room, RoomDoodadPlaces Places)>(rooms.Count);
+        if (tilesX <= 0 || tilesY <= 0)
+        {
+            settled.AddRange(rooms);
+            return settled;
+        }
+
+        // SUREST FIRST: the most hits, then the greater share of its lines hit, then the tiles the
+        // other search found agreeing there, then the more lines it has to hit, then the name and the
+        // place, so an area settles the same way every time.
+        var all = new List<(int Room, RoomDoodadPlace Place)>();
+        for (var one = 0; one < rooms.Count; one++)
+        {
+            foreach (RoomDoodadPlace place in rooms[one].Places.Places)
+            {
+                all.Add((one, place));
+            }
+        }
+
+        all.Sort((a, b) =>
+        {
+            int order = b.Place.Hits.CompareTo(a.Place.Hits);
+            order = order != 0 ? order : ((double)b.Place.Hits / b.Place.Lines).CompareTo((double)a.Place.Hits / a.Place.Lines);
+            order = order != 0 ? order : b.Place.TilesAgree.CompareTo(a.Place.TilesAgree);
+            order = order != 0 ? order : b.Place.Lines.CompareTo(a.Place.Lines);
+            order = order != 0 ? order : string.CompareOrdinal(rooms[a.Room].Room, rooms[b.Room].Room);
+            order = order != 0 ? order : a.Place.Where.Y.CompareTo(b.Place.Where.Y);
+            order = order != 0 ? order : a.Place.Where.X.CompareTo(b.Place.Where.X);
+            return order != 0 ? order : a.Place.Where.Turn.CompareTo(b.Place.Where.Turn);
+        });
+
+        // EACH TILE'S HOLDER, and whether it holds the tile inside its footprint or on its rim: a tile
+        // inside a kept footprint is nobody else's; one on its rim may be another room's rim too.
+        const byte Free = 0, OnRim = 1, Inside = 2;
+        var held = new byte[tilesX * tilesY];
+        var holder = new int[tilesX * tilesY];
+        var kept = new List<RoomDoodadPlace>[rooms.Count];
+        var yielded = new List<(RoomDoodadPlace Place, string To)>[rooms.Count];
+        foreach ((int room, RoomDoodadPlace place) in all)
+        {
+            RoomCandidate where = place.Where;
+            int x0 = Math.Max(0, where.X), x1 = Math.Min(tilesX, where.X + where.Width);
+            int y0 = Math.Max(0, where.Y), y1 = Math.Min(tilesY, where.Y + where.Height);
+            int lostTo = -1;
+            for (int y = y0; y < y1 && lostTo < 0; y++)
+            {
+                for (int x = x0; x < x1; x++)
+                {
+                    int cell = (y * tilesX) + x;
+                    bool rim = x == where.X || x == where.X + where.Width - 1 || y == where.Y || y == where.Y + where.Height - 1;
+                    if (held[cell] != Free && (held[cell] == Inside || !rim) && holder[cell] != room)
+                    {
+                        lostTo = holder[cell];
+                        break;
+                    }
+                }
+            }
+
+            if (lostTo >= 0)
+            {
+                (yielded[room] ??= []).Add((place, rooms[lostTo].Room));
+                continue;
+            }
+
+            for (int y = y0; y < y1; y++)
+            {
+                for (int x = x0; x < x1; x++)
+                {
+                    int cell = (y * tilesX) + x;
+                    bool rim = x == where.X || x == where.X + where.Width - 1 || y == where.Y || y == where.Y + where.Height - 1;
+                    if (!rim || held[cell] == Free)
+                    {
+                        held[cell] = rim ? OnRim : Inside;
+                        holder[cell] = room;
+                    }
+                }
+            }
+
+            (kept[room] ??= []).Add(place);
+        }
+
+        for (var one = 0; one < rooms.Count; one++)
+        {
+            (string room, RoomDoodadPlaces places) = rooms[one];
+            if (kept[one] is null && yielded[one] is null)
+            {
+                settled.Add((room, places));
+                continue;
+            }
+
+            // KEPT IN THE FINDER'S ORDER, most hits first, as the room's own list reads.
+            List<RoomDoodadPlace> mine = kept[one] ?? [];
+            var ordered = new List<RoomDoodadPlace>(mine.Count);
+            foreach (RoomDoodadPlace place in places.Places)
+            {
+                if (mine.Contains(place))
+                {
+                    ordered.Add(place);
+                }
+            }
+
+            settled.Add((room, places with
+            {
+                Places = ordered,
+                Yielded = yielded[one] ?? [],
+                Why = ordered.Count > 0 ? string.Empty : "every place it found stands on another room's tiles",
+            }));
+        }
+
+        return settled;
     }
 }

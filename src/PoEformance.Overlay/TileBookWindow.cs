@@ -507,18 +507,27 @@ public sealed class TileBookWindow : BookWindow<TileBook>
                 places += found.Places.Count;
                 unplaced += found.Places.Count == 0 ? 1 : 0;
                 string name = TerrainRooms.NameFor(room);
-                if (found.Places.Count == 0)
-                {
-                    lines.Add(string.Create(CultureInfo.InvariantCulture,
-                        $"{name}: no place - {found.Why}; {found.Matchable} of its {found.Lines} doodad lines stand in the area, {found.ByModel} told by their model"));
-                    continue;
-                }
-
-                var said = new List<string>(found.Places.Count);
+                var said = new List<string>(found.Places.Count + found.Yielded.Count);
                 foreach (RoomDoodadPlace place in found.Places)
                 {
                     said.Add(string.Create(CultureInfo.InvariantCulture,
-                        $"tile {place.Where.X}, {place.Where.Y}, {RoomFinder.Said(place.Where.Turn)}: {place.Hits} of {place.Lines} doodads within a tile, off {place.MeanOff:0} on average"));
+                        $"tile {place.Where.X}, {place.Where.Y}, {RoomFinder.Said(place.Where.Turn)}: {place.Hits} of {place.Lines} doodads within a tile, off {place.MeanOff:0} on average")
+                        + (place.TilesAgree >= 0 ? string.Create(CultureInfo.InvariantCulture, $", {place.TilesAgree} tiles agree") : ", not on the tile search's list"));
+                }
+
+                // WHAT IT GAVE UP, AND TO WHOM: a variant not laid votes for the laid one's tile - see RoomDoodadFinder.Settle.
+                foreach ((RoomDoodadPlace place, string to) in found.Yielded)
+                {
+                    said.Add(string.Create(CultureInfo.InvariantCulture,
+                        $"yielded tile {place.Where.X}, {place.Where.Y}, {RoomFinder.Said(place.Where.Turn)} ({place.Hits} of {place.Lines}) to {TerrainRooms.NameFor(to)}"));
+                }
+
+                if (found.Places.Count == 0)
+                {
+                    lines.Add(string.Create(CultureInfo.InvariantCulture,
+                        $"{name}: no place - {found.Why}; {found.Matchable} of its {found.Lines} doodad lines stand in the area, {found.ByModel} told by their model")
+                        + (said.Count > 0 ? " - " + string.Join("; ", said) : string.Empty));
+                    continue;
                 }
 
                 lines.Add(string.Create(CultureInfo.InvariantCulture,
