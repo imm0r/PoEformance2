@@ -21,6 +21,21 @@ public class ProgramGpuTests(CardFixture card) : IClassFixture<CardFixture>
 {
     private const int Side = ModelGpuTests.Side;
 
+    /// <summary>
+    /// The test sheet's half-width in the game's units - a tile is 250 across.
+    /// </summary>
+    /// <remarks>
+    /// AT THE GAME'S SCALE, NOT ONE UNIT, because the materials are authored for it: Dung01c marches
+    /// its parallax 21 units deep, which on a sheet two units wide runs the ray through a dozen
+    /// repeats of the height texture between two neighbouring pixels. The march is then chaos, and
+    /// which of it a picture shows is decided by the level each read takes - the card's per pixel,
+    /// the processor's per triangle - so the first run of these tests failed on exactly the two
+    /// materials with a march, each picture right by its own rule. At this size a neighbouring pixel
+    /// differs by as little as on every other material (measured on the processor: 52 levels a
+    /// step at one unit, 6 at a hundred).
+    /// </remarks>
+    private const float Scale = 100f;
+
     /// <summary>How long a picture waits for its shaders before the wait is the failure.</summary>
     private static readonly TimeSpan Patience = TimeSpan.FromMinutes(3);
 
@@ -33,7 +48,7 @@ public class ProgramGpuTests(CardFixture card) : IClassFixture<CardFixture>
     [GpuFact]
     public void EVERYFIXTUREMaterialIsDrawnByTheCardAsTheProcessorDrawsItUnderTheGamesLight()
     {
-        PointLight[] points = [new(new Vector3(0.5f, 0.8f, -0.3f), new Vector3(2f, 1f, 0.5f), 1.5f, 0.4f, "warm")];
+        PointLight[] points = [new(new Vector3(0.5f, 0.8f, -0.3f) * Scale, new Vector3(2f, 1f, 0.5f), 1.5f * Scale, 0.4f, "warm")];
         var light = new SceneLight(points, SceneLight.PointShape.Penumbra, null)
         {
             SunColour = new Vector3(1.4f, 1.3f, 1.1f),
@@ -199,7 +214,7 @@ public class ProgramGpuTests(CardFixture card) : IClassFixture<CardFixture>
     }
 
     /// <summary>
-    /// A rolling sheet two by two facing the camera, with coordinates tiled half again, normals that turn every way and a vertex colour that ramps - and where asked a second sheet a little in front of it, a shape of its own.
+    /// A rolling sheet <see cref="Scale"/> either way of the middle facing the camera, with coordinates tiled half again, normals that turn every way and a vertex colour that ramps - and where asked a second sheet a little in front of it, a shape of its own.
     /// </summary>
     private static SkinnedMesh Hill(bool layered)
     {
@@ -220,7 +235,7 @@ public class ProgramGpuTests(CardFixture card) : IClassFixture<CardFixture>
                 {
                     float x = -1f + (2f * i / cells), z = -1f + (2f * j / cells);
                     float y = (0.25f * MathF.Sin(3f * x) * MathF.Cos(2f * z)) + lift;
-                    positions.Add(new Vector3(x, y, z));
+                    positions.Add(new Vector3(x, y, z) * Scale);
                     normals.Add(Vector3.Normalize(new Vector3(-0.75f * MathF.Cos(3f * x) * MathF.Cos(2f * z), 1f, 0.5f * MathF.Sin(3f * x) * MathF.Sin(2f * z))));
                     spots.Add(new Vector2((x * 1.5f) + 0.5f, (z * 1.5f) + 0.5f));
                     colours.AddRange([(byte)(i * 255 / cells), (byte)(j * 255 / cells), 128, (byte)(255 - (i * 4))]);
@@ -240,7 +255,7 @@ public class ProgramGpuTests(CardFixture card) : IClassFixture<CardFixture>
         }
 
         return SkinnedMesh.Of(
-            [.. positions], [.. normals], [.. indices], new Vector3(-1f, -0.3f, -1f), new Vector3(1f, 0.4f, 1f),
+            [.. positions], [.. normals], [.. indices], new Vector3(-1f, -0.3f, -1f) * Scale, new Vector3(1f, 0.4f, 1f) * Scale,
             [.. spots], shapes, colours: [.. colours]);
     }
 
