@@ -216,7 +216,51 @@ public class RoomDoodadFinderTests
         Assert.Equal("desert.arm", Assert.Single(settled[4].Places.Yielded).To);
     }
 
-    /// <summary>Two variants with every doodad in common, every one standing: the tiles the other search found agreeing decide, and the name only after that.</summary>
+    /// <summary>
+    /// A variant whose one extra line is a scripted object outside the network bubble loses nothing for it: the props tie, the tiles decide; with the object present, its hit decides for the variant; and a room with more props standing keeps the doodads over one with more lines of any kind.
+    /// </summary>
+    [Fact]
+    public void SETTLINGGoesByThePropsFirstSoAnAbsentScriptedObjectCostsItsVariantNothing()
+    {
+        // One place at the one tile: its props' entities are the first of the sightings, the scripted objects' the rest.
+        static RoomDoodadPlaces Of(int hits, int lines, int propHits, int props, int tilesAgree, params int[] scripted)
+            => new(
+                [new RoomDoodadPlace(new RoomCandidate(5, 5, 0, 4, 4, hits, lines), hits, lines, 1f, [])
+                {
+                    TilesAgree = tilesAgree,
+                    PropHits = propHits,
+                    Props = props,
+                    Entities = [.. Enumerable.Range(0, propHits), .. scripted],
+                }],
+                lines, lines, lines, string.Empty);
+
+        // The checkpoint outside the bubble: 27 of 28 against the plain room's 27 of 27, the same 27 props - the tiles say the checkpoint room.
+        List<(string Room, RoomDoodadPlaces Places)> absent = RoomDoodadFinder.Settle(
+            [("workshop_wall_cc_01.arm", Of(27, 27, 27, 27, tilesAgree: 54)), ("checkpoint_wall_cc_01.arm", Of(27, 28, 27, 27, tilesAgree: 60))], 20, 20);
+        Assert.Single(absent[1].Places.Places);
+        Assert.Equal("checkpoint_wall_cc_01.arm", Assert.Single(absent[0].Places.Yielded).To);
+
+        // The tiles tied as well: the plain room, every line of it present, and the same way every time.
+        List<(string Room, RoomDoodadPlaces Places)> tied = RoomDoodadFinder.Settle(
+            [("checkpoint_wall_cc_01.arm", Of(27, 28, 27, 27, tilesAgree: 54)), ("workshop_wall_cc_01.arm", Of(27, 27, 27, 27, tilesAgree: 54))], 20, 20);
+        Assert.Single(tied[1].Places.Places);
+        Assert.Equal("workshop_wall_cc_01.arm", Assert.Single(tied[0].Places.Yielded).To);
+
+        // The checkpoint inside the bubble: its hit decides for its room, the props and tiles tied.
+        List<(string Room, RoomDoodadPlaces Places)> present = RoomDoodadFinder.Settle(
+            [("workshop_ledge_cc_01.arm", Of(18, 18, 18, 18, tilesAgree: 70)), ("checkpoint_ledge_cc_01.arm", Of(19, 19, 18, 18, tilesAgree: 70, 177))], 20, 20);
+        Assert.Single(present[1].Places.Places);
+        Assert.Equal("checkpoint_ledge_cc_01.arm", Assert.Single(present[0].Places.Yielded).To);
+
+        // More hits of any kind do not outrank more props: a variant with two props gone and six scripted
+        // objects present stands on the plain room's doodads and yields to it.
+        List<(string Room, RoomDoodadPlaces Places)> props = RoomDoodadFinder.Settle(
+            [("busy.arm", Of(14, 16, 8, 10, tilesAgree: 30, 100, 101, 102, 103, 104, 105)), ("plain.arm", Of(10, 10, 10, 10, tilesAgree: 30))], 20, 20);
+        Assert.Single(props[1].Places.Places);
+        Assert.Equal("plain.arm", Assert.Single(props[0].Places.Yielded).To);
+    }
+
+    /// <summary>Two variants with every doodad in common, every one standing: the tiles laid at the place decide, and the name only after that.</summary>
     [Fact]
     public void VARIANTSSharingEveryDoodadAreToldApartByTheirTiles()
     {

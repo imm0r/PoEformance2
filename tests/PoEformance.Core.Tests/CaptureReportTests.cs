@@ -252,7 +252,7 @@ public class CaptureReportTests
     {
         RoomLayout square = RoomArrangementTests.Square();
         var laid = new RoomDoodadPlace(new RoomCandidate(5, 7, 1, 3, 3, 12, 12), 12, 12, 4.2f, []) { TilesAgree = 9, PropHits = 9, Props = 9 };
-        var yielded = new RoomDoodadPlace(new RoomCandidate(5, 7, 1, 3, 3, 10, 12), 10, 12, 3f, []);
+        var yielded = new RoomDoodadPlace(new RoomCandidate(5, 7, 1, 3, 3, 10, 12), 10, 12, 3f, []) { PropHits = 8, Props = 8 };
         (string Room, RoomLayout Layout, RoomDoodadPlaces Places)[] placed =
         [
             ("Metadata/Terrain/Rooms/desert.arm", square, new RoomDoodadPlaces([laid], 12, 12, 12, string.Empty)),
@@ -268,7 +268,7 @@ public class CaptureReportTests
         string[] lines = detail.Split('\n');
         Assert.Equal("desert: 1 place, 12 of 12 doodads told by their model - tile 5, 7, turned 90: 12 of 12 doodads within a tile (9 of 9 props), off 4 on average, 9 tiles agree", lines[0]);
         Assert.Equal(
-            "grass: no place - every place it found stands on another room's doodads; 10 of its 12 doodad lines stand in the area, 8 of them props, 10 told by their model - yielded tile 5, 7, turned 90 (10 of 12) to desert",
+            "grass: no place - every place it found stands on another room's doodads; 10 of its 12 doodad lines stand in the area, 8 of them props, 10 told by their model - yielded tile 5, 7, turned 90 (10 of 12, 8 of 8 props, tiles not scored) to desert",
             lines[1]);
     }
 

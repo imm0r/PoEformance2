@@ -49,6 +49,13 @@ public readonly record struct RoomDoodad(int X, int Y, float Turn, float Scale, 
     /// room's props say where it stands for as long as the area lasts; its scripted objects say what
     /// the player has done. So the props decide a placing - see RoomDoodadFinder - and the others are
     /// counted beside them.
+    ///
+    /// THE MECHANISM, learned from a third capture whose client held one checkpoint entity while the
+    /// game's map drew four: a scripted object is the server's entity, in the client only while it
+    /// stands inside the client's network bubble, and a checkpoint is read only once the player comes
+    /// near it. The props the client builds itself from the room files, so they stand across the
+    /// whole area from the first frame. The game names no checkpoint in its UI either, beyond the
+    /// one being hovered, so there is no second road to the ones outside the bubble.
     /// </remarks>
     public bool IsProp => Stub.StartsWith("Metadata/MiscellaneousObjects/Doodad", StringComparison.OrdinalIgnoreCase);
 }

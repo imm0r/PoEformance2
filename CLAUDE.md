@@ -159,7 +159,11 @@ room placing runs again here without the game -
 writes `placing-replay.txt` beside the capture's files. Two captures of one area forty
 minutes apart are how it was learned that the power-line pieces and checkpoints come and go
 with play while the plain props never move; hold a finder change against a capture before
-asking for a screenshot.
+asking for a screenshot. The reason they come and go is the network bubble: a scripted
+object is the server's entity and the client holds it only while it is near, while the
+props the client builds itself from the room files. A third capture had one checkpoint
+entity in the client while the game's map drew four, and "there is one checkpoint in this
+area" was nearly concluded from it. An entity's absence from the client says nothing.
 
 **The loaded-file list is not the area.** It names what was loaded since the area change, and
 a file still cached from an earlier instance of the same map is not loaded again and not
