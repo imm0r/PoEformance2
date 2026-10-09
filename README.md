@@ -116,6 +116,10 @@ sun's height, theta its bearing; the row says where its shadows fall on the game
 turn was found the same way - the cube's up is the world's, hor_angle turns it about that - and only
 how vert_angle tips it is still a candidate, offered where it can change the picture. A *free sun* stands
 anywhere - two sliders, or shift + drag in the model window, its shadows coarse while it moves.
+The environment also gives the area's **dust colour** (`area.dust_color`), which dust graphs lay over a
+material whether the game's light is on or not; where the file sets none, a grey of a half is taken
+and the Light fold's *assumed* line says so. *find the readings* looks for the colour too, so the
+game's own default can be read where it keeps it.
 
 A room drawn as laid **leaves out what the game's camera cannot see** (*leave out the hidden*, on
 unless switched off): the camera is the game's own, read while you play and set over every place

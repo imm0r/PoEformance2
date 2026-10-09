@@ -90,12 +90,30 @@ public sealed class DissectorWindow
     private bool _onlyChanged;
     private int _agreement;            // 0 = every row, 1 = only differing, 2 = only matching
     private bool _hideEmpty = true;
+    private string _typedFind = string.Empty;
+    private Task<PatternHuntResult>? _hunting;
+    private FloatHuntProgress? _huntProgress;
+    private IReadOnlyList<PatternNeedle> _huntNeedles = [];
+    private PatternHuntResult? _found;
+    private IReadOnlyList<PatternNeedle> _foundNeedles = [];
+    private string _foundWhy = string.Empty;
 
     public DissectorWindow(StructureInspector inspector)
     {
         ArgumentNullException.ThrowIfNull(inspector);
         _inspector = inspector;
     }
+
+    /// <summary>
+    /// Starts a search of the whole of the game's memory for runs of bytes, or null where the reader cannot - see PatternHunt.
+    /// </summary>
+    /// <remarks>
+    /// THE QUESTION A ROW CANNOT ASK: everything else here starts from an address, and a name the game
+    /// must hold somewhere - a shader stage's, say, whose order no file gives - has none to start from.
+    /// Found as text, it has one; and "pointers here" then says who refers to it, a table of names
+    /// being a row of such pointers.
+    /// </remarks>
+    public Func<IReadOnlyList<PatternNeedle>, FloatHuntProgress, Task<PatternHuntResult>?>? Hunt { get; set; }
 
     /// <summary>Bytes per row, as the reader wants it.</summary>
     private int Stride => _strideIndex == 0 ? 8 : 4;
@@ -242,6 +260,7 @@ public sealed class DissectorWindow
         DrawTheRead();
         DrawWhatToMakeOfIt(view);
         DrawComparisonFilters();
+        DrawFind(view);
 
         ImGui.TextColored(DimText, view.Status);
 
@@ -337,6 +356,137 @@ public sealed class DissectorWindow
             "Another address of the SAME kind of structure, read beside this one and walked"
             + " through the same offsets with it. The entity browser can send one over without"
             + " typing.");
+    }
+
+    /// <summary>
+    /// A search of the whole of the game's memory: a text, one byte a character and two, or pointers to the address on show - and what it found, each place a click away.
+    /// </summary>
+    private void DrawFind(StructureView view)
+    {
+        if (Hunt is null)
+        {
+            return;
+        }
+
+        if (_hunting is { } running)
+        {
+            if (!running.IsCompleted)
+            {
+                long bytes = _huntProgress?.Bytes ?? 0;
+                ImGui.TextColored(DimText, string.Create(CultureInfo.InvariantCulture,
+                    $"searching the game's memory for {string.Join(", ", _huntNeedles.Select(one => one.Name))}: {bytes / (1024.0 * 1024 * 1024):0.0} GB looked through"));
+                return;
+            }
+
+            _found = running.IsCompletedSuccessfully ? running.Result : null;
+            _foundNeedles = _huntNeedles;
+            _foundWhy = running.Exception?.GetBaseException().Message ?? string.Empty;
+            _hunting = null;
+        }
+
+        bool asText = OverlayLayout.Sized.Input("Find", ref _typedFind, 64, "PreLighting_Final", ImGuiInputTextFlags.EnterReturnsTrue);
+        ImGui.SameLine();
+        asText |= ImGui.SmallButton("as text");
+        OverlayLayout.Hint(
+            "Searches the whole of the game's memory for this text, kept one byte a character and two,"
+            + " and lists every place with what lies round it. Takes a while.");
+        ImGui.SameLine();
+        bool pointers = ImGui.SmallButton("pointers here");
+        OverlayLayout.Hint(
+            "Searches the whole of the game's memory for pointers to the address on show - who refers"
+            + " to this. A table of names is a row of pointers to them.");
+
+        string text = _typedFind.Trim();
+        if (asText && text.Length > 0)
+        {
+            Find(PatternNeedle.Text(text));
+        }
+        else if (pointers && view.Address != 0)
+        {
+            Find([PatternNeedle.Pointer(view.Address)]);
+        }
+
+        if (_foundWhy.Length > 0)
+        {
+            ImGui.TextColored(BaselineText, "the search failed: " + _foundWhy);
+        }
+
+        DrawFound();
+    }
+
+    private void Find(IReadOnlyList<PatternNeedle> needles)
+    {
+        var progress = new FloatHuntProgress();
+        Task<PatternHuntResult>? started = Hunt?.Invoke(needles, progress);
+        if (started is null)
+        {
+            return;
+        }
+
+        _hunting = started;
+        _huntProgress = progress;
+        _huntNeedles = needles;
+        _found = null;
+        _foundWhy = string.Empty;
+    }
+
+    /// <summary>What the last search found: each place with what reads round it, a click to go there, and the lot to copy.</summary>
+    private void DrawFound()
+    {
+        if (_found is not { } found)
+        {
+            return;
+        }
+
+        string head = string.Create(CultureInfo.InvariantCulture,
+            $"found {found.Sightings.Count}{(found.Capped.Count > 0 ? "+" : string.Empty)} place{(found.Sightings.Count == 1 ? string.Empty : "s")} of {string.Join(", ", _foundNeedles.Select(one => one.Name))}{(found.Truncated ? " - stopped at the budget" : string.Empty)}###found");
+        if (!ImGui.TreeNode(head))
+        {
+            return;
+        }
+
+        if (ImGui.SmallButton("Copy##found"))
+        {
+            ImGui.SetClipboardText(PatternHunt.Report(found, _foundNeedles));
+        }
+
+        OverlayLayout.Hint("Every place with the bytes round it, sixteen to a row - to paste where somebody can read it.");
+        for (var at = 0; at < found.Sightings.Count; at++)
+        {
+            PatternSighting one = found.Sightings[at];
+            if (ImGui.SmallButton(string.Create(CultureInfo.InvariantCulture, $"Go##found{at}")))
+            {
+                GoTo(one.At);
+            }
+
+            ImGui.SameLine();
+            OverlayFonts.PushMono();
+            try
+            {
+                ImGui.TextColored(PointerText, one.At.ToString("X12", CultureInfo.InvariantCulture));
+                ImGui.SameLine();
+                ImGui.TextColored(TextFound, PatternHunt.Readable(Near(one, 48)));
+            }
+            finally
+            {
+                OverlayFonts.PopMono();
+            }
+        }
+
+        ImGui.TreePop();
+    }
+
+    /// <summary>The bytes up to so many either side of a place, of what was read round it.</summary>
+    private static ReadOnlySpan<byte> Near(PatternSighting one, int reach)
+    {
+        if (one.Around.Length == 0)
+        {
+            return [];
+        }
+
+        int at = (int)(one.At - one.From);
+        int from = Math.Max(0, at - reach);
+        return one.Around.AsSpan(from, Math.Min(one.Around.Length, at + reach) - from);
     }
 
     /// <summary>What to make of the bytes: names over them, a baseline, and what to leave out.</summary>

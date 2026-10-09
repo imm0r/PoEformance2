@@ -179,8 +179,19 @@ public sealed class ShadeProgram
     /// <summary>Set in x where a step discarded the pixel, as the engine's <c>discard</c> does.</summary>
     internal const int Dropped = 10;
 
+    /// <summary>
+    /// The area's dust colour in xyz - what <c>DustColor</c> reads - set per drawing.
+    /// </summary>
+    /// <remarks>
+    /// THE ENGINE'S <c>dust_color</c>, a per-pass uniform (common.ffx), and the area's .env is where it
+    /// comes from: <c>area.dust_color</c>, three numbers, in 450 of the install's 861 environments. So
+    /// it is handed in like the clock rather than compiled in - one material is drawn under many
+    /// areas. Its w is not given anywhere and no graph is let read it (see Implied).
+    /// </remarks>
+    internal const int Dust = 11;
+
     /// <summary>How many registers are the mesh's own, before any a program allocates.</summary>
-    private const int Fixed = 11;
+    private const int Fixed = 12;
 
     /// <summary>Stands in for FixModelTBN's basis, which only ParallaxUvSpace takes - see <see cref="Basis"/>.</summary>
     private const int FixedBasis = -3;
@@ -263,7 +274,7 @@ public sealed class ShadeProgram
             "FromVertexNormal", "FromVertexWorldPos", "FromVertexLocalPosition", "InputVertexPosition", "InputVertexNormal", "InputVertexColor",
             "FromVertexColor", "Time",
             "ModelOrigin", "GroundScroll", "Transform", "LookUpTexture",
-            "Noise31", "PerlinNoise31", "Vibrance", "Rotate", "RotateUV", "RadiusToPolarNorm",
+            "Noise31", "PerlinNoise31", "Vibrance", "Rotate", "RotateUV", "RadiusToPolarNorm", "DustColor",
             "DepthDistance", "GetDepthDistance", "MaskedContactFade", "ViewDir", "FixModelTBN", "ParallaxUvSpace",
         ],
         StringComparer.Ordinal);
@@ -510,17 +521,27 @@ public sealed class ShadeProgram
 
         // WHAT EACH NAMED VALUE HOLDS NOW, by register, and which of its components nobody has set.
         // The colour starts unwritten: a graph that reads it before any has written it has nothing to
-        // read. The rest start as the engine's InitSurface and InitMaterial leave them, where every
-        // lighting model leaves them alike - the indirect light's w is the material's own ambient
-        // occlusion, a uniform this has not got, and the specular, emissive and gloss differ between
-        // the models (texturing.ffx), so those are unset. The TBN basis is the model's own, which
-        // ParallaxUvSpaceContactFade hands on as "model_tbn_basis".
+        // read. The rest start as the engine's InitSurface and InitMaterial leave them (lighting.ffx,
+        // texturing.ffx). The TBN basis is the model's own, which ParallaxUvSpaceContactFade hands on
+        // as "model_tbn_basis".
+        //
+        // THE EMISSIVE STARTS BLACK: nought outright in the Phong and anisotropic models, and
+        // material_emission in the spec-gloss one, which is nought unless PBR_MATERIAL_UNIFORMS is
+        // defined - it is defined nowhere in the shipped sources, and no material file carries an
+        // emission to fill such a uniform. MASK_UVs_Static reads it before any graph writes it, and
+        // that read alone kept every material masking by it uncoloured.
+        //
+        // The same reading starts the specular white and the indirect light's w at one. Those stay
+        // unset here, because the specular this carries is the one a graph wrote (see Glossy): a
+        // default specular would light every material that never writes one, which wants its own
+        // check against the game.
         var state = new Dictionary<string, Held>(StringComparer.Ordinal)
         {
             ["UV"] = new(Coordinates, 0),
             ["WorldPos"] = new(Position, 0),
             ["WorldNormal"] = new(Normal, 0),
             ["IndirectColor"] = new(build.Constant(Vector4.Zero), 0b1000),
+            ["EmissiveColor"] = new(build.Constant(Vector4.Zero), 0),
             ["SubsurfaceColor"] = new(build.Constant(Vector4.Zero), 0),
             ["TbnNormal"] = new(build.Constant(new Vector4(0f, 0f, 1f, 0f)), 0),
             ["TbnBasis"] = new(Basis, 0),
@@ -693,8 +714,8 @@ public sealed class ShadeProgram
         }
 
         // THE SPECULAR COLOUR AND THE GLOSS, where the graphs wrote them whole: what a metal's colour
-        // is, its albedo being black - see Glossy. Neither starts set, since the lighting models
-        // start them differently (see the state above), so one no graph wrote is not there.
+        // is, its albedo being black - see Glossy. Neither starts set (see the state above), so one
+        // no graph wrote is not there.
         int specular = state.TryGetValue("SpecularColor", out Held shine) && (shine.Unset & 0b0111) == 0 ? shine.Register : -1;
         int gloss = specular >= 0 && state.TryGetValue("Glossiness", out Held smooth) && (smooth.Unset & 0b0001) == 0 ? smooth.Register : -1;
 
@@ -760,9 +781,11 @@ public sealed class ShadeProgram
     /// <param name="registers">The registers.</param>
     /// <param name="time">The clock - see <see cref="Clock"/>.</param>
     /// <param name="eye">The way into the picture and the origin's depth - see <see cref="Eye"/>.</param>
-    internal void Preset(Span<Vector4> registers, float time = 0f, Vector4 eye = default)
+    /// <param name="dust">The area's dust colour - see <see cref="Dust"/>.</param>
+    internal void Preset(Span<Vector4> registers, float time, Vector4 eye, Vector3 dust)
     {
         registers[Clock] = new Vector4(time);
+        registers[Dust] = new Vector4(dust, 0f);
         registers[Behind] = new Vector4(float.MaxValue);
         registers[Eye] = eye;
         registers[Tangent] = Vector4.Zero;
@@ -1993,6 +2016,10 @@ public sealed class ShadeProgram
             "b" => "z",
             _ => string.Empty,
         },
+
+        // THE DUST'S W IS NO SWIZZLE OF IT: the .env gives three numbers and nothing says what the
+        // engine puts after them, so a link reading the w is refused rather than handed one - see Dust.
+        "DustColor" => variable == "color" ? "xyz" : string.Empty,
         _ => string.Empty,
     };
 
@@ -2930,9 +2957,7 @@ public sealed class ShadeProgram
                 case "SelectFloat4":
                 case "SelectBool":
                 case "SelectUInt":
-                    return Port(node, "a") is { } no && Port(node, "b") is { } yes && Port(node, "condition") is { } condition
-                        ? build.Emit(Op.Select, no, yes, condition, splat: splat)
-                        : null;
+                    return Selected(node, splat);
 
                 case "SelectChannel":
                     return Port(node, "input") is { } channels && Port(node, "index") is { } index
@@ -2957,7 +2982,9 @@ public sealed class ShadeProgram
                     return Compare(node, Either);
 
                 case "Not":
-                    return Port(node, "a") is { } negated ? build.Emit(Op.Compare, negated, extra: Not) : null;
+                    return Port(node, "a") is not { } negated ? null
+                        : build.ConstantOf(negated, out Vector4 fixedNot) ? build.Constant(new Vector4(Compared(fixedNot.X, 0f, Not) ? 1f : 0f))
+                        : build.Emit(Op.Compare, negated, extra: Not);
 
                 // THE INPUT ITSELF: each output is one of its components - see Implied.
                 case "Float2ToCoords":
@@ -3077,6 +3104,10 @@ public sealed class ShadeProgram
                 case "Time":
                     return Clock;
 
+                // color = dust_color - the area's, handed in per drawing. See Dust.
+                case "DustColor":
+                    return Dust;
+
                 case "LookUpTexture":
                     return LookedUp(node);
 
@@ -3136,8 +3167,49 @@ public sealed class ShadeProgram
         private int? Constanted(ShaderNode node, Op op, bool splat)
             => Port(node, "a") is { } a ? build.Emit(op, a, build.Constant(Vectored(Parameter(node, 0).Numbers)), splat: splat) : null;
 
+        /// <summary>A comparison - worked out here where both sides are constants, so a select it decides can be too.</summary>
         private int? Compare(ShaderNode node, int how)
-            => Port(node, "a") is { } a && Port(node, "b") is { } b ? build.Emit(Op.Compare, a, b, extra: how) : null;
+        {
+            if (Port(node, "a") is not { } a || Port(node, "b") is not { } b)
+            {
+                return null;
+            }
+
+            return build.ConstantOf(a, out Vector4 left) && build.ConstantOf(b, out Vector4 right)
+                ? build.Constant(new Vector4(Compared(left.X, right.X, how) ? 1f : 0f))
+                : build.Emit(Op.Compare, a, b, extra: how);
+        }
+
+        /// <summary>
+        /// SelectFloat and its kin: b where the condition's x is not nought, else a - and only the side taken, where the condition is a constant.
+        /// </summary>
+        /// <remarks>
+        /// ONE SIDE, NOT BOTH, WHERE THE MATERIAL HAS DECIDED. The mask graphs are switchboards:
+        /// MASK_UVs_Static picks its mask type, its channel and its operation by twenty selects, every
+        /// one of them on a parameter the material sets, and the sides it does not take run through
+        /// nodes this does not evaluate. Compiling both sides failed the whole write on a node the
+        /// material never reaches. The select takes the whole of one side, so the side not taken
+        /// cannot change the result - the game's compiler drops it the same way.
+        ///
+        /// THE CONDITION FIRST, then, so whether it is fixed is known before either side is compiled.
+        /// </remarks>
+        private int? Selected(ShaderNode node, bool splat)
+        {
+            if (Port(node, "condition") is not { } condition)
+            {
+                return null;
+            }
+
+            if (build.ConstantOf(condition, out Vector4 decided))
+            {
+                int? taken = Port(node, decided.X != 0f ? "b" : "a");
+                return taken is { } side && splat ? build.Emit(Op.Swizzle, side, extra: Spread) : taken;
+            }
+
+            return Port(node, "a") is { } no && Port(node, "b") is { } yes
+                ? build.Emit(Op.Select, no, yes, condition, splat: splat)
+                : null;
+        }
 
         /// <summary>CoordsToFloat2, 3 and 4: each float input's x put in its own component.</summary>
         private int? Assembled(ShaderNode node, int width)

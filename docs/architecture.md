@@ -417,6 +417,27 @@ own wrapper answered only "invalid profile" there. HLSL's reserved words are a t
 catches and a reading does not: `point` and `linear` are keywords, and a helper called `Shade`
 clashed with the constant of that name.
 
+**What a graph reads from outside its material.** The channels start where the engine's `InitSurface`
+and `InitMaterial` leave them; the emissive among them is black in every lighting model (nought
+outright, or `material_emission`, which no shipped source defines and no material file fills), so
+`MASK_UVs_Static` reading it before any graph writes it reads nought. A **select whose condition is a
+constant** - a parameter the material sets, compared with another constant, as the mask graphs'
+switchboards are - compiles the side it takes alone: the other may run through nodes nothing
+evaluates, and compiling both sides cost the whole graph for a branch the material never reaches
+(`TWEAK_AlbedoTint`'s mask texture, `MASK_UVs_Static`'s twenty switches). **`DustColor`** is the
+engine's per-pass `dust_color`, and its source is the area's `.env` (`area.dust_color`, three numbers,
+in 450 of 861 files): handed in per drawing like the clock (`ShadeProgram.Dust`, `MeshPicture.Canvas.Dust`,
+`ModelScene.Dust`), its w refused since nothing gives one, and `EnvironmentSettings.AssumedDust` - a
+grey of a half, said as assumed - where the file sets none. `LightHunt` looks for the file's colour in
+the game's memory beside the sun's vector, so where the engine keeps it can be read in an area whose
+file sets none.
+
+**The Memory Dissector finds as well as reads** (`PatternHunt`): a text, one byte a character and
+two, or every pointer to the address on show, through the whole of the game's memory nearest its own
+image first, each place listed with the bytes round it and a click away. It is for the questions no
+file answers but the game's data does - the order a material's shader stages run in, which no shader
+source gives (`ShadeProgram.Stages` leaves a write it cannot order out and names it), is the first.
+
 **A free sun** stands where it is put - two sliders, its bearing on the game's screen and its
 height, or shift + drag in the model window (`IMovableSun`), the drag's direction measured through
 the picture's camera so the sun's mark follows the hand. While it moves its shadow map is 512

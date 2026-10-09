@@ -1,0 +1,1075 @@
+{
+    "version": 6,
+    "shader_group": [
+        "Material"
+    ],
+    "overriden_lighting_model": "SpecGlossPbrMaterial",
+    "description": "Allows you to Apply a Tint to the Albedo Value of a Material.",
+    "nodes": [
+        {
+            "type": "InputUV",
+            "index": 0,
+            "stage": "Texturing_Init",
+            "ui_position": [
+                1216.0,
+                960.0
+            ]
+        },
+        {
+            "type": "UV",
+            "index": 0,
+            "stage": "Texturing_Init",
+            "ui_position": [
+                5184.0,
+                960.0
+            ]
+        },
+        {
+            "type": "InputAlbedoColor",
+            "index": 0,
+            "stage": "Texturing_Init",
+            "ui_position": [
+                1216.0,
+                960.0
+            ]
+        },
+        {
+            "type": "Dummy3",
+            "index": 7,
+            "ui_position": [
+                1600.0,
+                448.0
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "Dummy3",
+            "index": 16,
+            "ui_position": [
+                1920.0,
+                -64.0
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "Dummy3",
+            "index": 17,
+            "ui_position": [
+                3199.99951171875,
+                -64.0
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "ConstantFloat3",
+            "index": 0,
+            "parameters": [
+                {
+                    "value": [
+                        1.0,
+                        1.0,
+                        1.0
+                    ],
+                    "layout": {
+                        "mode": "ColorPicker",
+                        "priority": 1,
+                        "icon": 162,
+                        "unit": "RGB",
+                        "tooltip": "Select the Tint Colour. ",
+                        "group": "Tint"
+                    }
+                }
+            ],
+            "custom_parameter": "Tint_Colour",
+            "ui_position": [
+                1216.0,
+                192.0
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "Dummy3",
+            "index": 9,
+            "ui_position": [
+                2752.0,
+                192.0
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "Dummy3",
+            "index": 11,
+            "ui_position": [
+                1600.0,
+                384.0
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "Dummy3",
+            "index": 8,
+            "ui_position": [
+                1920.0,
+                512.0
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "Dummy3",
+            "index": 12,
+            "ui_position": [
+                2240.0,
+                512.0
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "Multiply3",
+            "index": 2,
+            "ui_position": [
+                2496.0,
+                448.0
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "OneMinus3",
+            "index": 0,
+            "ui_position": [
+                2048.0,
+                320.0
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "OneMinus3",
+            "index": 1,
+            "ui_position": [
+                2048.0,
+                384.0
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "Multiply3",
+            "index": 3,
+            "ui_position": [
+                2304.0,
+                320.0
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "OneMinus3",
+            "index": 2,
+            "ui_position": [
+                2496.0,
+                320.0
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "GrayScale",
+            "index": 0,
+            "ui_position": [
+                1920.0,
+                640.0
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "ConstantFloat",
+            "index": 10,
+            "parameters": [
+                {
+                    "value": 2.25,
+                    "layout": {
+                        "priority": 4,
+                        "icon": 53,
+                        "tooltip": "Control the Contrast of the Underlying Channel.",
+                        "group": "Base Albedo",
+                        "range": [
+                            {
+                                "min": 0.0,
+                                "max": 3.0
+                            }
+                        ]
+                    }
+                }
+            ],
+            "custom_parameter": "Contrast_Power",
+            "ui_position": [
+                1920.0,
+                768.0
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "Power",
+            "index": 0,
+            "ui_position": [
+                2432.0,
+                640.0
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "Lerp3",
+            "index": 4,
+            "ui_position": [
+                2752.0,
+                448.0
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "Saturate3",
+            "index": 0,
+            "ui_position": [
+                2944.0,
+                448.0
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "ConstantFloat",
+            "index": 9,
+            "parameters": [
+                {
+                    "value": 100.0,
+                    "layout": {
+                        "priority": 3,
+                        "icon": 153,
+                        "unit": "Percentage",
+                        "tooltip": "Control how much the Underlying Channel Influences the Tint.",
+                        "group": "Base Albedo",
+                        "range": [
+                            {
+                                "min": 0.0,
+                                "max": 100.0
+                            }
+                        ]
+                    }
+                }
+            ],
+            "custom_parameter": "Base_Albedo_Influence",
+            "ui_position": [
+                2560.0,
+                64.0
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "MultiplyConst",
+            "index": 1,
+            "parameters": [
+                {
+                    "value": 0.009999999776482582
+                }
+            ],
+            "ui_position": [
+                2880.0,
+                64.0
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "Lerp3",
+            "index": 5,
+            "ui_position": [
+                3264.0,
+                192.0
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "ConstantFloat",
+            "index": 11,
+            "parameters": [
+                {
+                    "value": 1.0,
+                    "layout": {
+                        "priority": 2,
+                        "icon": 52,
+                        "tooltip": "Set the Overall Intensity of the Tint.",
+                        "group": "Tint"
+                    }
+                }
+            ],
+            "custom_parameter": "Tint_Intensity",
+            "ui_position": [
+                3264.0,
+                320.0
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "Lerp3",
+            "index": 7,
+            "ui_position": [
+                3648.0,
+                192.0
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "Saturate3",
+            "index": 1,
+            "ui_position": [
+                3840.0,
+                192.0
+            ],
+            "group_id": "<Group>_0"
+        },
+        {
+            "type": "Dummy3",
+            "index": 15,
+            "ui_position": [
+                1600.0,
+                1152.0
+            ]
+        },
+        {
+            "type": "Dummy3",
+            "index": 13,
+            "ui_position": [
+                3392.0,
+                1152.0
+            ],
+            "group_id": "<Group>_1"
+        },
+        {
+            "type": "Dummy3",
+            "index": 10,
+            "ui_position": [
+                3968.0,
+                1152.0
+            ],
+            "group_id": "<Group>_1"
+        },
+        {
+            "type": "InputTexture",
+            "index": 0,
+            "parameters": [
+                {
+                    "srgb": false,
+                    "layout": {
+                        "icon": 77,
+                        "priority": 11,
+                        "tooltip": "Mask Map for Isolating only Part of the Material to Tweak.",
+                        "group": "Mask"
+                    }
+                }
+            ],
+            "custom_parameter": "Mask_Input",
+            "ui_position": [
+                3392.0,
+                1280.0
+            ],
+            "group_id": "<Group>_1"
+        },
+        {
+            "type": "Dummy2",
+            "index": 1,
+            "ui_position": [
+                1600.0,
+                1472.0
+            ]
+        },
+        {
+            "type": "Dummy2",
+            "index": 0,
+            "ui_position": [
+                3392.0,
+                1472.0
+            ],
+            "group_id": "<Group>_1"
+        },
+        {
+            "type": "SampleInputTexture",
+            "index": 0,
+            "parameters": [
+                {}
+            ],
+            "ui_position": [
+                3776.0,
+                1280.0
+            ],
+            "group_id": "<Group>_1"
+        },
+        {
+            "type": "Lerp3",
+            "index": 6,
+            "ui_position": [
+                4224.0,
+                1152.0
+            ],
+            "group_id": "<Group>_1"
+        },
+        {
+            "type": "Dummy3",
+            "index": 14,
+            "ui_position": [
+                4544.00244140625,
+                1152.0
+            ],
+            "group_id": "<Group>_1"
+        },
+        {
+            "type": "ConstantBool",
+            "index": 0,
+            "parameters": [
+                {
+                    "layout": {
+                        "icon": 137,
+                        "priority": 10,
+                        "tooltip": "Enable the Mask to Isolate Part of the Material to Tweak.",
+                        "group": "Mask"
+                    }
+                }
+            ],
+            "custom_parameter": "Enable_MaskInput",
+            "ui_position": [
+                4416.00244140625,
+                1280.0
+            ],
+            "group_id": "<Group>_1"
+        },
+        {
+            "type": "SelectFloat3",
+            "index": 0,
+            "ui_position": [
+                4800.00244140625,
+                1152.0
+            ],
+            "group_id": "<Group>_1"
+        },
+        {
+            "type": "AlbedoColor",
+            "index": 0,
+            "stage": "Texturing_Init",
+            "ui_position": [
+                5184.0,
+                960.0
+            ]
+        },
+        {
+            "type": "<Group>",
+            "index": 0,
+            "ui_position": [
+                1152.0,
+                -128.0
+            ],
+            "ui_size": [
+                2906.66943359375,
+                1024.000244140625
+            ],
+            "title": "Albedo Tint",
+            "group_color": [
+                49.000003814697269,
+                49.000003814697269,
+                140.0,
+                255.0
+            ]
+        },
+        {
+            "type": "<Group>",
+            "index": 1,
+            "ui_position": [
+                3328.0,
+                1088.0
+            ],
+            "ui_size": [
+                1728.0,
+                512.0
+            ],
+            "title": "Mask Input",
+            "group_color": [
+                0.0,
+                0.0,
+                0.0,
+                255.0
+            ]
+        }
+    ],
+    "links": [
+        {
+            "src": {
+                "type": "InputUV",
+                "index": 0,
+                "stage": "Texturing_Init",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "UV",
+                "index": 0,
+                "stage": "Texturing_Init",
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputAlbedoColor",
+                "index": 0,
+                "stage": "Texturing_Init",
+                "variable": "output",
+                "swizzle": "xyz"
+            },
+            "dst": {
+                "type": "Dummy3",
+                "index": 7,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 7,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Dummy3",
+                "index": 16,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 16,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Dummy3",
+                "index": 17,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat3",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Dummy3",
+                "index": 9,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat3",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Dummy3",
+                "index": 11,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 11,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Dummy3",
+                "index": 8,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 8,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Dummy3",
+                "index": 12,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 7,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Multiply3",
+                "index": 2,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 12,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Multiply3",
+                "index": 2,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 7,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "OneMinus3",
+                "index": 0,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 11,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "OneMinus3",
+                "index": 1,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "OneMinus3",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply3",
+                "index": 3,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "OneMinus3",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Multiply3",
+                "index": 3,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply3",
+                "index": 3,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "OneMinus3",
+                "index": 2,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 7,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "GrayScale",
+                "index": 0,
+                "variable": "in_color"
+            }
+        },
+        {
+            "src": {
+                "type": "GrayScale",
+                "index": 0,
+                "variable": "out_color",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "Power",
+                "index": 0,
+                "variable": "base"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat",
+                "index": 10,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Power",
+                "index": 0,
+                "variable": "exp"
+            }
+        },
+        {
+            "src": {
+                "type": "Multiply3",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 4,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "OneMinus3",
+                "index": 2,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 4,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "Power",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 4,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp3",
+                "index": 4,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate3",
+                "index": 0,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat",
+                "index": 9,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "MultiplyConst",
+                "index": 1,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 9,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 5,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate3",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 5,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "MultiplyConst",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 5,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 17,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 7,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp3",
+                "index": 5,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 7,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantFloat",
+                "index": 11,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 7,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp3",
+                "index": 7,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Saturate3",
+                "index": 1,
+                "variable": "input"
+            }
+        },
+        {
+            "src": {
+                "type": "InputAlbedoColor",
+                "index": 0,
+                "stage": "Texturing_Init",
+                "variable": "output",
+                "swizzle": "xyz"
+            },
+            "dst": {
+                "type": "Dummy3",
+                "index": 15,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 15,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Dummy3",
+                "index": 13,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 13,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Dummy3",
+                "index": 10,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "InputUV",
+                "index": 0,
+                "stage": "Texturing_Init",
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Dummy2",
+                "index": 1,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy2",
+                "index": 1,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Dummy2",
+                "index": 0,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "InputTexture",
+                "index": 0,
+                "variable": "out_texture"
+            },
+            "dst": {
+                "type": "SampleInputTexture",
+                "index": 0,
+                "variable": "in_texture"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy2",
+                "index": 0,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "SampleInputTexture",
+                "index": 0,
+                "variable": "uv"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate3",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 6,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 10,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 6,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "SampleInputTexture",
+                "index": 0,
+                "variable": "color",
+                "swizzle": "x"
+            },
+            "dst": {
+                "type": "Lerp3",
+                "index": 6,
+                "variable": "alpha"
+            }
+        },
+        {
+            "src": {
+                "type": "Lerp3",
+                "index": 6,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "Dummy3",
+                "index": 14,
+                "variable": "in_value"
+            }
+        },
+        {
+            "src": {
+                "type": "Saturate3",
+                "index": 1,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SelectFloat3",
+                "index": 0,
+                "variable": "a"
+            }
+        },
+        {
+            "src": {
+                "type": "Dummy3",
+                "index": 14,
+                "variable": "out_value"
+            },
+            "dst": {
+                "type": "SelectFloat3",
+                "index": 0,
+                "variable": "b"
+            }
+        },
+        {
+            "src": {
+                "type": "ConstantBool",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "SelectFloat3",
+                "index": 0,
+                "variable": "condition"
+            }
+        },
+        {
+            "src": {
+                "type": "InputAlbedoColor",
+                "index": 0,
+                "stage": "Texturing_Init",
+                "variable": "output",
+                "swizzle": "w"
+            },
+            "dst": {
+                "type": "AlbedoColor",
+                "index": 0,
+                "stage": "Texturing_Init",
+                "variable": "input",
+                "swizzle": "w"
+            }
+        },
+        {
+            "src": {
+                "type": "SelectFloat3",
+                "index": 0,
+                "variable": "output"
+            },
+            "dst": {
+                "type": "AlbedoColor",
+                "index": 0,
+                "stage": "Texturing_Init",
+                "variable": "input",
+                "swizzle": "xyz"
+            }
+        }
+    ],
+    "unused_links": [
+        {
+            "src": {
+                "type": "InputAlbedoColor",
+                "index": 0,
+                "stage": "Texturing_Init",
+                "variable": "output",
+                "swizzle": "xyz"
+            }
+        }
+    ]
+}

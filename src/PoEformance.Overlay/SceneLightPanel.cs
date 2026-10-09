@@ -112,6 +112,8 @@ public sealed class SceneLightPanel : IMovableSun
     private bool _moving;
 
     private string _loadedPath = "\0";
+    private string _dustPath = "\0";
+    private Vector3 _dust = EnvironmentSettings.AssumedDust;
     private EnvironmentSettings _environment = EnvironmentSettings.None;
     private CubeMap? _cube;
     private string _cubeSaid = string.Empty;
@@ -827,6 +829,32 @@ public sealed class SceneLightPanel : IMovableSun
         }
 
         ImGui.TreePop();
+    }
+
+    /// <summary>
+    /// The dust colour a model's materials read: the environment in use's area.dust_color, or the assumed one where it sets none - whether the game's light is on or not.
+    /// </summary>
+    /// <remarks>
+    /// THE FILE ALONE, not <see cref="Load"/>: that decodes the environment's cube and colour grade too,
+    /// which a picture under the lamp has no use for, and it is asked every frame.
+    /// </remarks>
+    public Vector3 Dust()
+    {
+        string path = Chosen();
+        if (string.Equals(path, _loadedPath, StringComparison.OrdinalIgnoreCase))
+        {
+            return _environment.DustColour;
+        }
+
+        if (!string.Equals(path, _dustPath, StringComparison.OrdinalIgnoreCase))
+        {
+            _dustPath = path;
+            _dust = path.Length == 0 || _read is null
+                ? EnvironmentSettings.AssumedDust
+                : EnvironmentSettings.Read(path, _read(path.Replace('\\', '/').Trim())).DustColour;
+        }
+
+        return _dust;
     }
 
     /// <summary>The .env in use: the picked one, else the area's.</summary>

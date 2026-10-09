@@ -724,6 +724,19 @@ public sealed class MonsterPortrait
     private SceneLight? Lit() => SceneLit?.Invoke(_model);
 
     /// <summary>
+    /// The area's dust colour a material's DustColor reads, or null for the assumed one - asked whether the game's light is on or not.
+    /// </summary>
+    /// <remarks>
+    /// NOT PART OF THE LIGHT: the dust is a colour the graphs lay over a material's own, so a picture
+    /// under the lamp wears it as one under the game's light does. See ShadeProgram.Dust.
+    /// </remarks>
+    public Func<Vector3>? SceneDust { get; set; }
+
+    private Vector3 Dusted() => SceneDust?.Invoke() ?? EnvironmentSettings.AssumedDust;
+
+    private Vector3 _drawnDust = EnvironmentSettings.AssumedDust;
+
+    /// <summary>
     /// Which tilesets place which tile, for a tile's dump to find the areas that use it - see ModelDump.OfTile.
     /// </summary>
     public TilesetCatalog? Tilesets { get; set; }
@@ -2743,6 +2756,7 @@ public sealed class MonsterPortrait
             || !ReferenceEquals(_drawnShades, ShadesOf(_model))
             || !ReferenceEquals(_drawnBlends, Blends())
             || !ReferenceEquals(_drawnLight, Lit())
+            || _drawnDust != Dusted()
             || (posed && (_drawnFrame != _frame || _drawnAnimation != _chosen))
             || _drawnCardOn != (Card?.On ?? false)
             || (_cardWaiting && Card is { On: true } card && card.Gpu is { } gpu && gpu.Landed != _cardLanded)
@@ -2995,6 +3009,7 @@ public sealed class MonsterPortrait
         }
 
         canvas.Time = _clock;
+        canvas.Dust = _drawnDust;
         _drawnClock = _clock;
         MonsterModel model = _model;
         float turn = _turn;
@@ -3095,6 +3110,7 @@ public sealed class MonsterPortrait
         _drawnShades = ShadesOf(_model);
         _drawnBlends = Blends();
         _drawnLight = Lit();
+        _drawnDust = Dusted();
         _drawnCardOn = Card?.On ?? false;
         _drawing++;
 
@@ -3193,7 +3209,7 @@ public sealed class MonsterPortrait
 
         var scene = new ModelScene(
             _model.Mesh, _turn, _tilt, Ink, _model.Skin, _zoom, _pan, _model.Skins, Blends(),
-            moving ? _posed : null, moving ? _posedNormals : null, _drawnLight, ShadesOf(_model), _clock);
+            moving ? _posed : null, moving ? _posedNormals : null, _drawnLight, ShadesOf(_model), _clock, _drawnDust);
         if (!gpu.Can(scene, out string why))
         {
             // A MATERIAL'S SHADER STILL COMPILING is the usual no: the picture is the processor's until
@@ -3858,6 +3874,7 @@ public sealed class MonsterPortrait
     private MeshPicture.Canvas Clocked(MeshPicture.Canvas canvas)
     {
         canvas.Time = _clock;
+        canvas.Dust = _drawnDust;
         return canvas;
     }
 

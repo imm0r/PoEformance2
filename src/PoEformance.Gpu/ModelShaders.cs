@@ -55,6 +55,7 @@ internal static class ModelShaders
             float4 Clock;     // x: the clock - ShadeProgram.Clock
             float4 Eye;       // the way into the picture in model space and the origin's depth - ShadeProgram.Eye
             float4 Depth;     // x: the reach the depth buffer was laid over
+            float4 Dust;      // xyz: the area's dust colour - ShadeProgram.Dust
         };
 
         cbuffer Part : register(b1)
@@ -607,7 +608,7 @@ internal static class ModelShaders
         ShadeOut Ran(Pixel pixel, bool translucent)
         {
             float behind = translucent && ShadeUsesDepth ? BehindAt(pixel.position) : 3.40282347e38;
-            return ShadeRun(Wrap, pixel.spot, pixel.place, pixel.turn, pixel.tint, behind, Clock.x, Eye);
+            return ShadeRun(Wrap, pixel.spot, pixel.place, pixel.turn, pixel.tint, behind, Clock.x, Eye, Dust.xyz);
         }
 
         // MeshPicture.Drawing.Lit with a program.

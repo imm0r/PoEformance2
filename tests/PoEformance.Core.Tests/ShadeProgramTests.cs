@@ -1418,20 +1418,21 @@ public class ShadeProgramTests
     /// GoldPropsc.mat from the channel 1open_01 dump. SpecGlossSpecMaskOpaqueBN multiplies the albedo
     /// by a ConstantPixel left at its declared nought wherever the texture's alpha - its specular
     /// mask - is one, and lays the texture's colour into the specular there instead. The flat
-    /// program carries the specular and not the gloss, whose texture - the normal map's w - only the
-    /// glossy one reads.
+    /// program carries the specular and not the gloss. DustForAOs lays the area's dust over it - see
+    /// ShadeProgram.Dust - where the normal faces up and the occlusion is open, and both of those are
+    /// the normal map's, so the flat program reads that map too; it was left out until DustColor was read.
     /// </remarks>
     [Fact]
     public void THEGOLDPROPSMATERIALCarriesItsSpecularAndItsGloss()
     {
         ShadeCompile compiled = Real("Art/Textures/Environment/desert/Keth/GoldPropsc.mat");
 
-        Assert.Equal(["DustColor in DustForAOs"], compiled.Skipped);
+        Assert.Empty(compiled.Skipped);
         ShadeProgram program = Assert.IsType<ShadeProgram>(compiled.Program);
         Assert.True(program.HasSpecular);
         Assert.False(program.HasGloss);
         Assert.Equal(-1, program.Plain);
-        Assert.DoesNotContain(program.Textures, one => one.Path.EndsWith("GoldProps_normal_DXT5.dds", StringComparison.Ordinal));
+        Assert.Contains(program.Textures, one => one.Path.EndsWith("GoldProps_normal_DXT5.dds", StringComparison.Ordinal));
 
         ShadeProgram glossy = Assert.IsType<ShadeProgram>(program.Glossy);
         Assert.True(glossy.HasGloss);
@@ -1881,6 +1882,129 @@ public class ShadeProgramTests
              "links":[
               {"src":{"type":"ConstantPixel3","index":0,"variable":"output"},"dst":{"type":"AlbedoColor","index":0,"stage":"Texturing_Init","variable":"input","swizzle":"xyz"}}]}
             """);
+
+    /// <summary>The emissive channel starts black, so a graph that reads it before any writes it reads nought - MASK_UVs_Static does.</summary>
+    [Fact]
+    public void THEEMISSIVEStartsBlackSoAReadBeforeAnyWriteAddsNothing()
+    {
+        string graph = Colouring(
+            """
+              {"type":"ConstantPixel3","index":0,"parameters":[{"value":[0.2,0.4,0.6]}]},
+              {"type":"InputEmissiveColor","index":0,"stage":"Texturing_Init"},
+              {"type":"Add3","index":0}
+            """,
+            """
+              {"src":{"type":"ConstantPixel3","index":0,"variable":"output"},"dst":{"type":"Add3","index":0,"variable":"a"}},
+              {"src":{"type":"InputEmissiveColor","index":0,"stage":"Texturing_Init","variable":"output"},"dst":{"type":"Add3","index":0,"variable":"b"}}
+            """,
+            "Add3", "output");
+
+        AssertColour(graph, 0.2f, 0.4f, 0.6f);
+    }
+
+    /// <summary>A select whose condition is a constant compiles the side it takes alone - the other may hold a node this does not know.</summary>
+    [Theory]
+    [InlineData(false, 0.2f)]
+    [InlineData(true, 0.7f)]
+    public void ASELECTOnAConstantTakesItsSideAndNeverLooksAtTheOther(bool taken, float red)
+    {
+        // The side not taken is a node no evaluator knows: compiling it would leave the whole graph out.
+        string Side(bool mine, float value) => mine == taken
+            ? string.Create(System.Globalization.CultureInfo.InvariantCulture, $$$"""{"type":"ConstantPixel3","index":{{{(mine ? 1 : 0)}}},"parameters":[{"value":[{{{value}}},0.1,0.1]}]}""")
+            : $$$"""{"type":"NoSuchNode","index":{{{(mine ? 1 : 0)}}}}""";
+        string Out(bool mine) => mine == taken ? "ConstantPixel3" : "NoSuchNode";
+        string graph = Colouring(
+            $$$"""
+              {"type":"ConstantBool","index":0,"parameters":[{"value":{{{(taken ? "true" : "false")}}}}]},
+              {{{Side(false, 0.2f)}}},
+              {{{Side(true, 0.7f)}}},
+              {"type":"SelectFloat3","index":0}
+            """,
+            $$$"""
+              {"src":{"type":"ConstantBool","index":0,"variable":"output"},"dst":{"type":"SelectFloat3","index":0,"variable":"condition"}},
+              {"src":{"type":"{{{Out(false)}}}","index":0,"variable":"output"},"dst":{"type":"SelectFloat3","index":0,"variable":"a"}},
+              {"src":{"type":"{{{Out(true)}}}","index":1,"variable":"output"},"dst":{"type":"SelectFloat3","index":0,"variable":"b"}}
+            """,
+            "SelectFloat3", "output");
+
+        AssertColour(graph, red, 0.1f, 0.1f);
+    }
+
+    /// <summary>
+    /// And a condition the material decides - a parameter compared with a constant, as the mask graphs' switchboards are - is a constant too.
+    /// </summary>
+    [Theory]
+    [InlineData(1, 0.7f)]
+    [InlineData(2, 0.2f)]
+    public void ANDACOMPARISONOfAParameterTheMaterialSetsDecidesItTheSameWay(int chosen, float red)
+    {
+        ShaderGraph graph = Graph(Colouring(
+            """
+              {"type":"ConstantUInt","index":0,"custom_parameter":"Mask Type"},
+              {"type":"ConstantUInt","index":1,"parameters":[{"value":1}]},
+              {"type":"EqualsUInt","index":0},
+              {"type":"ConstantPixel3","index":0,"parameters":[{"value":[0.2,0.1,0.1]}]},
+              {"type":"ConstantPixel3","index":1,"parameters":[{"value":[0.7,0.1,0.1]}]},
+              {"type":"SelectFloat3","index":0}
+            """,
+            """
+              {"src":{"type":"ConstantUInt","index":0,"variable":"output"},"dst":{"type":"EqualsUInt","index":0,"variable":"a"}},
+              {"src":{"type":"ConstantUInt","index":1,"variable":"output"},"dst":{"type":"EqualsUInt","index":0,"variable":"b"}},
+              {"src":{"type":"EqualsUInt","index":0,"variable":"output"},"dst":{"type":"SelectFloat3","index":0,"variable":"condition"}},
+              {"src":{"type":"ConstantPixel3","index":0,"variable":"output"},"dst":{"type":"SelectFloat3","index":0,"variable":"a"}},
+              {"src":{"type":"ConstantPixel3","index":1,"variable":"output"},"dst":{"type":"SelectFloat3","index":0,"variable":"b"}}
+            """,
+            "SelectFloat3", "output"));
+        ShadeProgram program = Checked(ShadeProgram.Compile([(Instance(("Mask Type", [Numbers(chosen)])), graph)]));
+
+        AssertClose(
+            MeshPicture.Of(Quad(), 64, skins: [Sheet(Srgb(red), Srgb(0.1f), Srgb(0.1f))]),
+            MeshPicture.Of(Quad(), 64, shades: [program]));
+    }
+
+    /// <summary>TWEAK_AlbedoTint's mask texture sits behind a select on Enable_MaskInput, which INCU_FlatStone01c leaves off - and names no mask.</summary>
+    [Fact]
+    public void ATINTWhoseMaskIsSwitchedOffNeedsNoMaskTexture()
+        => Checked(Real("Art/Models/Terrain/Leagues/Incursion/Tiles/Textures/Architecture/Past/Interior/INCU_FlatStone01c.mat"));
+
+    /// <summary>DustColor is the area's dust colour, handed in like the clock: the canvas's, and the assumed grey where nobody set one.</summary>
+    [Fact]
+    public void DUSTCOLORIsTheAreasDustColourAsTheCanvasHandsItIn()
+    {
+        string graph = Colouring("""{"type":"DustColor","index":0}""", string.Empty, "DustColor", "color", "xyz");
+        ShadeProgram program = Compile(graph);
+
+        AssertClose(
+            MeshPicture.Of(Quad(), 64, skins: [Sheet(Srgb(0.5f), Srgb(0.5f), Srgb(0.5f))]),
+            MeshPicture.Of(Quad(), 64, shades: [program]));
+        AssertClose(
+            MeshPicture.Of(Quad(), 64, skins: [Sheet(Srgb(0.87f), Srgb(0.44f), Srgb(0.01f))]),
+            MeshPicture.Of(Quad(), new MeshPicture.Canvas(64) { Dust = new Vector3(0.87f, 0.44f, 0.01f) }, shades: [program]));
+    }
+
+    /// <summary>The .env gives three numbers, so a graph reading the dust's w is refused rather than handed one nobody wrote.</summary>
+    [Fact]
+    public void ANDITSWIsNoSwizzleOfIt()
+    {
+        string graph = Colouring(
+            """
+              {"type":"ConstantPixel3","index":0,"parameters":[{"value":[0.2,0.4,0.6]}]},
+              {"type":"DustColor","index":0},
+              {"type":"MultiplyConst3","index":0}
+            """,
+            """
+              {"src":{"type":"DustColor","index":0,"variable":"color","swizzle":"w"},"dst":{"type":"MultiplyConst3","index":0,"variable":"a"}}
+            """,
+            "MultiplyConst3", "output");
+        ShadeCompile compiled = ShadeProgram.Compile([(Instance(), Graph(graph))]);
+
+        Assert.Contains(compiled.Skipped, one => one.Contains("swizzle", StringComparison.Ordinal));
+    }
+
+    /// <summary>The waygate's floors lay the area's dust over their colour by DustColourTint, which now evaluates whole.</summary>
+    [Fact]
+    public void ADUSTTINTEvaluatesWhole()
+        => Checked(Real("Art/Models/Terrain/Leagues/Incursion/Tiles/WaygateDevice/Textures/Default/VAAL_FloorMechanisms01c.mat"));
 
     // ---- helpers ----
 
