@@ -429,14 +429,22 @@ engine's per-pass `dust_color`, and its source is the area's `.env` (`area.dust_
 in 450 of 861 files): handed in per drawing like the clock (`ShadeProgram.Dust`, `MeshPicture.Canvas.Dust`,
 `ModelScene.Dust`), its w refused since nothing gives one, and `EnvironmentSettings.AssumedDust` - a
 grey of a half, said as assumed - where the file sets none. `LightHunt` looks for the file's colour in
-the game's memory beside the sun's vector, so where the engine keeps it can be read in an area whose
-file sets none.
+the game's memory: in Excavation it lay 0x360 bytes after phi and 0x290 after hor_angle in each of the
+five copies of the parsed environment the report listed, so the hunt reads those places beside the
+angles it finds - the file's colour where the file sets one (a check that the place is still right),
+the engine's own where it does not. The offsets are the schema's (`ParsedEnvironment`, handed to the
+hunt as a `DustPlace`), with the measurement written beside them.
 
 **The Memory Dissector finds as well as reads** (`PatternHunt`): a text, one byte a character and
 two, or every pointer to the address on show, through the whole of the game's memory nearest its own
 image first, each place listed with the bytes round it and a click away. It is for the questions no
-file answers but the game's data does - the order a material's shader stages run in, which no shader
-source gives (`ShadeProgram.Stages` leaves a write it cannot order out and names it), is the first.
+file answers but the game's data does, and its first answer was the order a material's shader stages
+run in, which no shader source gives: the client keeps a table of the stage names - an array of
+`std::string` in its own image, UVSetup, UVSetup_Calc, UVSetup_Final, Texturing_Init, Texturing,
+Texturing_Calc, Texturing_Final, PreLighting, PreLighting_Calc, PreLighting_Final in a row - and the
+long names it put on the heap were allocated in the pipeline's own order. `ShadeProgram.Stages` runs
+them in that order, and no longer leaves out a write whose outcome hung on it. How it was found, and
+the two decoys beside it, is written down at the head of `schema/poe2.offsets.json`.
 
 **A free sun** stands where it is put - two sliders, its bearing on the game's screen and its
 height, or shift + drag in the model window (`IMovableSun`), the drag's direction measured through

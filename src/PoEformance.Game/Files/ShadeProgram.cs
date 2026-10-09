@@ -392,19 +392,21 @@ public sealed class ShadeProgram
 
     /// <summary>The stages a colour is assembled across, in the order they are run.</summary>
     /// <remarks>
-    /// THE ORDER IS NOT IN THE GAME'S SHADER SOURCES - no file lists it - so it is only as good as
-    /// what each step of it rests on:
-    /// <list type="bullet">
-    /// <item>coordinates are set up before textures are read with them, and the texturing is done
-    /// before the lighting's own pass over the colour - the stage FAMILIES in order;</item>
-    /// <item>a family's <c>_Init</c> pass comes before the rest of it: AGT_DesertDust at
-    /// Texturing_Calc lays dust over the colour DielectricSpecGlossBN wrote at Texturing_Init, and
-    /// ParallaxUvSpaceContactFade at Texturing_Final fades the alpha that same graph wrote;</item>
-    /// <item>nothing says how the plain stage, <c>_Calc</c> and <c>_Final</c> of one family fall
-    /// against each other. They are run in that order, and where it would matter - a write reads
-    /// what one at another of them writes, or both write one channel - that write is left out and
-    /// named rather than placed by a guess (see <see cref="Unordered"/>).</item>
-    /// </list>
+    /// THE ORDER IS THE ENGINE'S OWN TABLE OF STAGE NAMES, read out of the running game: no shader
+    /// source lists it, but the client keeps an array of std::string in its own image - 32 bytes an
+    /// entry, the short names inline and the long ones on the heap - and the Memory Dissector's find
+    /// turned it up on 2026-10-09 (how, and the decoys beside it, at the head of the offset schema): UVSetup, UVSetup_Calc, UVSetup_Final, Texturing_Init, Texturing,
+    /// Texturing_Calc, Texturing_Final, PreLighting, PreLighting_Calc, PreLighting_Final, one after the
+    /// other. The long names were allocated in the same order, and that order is the pipeline's -
+    /// ProjectionTransform and VertexOutput before PreLighting, CustomLighting and LightingEnd after
+    /// it - so the table is read as the order the stages run in. It agrees with what the graphs showed
+    /// before it was found: AGT_DesertDust at Texturing_Calc lays dust over the colour
+    /// DielectricSpecGlossBN wrote at Texturing_Init, and ParallaxUvSpaceContactFade at
+    /// Texturing_Final fades the alpha that same graph wrote.
+    ///
+    /// UNTIL THEN a write whose outcome hung on the plain stage, <c>_Calc</c> and <c>_Final</c> of one
+    /// family was left out and named; the particles of exit_01 and Dust_Triplanar were.
+    ///
     /// A colour written at any stage not here is left out and named.
     /// </remarks>
     public static readonly IReadOnlyList<string> Stages =
@@ -552,7 +554,6 @@ public sealed class ShadeProgram
 
         var lookups = new Lookup[chain.Count];
         var writers = new List<Writer>[chain.Count, Stages.Count];
-        var every = new List<Writer>();
         var moved = new Displaced(null, null);
         for (var link = 0; link < chain.Count; link++)
         {
@@ -581,9 +582,7 @@ public sealed class ShadeProgram
                     continue;
                 }
 
-                var writer = new Writer(node, at, Array.IndexOf(Channels, channel), Reads(lookups[link], node), Same(lookups[link], node, channel));
-                (writers[link, at] ??= []).Add(writer);
-                every.Add(writer);
+                (writers[link, at] ??= []).Add(new Writer(node, at, Array.IndexOf(Channels, channel)));
             }
         }
 
@@ -632,35 +631,27 @@ public sealed class ShadeProgram
                 {
                     string channel = Channels[writer.Channel];
                     string what = channel == "UV" ? $"{named}'s coordinates" : named;
-                    string why;
-                    if (Unordered(every, writer) is { } against)
+                    Builder.Mark mark = build.Marked();
+                    unit.Start();
+                    if (channel == "Albedo")
                     {
-                        why = $"{what} at {stage}, whose order against {against} is not known";
-                    }
-                    else
-                    {
-                        Builder.Mark mark = build.Marked();
-                        unit.Start();
-                        if (channel == "Albedo")
+                        // THE COLOUR'S W APART FROM ITS XYZ - see the class's remarks.
+                        if (unit.Colour(writer.Node) is { } colour && build.Fits)
                         {
-                            // THE COLOUR'S W APART FROM ITS XYZ - see the class's remarks.
-                            if (unit.Colour(writer.Node) is { } colour && build.Fits)
-                            {
-                                wrote.Add((channel, colour.Register, colour.Unset, colour.Alpha));
-                                continue;
-                            }
-                        }
-                        else if (unit.Port(writer.Node, "input") is { } register && build.Fits && (channel == "TbnBasis") == (register == Basis))
-                        {
-                            wrote.Add((channel, register, 0, true));
+                            wrote.Add((channel, colour.Register, colour.Unset, colour.Alpha));
                             continue;
                         }
-
-                        string stopped = !build.Fits ? "too many steps" : unit.Why.Length > 0 ? unit.Why : $"{writer.Node.Type} not from the basis it read";
-                        why = $"{stopped} in {what}";
-                        build.Back(mark);
-                        unit.Forget(mark.Next);
                     }
+                    else if (unit.Port(writer.Node, "input") is { } register && build.Fits && (channel == "TbnBasis") == (register == Basis))
+                    {
+                        wrote.Add((channel, register, 0, true));
+                        continue;
+                    }
+
+                    string stopped = !build.Fits ? "too many steps" : unit.Why.Length > 0 ? unit.Why : $"{writer.Node.Type} not from the basis it read";
+                    string why = $"{stopped} in {what}";
+                    build.Back(mark);
+                    unit.Forget(mark.Next);
 
                     // THE COLOUR AND THE COORDINATES ARE SAID WHEN LEFT OUT: one is what is drawn, the
                     // other is where every texture after it is read. A followed channel is lost.
@@ -1518,89 +1509,6 @@ public sealed class ShadeProgram
 
     private static int Mapped(int[] map, int register) => register >= 0 ? map[register] : register;
 
-    /// <summary>
-    /// The stage of a write this one's outcome hangs on though nothing says which runs first; else null.
-    /// </summary>
-    /// <remarks>
-    /// TWO STAGES ARE UNORDERED when they are of one family and neither is its <c>_Init</c> - see
-    /// <see cref="Stages"/>. Between two writes at such stages the order matters where one READS
-    /// what the other writes - a graph at Texturing_Calc laying something over a colour a graph at
-    /// Texturing writes comes out differently the other way round - and where both write one channel,
-    /// since whichever is last stands. Then the reading write, or the later of the two, is left out
-    /// and named rather than placed by a guess. Nothing else is held back: AddDetailMap at Texturing
-    /// adds to the normal, AGT_DesertDust at Texturing_Calc reads and writes the normal too, and the
-    /// dust's colour, which reads no normal, is not the normal's business.
-    ///
-    /// A WRITE OF WHAT WAS READ, unchanged - <c>UV</c> fed straight from <c>InputUV</c>, as half
-    /// the graphs do to keep a channel they do not touch - comes to the same in either order, and
-    /// counts for neither side.
-    /// </remarks>
-    private static string? Unordered(List<Writer> every, Writer writer)
-    {
-        string stage = Stages[writer.Stage];
-        if (writer.Same || Initial(stage))
-        {
-            return null;
-        }
-
-        string family = Family(stage);
-        foreach (Writer other in every)
-        {
-            string theirs = Stages[other.Stage];
-            if (other.Stage == writer.Stage || other.Same || Initial(theirs)
-                || !string.Equals(Family(theirs), family, StringComparison.Ordinal))
-            {
-                continue;
-            }
-
-            if ((writer.Reads & (1 << other.Channel)) != 0 || (other.Channel == writer.Channel && other.Stage < writer.Stage))
-            {
-                return theirs;
-            }
-        }
-
-        return null;
-    }
-
-    /// <summary>The channels a write's value is worked out from, as bits of <see cref="Channels"/>: every reader behind it.</summary>
-    private static int Reads(Lookup lookup, ShaderNode writer)
-    {
-        var reads = 0;
-        var seen = new HashSet<ShaderNode>(ReferenceEqualityComparer.Instance);
-        var pending = new Stack<ShaderNode>();
-        pending.Push(writer);
-        while (pending.Count > 0)
-        {
-            foreach (ShaderLink link in lookup.Into(pending.Pop()))
-            {
-                if (lookup.Node(link.Source) is not { } source || !seen.Add(source))
-                {
-                    continue;
-                }
-
-                if (ReadBy(source.Type) is { } channel)
-                {
-                    reads |= 1 << Array.IndexOf(Channels, channel);
-                }
-
-                pending.Push(source);
-            }
-        }
-
-        return reads;
-    }
-
-    /// <summary>Whether a write is of its own channel's reader, whole and unchanged.</summary>
-    private static bool Same(Lookup lookup, ShaderNode writer, string channel)
-    {
-        IReadOnlyList<ShaderLink> into = lookup.Into(writer);
-        return into.Count == 1
-            && into[0].Source.Swizzle.Length == 0
-            && into[0].Target.Swizzle.Length == 0
-            && lookup.Node(into[0].Source) is { } source
-            && ReadBy(source.Type) == channel;
-    }
-
     /// <summary>Whether a vertex-stage write hands on exactly what its own reader gave it, component for component.</summary>
     private static bool PassedThrough(Lookup lookup, ShaderNode writer)
     {
@@ -1633,14 +1541,6 @@ public sealed class ShadeProgram
         }
 
         return true;
-    }
-
-    private static bool Initial(string stage) => stage.EndsWith("_Init", StringComparison.Ordinal);
-
-    private static string Family(string stage)
-    {
-        int cut = stage.IndexOf('_', StringComparison.Ordinal);
-        return cut > 0 ? stage[..cut] : stage;
     }
 
     private static int IndexOf(string stage)
@@ -2039,8 +1939,8 @@ public sealed class ShadeProgram
     /// <summary>The graphs, if any, that moved the vertices' positions and normals, or wrote their colour, at a vertex stage.</summary>
     private readonly record struct Displaced(string? Position, string? Normal, string? Colour = null);
 
-    /// <summary>One fed writer of a channel: its node, the stage it writes at, the channel, what it reads, and whether it only hands on what it read.</summary>
-    private readonly record struct Writer(ShaderNode Node, int Stage, int Channel, int Reads, bool Same);
+    /// <summary>One fed writer of a channel: its node, the stage it writes at, and the channel.</summary>
+    private readonly record struct Writer(ShaderNode Node, int Stage, int Channel);
 
     /// <summary>One step: what to do, where to put it, and from which registers.</summary>
     /// <param name="Extra">A texture's index for a read, the packed swizzle for a swizzle, the width for a dot, length or normalisation, how for a comparison.</param>

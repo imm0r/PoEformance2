@@ -73,8 +73,9 @@ public sealed record EnvironmentSettings(
     /// <remarks>
     /// AN ASSUMPTION, AND SAID AS ONE (see <see cref="Assumed"/>): 411 of the install's 861 .env files
     /// set no area.dust_color, and what the engine puts in its place is written nowhere this tool reads.
-    /// The light panel's search of the game's memory looks for an area's dust colour, so that where the
-    /// game keeps it can be read in an area whose file sets none.
+    /// Where the game keeps the colour it uses was found in its memory - the offset schema's
+    /// ParsedEnvironment - and the light panel's search reads it there, so in an area whose file sets
+    /// none its report shows the engine's own; this grey stands until that has been read.
     /// </remarks>
     public static Vector3 AssumedDust { get; } = new(0.5f);
 

@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using PoEformance.Core.Diagnostics;
 using PoEformance.Core.Memory;
+using PoEformance.Core.Schema;
 using PoEformance.Game.Diagnostics;
 using PoEformance.Game.Files;
 
@@ -199,6 +200,61 @@ public class LightHuntTests
         Assert.Contains("beside area.dust_color at 0x20000C00:", verdict.Report, StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// The dust colour is read where the parsed environment keeps it, after phi and hor_angle - the file's beside a file that sets one, the engine's own beside one that does not.
+    /// </summary>
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void THEDUSTCOLOURIsReadBesideTheAngles(bool fileSetsIt)
+    {
+        string area = fileSetsIt ? """, "area": { "dust_color": [ 0.4936, 0.32918, 0.21288 ] }""" : string.Empty;
+        EnvironmentSettings env = EnvironmentSettings.Read("e.env", Encoding.UTF8.GetBytes(
+            "{ \"directional_light\": { \"multiplier\": 1.0, \"phi\": 2.14668, \"theta\": 2.1642 }, \"environment_mapping\": { \"hor_angle\": -1.32641 }" + area + " }"));
+        DustPlace place = ShippedDust();
+        LightHunt hunt = LightHunt.For("e.env", env, one => $"reading {one + 1}", out string why, place)!;
+        Assert.True(why.Length == 0, why);
+
+        // ONE PARSED ENVIRONMENT as Excavation's lay: phi, hor_angle 0xD0 on, the dust 0x360 on.
+        var bytes = new byte[0x2000];
+        const int phiAt = 0x800;
+        Floats(bytes, phiAt, 2.14668f);
+        Floats(bytes, phiAt + 0xD0, -1.32641f);
+        Floats(bytes, phiAt + place.AfterPhi, 0.5f, 0.45f, 0.4f);
+        (FakeMemoryReader memory, Space space) = Memory(bytes);
+
+        LightHuntVerdict verdict = hunt.Read(FloatHunt.Run(memory, space, hunt.Needles));
+
+        Assert.Contains(fileSetsIt ? "the file's is 0.4936 0.32918 0.21288" : "the file sets none, so this is the engine's own", verdict.Report, StringComparison.Ordinal);
+        // READ BESIDE HOR_ANGLE, whose window is the narrower and so is read first - and covers phi,
+        // whose own is then not read again.
+        const int horAt = phiAt + 0xD0;
+        Assert.Contains(
+            $"beside hor_angle at 0x{Base + horAt:X}: 0.5 0.45 0.4{(fileSetsIt ? " - NOT the file's" : string.Empty)}", verdict.Report, StringComparison.Ordinal);
+
+        // THE ANGLES' WINDOWS ARE NOT PRINTED WHOLE - they are only there for the dust.
+        Assert.DoesNotContain($"beside hor_angle at 0x{Base + horAt:X}:{Environment.NewLine}", verdict.Report, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Where the dust lies is the offset schema's to say: the shipped one puts it where Excavation's was measured, and without one the report says it was not read.
+    /// </summary>
+    [Fact]
+    public void WHERETHEDUSTLiesIsTheOffsetSchemasToSay()
+    {
+        Assert.Equal(new DustPlace(0x360, 0x290), ShippedDust());
+        Assert.Null(DustPlace.From(null));
+        Assert.Null(DustPlace.From(new StructDef("ParsedEnvironment", null, [new FieldDef("Phi", 0, FieldType.F32, null, null)], new Dictionary<string, long>())));
+
+        EnvironmentSettings env = EnvironmentSettings.Read("e.env", Encoding.UTF8.GetBytes(
+            """{ "directional_light": { "multiplier": 1.0, "phi": 2.14668, "theta": 2.1642 }, "environment_mapping": { "hor_angle": -1.32641 } }"""));
+        LightHunt hunt = LightHunt.For("e.env", env, one => $"reading {one + 1}", out _)!;
+        Assert.All(hunt.Needles.Where(one => one.Name is "phi" or "hor_angle"), one => Assert.Equal(0, one.Around));
+
+        (FakeMemoryReader memory, Space space) = Memory(new byte[0x100]);
+        Assert.Contains("dust beside the angles: not read", hunt.Read(FloatHunt.Run(memory, space, hunt.Needles)).Report, StringComparison.Ordinal);
+    }
+
     /// <summary>And an environment whose only finding would be its dust colour is still worth a hunt.</summary>
     [Fact]
     public void ADUSTCOLOURAloneIsSomethingToLookFor()
@@ -313,6 +369,19 @@ public class LightHuntTests
 
     private static void Floats(byte[] into, int at, params float[] values)
         => MemoryMarshal.Cast<float, byte>(values).CopyTo(into.AsSpan(at));
+
+    /// <summary>The dust's place as the shipped offset schema states it.</summary>
+    private static DustPlace ShippedDust()
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir is not null && !File.Exists(Path.Combine(dir.FullName, "schema", "poe2.offsets.json")))
+        {
+            dir = dir.Parent;
+        }
+
+        OffsetSchema schema = SchemaJson.Load(Path.Combine(dir!.FullName, "schema", "poe2.offsets.json"));
+        return DustPlace.From(schema.Structs.GetValueOrDefault("ParsedEnvironment"))!;
+    }
 
     private static (FakeMemoryReader Memory, Space Space) Memory(byte[] bytes)
         => (new FakeMemoryReader().Place(Base, bytes), new Space(new MemoryRegion(Base, (ulong)bytes.Length)));

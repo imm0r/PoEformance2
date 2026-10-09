@@ -118,8 +118,9 @@ how vert_angle tips it is still a candidate, offered where it can change the pic
 anywhere - two sliders, or shift + drag in the model window, its shadows coarse while it moves.
 The environment also gives the area's **dust colour** (`area.dust_color`), which dust graphs lay over a
 material whether the game's light is on or not; where the file sets none, a grey of a half is taken
-and the Light fold's *assumed* line says so. *find the readings* looks for the colour too, so the
-game's own default can be read where it keeps it.
+and the Light fold's *assumed* line says so. *find the readings* also reads the colour where the game
+keeps it, beside the sun's angles (the offset schema's `ParsedEnvironment`), so in an area whose file
+sets none its report shows the game's own.
 
 A room drawn as laid **leaves out what the game's camera cannot see** (*leave out the hidden*, on
 unless switched off): the camera is the game's own, read while you play and set over every place

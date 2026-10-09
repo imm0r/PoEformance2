@@ -5,6 +5,7 @@ using ImGuiNET;
 using PoEformance.Core.Diagnostics;
 using PoEformance.Features;
 using PoEformance.Game.Components;
+using PoEformance.Game.Diagnostics;
 using PoEformance.Game.Entities;
 using PoEformance.Game.Files;
 using PoEformance.Game.Ui;
@@ -2364,6 +2365,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     public Func<IReadOnlyList<FloatNeedle>, ulong, FloatHuntProgress, Task<FloatHuntResult>?>? HuntFloats { get; set; }
 
     /// <summary>
+    /// Where the parsed environment keeps its dust colour, from the offset schema's ParsedEnvironment - set by whoever loaded the schema, before the tile book is attached.
+    /// </summary>
+    /// <remarks>Unset, the light panel's hunt does not read the dust colour beside the angles, and its report says why.</remarks>
+    public DustPlace? EnvironmentDust { get; set; }
+
+    /// <summary>
     /// Starts a search of the whole of the game's memory for runs of bytes - set by whoever owns the reader. See PatternHunt.
     /// </summary>
     /// <remarks>The Memory Dissector's find: a text, or the pointers to the address on show. Unset, it is not offered.</remarks>
@@ -3390,7 +3397,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         Func<IReadOnlyList<FloatNeedle>, ulong, FloatHuntProgress, Task<FloatHuntResult>?>? huntFloats = HuntFloats;
         var lighting = new SceneLightPanel(
             readFile, () => EnvironmentFiles, () => _snapshot.Area.Environment, PlayerGround, LiveGround,
-            huntFloats is null ? null : (needles, progress) => huntFloats(needles, _snapshot.Player?.Address ?? 0, progress));
+            huntFloats is null ? null : (needles, progress) => huntFloats(needles, _snapshot.Player?.Address ?? 0, progress),
+            EnvironmentDust);
         var window = new TileBookWindow(() => TileFiles, TilesHere)
         {
             Lighting = lighting,
