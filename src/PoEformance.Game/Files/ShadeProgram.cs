@@ -720,6 +720,24 @@ public sealed class ShadeProgram
         return new ShadeCompile(program, skipped);
     }
 
+    /// <summary>The steps, in order - what <see cref="ShadeHlsl"/> writes out.</summary>
+    internal ReadOnlySpan<Step> Steps => _steps;
+
+    /// <summary>The registers the constants are put in, beside <see cref="ConstantValues"/>.</summary>
+    internal ReadOnlySpan<int> ConstantRegisters => _constantAt;
+
+    /// <summary>The constants, beside <see cref="ConstantRegisters"/>.</summary>
+    internal ReadOnlySpan<Vector4> ConstantValues => _constants;
+
+    /// <summary>The register the colour is left in.</summary>
+    internal int Result => _result;
+
+    /// <summary>The register the specular colour is left in, or below nought for none.</summary>
+    internal int SpecularRegister => _specular;
+
+    /// <summary>The register the gloss is left in, or below nought for none.</summary>
+    internal int GlossRegister => _gloss;
+
     /// <summary>This program with its textures in hand, one per entry of <see cref="Textures"/>.</summary>
     public ShadeProgram With(IReadOnlyList<Mipmaps?> sheets)
     {

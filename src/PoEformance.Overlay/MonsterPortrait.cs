@@ -318,6 +318,12 @@ public sealed class MonsterPortrait
     private bool _drawnCardOn;
 
     /// <summary>
+    /// Whether the last picture went to the processor because the card said no, and how many material shaders had landed then - one landing since redraws, in case it was this picture's.
+    /// </summary>
+    private bool _cardWaiting;
+    private long _cardLanded;
+
+    /// <summary>
     /// What every key this pane hands the renderer starts with.
     /// </summary>
     /// <remarks>
@@ -2739,6 +2745,7 @@ public sealed class MonsterPortrait
             || !ReferenceEquals(_drawnLight, Lit())
             || (posed && (_drawnFrame != _frame || _drawnAnimation != _chosen))
             || _drawnCardOn != (Card?.On ?? false)
+            || (_cardWaiting && Card is { On: true } card && card.Gpu is { } gpu && gpu.Landed != _cardLanded)
             || _probeAsked;
 
         if (moved)
@@ -2754,7 +2761,9 @@ public sealed class MonsterPortrait
         // are the frame's, and a drawing on a task must not read them while the frame writes them.
         if (ticking && _drawnClock != _clock)
         {
-            if (posed)
+            // ON THE CARD THE TICK IS A FRAME'S DRAW like any other, and cheaper than the processor's
+            // kept still part - see ClockBehind for why the processor's goes behind the frame.
+            if (posed || _onCard)
             {
                 Render(size, posed);
             }
@@ -3157,9 +3166,9 @@ public sealed class MonsterPortrait
     /// Draws the picture on the graphics card where it is switched on and can draw the same picture - false leaves it to the processor.
     /// </summary>
     /// <remarks>
-    /// THE PROCESSOR KEEPS WHAT THE CARD CANNOT DO YET - shade programs - and what
-    /// reads the processor's own pixels: the probe, and the grey laid on them. Each says so on the
-    /// card button rather than drawing something else. A card that fails mid-draw is not asked again;
+    /// THE PROCESSOR KEEPS what reads its own pixels - the probe, and the grey laid on them - and a
+    /// picture whose material shaders are still compiling for the card. Each says so on the card
+    /// button rather than drawing something else. A card that fails mid-draw is not asked again;
     /// see <see cref="CardPictures.Fail"/>.
     /// </remarks>
     private bool OnCard(int size, bool moving)
@@ -3184,10 +3193,14 @@ public sealed class MonsterPortrait
 
         var scene = new ModelScene(
             _model.Mesh, _turn, _tilt, Ink, _model.Skin, _zoom, _pan, _model.Skins, Blends(),
-            moving ? _posed : null, moving ? _posedNormals : null, _drawnLight);
-        if (!gpu.Can(scene, ShadesOf(_model), out string why))
+            moving ? _posed : null, moving ? _posedNormals : null, _drawnLight, ShadesOf(_model), _clock);
+        if (!gpu.Can(scene, out string why))
         {
+            // A MATERIAL'S SHADER STILL COMPILING is the usual no: the picture is the processor's until
+            // it lands, and the frame it lands on draws it again - see the redraw test in Draw.
             _cardWhy = why;
+            _cardWaiting = true;
+            _cardLanded = gpu.Landed;
             return false;
         }
 
@@ -3204,6 +3217,8 @@ public sealed class MonsterPortrait
             if (!gpu.Draw(target, scene, out why))
             {
                 _cardWhy = why;
+                _cardWaiting = true;
+                _cardLanded = gpu.Landed;
                 return false;
             }
         }
@@ -3227,6 +3242,7 @@ public sealed class MonsterPortrait
         Drop();
         _texture = _cardShown;
         _onCard = true;
+        _cardWaiting = false;
         _cardWhy = string.Empty;
         Why = string.Empty;
         return true;

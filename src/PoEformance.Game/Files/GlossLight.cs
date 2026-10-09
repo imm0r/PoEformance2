@@ -42,6 +42,15 @@ public static class GlossLight
     /// <summary>Each entry's part the specular colour does not scale, then the part it does - see the remarks.</summary>
     private static readonly (float[] Bias, float[] Scale) Table = Tabled();
 
+    /// <summary>The side of the environment's tables, which <see cref="Environment"/> reads by gloss down and facing across.</summary>
+    public static int TableSide => Side;
+
+    /// <summary>The environment's bias, <see cref="TableSide"/> squared, a row per gloss - read the same way elsewhere, the graphics card's.</summary>
+    public static ReadOnlySpan<float> BiasTable => Table.Bias;
+
+    /// <summary>The environment's scale, laid out as <see cref="BiasTable"/>.</summary>
+    public static ReadOnlySpan<float> ScaleTable => Table.Scale;
+
     /// <summary>The game's Fresnel - Schlick's, by its exp2 fit.</summary>
     public static float Fresnel(float vdoth) => float.Exp2(((-5.55473f * vdoth) - 6.98316f) * vdoth);
 

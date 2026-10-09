@@ -94,7 +94,6 @@ public sealed partial class ModelGpu
             Ambient = new Int4(ambient, grade is null ? 0 : 1, ambient == 2 ? light.Cube!.Size : 0, light.PointCount),
             Cells = new Int4(cells.X, cells.Y, cells.Z, (cells.X * cells.Y * cells.Z) + 1),
             Graded = grade is null ? default : new Int4(grade.Width, grade.Height, grade.Depth, 0),
-            Tables = new Int4(ShadeProgram.TableSteps, ColourGrade.EncodingSteps, 0, 0),
         });
         context.VSSetConstantBuffer(2, _scene);
         context.PSSetConstantBuffer(2, _scene);
@@ -108,7 +107,6 @@ public sealed partial class ModelGpu
         }
 
         LightBuffers? points = light.PointCount > 0 ? Points(light) : null;
-        context.PSSetShaderResource(1, _tables.View);
         context.PSSetShaderResource(2, points?.Points.View!);
         context.PSSetShaderResource(3, points?.Reach.View!);
         context.PSSetShaderResource(4, ambient == 2 ? Read(light.Cube!, light.Cube!.Texels).View : null!);
@@ -142,15 +140,6 @@ public sealed partial class ModelGpu
         // pixel in shadow, on every frame the map was drawn on. The first WARP run caught it on the
         // coarse map; the full one passed only because it was drawn twice, the second from the kept map.
         context.OMSetRenderTargets((ID3D11RenderTargetView)null!, null);
-    }
-
-    /// <summary>What the lit drawing bound for reading, taken off again - the shadow map is a target the next time it is drawn.</summary>
-    private void Unlit()
-    {
-        for (var slot = 1; slot <= 6; slot++)
-        {
-            _context.PSSetShaderResource(slot, null!);
-        }
     }
 
     /// <summary>
@@ -198,14 +187,23 @@ public sealed partial class ModelGpu
         return least;
     }
 
-    /// <summary>ShadeProgram's sRGB tables and ColourGrade's gamma table, one after another - see ModelShaders' FromTable and Encoded.</summary>
+    /// <summary>
+    /// ShadeProgram's sRGB tables, ColourGrade's gamma table and GlossLight's environment, one after another - where ModelShaders.Common's table offsets say.
+    /// </summary>
     private static CardBuffer Tables(ID3D11Device device)
     {
         ReadOnlySpan<float> linear = ShadeProgram.LinearTable, srgb = ShadeProgram.SrgbTable, gamma = ColourGrade.Encoding;
-        var all = new float[linear.Length + srgb.Length + gamma.Length];
-        linear.CopyTo(all);
-        srgb.CopyTo(all.AsSpan(linear.Length));
-        gamma.CopyTo(all.AsSpan(linear.Length + srgb.Length));
+        ReadOnlySpan<float> bias = GlossLight.BiasTable, scale = GlossLight.ScaleTable;
+        var all = new float[linear.Length + srgb.Length + gamma.Length + bias.Length + scale.Length];
+        Span<float> rest = all;
+        linear.CopyTo(rest);
+        rest = rest[linear.Length..];
+        srgb.CopyTo(rest);
+        rest = rest[srgb.Length..];
+        gamma.CopyTo(rest);
+        rest = rest[gamma.Length..];
+        bias.CopyTo(rest);
+        scale.CopyTo(rest[bias.Length..]);
         return CardBuffer.Of<float>(device, all, Format.R32_Float, all.Length);
     }
 
@@ -302,7 +300,6 @@ public sealed partial class ModelGpu
         public Int4 Ambient;
         public Int4 Cells;
         public Int4 Graded;
-        public Int4 Tables;
     }
 
     /// <summary>An HLSL int4.</summary>

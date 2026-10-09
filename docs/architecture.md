@@ -382,14 +382,40 @@ through their texture, shadow-only - each texel keeping its nearest depth throug
 kept while the mesh stands still; every lit pixel then runs `SceneLight.Shade` line for line, with
 the point lights looked up through the same grid and the cube, the grade and the sRGB and gamma
 tables handed over as the processor holds them and read texel by texel, not through the card's own
-filtering. Not on the card yet: shade programs, and the probe and the grey, which read the
-processor's pixels - each sends the picture to the processor, and the pane's `card` button says
-why. The two pictures are held against each other on a Windows runner with WARP
+filtering.
+
+A material's **shade program is a shader of its own** on the card. It is not a second reading of
+the graphs: `ShadeProgram.Compile` has already ordered the stages, followed the fragments and dropped
+what the colour does not read, and `ShadeHlsl` writes the resulting step list out - a register a
+variable, a step a statement, each op as `ShadeProgram.Run` does it with the same helpers line for
+line, the constants written to the bit - so the card's picture is the processor's by construction.
+The game's own HLSL is no shortcut: the install ships it only as fragments, one per node, in the
+engine's fragment language, which the engine assembles per material at run time inside its own
+renderer; the program already is that assembly. Around it `ModelShaders.Programmed` runs it in
+MeshPicture's two passes - solid (cut on the program's alpha, or the texture's where the graphs set
+none; a graph's discard dropped) and mixed (covered by the program's alpha, a ground layer measured
+against a copy of the solid depth, since the depth buffer cannot be read while the mixed pass tests
+against it) - under the picture's lamp, with a glossy material's lobe and environment and a flat
+one's specular laid on, or under the game's light. A texture read takes its level from the screen's
+derivatives, the game's own way and the processor's wherever a triangle's coordinates are straight;
+a parallax march reads at the level its starting coordinates step at (SAMPLE_TEX2DGRAD), and
+FixModelTBN's frame comes from the screen's derivatives too (GetScreenspaceTangentFrame). The vertex
+colour is a stream of its own, white where a mesh has none, as `MeshPicture.VertexColourOf` reads
+it; and a translucent shape covers a pixel once, however many of its triangles reach it - a
+stencil number per shape, the processor's stamps. `ProgramShaders` compiles each program behind the
+frame (fxc, shader model 4, IEEE-strict so not-a-number is kept as the processor keeps it) and keeps
+the bytecode in `shader-cache/` beside the tool, named by a hash of everything that went into it;
+until a picture's shaders are in it is drawn on the processor, the card button says how many are
+still compiling, and the frame they land on draws it again. Not on the card: the probe and the grey,
+which read the processor's pixels - each sends the picture to the processor, and the pane's `card`
+button says why. The two pictures are held against each other on a Windows runner with WARP
 (`tests/PoEformance.Gpu.Tests`, the `gpu-test` job), the only place fxc compiles the shaders before
 they reach a player's machine; on Linux DXC's `libdxcompiler.so` (in the `Vortice.Dxc.Native`
 package) at legacy HLSL 2018 is a fair syntax and type check of them, called straight through its
 COM vtable (`IDxcCompiler3::Compile` the fourth slot, arguments as four-byte `wchar_t`) - Vortice.Dxc's
-own wrapper answered only "invalid profile" there.
+own wrapper answered only "invalid profile" there. HLSL's reserved words are a trap such a check
+catches and a reading does not: `point` and `linear` are keywords, and a helper called `Shade`
+clashed with the constant of that name.
 
 **A free sun** stands where it is put - two sliders, its bearing on the game's screen and its
 height, or shift + drag in the model window (`IMovableSun`), the drag's direction measured through
