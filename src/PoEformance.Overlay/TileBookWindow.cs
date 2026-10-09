@@ -253,13 +253,15 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     /// <summary>The area's rooms searched and arranged, for the header's line - the overlay asks it every frame while the box is ticked. Null leaves the box out.</summary>
     public AreaRooms? AllRooms { get; init; }
 
-    /// <summary>Reads the area's entity maps once for the rooms' doodad stubs - see SleepingDoodads. Null leaves the "doodads in this area" button out.</summary>
-    public Func<IReadOnlySet<string>, DoodadSurvey>? Survey { get; init; }
-
     /// <summary>The survey's line and its hover, made once per survey.</summary>
     private DoodadSurvey? _doodadsSaidOf;
     private string _doodadsSaid = string.Empty;
     private string _doodadsDetail = string.Empty;
+
+    /// <summary>The line about the rooms placed by their doodads and its hover, made once per survey.</summary>
+    private IReadOnlyList<(string Room, RoomLayout Layout, RoomDoodadPlaces Places)>? _placedSaidOf;
+    private string _placedSaid = string.Empty;
+    private string _placedDetail = string.Empty;
 
     /// <summary>The header's line about the arrangement and its hover, made once per arrangement.</summary>
     private RoomArrangement? _roomsSaidOf;
@@ -382,12 +384,13 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         float end = ImGui.GetItemRectMax().X;
         if (ImGui.IsItemHovered())
         {
-            ImGui.SetTooltip("Every room this area loaded, outlined on the large map with its name - each where its search ranks it first,"
-                + " the surest first, unless a surer room already holds one of its tiles: then the next place on its own list that is free.\n"
-                + "Each with its misses marked as a picked row's are: a dot on a corner whose ground is not the room's, a ring on a tile"
-                + " that is not what its slot asks for, and either in the join colour where a join explains it - rooms that join meet"
-                + " at those. One kind too many is switched off on its style row.\n"
-                + "Searched off the frame, one room at a time, whenever the area or its rooms change.\n"
+            ImGui.SetTooltip("Every room this area loaded, outlined on the large map with its name, at every place its doodads stand:"
+                + " each doodad line of a room is an entity standing where the line put it, and the places where two thirds of them"
+                + " do are the room's - a wall module the area lays four times is outlined four times. A ring marks a doodad line"
+                + " whose entity is not where the place puts it.\n"
+                + "Where nothing can read the area's entities the rooms are placed by their ground and tiles instead, each where its"
+                + " search ranks it first unless a surer room holds one of its tiles, with the three marks a picked row gets.\n"
+                + "Searched off the frame, one room at a time, whenever the area or its rooms change; the doodads read once after.\n"
                 + "Ctrl + click a room's name on the large map to route there - the route goes once you stand in the room;"
                 + " ctrl + shift + click anywhere on the map puts a stop on the newest route.");
         }
@@ -427,6 +430,14 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         {
             OverlayLayout.Flow(end, ImGui.CalcTextSize("rooms: open a map to start").X, right, 0f);
             ImGui.TextDisabled("rooms: open a map to start");
+            return;
+        }
+
+        // BY THEIR DOODADS where the entities can be read - what the map draws - else by the arrangement.
+        if (rooms.ReadDoodads is not null)
+        {
+            end = PlacedSaid(rooms, end, right);
+            DoodadsBox(rooms, end, right);
             return;
         }
 
@@ -472,6 +483,66 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     }
 
     /// <summary>
+    /// The "rooms:" line where the map draws the rooms by their doodads, and its hover - every room's places, or why it has none - made once per survey. Returns where the line ended.
+    /// </summary>
+    private float PlacedSaid(AreaRooms rooms, float end, float right)
+    {
+        if (rooms.Placed is not { } placed)
+        {
+            string waiting = rooms.Surveying
+                ? "rooms: searched - reading the area's doodads to place them..."
+                : "rooms: searched - the area's doodads are not read; press the button to read them";
+            OverlayLayout.Flow(end, ImGui.CalcTextSize(waiting).X, right, 0f);
+            ImGui.TextDisabled(waiting);
+            return ImGui.GetItemRectMax().X;
+        }
+
+        if (!ReferenceEquals(placed, _placedSaidOf))
+        {
+            _placedSaidOf = placed;
+            int places = 0, unplaced = 0;
+            var lines = new List<string>(placed.Count);
+            foreach ((string room, _, RoomDoodadPlaces found) in placed)
+            {
+                places += found.Places.Count;
+                unplaced += found.Places.Count == 0 ? 1 : 0;
+                string name = TerrainRooms.NameFor(room);
+                if (found.Places.Count == 0)
+                {
+                    lines.Add(string.Create(CultureInfo.InvariantCulture,
+                        $"{name}: no place - {found.Why}; {found.Matchable} of its {found.Lines} doodad lines stand in the area, {found.ByModel} told by their model"));
+                    continue;
+                }
+
+                var said = new List<string>(found.Places.Count);
+                foreach (RoomDoodadPlace place in found.Places)
+                {
+                    said.Add(string.Create(CultureInfo.InvariantCulture,
+                        $"tile {place.Where.X}, {place.Where.Y}, {RoomFinder.Said(place.Where.Turn)}: {place.Hits} of {place.Lines} doodads within a tile, off {place.MeanOff:0} on average"));
+                }
+
+                lines.Add(string.Create(CultureInfo.InvariantCulture,
+                    $"{name}: {found.Places.Count} place{(found.Places.Count == 1 ? string.Empty : "s")}, {found.ByModel} of {found.Matchable} doodads told by their model - ")
+                    + string.Join("; ", said));
+            }
+
+            _placedSaid = string.Create(CultureInfo.InvariantCulture, $"rooms: {placed.Count - unplaced} placed by their doodads at {places} places")
+                + (unplaced > 0 ? string.Create(CultureInfo.InvariantCulture, $", {unplaced} with no place") : string.Empty);
+            _placedDetail = string.Join('\n', lines);
+        }
+
+        OverlayLayout.Flow(end, ImGui.CalcTextSize(_placedSaid).X, right, 0f);
+        ImGuiText.Wrapped(OverlayInk.Quiet, ImGuiText.Escape(_placedSaid));
+        end = ImGui.GetItemRectMax().X;
+        if (ImGui.IsItemHovered() && _placedDetail.Length > 0)
+        {
+            ImGui.SetTooltip(ImGuiText.Escape(_placedDetail));
+        }
+
+        return end;
+    }
+
+    /// <summary>
     /// The "doodads in this area" button and the last survey's line - see SleepingDoodads for what it measures and why.
     /// </summary>
     /// <remarks>
@@ -481,7 +552,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     /// </remarks>
     private void DoodadsBox(AreaRooms rooms, float end, float right)
     {
-        if (Survey is not { } survey)
+        if (rooms.ReadDoodads is null)
         {
             return;
         }
@@ -504,7 +575,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
 
         if (pressed)
         {
-            rooms.Survey(survey);
+            rooms.Survey();
         }
 
         if (rooms.Surveying)
