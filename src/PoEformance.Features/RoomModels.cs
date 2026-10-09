@@ -209,6 +209,12 @@ public static class RoomModels
     internal sealed record Doodads(
         int Placed, int Missing, int Capped, int Hidden, string FirstMissing, int Most, long MostTriangles, IReadOnlyCollection<MonsterModel> Models)
     {
+        /// <summary>Doodads not loaded at all: every one of their file's places was asked and none could be seen - see <see cref="DoodadSieve"/>.</summary>
+        public int Unloaded { get; init; }
+
+        /// <summary>Doodads loaded for another place of their file, and not laid at this one because it could not be seen there.</summary>
+        public int Unseen { get; init; }
+
         /// <summary>The lines under the picture about what did not draw, and why.</summary>
         public IEnumerable<string> Said()
         {
@@ -221,6 +227,12 @@ public static class RoomModels
             {
                 yield return string.Create(CultureInfo.InvariantCulture,
                     $"{Hidden} of the level editor's tools hidden - walk blockers and markers the game does not draw; \"tools\" shows them");
+            }
+
+            if (Unloaded + Unseen > 0)
+            {
+                yield return string.Create(CultureInfo.InvariantCulture,
+                    $"{Unloaded + Unseen} doodads left out unseen - {Unloaded} never loaded, {Unseen} loaded for another place and not laid at this one; \"leave out the hidden\" lays them");
             }
 
             if (Capped > 0)
@@ -238,6 +250,11 @@ public static class RoomModels
     /// ONE LOAD PER MODEL, keyed by its file: a room places the same tree or rock dozens of times. AND
     /// ONE TEXTURE CACHE FOR ALL OF THEM, because two different doodads sharing a material - the rock
     /// and the stump on one sheet - are one decode and one upload, not one each.
+    ///
+    /// WITH A SIEVE, EVERY PLACE IS ASKED BEFORE ANYTHING IS LOADED - a box <see cref="DoodadSieve.Margin"/>
+    /// round where it stands, its scale applied - and a file none of whose places passes is never read.
+    /// A file that is read has every place asked again with its own box, so a place the margin let
+    /// through is still left out where the doodad itself cannot be seen.
     /// </remarks>
     internal static Doodads Lay(
         RoomLayout room,
@@ -248,20 +265,22 @@ public static class RoomModels
         bool tools,
         Func<RoomDoodad, Matrix4x4>? beyond,
         DoodadHeight heights = DoodadHeight.File,
-        RoomLights.Gathered? lights = null)
+        RoomLights.Gathered? lights = null,
+        DoodadSieve? sieve = null)
     {
         var models = new Dictionary<string, MonsterModel>(StringComparer.OrdinalIgnoreCase);
         float size = CellSize;
         long triangles = 0;
-        int placed = 0, missing = 0, capped = 0, hidden = 0;
+        int placed = 0, missing = 0, capped = 0, hidden = 0, unloaded = 0, unseen = 0;
         int mostDoodads = doodads > 0 ? doodads : UsualDoodads;
         long mostTriangles = (long)mostDoodads * TrianglesPerDoodad;
         string firstMissing = string.Empty;
 
-        using ModelProgress.Step step = ModelProgress.Begin(paints.Progress, "laying the doodads", room.Doodads.Count);
+        // WHERE EACH GOES FIRST, and whether it could be seen there at all.
+        var laid = new List<(RoomDoodad One, Matrix4x4 Place)>(room.Doodads.Count);
+        HashSet<string>? wanted = sieve is null ? null : new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (RoomDoodad one in room.Doodads)
         {
-            step.Advance();
             if (one.Ao.Length == 0)
             {
                 continue;
@@ -290,8 +309,28 @@ public static class RoomModels
 
             // THE LIGHTS WHETHER OR NOT THE DOODAD DRAWS: a light can be all a doodad is -
             // grimtangle_ambientlight.ao has no mesh - and a doodad left out to keep the picture
-            // turnable still lights the room in the game.
+            // turnable, or because the camera cannot see it, still lights the room in the game.
             lights?.Add(one.Ao, place);
+            laid.Add((one, place));
+            if (wanted is not null && !wanted.Contains(one.Ao))
+            {
+                var half = new Vector3(sieve!.Margin * scale);
+                if (sieve.Kept(place.Translation - half, place.Translation + half))
+                {
+                    wanted.Add(one.Ao);
+                }
+            }
+        }
+
+        using ModelProgress.Step step = ModelProgress.Begin(paints.Progress, "laying the doodads", laid.Count);
+        foreach ((RoomDoodad one, Matrix4x4 place) in laid)
+        {
+            step.Advance();
+            if (wanted is not null && !wanted.Contains(one.Ao))
+            {
+                unloaded++;
+                continue;
+            }
 
             if (!models.TryGetValue(one.Ao, out MonsterModel? model))
             {
@@ -310,6 +349,16 @@ public static class RoomModels
                 continue;
             }
 
+            if (sieve is not null)
+            {
+                (Vector3 low, Vector3 high) = Boxed(model.Mesh.Least, model.Mesh.Most, place);
+                if (!sieve.Kept(low, high))
+                {
+                    unseen++;
+                    continue;
+                }
+            }
+
             if (placed >= mostDoodads || triangles + model.Mesh.Triangles > mostTriangles)
             {
                 capped++;
@@ -321,7 +370,27 @@ public static class RoomModels
             placed++;
         }
 
-        return new Doodads(placed, missing, capped, hidden, firstMissing, mostDoodads, mostTriangles, models.Values);
+        return new Doodads(placed, missing, capped, hidden, firstMissing, mostDoodads, mostTriangles, models.Values)
+        {
+            Unloaded = unloaded,
+            Unseen = unseen,
+        };
+    }
+
+    /// <summary>A box through a transform, by its eight corners - a turned box's corners are not the old corners turned.</summary>
+    internal static (Vector3 Least, Vector3 Most) Boxed(Vector3 least, Vector3 most, Matrix4x4 place)
+    {
+        Vector3 low = new(float.MaxValue), high = new(float.MinValue);
+        for (var one = 0; one < 8; one++)
+        {
+            Vector3 put = Vector3.Transform(
+                new Vector3((one & 1) == 0 ? least.X : most.X, (one & 2) == 0 ? least.Y : most.Y, (one & 4) == 0 ? least.Z : most.Z),
+                place);
+            low = Vector3.Min(low, put);
+            high = Vector3.Max(high, put);
+        }
+
+        return (low, high);
     }
 
     /// <summary>A pile joined into a room's model, with the shaders and meshes of the models in it.</summary>
@@ -346,3 +415,10 @@ public static class RoomModels
         };
     }
 }
+
+/// <summary>
+/// Which of a room's doodads are laid at all: asked with a box round each place before anything is loaded, and with the doodad's own box once it is.
+/// </summary>
+/// <param name="Kept">Whether anything in a box, in the pile's frame, may be seen - false leaves what is in it out.</param>
+/// <param name="Margin">How far round a place the box reaches before the doodad's own size is known, in world units, times its scale.</param>
+internal sealed record DoodadSieve(Func<Vector3, Vector3, bool> Kept, float Margin);

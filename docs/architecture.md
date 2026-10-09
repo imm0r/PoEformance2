@@ -161,18 +161,21 @@ frames (99.5%)** in a file 17% smaller than the one that lost the last ten minut
 
 ### 3. Layers the compiler enforces
 
-Six projects; references point strictly downward. Getting this wrong is a build
-error, not a review comment.
+Seven projects and one vendored library; references point strictly downward. Getting
+this wrong is a build error, not a review comment.
 
 ```
 PoEformance.App        composition root - wires everything BY HAND in Program.cs
    │
    ├── PoEformance.Overlay   ImGui in-game overlay        (net10.0-windows)
+   │        │                 └─ ClickableTransparentOverlay, vendored (see below)
    ├── PoEformance.Config    WebView2 config window        (net10.0-windows)
    │        │
    │        ▼
    ├── PoEformance.Features  radar/loot/alert/automation LOGIC - data in, data out
    │        │
+   │        ├── PoEformance.Gpu  models drawn on the graphics card (net10.0-windows;
+   │        │                    used by the Overlay only, knows the Game layer only)
    │        ▼
    ├── PoEformance.Game      PoE2 domain: entities, player, terrain, UI tree
    │        │
@@ -180,6 +183,13 @@ PoEformance.App        composition root - wires everything BY HAND in Program.cs
    └── PoEformance.Core      process attach, RPM, patterns, schema, record/replay
                              (plain net10.0 - builds and tests on any OS)
 ```
+
+**ClickableTransparentOverlay is vendored** (`src/ClickableTransparentOverlay`, 11.1.0, Apache
+2.0): the package keeps its Direct3D 11 device private and takes pictures only as pixels in
+memory, and the model panes now draw on that device. The files are upstream's except for the
+changes `NOTICE.md` lists, each marked `// PoEformance:` - the device and its context exposed to
+the overlay, a view the caller owns handed to ImGui and taken back, and the device asked for at
+feature level 11 where the card has it.
 
 - **Core** knows nothing about Path of Exile. It could attach to Notepad.
 - **Game** turns raw memory into typed snapshots using the schema. No UI, no features.
@@ -326,11 +336,18 @@ env_map_rotation)`, System.Numerics' own order, the order the camera matrix is k
 found alone is taken. In AzmerianRanges (phi 2.33874, theta 2.32128) it found one reading's vector
 and its negative, nine copies each and every copy beside the other, sixteen bytes apart: phi is the
 sun's height and theta its bearing, and of the two signs only one puts the sun above the ground -
-`SceneLight.GameSun`, drawn ever since, the panel's choice gone. The sky's turn was not found, as
-written or transposed, so the hunt now also looks for every other arrangement of the same turns
-(each about any axis, either way, after any of the 48 swaps and flips of the axes - 587 needles for
-AzmerianRanges, found by a binary search over their first floats), reads back 256 bytes either side
-of the sun's vector to show what the game keeps beside it, and looks through 16 GB rather than 8.
+`SceneLight.GameSun`, drawn ever since, the panel's choice gone. The bytes read back round those
+copies showed what they are: the shadow cascades' boxes along the light, each face a plane and the
+opposite face its negative, beside the camera frustum's corners - so the axis is the game's and the
+sign the ground's. The sky's turn was not among the first candidates, as written or transposed, so
+the hunt looks for every other arrangement of the same turns (each about any axis, either way, after
+any of the 48 swaps and flips of the axes - 572 needles for AzmerianRanges, found by a binary search
+over their first floats) through 16 GB. One stood out: 37 copies, nearly all at offset 0x80 of a
+256-byte block, the stride of Direct3D 12's constant buffers - rows (cos h, 0, sin h), (-sin h, 0,
+cos h), (0, -1, 0), the world's axes swapped to the cube's (`SceneLight.CubeSwap`, its up plus y) and
+turned about that up by minus hor_angle (`SceneLight.CubeTurnFrom`). The cube is authored y-up, and
+the picture had been reading its sky off the z faces. How vert_angle tips it waits on a hunt in an
+area that has one.
 
 **The colour grade** (`ColourGrade`) is `post_transform`'s 3D table applied as `ApplyColorGrading`
 does with GGG_POE_1 off: divided by the brightest channel past one, looked up trilinearly by the
@@ -349,10 +366,49 @@ are only the turns that differ - with one angle nought the four orders are one o
 where the cube lights nothing (`gi_env_occlusion` 1, AzmerianRanges among them, or a flat ambient)
 the row says why.
 
+**Pictures are drawn on the graphics card** (`PoEformance.Gpu`, `ModelGpu`) where it can draw
+the same picture as the processor, and on the processor where not - `MeshPicture` stays the
+reference. The camera is `MeshPicture.Camera` laid onto the card's clip space so a vertex lands on
+the very pixel position the processor gives it; depth is the processor's "nearer wins, the first
+drawn on a tie"; the solid and cut-out shapes go first in the mesh's order and the translucent
+ones after, testing depth and writing none, mixed and added in premultiplied terms into a float
+target that a last pass turns into straight bytes, truncated as `MeshPicture` truncates. Meshes
+and their textures - every level `Mipmaps` made - are uploaded once and kept while drawn. What the
+card cannot match exactly is small and said where it shows: an edge two triangles share is filled
+once rather than twice, and a texture is filtered with the card's own weights. Not on the card yet:
+shade programs, the game's light, and the probe and the grey, which read the processor's pixels -
+each sends the picture to the processor, and the pane's `card` button says why. The two pictures
+are held against each other on a Windows runner with WARP (`tests/PoEformance.Gpu.Tests`, the
+`gpu-test` job), the only place the shaders are compiled before they reach a player's machine.
+
 **A free sun** stands where it is put - two sliders, its bearing on the game's screen and its
 height, or shift + drag in the model window (`IMovableSun`), the drag's direction measured through
 the picture's camera so the sun's mark follows the hand. While it moves its shadow map is 512
 square (`ShadowMap.Coarse`), and 2048 once it is let go.
+
+**What the game's camera cannot see is left out of a laid room** (`CameraSight`, run by
+`LaidRoomModels.Hiding`), asked for over Azmerian Ranges, whose rooms take thousands of doodads and
+much of what they drew lay under the ground the game shows. The camera follows the player at a fixed
+angle - the player is always mid-screen - so standing over another place is the matrix read now
+(`CameraShot`) moved by how far that place is from the player. The places are walkable cells, one
+per half of the screen's smaller side, out to the screen's reach past the room - 144 over a test area
+forty tiles square, at most 384 - each a perspective view with the game's own near plane, so a wall
+behind the camera hides nothing (an orthographic view along the camera's direction would have let a
+mountain at the room's far edge hide the valley in front of it). A view is a depth of one over w at
+216 rows; solid triangles write it, and a triangle is kept where at least one view shows it at a
+texel no further than 8 units behind what is there, or - smaller than a texel - at its middle against
+the furthest of the nine texels round it. Shadow-only casters are always kept. It runs twice: the
+tiles are laid first and drawn into a coarse copy of every view (90 rows, with halving levels of the
+furthest depth), and every doodad place is asked against it before anything is loaded - a box a tile
+across times its scale, then its own box once its file is read (`DoodadSieve`); a file none of whose
+places passes is never read. Then the whole room is drawn into the views and the mesh rebuilt from
+what is seen (`SkinnedMesh.Keeping`, every shape kept in its place so materials and blends stay in
+step); the picture, its light and the sun's shadow map are worked out from that. A cut under the
+area's ground drops triangles whose three corners all lie deeper than it, counted from the ground
+under each corner. Measured on four threads over that test area: 2.5 million triangles against 144
+views in about 1.3 s, 5000 doodad boxes in 0.2 s; drawing a triangle into every view it falls in was nearly all of
+it, which is why the places are half a screen apart and each row is solved for its span rather than
+tested texel by texel.
 
 It lives in a **window of its own** now, in every book (`MonsterPortrait.DrawWindow`): the
 picture, its animation row, the buttons on it, and its lines folded under it. The book keeps the

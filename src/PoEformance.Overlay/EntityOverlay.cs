@@ -538,6 +538,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             RoomTools = _tileBook?.Tools ?? basis.RoomTools,
             RoomAnywhere = _tileBook?.Anywhere ?? basis.RoomAnywhere,
             RoomsOnMap = _tileBook?.RoomsOnMap ?? basis.RoomsOnMap,
+            RoomSight = _tileBook?.Sight ?? basis.RoomSight,
+            RoomCut = _tileBook?.Cut ?? basis.RoomCut,
             EffectColumns = _effectBook?.Columns is { Count: > 0 } effectColumns
                 ? effectColumns
                 : basis.EffectColumns,
@@ -557,6 +559,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             ModelLight = _monsterBook?.Model?.Light ?? basis.ModelLight,
             ModelLightTarget = _monsterBook?.Model?.LightTarget ?? basis.ModelLightTarget,
             ModelFlatLight = _modelWants.ModelFlatLight,
+            ModelCard = _card.On,
             ShowProjectiles = _projectiles.Enabled,
             ProjectileTrails = _projectiles.ShowTrails,
             ProjectilePaths = _projectiles.ShowPaths,
@@ -732,6 +735,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// <summary>What the settings file said about the model pane, until there is a pane to say it to.</summary>
     private OverlaySettings _modelWants = OverlaySettings.Default;
 
+    /// <summary>The graphics card's drawing for every model pane - see CardPictures.</summary>
+    private readonly CardPictures _card;
+
     /// <summary>
     /// Puts the capture settings onto the model pane, wherever it has got to.
     /// </summary>
@@ -780,6 +786,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         {
             pane.LightTarget = _modelWants.ModelLightTarget;
         }
+
+        // ONE CARD FOR EVERY BOOK, and one switch: every pane holds the same one, so a press in one
+        // is the others' too, and only the settings need telling.
+        pane.Card = _card;
+        _card.On = _modelWants.ModelCard;
+        _card.Changed = on =>
+        {
+            _modelWants = _modelWants with { ModelCard = on };
+            SettingsChanged?.Invoke();
+        };
 
         // ONE CHOICE FOR EVERY BOOK: a press in one pane is carried to the others and kept.
         pane.FlatLight = _modelWants.ModelFlatLight;
@@ -1463,6 +1479,21 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         Vector2? alongY = OnScreen(player.WorldX, player.WorldY + step, player.WorldZ, size);
         return origin is { } o && alongX is { } x && alongY is { } y
             ? new SceneLight.GroundOnScreen(x - o, y - o)
+            : null;
+    }
+
+    /// <summary>
+    /// The game's camera as the snapshot holds it, for a laid room to leave out what it cannot see - or null outside the game.
+    /// </summary>
+    /// <remarks>
+    /// ASKED OFF THE FRAME, by the tile book's load: the snapshot is swapped whole, so one read of it is
+    /// one frame's, and the matrix is copied because the next frame's may arrive in the same array.
+    /// </remarks>
+    private CameraShot? Shot()
+    {
+        WorldSnapshot snapshot = _snapshot;
+        return snapshot.InGame && snapshot.Player is WorldEntity player && snapshot.Matrix.Length >= 16
+            ? new CameraShot(snapshot.Matrix[..16], new Vector3(player.WorldX, player.WorldY, player.WorldZ))
             : null;
     }
 
@@ -2171,6 +2202,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // it needs, which is what keeps its projection maths testable away from a GPU.
         _terrain = new TerrainLayer(Upload, key => RemoveImage(key));
         _icons = new IconCache(Upload, key => RemoveImage(key));
+
+        // THE MODEL PANES' CARD, on this overlay's own device - asked for on the render thread the
+        // first time a pane draws, since the device does not exist yet. See CardPictures.
+        _card = new CardPictures(() => (Device, DeviceContext), AddView, DropView);
 
         // Both tables are set by whoever wires this up, in no fixed order against this
         // constructor, so the list reads them per draw rather than taking a copy of Empty.
@@ -3333,7 +3368,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         bool roomTools = false,
         bool roomAnywhere = false,
         bool roomsOnMap = false,
-        IReadOnlyList<string>? tileSections = null)
+        IReadOnlyList<string>? tileSections = null,
+        bool roomSight = true,
+        int roomCut = 0)
     {
         // ONE INDEX OF WHICH TILESETS PLACE WHICH TILE, built off the frame on first ask: the pane's
         // tileset choice and the dump both read it, and building it twice would read every tileset twice.
@@ -3359,6 +3396,8 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Doodads = roomDoodads,
             Tools = roomTools,
             Anywhere = roomAnywhere,
+            Sight = roomSight,
+            Cut = roomCut,
             Terrain = () => _snapshot.Terrain as TerrainGrid,
             Read = readFile,
             Ghost = ghost => _roomGhost = ghost,
@@ -3366,7 +3405,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize)
             {
                 Book = "tile",
-                Load = (read, _, key, _, progress) => TileBookWindow.Load(read, key, () => _snapshot.Terrain as TerrainGrid, progress, () => _snapshot.Entities),
+                Load = (read, _, key, _, progress) => TileBookWindow.Load(read, key, () => _snapshot.Terrain as TerrainGrid, progress, () => _snapshot.Entities, Shot),
                 Ink = TileBookWindow.GroundInk,
                 Shaded = true,
 
@@ -3832,6 +3871,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         {
             _terrain.Dispose();
             _icons.Dispose();
+            _card.Dispose();
         }
 
         base.Dispose(disposing);

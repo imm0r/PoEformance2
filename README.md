@@ -96,7 +96,10 @@ files - plus the raw bytes of the game's root objects, one hop beyond them, and 
 the entities around you; `memory.txt` beside it says what sits at which address.
 
 Every book shows its model in a **window of its own** - drag to turn, the wheel zooms - which opens
-when a row is chosen; the book keeps the switches. The Tile Book's are in folds: Drawing, Where it
+when a row is chosen; the book keeps the switches. The picture is **drawn on the graphics card**
+where the card can draw the same picture the processor would, and on the processor where it cannot
+yet (materials' shader graphs, the game's light); the rate in the picture's corner says which drew
+it, and the `card` button beside it switches the card off and says why a picture went to the processor. The Tile Book's are in folds: Drawing, Where it
 lies in this area, Light, View & export, Files & surveys; the Item and Effect books keep theirs in
 a bar under the list.
 
@@ -107,8 +110,17 @@ their `.ao` Lights blocks. Each part has its own switch, the environment's colou
 How the sun's phi and theta become its direction was asked of the game itself - *find the readings*
 searches its memory for every candidate's vector - and the one it holds is the one drawn: phi is the
 sun's height, theta its bearing; the row says where its shadows fall on the game's screen. The sky's
-two angles are still candidates, offered only where they can change the picture. A *free sun* stands
+turn was found the same way - the cube's up is the world's, hor_angle turns it about that - and only
+how vert_angle tips it is still a candidate, offered where it can change the picture. A *free sun* stands
 anywhere - two sliders, or shift + drag in the model window, its shadows coarse while it moves.
+
+A room drawn as laid **leaves out what the game's camera cannot see** (*leave out the hidden*, on
+unless switched off): the camera is the game's own, read while you play and set over every place
+you could stand within its reach of the room, and what none of those views shows - ground under
+ground, the inside of rock, the far side of a cliff - is neither loaded nor drawn, lit or shadowed.
+A doodad is asked before it is read, so a large room loads what can be seen rather than everything
+it places. A second control cuts everything further than a set depth under the area's own ground.
+The line under the picture says how much was left out and how long finding it took.
 
 The overlay draws the area's layout **on the game's own map** — including the parts not
 explored yet — and marks living monsters, chests, drops and NPCs on it. The large map when

@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    ClickableTransparentOverlay 11.1.0 (zaafar/ClickableTransparentOverlay, commit 297f3d4),
+    Apache License 2.0 - see LICENSE beside this file, and NOTICE.md for what this copy changes.
+
+    VENDORED RATHER THAN REFERENCED so the model viewer can draw on the overlay's own Direct3D 11
+    device: the package keeps the device private and takes pictures only as pixels in memory. The
+    files stay as upstream wrote them apart from the changes NOTICE.md lists, so a later version
+    can be compared line for line - which is also why its own settings are kept here rather than
+    the solution's: implicit usings off, and the solution's analyzers not turned on code nobody
+    here wrote.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <!-- UPSTREAM DOES NOT HOLD TO ITS OWN NULLABLE ANNOTATIONS - 23 uninitialised-field warnings,
+         which the solution's warnings-as-errors turns into a failed build - so the analysis is off
+         here, and the annotations it does write are let stand without it (CS8632). -->
+    <Nullable>disable</Nullable>
+    <NoWarn>$(NoWarn);CS8632</NoWarn>
+    <NoWin32Manifest>true</NoWin32Manifest>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IsAotCompatible>false</IsAotCompatible>
+    <EnableAotAnalyzer>false</EnableAotAnalyzer>
+    <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
+    <EnableSingleFileAnalyzer>false</EnableSingleFileAnalyzer>
+    <EnableNETAnalyzers>false</EnableNETAnalyzers>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ImGui.NET" Version="1.91.6.1" />
+    <!-- 3.1.12 and not upstream's 3.1.6, for the advisories Directory.Build.props describes. -->
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
+    <PackageReference Include="Vortice.D3DCompiler" Version="3.5.0" />
+    <PackageReference Include="Vortice.Direct3D11" Version="3.5.0" />
+  </ItemGroup>
+</Project>

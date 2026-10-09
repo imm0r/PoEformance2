@@ -174,6 +174,15 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     /// <summary>How high doodads with a height in their line are set - see DoodadHeight. Nought is the usual, at the line's height.</summary>
     private DoodadHeight _heights;
 
+    /// <summary>Whether a laid room leaves out what the game's camera cannot see - see LaidRoomModels. Kept in the settings; see <see cref="Sight"/>.</summary>
+    private bool _sight = true;
+
+    /// <summary>How far under the area's ground a laid room leaves everything out; nought for nothing. Kept in the settings; see <see cref="Cut"/>.</summary>
+    private int _cut;
+
+    /// <summary>The cut's slider while it is dragged - applied when it is let go, as the doodads slider is.</summary>
+    private int _cutting;
+
     /// <summary>Every tile file's identity read for the area in <see cref="_identitiesOf"/> - one read per file across every room searched there.</summary>
     private ConcurrentDictionary<string, TileIdentity?> _identities = new(StringComparer.OrdinalIgnoreCase);
     private TerrainGrid? _identitiesOf;
@@ -207,6 +216,24 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     {
         get => _anywhere;
         set => _anywhere = value;
+    }
+
+    /// <summary>Whether a laid room leaves out what the game's camera cannot see, as the box has it - what the settings keep.</summary>
+    public bool Sight
+    {
+        get => _sight;
+        set => _sight = value;
+    }
+
+    /// <summary>How far under the area's ground a laid room leaves everything out, as the slider has it - what the settings keep. Out of range is nought.</summary>
+    public int Cut
+    {
+        get => _cut;
+        set
+        {
+            _cut = value is > 0 and <= RoomKey.MostCut ? value : 0;
+            _cutting = _cut;
+        }
     }
 
     /// <summary>Whether every room the area loaded is outlined on the large map at once, as the box has it - what the settings keep. See AreaRooms.</summary>
@@ -436,12 +463,14 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     /// <param name="terrain">The current area, for a room laid from its tiles; null leaves such a room out.</param>
     /// <param name="progress">Where the build says how far it has got, for the pane's bar, or null.</param>
     /// <param name="entities">The area's entities in memory, for a laid room's doodad heights line, or null.</param>
+    /// <param name="camera">The game's camera as last read, for what a laid room may leave out unseen, or null.</param>
     public static MonsterModel Load(
         Func<string, byte[]?> read,
         string key,
         Func<TerrainGrid?>? terrain = null,
         ModelProgress? progress = null,
-        Func<IReadOnlyList<WorldEntity>?>? entities = null)
+        Func<IReadOnlyList<WorldEntity>?>? entities = null,
+        Func<CameraShot?>? camera = null)
     {
         ArgumentNullException.ThrowIfNull(key);
 
@@ -474,7 +503,8 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         return grid is not null && Stamp(grid) == area
             ? LaidRoomModels.Of(
                 read, room.Path, grid, x, y, turn, shaded: true, doodads: room.Doodads, tools: room.Tools, atLevel: room.AtLevel,
-                progress: progress, heights: room.Heights, entities: entities?.Invoke())
+                progress: progress, heights: room.Heights, entities: entities?.Invoke(),
+                camera: room.Hidden ? null : camera?.Invoke(), sight: !room.Hidden, cut: room.Cut)
             : MonsterModel.None with { Why = "the area this place was found in is gone - pick the room's place again" };
     }
 
@@ -768,6 +798,48 @@ public sealed class TileBookWindow : BookWindow<TileBook>
                     + " raised until its ground meets the area's on average.\n"
                     + "Which of the two the game does is not settled: compare both with the game, and see the \"level:\" line under the picture.");
             }
+
+            Hiding();
+        }
+    }
+
+    /// <summary>What the cut's slider says at nought.</summary>
+    private const string CutOff = "no cut";
+
+    /// <summary>
+    /// A laid room's row for what is left out unseen: the camera's switch and the cut under the ground, each reloading the room.
+    /// </summary>
+    private void Hiding()
+    {
+        if (ImGui.Checkbox("leave out the hidden##roomsight", ref _sight))
+        {
+            Changed?.Invoke();
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("Leaves out what the game's camera cannot see from anywhere the player can stand near the room - under the ground,"
+                + " inside rock, behind cliffs - before it is loaded where it can be, and from the picture, its light and its shadows.\n"
+                + "The camera is the game's own, read now and moved over every walkable place within its reach, so it needs the game running"
+                + " and the room drawn as laid. Turn the picture to look from below and the holes show; off draws everything.\n"
+                + "The line under the picture says how much was left out and how long it took.");
+        }
+
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(Math.Min(ImGui.GetContentRegionAvail().X, 220f));
+        ImGui.SliderInt("##roomcut", ref _cutting, 0, RoomKey.MostCut, _cutting == 0 ? CutOff : "cut %d under ground", ImGuiSliderFlags.AlwaysClamp);
+        if (ImGui.IsItemDeactivatedAfterEdit() && _cutting != _cut)
+        {
+            _cut = Math.Clamp(_cutting, 0, RoomKey.MostCut);
+            Changed?.Invoke();
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("Leaves out everything further under the area's own ground than this many world units - a triangle whose three corners"
+                + " all lie deeper, and a doodad before it is loaded where all of it would. Nought cuts nothing.\n"
+                + "Counted from the ground under each point, so a slope is cut along the slope. The room reloads when the slider is let go;"
+                + " Ctrl+click types a number.");
         }
     }
 
@@ -775,7 +847,9 @@ public sealed class TileBookWindow : BookWindow<TileBook>
     private string LaidKey(string chosen)
     {
         string laid = LaidPlace();
-        return new RoomKey(chosen, _doodads, _tools, laid, AtLevel: laid.Length > 0 && _atLevel, Heights: _heights).ToString();
+        return new RoomKey(
+            chosen, _doodads, _tools, laid, AtLevel: laid.Length > 0 && _atLevel, Heights: _heights,
+            Hidden: laid.Length > 0 && !_sight, Cut: laid.Length > 0 ? _cut : 0).ToString();
     }
 
     /// <summary>The place the room is drawn laid at, as the key writes it - or empty for the room as its file has it.</summary>

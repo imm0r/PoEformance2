@@ -5,6 +5,7 @@ using ImGuiNET;
 using PoEformance.Features;
 using PoEformance.Game.Entities;
 using PoEformance.Game.Files;
+using PoEformance.Gpu;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.PixelFormats;
@@ -304,6 +305,17 @@ public sealed class MonsterPortrait
     private IntPtr _texture;
     private string _key = string.Empty;
     private int _keys;
+
+    /// <summary>Where this pane's pictures are drawn on the card, and ImGui's handle for it - kept while the size holds. See <see cref="OnCard"/>.</summary>
+    private ModelTarget? _cardTarget;
+    private IntPtr _cardShown;
+
+    /// <summary>Whether the picture shown was drawn on the card, and why the last one was not.</summary>
+    private bool _onCard;
+    private string _cardWhy = string.Empty;
+
+    /// <summary>The card's switch as the last picture was drawn - a press redraws.</summary>
+    private bool _drawnCardOn;
 
     /// <summary>
     /// What every key this pane hands the renderer starts with.
@@ -838,6 +850,11 @@ public sealed class MonsterPortrait
     /// </remarks>
     public bool Grey { get; set; }
 
+    /// <summary>
+    /// The graphics card's drawing, shared by every book, or null to draw on the processor alone - see <see cref="CardPictures"/>.
+    /// </summary>
+    public CardPictures? Card { get; set; }
+
     /// <summary>How much of the colour's mean the grey keeps. See <see cref="PictureGrey.Measured"/>.</summary>
     public float GreyFactor { get; set; } = PictureGrey.Measured;
 
@@ -1245,6 +1262,7 @@ public sealed class MonsterPortrait
             ClockToggle(corner);
             LightToggle(corner);
             ProbeToggle(corner);
+            CardToggle(corner);
         }
 
         ImGui.SetCursorScreenPos(below);
@@ -1256,16 +1274,21 @@ public sealed class MonsterPortrait
     private string RateText()
     {
         int now = (int)Math.Round(_rate.At(ImGui.GetTime()));
-        if (now != _rateShown || _rateText.Length == 0)
+        bool card = Card is not null && _onCard;
+        if (now != _rateShown || card != _rateCard || _rateText.Length == 0)
         {
             _rateShown = now;
-            _rateText = now.ToString(CultureInfo.InvariantCulture) + " fps";
+            _rateCard = card;
+
+            // WHICH OF THE TWO DREW THE PICTURE SHOWN, beside how often - a glance says both.
+            _rateText = now.ToString(CultureInfo.InvariantCulture) + " fps" + (Card is null ? string.Empty : card ? " card" : " cpu");
         }
 
         return _rateText;
     }
 
     private int _rateShown = -1;
+    private bool _rateCard;
     private string _rateText = string.Empty;
 
     /// <summary>
@@ -1455,7 +1478,7 @@ public sealed class MonsterPortrait
     }
 
     /// <summary>The room the rate is given, three digits wide, so the button beside it does not shuffle as the number changes.</summary>
-    private const string RateRoom = "999 fps";
+    private const string RateRoom = "999 fps card";
 
     /// <summary>
     /// Carries the camera on one step of its lap, where the orbit is running.
@@ -2715,6 +2738,7 @@ public sealed class MonsterPortrait
             || !ReferenceEquals(_drawnBlends, Blends())
             || !ReferenceEquals(_drawnLight, Lit())
             || (posed && (_drawnFrame != _frame || _drawnAnimation != _chosen))
+            || _drawnCardOn != (Card?.On ?? false)
             || _probeAsked;
 
         if (moved)
@@ -3062,31 +3086,42 @@ public sealed class MonsterPortrait
         _drawnShades = ShadesOf(_model);
         _drawnBlends = Blends();
         _drawnLight = Lit();
+        _drawnCardOn = Card?.On ?? false;
         _drawing++;
 
         try
         {
-            // The canvas lends its pixels rather than giving them, and LoadPixelData below copies
-            // them into the image straight away - so nothing here outlives the next redraw.
-            GamePicture drawn;
             float lowest;
-            MeshPicture.Canvas canvas = Probing(Clocked(Canvas(size)), size);
-            canvas.Light = _drawnLight;
-            if (posed && _pose is not null && _tracks is not null)
+            bool moving = posed && _pose is not null && _tracks is not null;
+            if (moving)
             {
-                _pose.Take(_tracks, _frame);
+                _pose!.Take(_tracks!, _frame);
                 _pose.Move(_model.Mesh, _posed, _posedNormals);
                 lowest = Lowest(_posed);
-                drawn = MeshPicture.Of(
-                    _model.Mesh, canvas, _posed, _posedNormals, _turn, _tilt, Ink,
-                    _model.Skin, _zoom, _pan, _model.Skins, Blends(), ShadesOf(_model));
             }
             else
             {
                 lowest = _model.Mesh.Most.Z;
-                drawn = MeshPicture.Of(
-                    _model.Mesh, canvas, _turn, _tilt, Ink, _model.Skin, _zoom, _pan, _model.Skins, Blends(), ShadesOf(_model));
             }
+
+            // ON THE CARD WHERE IT CAN DRAW THE SAME PICTURE, on the processor where it cannot.
+            if (OnCard(size, moving))
+            {
+                _rate.Redrawn(ImGui.GetTime());
+                Planted(lowest);
+                return;
+            }
+
+            // The canvas lends its pixels rather than giving them, and LoadPixelData below copies
+            // them into the image straight away - so nothing here outlives the next redraw.
+            MeshPicture.Canvas canvas = Probing(Clocked(Canvas(size)), size);
+            canvas.Light = _drawnLight;
+            GamePicture drawn = moving
+                ? MeshPicture.Of(
+                    _model.Mesh, canvas, _posed, _posedNormals, _turn, _tilt, Ink,
+                    _model.Skin, _zoom, _pan, _model.Skins, Blends(), ShadesOf(_model))
+                : MeshPicture.Of(
+                    _model.Mesh, canvas, _turn, _tilt, Ink, _model.Skin, _zoom, _pan, _model.Skins, Blends(), ShadesOf(_model));
 
             Probed(canvas);
 
@@ -3115,6 +3150,113 @@ public sealed class MonsterPortrait
             // input here came out of a game's files.
             Why = $"the model would not draw: {exception.Message}";
             Drop();
+        }
+    }
+
+    /// <summary>
+    /// Draws the picture on the graphics card where it is switched on and can draw the same picture - false leaves it to the processor.
+    /// </summary>
+    /// <remarks>
+    /// THE PROCESSOR KEEPS WHAT THE CARD CANNOT DO YET - shade programs, the game's light - and what
+    /// reads the processor's own pixels: the probe, and the grey laid on them. Each says so on the
+    /// card button rather than drawing something else. A card that fails mid-draw is not asked again;
+    /// see <see cref="CardPictures.Fail"/>.
+    /// </remarks>
+    private bool OnCard(int size, bool moving)
+    {
+        _onCard = false;
+        if (Card is not { } card)
+        {
+            return false;
+        }
+
+        if (!card.On || _probing || Grey)
+        {
+            _cardWhy = !card.On ? "the card is switched off" : _probing ? "the probe reads the processor's drawing" : "the grey is laid on the processor's pixels";
+            return false;
+        }
+
+        if (card.Gpu is not { } gpu)
+        {
+            _cardWhy = card.Why;
+            return false;
+        }
+
+        var scene = new ModelScene(
+            _model.Mesh, _turn, _tilt, Ink, _model.Skin, _zoom, _pan, _model.Skins, Blends(),
+            moving ? _posed : null, moving ? _posedNormals : null);
+        if (!gpu.Can(scene, ShadesOf(_model), _drawnLight, out string why))
+        {
+            _cardWhy = why;
+            return false;
+        }
+
+        try
+        {
+            if (_cardTarget is not { } target || target.Size != size)
+            {
+                card.Forget(_cardTarget, _cardShown);
+                _cardShown = IntPtr.Zero;
+                _cardTarget = target = gpu.Target(size);
+                _cardShown = card.Show(target);
+            }
+
+            if (!gpu.Draw(target, scene, out why))
+            {
+                _cardWhy = why;
+                return false;
+            }
+        }
+        catch (Exception exception) when (exception is not (OutOfMemoryException or StackOverflowException))
+        {
+            // NOTHING OF THE CARD'S LEFT FOR IMGUI TO DRAW: its picture is taken back before the
+            // device that made it is let go.
+            if (_texture == _cardShown)
+            {
+                _texture = IntPtr.Zero;
+            }
+
+            card.Forget(_cardTarget, _cardShown);
+            _cardTarget = null;
+            _cardShown = IntPtr.Zero;
+            card.Fail($"the card failed to draw: {exception.Message}");
+            _cardWhy = card.Why;
+            return false;
+        }
+
+        Drop();
+        _texture = _cardShown;
+        _onCard = true;
+        _cardWhy = string.Empty;
+        Why = string.Empty;
+        return true;
+    }
+
+    /// <summary>
+    /// The card's button beside the rate: which of the two draws the pictures, and why the processor drew this one where the card is on.
+    /// </summary>
+    private void CardToggle(Vector2 corner)
+    {
+        if (Card is not { } card)
+        {
+            return;
+        }
+
+        Cornered(corner);
+        if (ImGui.SmallButton(card.On ? "card##monster-card" : "processor##monster-card"))
+        {
+            card.On = !card.On;
+            card.Changed?.Invoke(card.On);
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(
+                (card.On
+                    ? "Pictures are drawn on the graphics card where it can draw the same picture as the processor, and on the processor where not."
+                    : "Pictures are drawn on the processor, as before the card could draw them.")
+                + (card.On && !_onCard && _cardWhy.Length > 0 ? "\nThis one on the processor: " + _cardWhy : string.Empty)
+                + "\nThe rate in the corner says which drew the picture shown. One switch for every book.");
         }
     }
 

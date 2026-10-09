@@ -66,4 +66,82 @@ internal sealed class ModelPile
 
         Triangles += mesh.Triangles;
     }
+
+    /// <summary>
+    /// The solid triangles laid so far, each vertex where its piece puts it - what hides things from the game's camera before the rest is loaded.
+    /// </summary>
+    /// <remarks>
+    /// NOT A JOIN: only the places and the solid shapes' indices, and a piece with no solid shape is not
+    /// so much as moved - normals, coordinates and colours are not needed to hide anything.
+    /// </remarks>
+    public (Vector3[] Places, int[] Indices) Solid()
+    {
+        var places = new List<Vector3>();
+        var indices = new List<int>();
+        var shape = 0;
+        foreach (MeshJoin join in Joins)
+        {
+            SkinnedMesh mesh = join.Mesh!;
+            int first = shape;
+            shape += mesh.Shapes.Count;
+            int solid = 0;
+            for (var one = 0; one < mesh.Shapes.Count; one++)
+            {
+                solid += MaterialBlends.Of(Modes[first + one]) == MaterialBlend.Opaque ? 1 : 0;
+            }
+
+            if (solid == 0)
+            {
+                continue;
+            }
+
+            int start = places.Count;
+            Matrix4x4 place = join.Place ?? Matrix4x4.Identity;
+            foreach (Vector3 vertex in mesh.Positions)
+            {
+                places.Add(Vector3.Transform(vertex, place));
+            }
+
+            for (var one = 0; one < mesh.Shapes.Count; one++)
+            {
+                if (MaterialBlends.Of(Modes[first + one]) != MaterialBlend.Opaque)
+                {
+                    continue;
+                }
+
+                MeshShape part = mesh.Shapes[one];
+                for (int at = part.From, end = Math.Min(part.From + part.Count, mesh.Indices.Length); at < end; at++)
+                {
+                    indices.Add(mesh.Indices[at] + start);
+                }
+            }
+        }
+
+        return ([.. places], [.. indices]);
+    }
+
+    /// <summary>
+    /// Every triangle's blend in a mesh joined from this pile, by the shape it is in - opaque outside every shape, as the picture has it.
+    /// </summary>
+    public MaterialBlend[] Blends(SkinnedMesh joined)
+    {
+        ArgumentNullException.ThrowIfNull(joined);
+        var blends = new MaterialBlend[joined.Triangles];
+        for (var one = 0; one < joined.Shapes.Count && one < Modes.Count; one++)
+        {
+            MaterialBlend blend = MaterialBlends.Of(Modes[one]);
+            if (blend == MaterialBlend.Opaque)
+            {
+                continue;
+            }
+
+            MeshShape shape = joined.Shapes[one];
+            for (int t = shape.From / 3, end = Math.Min((shape.From + shape.Count) / 3, blends.Length); t < end; t++)
+            {
+                blends[t] = blend;
+            }
+        }
+
+        return blends;
+    }
 }

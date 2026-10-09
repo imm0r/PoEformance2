@@ -193,6 +193,15 @@ public sealed record OverlaySettings(
     // ranks it first unless a surer room holds that spot. Off, the usual. See AreaRooms.
     [property: JsonPropertyName("roomsOnMap")] bool RoomsOnMap = false,
 
+    // Whether a laid room in the tile book leaves out what the game's camera cannot see from anywhere
+    // the player can stand - under the ground, inside rock. ON, the usual: a large room is otherwise
+    // thousands of doodads nobody can see. See LaidRoomModels.Hiding.
+    [property: JsonPropertyName("roomSight")] bool RoomSight = true,
+
+    // How far under the area's ground a laid room leaves everything out, in world units. Zero, the
+    // usual, cuts nothing. See LaidRoomModels.Hiding.
+    [property: JsonPropertyName("roomCut")] int RoomCut = 0,
+
     // And the effect book's, kept apart for the same reason. See EffectBookWindow.
     [property: JsonPropertyName("effectColumns")] IReadOnlyList<string>? EffectColumns = null,
     [property: JsonPropertyName("effectColumnWidths")] IReadOnlyDictionary<string, int>? EffectColumnWidths = null,
@@ -234,6 +243,10 @@ public sealed record OverlaySettings(
     // cheap choice where the game's GGX is too slow. Off, the usual, is the game's. One for every
     // book, since it is the same question in each. See MonsterPortrait.FlatLight.
     [property: JsonPropertyName("modelFlatLight")] bool ModelFlatLight = false,
+
+    // Whether the model panes draw on the graphics card where it can draw the same picture as the
+    // processor. ON, the usual: it is the same picture, faster. One for every book. See CardPictures.
+    [property: JsonPropertyName("modelCard")] bool ModelCard = true,
 
     // Whether the monster book's facet rail has a pane of its own. ON by default, because a rail
     // nobody knows about is a rail nobody opens - and OFF is a real setting because this window is

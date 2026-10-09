@@ -3577,7 +3577,9 @@ internal static class Program
             roomTools: settings.RoomTools,
             roomAnywhere: settings.RoomAnywhere,
             roomsOnMap: settings.RoomsOnMap,
-            tileSections: settings.TileSections);
+            tileSections: settings.TileSections,
+            roomSight: settings.RoomSight,
+            roomCut: settings.RoomCut);
         overlay.AttachPointsOfInterest(route);
 
         // Before the editor, which is handed this exact instance - and before the layers read

@@ -142,16 +142,39 @@ public class LightHuntTests
     {
         EnvironmentSettings env = Sunny();
         LightHunt hunt = LightHunt.For("Sunny.env", env, one => $"reading {one + 1}", out _)!;
-        Matrix4x4 turn = SceneLight.CubeTurnFrom(env.HorAngle!.Value, env.VertAngle!.Value, SceneLight.CubeReading.ZThenX);
+        Matrix4x4 turn = SceneLight.CubeTurnFrom(env.HorAngle!.Value, env.VertAngle!.Value, SceneLight.CubeReading.RoundThenTipX);
         var bytes = new byte[0x1000];
         Floats(bytes, 0x100, turn.M11, turn.M12, turn.M13, turn.M14, turn.M21, turn.M22, turn.M23, turn.M24, turn.M31, turn.M32, turn.M33, turn.M34);
         (FakeMemoryReader memory, Space space) = Memory(bytes);
 
         LightHuntVerdict verdict = hunt.Read(FloatHunt.Run(memory, space, hunt.Needles));
 
-        Assert.Equal((int)SceneLight.CubeReading.ZThenX, verdict.Cube);
-        Assert.Contains("cube reading 2, rows of four (turned by hor, then tipped about x by vert): 1 place", verdict.Report, StringComparison.Ordinal);
+        Assert.Equal((int)SceneLight.CubeReading.RoundThenTipX, verdict.Cube);
+        Assert.Contains(
+            "cube reading 2, rows of four (axes swapped, turned about the cube's up by -hor, then tipped about its x by vert): 1 place", verdict.Report, StringComparison.Ordinal);
         Assert.Contains("cube reading 3 is reading 2's turn", verdict.Report, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// The game's env_map_rotation as AzmerianRanges held it, 37 times over: rows (cos h, 0, sin h), (-sin h, 0, cos h), (0, -1, 0) - the world's up turned to the cube's plus y, the ground turned about it.
+    /// </summary>
+    [Fact]
+    public void THECUBETurnIsTheOneTheGameHolds()
+    {
+        const float hor = 0.19198f;
+        Matrix4x4 turn = SceneLight.CubeTurnFrom(hor, 0f, SceneLight.CubeReading.Round);
+        float c = MathF.Cos(hor), s = MathF.Sin(hor);
+        float[] expected = [c, 0f, s, -s, 0f, c, 0f, -1f, 0f];
+        float[] got = [turn.M11, turn.M12, turn.M13, turn.M21, turn.M22, turn.M23, turn.M31, turn.M32, turn.M33];
+        for (var at = 0; at < expected.Length; at++)
+        {
+            Assert.True(MathF.Abs(expected[at] - got[at]) < 1e-6f, $"entry {at}: {got[at]} against {expected[at]}");
+        }
+
+        // THE WORLD'S UP, minus z, reads the cube's plus y - its sky - turned or not.
+        Vector3 up = Vector3.TransformNormal(new Vector3(0f, 0f, -1f), turn);
+        Assert.True(Vector3.Distance(up, Vector3.UnitY) < 1e-6f, up.ToString());
+        Assert.Equal(SceneLight.CubeSwap, new SceneLight([], SceneLight.PointShape.Zero, null).CubeTurn);
     }
 
     /// <summary>An environment with no sun angles and no cube turn has nothing to look for, and says so.</summary>
