@@ -1346,12 +1346,18 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// rooms are there by the time the large map is opened. Each a touch thinner than the picked one
     /// (RoomGhostOnMap), which is drawn over it.
     ///
-    /// WITH ITS MISSES MARKED, the same three marks the picked room gets. The first version left them
-    /// out as twenty rooms' worth of dots; they were asked for because they are what shows the rooms
-    /// fitting together: where two rooms join, each one's rim misses along the join, so the marks a
-    /// join explains sit on the seam between the two outlines like the teeth of a puzzle piece, and a
-    /// room whose marks lie anywhere else is a room placed wrong. Each kind is its own style row, so
-    /// a map that is too busy switches a kind off.
+    /// BY THEIR DOODADS, wherever the area's entities can be read: every place each room's doodads
+    /// stand, a room the area lays four times outlined four times, and a ring on each doodad line
+    /// whose entity is not where the place puts it - see RoomDoodadFinder for why the entities decide
+    /// and AreaRooms for what the first answer got wrong. Nothing is drawn while they are being read:
+    /// the arrangement's places are the ones this replaced, and drawing them meanwhile would show the
+    /// wrong map for a second and then change it.
+    ///
+    /// BY THE GROUND AND TILES only where nothing can read the entities, with the three marks the
+    /// picked room gets. They were asked for because they are what shows the rooms fitting together:
+    /// where two rooms join, each one's rim misses along the join, so the marks a join explains sit
+    /// on the seam between the two outlines like the teeth of a puzzle piece. Each kind is its own
+    /// style row, so a map that is too busy switches a kind off.
     /// </remarks>
     private void AllRoomsOnMap(ImDrawListPtr draw, MapView map, WorldEntity player)
     {
@@ -1360,8 +1366,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             return;
         }
 
+        // ASKED EVERY FRAME, on any map: this is what starts the searches and, after them, the survey.
         RoomArrangement? arranged = _areaRooms.Arranged(grid, AreaRoomFiles(), _tileBook.RoomsOverlap);
-        if (arranged is null || !map.IsLargeMap)
+        if (!map.IsLargeMap)
         {
             return;
         }
@@ -1376,6 +1383,41 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         float width = Math.Max(1f, Style.Width(StyleCatalogue.Keys.RoomOutline, 2f) * 0.75f);
         float font = RoomFont();
         Span<Vector2> corners = stackalloc Vector2[4];
+        if (_areaRooms.ReadDoodads is not null)
+        {
+            if (_areaRooms.Placed is not { } placed)
+            {
+                return;
+            }
+
+            foreach ((string room, RoomLayout layout, RoomDoodadPlaces found) in placed)
+            {
+                foreach (RoomDoodadPlace place in found.Places)
+                {
+                    Outlined(draw, map, player, grid, place.Where, outline, width, corners);
+                    if (tile != 0)
+                    {
+                        // A DOODAD THE PLACE HAS NO ENTITY FOR, in the tile ink: the same ring as a tile
+                        // that disagrees, which is the nearest thing in meaning the style rows have.
+                        foreach (Vector2 at in place.Missing)
+                        {
+                            Vector2 on = Grounded(grid, map, player, (int)(at.X / MapView.WorldToGrid), (int)(at.Y / MapView.WorldToGrid));
+                            draw.AddCircle(on, 3.75f, tile, 12, 1.5f);
+                        }
+                    }
+
+                    Named(draw, corners, room, place.Where, layout, name, plate, font);
+                }
+            }
+
+            return;
+        }
+
+        if (arranged is null)
+        {
+            return;
+        }
+
         foreach (RoomLaid room in arranged.Laid)
         {
             Outlined(draw, map, player, grid, room.Where, outline, width, corners);
@@ -3418,6 +3460,13 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // tileset choice and the dump both read it, and building it twice would read every tileset twice.
         var catalog = new TilesetCatalog(readFile, () => TileSets);
         _areaRooms = readFile is null ? null : new AreaRooms(readFile);
+        if (_areaRooms is not null)
+        {
+            // THE ENTITIES' READ, set before the books are attached like the hunts: the map places the
+            // rooms by their doodads wherever this is set - see AreaRooms.
+            _areaRooms.ReadDoodads = SurveyDoodads;
+        }
+
         _capture.Read = readFile;
         // THE HUNT AS IT STANDS NOW: HuntFloats is set before the books are attached, and the anchor is
         // the player's own entity, on the game's heap, whenever the button is pressed.
@@ -3430,7 +3479,6 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         {
             Lighting = lighting,
             AllRooms = _areaRooms,
-            Survey = SurveyDoodads,
             RoomsOnMap = roomsOnMap,
             Changed = () => SettingsChanged?.Invoke(),
             Tilesets = catalog,

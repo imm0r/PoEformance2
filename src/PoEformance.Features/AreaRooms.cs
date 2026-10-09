@@ -5,25 +5,33 @@ using PoEformance.Game.World;
 namespace PoEformance.Features;
 
 /// <summary>
-/// Every room the current area loaded, searched for off the frame and arranged so no two share a tile - for the large map to outline all at once.
+/// Every room the current area loaded: searched for off the frame by its ground and tiles, and placed by its doodads once the area's entities are read - for the large map to outline all at once.
 /// </summary>
 /// <remarks>
 /// WHY THIS EXISTS. The tile book finds one room at a time and outlines the row a person picks; with
 /// twenty rooms in an area that is twenty picks to see the layout. Asked for: every room drawn at once,
-/// taking each search's first row as right for now, and no two rooms on top of one another - which is
-/// RoomArrangement's to settle.
+/// where it stands.
+///
+/// TWO ANSWERS, AND WHICH ONE THE MAP TAKES. The ground-and-tile search (RoomFinder) ranks places by
+/// how well a room's slots agree with what the area laid, and RoomArrangement gives each room one place
+/// no surer room holds. That was the first answer and it is kept for the tile book, where a person
+/// reads a room's list; but it placed a floor module in the black beside the boss arena, because its
+/// best places lay inside the arena and the rule moved it, and it could never draw a wall module that
+/// the area lays four times. The second answer asks the area's entities: each doodad line of a room is
+/// an entity standing where the line put it, and RoomDoodadFinder finds every place the room's
+/// doodads stand. The map draws that wherever the entities can be read - see <see cref="Placed"/> -
+/// and the arrangement only where they cannot.
 ///
 /// ONE SEARCH AT A TIME, ON ONE TASK. Each tries its room eight ways round at every tile corner of
 /// the area - cheap per try, not per area - and twenty of them at once would take every core from the
-/// game for the seconds they run. In turn they take one, and the map fills in when the last is done.
-/// The searches are the tile book's own (RoomFinder.Find with the same walkable mask), so a room
-/// drawn here sits where the first row of its list puts it, until another room is surer of that spot.
+/// game for the seconds they run. In turn they take one. The doodad survey follows on its own task
+/// once the rooms are read, since it needs their files for the stubs to look for; it is one walk of
+/// two entity maps, measured at 47 ms for an area of 1441 entities.
 ///
 /// AGAIN ONLY WHEN THE AREA OR ITS ROOMS CHANGE: the grid by reference, as everywhere, and the rooms
 /// by their count - the loaded-file list only ever grows within an area, and a room arriving late is
-/// a new arrangement. The searches are kept, so a change of RoomOverlap rule arranges them again on
-/// the spot: placing the rooms down their lists only looks up the tiles each place covers, where the
-/// searches took seconds.
+/// a new arrangement and a new survey. The searches are kept, so a change of RoomOverlap rule
+/// arranges them again on the spot.
 /// </remarks>
 public sealed class AreaRooms
 {
@@ -41,9 +49,10 @@ public sealed class AreaRooms
     private IReadOnlySet<string>? _stubs;
     private List<(string Room, RoomLayout Layout, RoomSearch Search)>? _stubsOf;
 
-    /// <summary>The survey of the area's entity maps for those stubs, running or run, and its answer once taken - see <see cref="Survey"/>.</summary>
-    private Task<DoodadSurvey>? _survey;
+    /// <summary>The survey of the area's entity maps for those stubs and the places it gives each room, running or run, and the answer once taken - see <see cref="Survey"/>.</summary>
+    private Task<(DoodadSurvey Survey, List<(string Room, RoomLayout Layout, RoomDoodadPlaces Places)> Placed)>? _survey;
     private DoodadSurvey? _surveyed;
+    private List<(string Room, RoomLayout Layout, RoomDoodadPlaces Places)>? _placed;
 
     /// <summary>The running search's count of rooms done - one array per search, so one left to run out cannot count into the next.</summary>
     private int[] _done = [0];
@@ -55,6 +64,11 @@ public sealed class AreaRooms
         ArgumentNullException.ThrowIfNull(read);
         _read = read;
     }
+
+    /// <summary>
+    /// Reads the area's entity maps once for the stubs given - see SleepingDoodads - set by whoever owns the game's memory. Null where nothing can, and the map falls back to the arrangement.
+    /// </summary>
+    public Func<IReadOnlySet<string>, DoodadSurvey>? ReadDoodads { get; set; }
 
     /// <summary>How many of the area's rooms have been searched, and of how many - for a line saying it is under way.</summary>
     public (int Done, int Of) Progress => (Volatile.Read(ref _done[0]), Volatile.Read(ref _of));
@@ -76,14 +90,21 @@ public sealed class AreaRooms
     {
         get
         {
-            if (_surveyed is null && _survey is { IsCompleted: true } done)
-            {
-                _surveyed = done.IsCompletedSuccessfully
-                    ? done.Result
-                    : DoodadSurvey.Not("the read failed: " + (done.Exception?.GetBaseException().Message ?? "cancelled"));
-            }
-
+            Taken();
             return _surveyed;
+        }
+    }
+
+    /// <summary>
+    /// Every room with the places its doodads stand in the area - every place, a room laid more than once standing more than once - or null while the entities are not read. See RoomDoodadFinder.
+    /// </summary>
+    /// <remarks>One list per survey, by reference, so a reader can tell a new answer from the last at a glance.</remarks>
+    public IReadOnlyList<(string Room, RoomLayout Layout, RoomDoodadPlaces Places)>? Placed
+    {
+        get
+        {
+            Taken();
+            return _placed;
         }
     }
 
@@ -93,8 +114,8 @@ public sealed class AreaRooms
     /// <remarks>
     /// THE STUB, NOT THE .ao: a doodad line names both, and the stub is the entity's own path where
     /// the game makes an entity of it - see RoomDoodad.Stub. Most lines carry the plain
-    /// Metadata/MiscellaneousObjects/Doodad, which is kept in the set on purpose: whether the game
-    /// keeps THOSE as entities is one of the things a survey is for.
+    /// Metadata/MiscellaneousObjects/Doodad, and the game keeps those as entities too - 684 of them in
+    /// The Assembly - told apart by the model each loaded, which the survey reads beside the path.
     /// </remarks>
     public IReadOnlySet<string>? Stubs()
     {
@@ -125,24 +146,36 @@ public sealed class AreaRooms
     }
 
     /// <summary>
-    /// Starts a survey of the area's entity maps for the rooms' doodads, on its own task - see SleepingDoodads. False where the rooms are not read yet or one is under way.
+    /// Starts a survey of the area's entity maps for the rooms' doodads and the placing of every room by them, on its own task - see SleepingDoodads and RoomDoodadFinder. False where nothing can read them, the rooms are not read yet, or one is under way.
     /// </summary>
-    /// <param name="read">The read itself - the overlay is handed it by whoever owns the game's memory.</param>
-    public bool Survey(Func<IReadOnlySet<string>, DoodadSurvey> read)
+    /// <remarks>Started on its own once the rooms are read - see <see cref="Arranged"/> - and again on the tile book's button, for a person who wants the numbers fresh.</remarks>
+    public bool Survey()
     {
-        ArgumentNullException.ThrowIfNull(read);
-        if (Surveying || Stubs() is not { } stubs)
+        if (ReadDoodads is not { } read || Surveying || _searched is not { } searched || Stubs() is not { } stubs || _grid is not { } grid)
         {
             return false;
         }
 
+        int tilesX = grid.TilesX;
+        int tilesY = grid.TilesY;
         _surveyed = null;
-        _survey = Task.Run(() => read(stubs));
+        _placed = null;
+        _survey = Task.Run(() =>
+        {
+            DoodadSurvey survey = read(stubs);
+            var placed = new List<(string Room, RoomLayout Layout, RoomDoodadPlaces Places)>(searched.Count);
+            foreach ((string room, RoomLayout layout, _) in searched)
+            {
+                placed.Add((room, layout, RoomDoodadFinder.Find(layout.Doodads, layout.Width, layout.Height, survey.Found, tilesX, tilesY)));
+            }
+
+            return (survey, placed);
+        });
         return true;
     }
 
     /// <summary>
-    /// The area's rooms arranged, or null while they are being searched for - starting the search where this area or its rooms are new. Called every frame; cheap when nothing changed.
+    /// The area's rooms arranged, or null while they are being searched for - starting the search where this area or its rooms are new, and the doodad survey once the search is done. Called every frame; cheap when nothing changed.
     /// </summary>
     /// <param name="grid">The current area, or null where none is read.</param>
     /// <param name="rooms">The rooms the area loaded, by file.</param>
@@ -167,6 +200,7 @@ public sealed class AreaRooms
             // A SURVEY IS THE AREA'S: one running for the old area runs out and is dropped like the search.
             _survey = null;
             _surveyed = null;
+            _placed = null;
             int[] done = [0];
             _done = done;
             Volatile.Write(ref _of, rooms.Count);
@@ -177,6 +211,9 @@ public sealed class AreaRooms
         if (_searched is null && _running is { IsCompleted: true } finished)
         {
             (_searched, _walkable) = finished.IsCompletedSuccessfully ? finished.Result : ([], null);
+
+            // THE DOODADS NEXT, without being asked: the map is drawn from them wherever they can be read.
+            Survey();
         }
 
         if (_searched is not null && (_arranged is null || _arranged.Rule != rule))
@@ -185,6 +222,23 @@ public sealed class AreaRooms
         }
 
         return _arranged;
+    }
+
+    /// <summary>Takes a finished survey's answer, once.</summary>
+    private void Taken()
+    {
+        if (_surveyed is null && _survey is { IsCompleted: true } done)
+        {
+            if (done.IsCompletedSuccessfully)
+            {
+                (_surveyed, _placed) = done.Result;
+            }
+            else
+            {
+                _surveyed = DoodadSurvey.Not("the read failed: " + (done.Exception?.GetBaseException().Message ?? "cancelled"));
+                _placed = [];
+            }
+        }
     }
 
     /// <summary>Every room searched in turn, and the walkable mask they were searched with.</summary>
