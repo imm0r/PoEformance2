@@ -98,6 +98,60 @@ public class RoomDoodadFinderTests
         Assert.Equal("its doodad lines name no stub", unnamed.Why);
     }
 
+    /// <summary>Where two rooms' places stand on the same tiles, the one with more of its doodads there keeps them, and rims may still meet.</summary>
+    [Fact]
+    public void SETTLINGGivesTilesToTheRoomWithMoreOfItsDoodadsThereAndLetsRimsMeet()
+    {
+        static RoomDoodadPlace Place(int x, int y, int wide, int tall, int hits, int lines)
+            => new(new RoomCandidate(x, y, 0, wide, tall, hits, lines), hits, lines, 1f, []);
+        static RoomDoodadPlaces Of(params RoomDoodadPlace[] places)
+            => new(places, places.Max(place => place.Lines), places.Max(place => place.Lines), places.Max(place => place.Lines), string.Empty);
+
+        (string Room, RoomDoodadPlaces Places)[] rooms =
+        [
+            // A variant not laid: only its shared lines are hit, at the tile where the laid one stands.
+            ("grass.arm", Of(Place(5, 5, 4, 4, 72, 83))),
+
+            // The laid one: every line it has is hit, on the same tile.
+            ("desert.arm", Of(Place(5, 5, 4, 4, 72, 72))),
+
+            // A wall laid twice, each sharing one rim row or column with the desert's rim - rooms that join.
+            ("wall.arm", Of(Place(8, 5, 4, 4, 20, 20), Place(5, 8, 4, 4, 20, 20))),
+
+            // A small room inside the desert's footprint: the tiles are the desert's, however well it fits.
+            ("inside.arm", Of(Place(6, 6, 2, 2, 30, 30))),
+        ];
+
+        List<(string Room, RoomDoodadPlaces Places)> settled = RoomDoodadFinder.Settle(rooms, 20, 20);
+
+        Assert.Equal(rooms.Select(one => one.Room), settled.Select(one => one.Room));
+        Assert.Single(settled[1].Places.Places);
+        Assert.Empty(settled[1].Places.Yielded);
+        Assert.Empty(settled[0].Places.Places);
+        Assert.Equal("desert.arm", Assert.Single(settled[0].Places.Yielded).To);
+        Assert.Equal("every place it found stands on another room's tiles", settled[0].Places.Why);
+        Assert.Equal(2, settled[2].Places.Places.Count);
+        Assert.Equal("desert.arm", Assert.Single(settled[3].Places.Yielded).To);
+    }
+
+    /// <summary>Two variants with every doodad in common, every one standing: the tiles the other search found agreeing decide, and the name only after that.</summary>
+    [Fact]
+    public void VARIANTSSharingEveryDoodadAreToldApartByTheirTiles()
+    {
+        static RoomDoodadPlaces Of(int tilesAgree)
+            => new([new RoomDoodadPlace(new RoomCandidate(5, 5, 0, 4, 4, 97, 97), 97, 97, 1f, []) { TilesAgree = tilesAgree }], 97, 97, 97, string.Empty);
+
+        List<(string Room, RoomDoodadPlaces Places)> settled = RoomDoodadFinder.Settle([("a_3open.arm", Of(40)), ("b_4open.arm", Of(44))], 20, 20);
+        Assert.Empty(settled[0].Places.Places);
+        Assert.Equal("b_4open.arm", Assert.Single(settled[0].Places.Yielded).To);
+        Assert.Single(settled[1].Places.Places);
+
+        // Unlisted by the tile search on both: the name decides, and the same way every time.
+        List<(string Room, RoomDoodadPlaces Places)> unlisted = RoomDoodadFinder.Settle([("b_4open.arm", Of(-1)), ("a_3open.arm", Of(-1))], 20, 20);
+        Assert.Single(unlisted[1].Places.Places);
+        Assert.Equal("a_3open.arm", Assert.Single(unlisted[0].Places.Yielded).To);
+    }
+
     /// <summary>Where a line's doodad stands when the room is laid with its corner at a tile, one of the eight ways round.</summary>
     private static Vector2 Expected(RoomDoodad line, int cornerX, int cornerY, int turn)
     {

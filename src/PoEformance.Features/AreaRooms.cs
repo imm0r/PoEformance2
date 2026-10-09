@@ -163,10 +163,19 @@ public sealed class AreaRooms
         _survey = Task.Run(() =>
         {
             DoodadSurvey survey = read(stubs);
-            var placed = new List<(string Room, RoomLayout Layout, RoomDoodadPlaces Places)>(searched.Count);
-            foreach ((string room, RoomLayout layout, _) in searched)
+            var found = new List<(string Room, RoomDoodadPlaces Places)>(searched.Count);
+            foreach ((string room, RoomLayout layout, RoomSearch search) in searched)
             {
-                placed.Add((room, layout, RoomDoodadFinder.Find(layout.Doodads, layout.Width, layout.Height, survey.Found, tilesX, tilesY)));
+                RoomDoodadPlaces places = RoomDoodadFinder.Find(layout.Doodads, layout.Width, layout.Height, survey.Found, tilesX, tilesY);
+                found.Add((room, places with { Places = Tiled(places.Places, search) }));
+            }
+
+            // ONE ROOM PER PLACE: the variants of a room all vote for the tile where the laid one stands.
+            List<(string Room, RoomDoodadPlaces Places)> settled = RoomDoodadFinder.Settle(found, tilesX, tilesY);
+            var placed = new List<(string Room, RoomLayout Layout, RoomDoodadPlaces Places)>(searched.Count);
+            for (var one = 0; one < searched.Count; one++)
+            {
+                placed.Add((searched[one].Room, searched[one].Layout, settled[one].Places));
             }
 
             return (survey, placed);
@@ -222,6 +231,30 @@ public sealed class AreaRooms
         }
 
         return _arranged;
+    }
+
+    /// <summary>
+    /// Each place with the tiles the ground-and-tile search found agreeing at that very place, where it listed it - the tie-breaker between variants that share every doodad, see RoomDoodadFinder.Settle.
+    /// </summary>
+    private static List<RoomDoodadPlace> Tiled(IReadOnlyList<RoomDoodadPlace> places, RoomSearch search)
+    {
+        var tiled = new List<RoomDoodadPlace>(places.Count);
+        foreach (RoomDoodadPlace place in places)
+        {
+            int agree = -1;
+            foreach (RoomCandidate candidate in search.Candidates)
+            {
+                if (candidate.X == place.Where.X && candidate.Y == place.Where.Y && candidate.Turn == place.Where.Turn)
+                {
+                    agree = candidate.TilesAgree;
+                    break;
+                }
+            }
+
+            tiled.Add(place with { TilesAgree = agree });
+        }
+
+        return tiled;
     }
 
     /// <summary>Takes a finished survey's answer, once.</summary>
