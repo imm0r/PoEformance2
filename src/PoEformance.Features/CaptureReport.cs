@@ -55,8 +55,35 @@ public static class CaptureReport
     /// <summary>The rooms around the player, each with its doodads' lights.</summary>
     public const string RoomsFile = "rooms.txt";
 
-    /// <summary>The overlay's own reads for a few seconds and one pass reading everything again - see CaptureMemory. Replayable with --replay.</summary>
+    /// <summary>The overlay's own reads for a few seconds and one pass reading what the ticked parts ask for - see CaptureMemory. Replayable with --replay.</summary>
     public const string MemoryFile = "memory.rec";
+
+    /// <summary>Every room arranged by its ground and tiles - the Tile Book's line and hover.</summary>
+    public const string ArrangedFile = "rooms-arranged.txt";
+
+    /// <summary>The Tile Book's picked row against the rooms on the map, and where it parts with the area.</summary>
+    public const string PickFile = "room-pick.txt";
+
+    /// <summary>The survey of the entity maps for the rooms' doodads, and every sighting.</summary>
+    public const string DoodadsFile = "doodads.txt";
+
+    /// <summary>Every room placed by its doodads - the Tile Book's line and hover.</summary>
+    public const string PlacedFile = "rooms-placed.txt";
+
+    /// <summary>The active routes, as the Routes page lists them.</summary>
+    public const string RoutesFile = "routes.txt";
+
+    /// <summary>The light hunt's last report.</summary>
+    public const string SceneLightFile = "scene-light.txt";
+
+    /// <summary>The model panes' probe lines.</summary>
+    public const string ProbeFile = "model-probe.txt";
+
+    /// <summary>The Memory Dissector's places, route and last search.</summary>
+    public const string DissectorFile = "dissector.txt";
+
+    /// <summary>The atlas check's report.</summary>
+    public const string AtlasLogFile = "atlas-log.txt";
 
     /// <summary>Where captures go: beside the tool, like its exports.</summary>
     public static string Root => Path.Combine(AppContext.BaseDirectory, "captures");
@@ -309,7 +336,7 @@ public static class CaptureReport
     /// Every file of a capture packed into one zip beside its folder, named like it - what gets sent. Returns the zip's path and the files left out.
     /// </summary>
     /// <remarks>
-    /// ASKED FOR because a capture is nine files and the place they are sent to takes five.
+    /// ASKED FOR because a capture is a dozen files or more and the place they are sent to takes five.
     ///
     /// THE PICTURES AND THE RECORDING ARE STORED, NOT COMPRESSED: a PNG and a Brotli stream are
     /// compressed already, and squeezing them again is seconds of work for nothing. The text files
@@ -356,6 +383,180 @@ public static class CaptureReport
 
         return said.ToString();
     }
+
+    /// <summary>
+    /// Every room arranged by its ground and tiles, in a line and its detail: where each was laid, what disagrees there, how many of its tiles can be walked, and the rooms crowded out or not found.
+    /// </summary>
+    /// <remarks>
+    /// THE TILE BOOK'S LINE AND ITS HOVER, built here so the capture writes the very text the window
+    /// shows: a report that differs from the screen by a word is a report somebody has to reconcile.
+    /// </remarks>
+    public static (string Said, string Detail) Arranged(RoomArrangement arranged)
+    {
+        ArgumentNullException.ThrowIfNull(arranged);
+        int moved = arranged.Laid.Count(one => one.Rank > 0);
+        string said = string.Create(CultureInfo.InvariantCulture, $"rooms: {arranged.Laid.Count} drawn")
+            + (moved > 0 ? string.Create(CultureInfo.InvariantCulture, $", {moved} off their first place") : string.Empty)
+            + (arranged.Crowded.Count > 0 ? string.Create(CultureInfo.InvariantCulture, $", {arranged.Crowded.Count} with no free place") : string.Empty)
+            + (arranged.Unfound.Count > 0 ? string.Create(CultureInfo.InvariantCulture, $", {arranged.Unfound.Count} not found") : string.Empty);
+        var lines = new List<string>(arranged.Laid.Count + arranged.Crowded.Count + arranged.Unfound.Count);
+        foreach (RoomLaid one in arranged.Laid)
+        {
+            // HOW MANY OF ITS TILES CAN BE WALKED, because the map draws the void and unexplored
+            // ground the same black: a room outlined in the black stands on ground or it does not,
+            // and this is where that is read rather than argued. See RoomLaid.Standing.
+            RoomMisses misses = one.Misses;
+            lines.Add(string.Create(CultureInfo.InvariantCulture,
+                $"{TerrainRooms.NameFor(one.Room)}: tile {one.Where.X}, {one.Where.Y}, {RoomFinder.Said(one.Where.Turn)}, {one.Beside}% beside the joins")
+                + string.Create(CultureInfo.InvariantCulture,
+                    $" - {misses.Corners.Count} corners and {misses.Tiles.Count} tiles disagree, {misses.Corners.Count + misses.Tiles.Count - misses.Elsewhere} of those at a join")
+                + (one.Standing is { } standing
+                    ? string.Create(CultureInfo.InvariantCulture, $" - stands on {standing} of its {one.Covers} tiles")
+                    : string.Create(CultureInfo.InvariantCulture, $" - {one.Covers} tiles, walkable ground not read"))
+                + (one.Rank > 0 ? string.Create(CultureInfo.InvariantCulture, $" - row {one.Rank + 1} of its list, the ones above it taken") : string.Empty));
+        }
+
+        lines.AddRange(arranged.Crowded.Select(one => TerrainRooms.NameFor(one) + ": every place on its list covers a tile a surer room holds"));
+        lines.AddRange(arranged.Unfound.Select(one => TerrainRooms.NameFor(one) + ": its search found nothing"));
+        return (said, string.Join('\n', lines));
+    }
+
+    /// <summary>
+    /// Every room placed by its doodads, in a line and its detail: each room's places with their hits, lines, offset and tiles agreeing, what it yielded to whom, or why it has none - see RoomDoodadFinder.
+    /// </summary>
+    public static (string Said, string Detail) Placed(IReadOnlyList<(string Room, RoomLayout Layout, RoomDoodadPlaces Places)> placed)
+    {
+        ArgumentNullException.ThrowIfNull(placed);
+        int places = 0, unplaced = 0;
+        var lines = new List<string>(placed.Count);
+        foreach ((string room, _, RoomDoodadPlaces found) in placed)
+        {
+            places += found.Places.Count;
+            unplaced += found.Places.Count == 0 ? 1 : 0;
+            string name = TerrainRooms.NameFor(room);
+            var said = new List<string>(found.Places.Count + found.Yielded.Count);
+            foreach (RoomDoodadPlace place in found.Places)
+            {
+                said.Add(string.Create(CultureInfo.InvariantCulture,
+                    $"tile {place.Where.X}, {place.Where.Y}, {RoomFinder.Said(place.Where.Turn)}: {place.Hits} of {place.Lines} doodads within a tile, off {place.MeanOff:0} on average")
+                    + (place.TilesAgree >= 0 ? string.Create(CultureInfo.InvariantCulture, $", {place.TilesAgree} tiles agree") : ", not on the tile search's list"));
+            }
+
+            // WHAT IT GAVE UP, AND TO WHOM: a variant not laid votes for the laid one's tile - see RoomDoodadFinder.Settle.
+            foreach ((RoomDoodadPlace place, string to) in found.Yielded)
+            {
+                said.Add(string.Create(CultureInfo.InvariantCulture,
+                    $"yielded tile {place.Where.X}, {place.Where.Y}, {RoomFinder.Said(place.Where.Turn)} ({place.Hits} of {place.Lines}) to {TerrainRooms.NameFor(to)}"));
+            }
+
+            if (found.Places.Count == 0)
+            {
+                lines.Add(string.Create(CultureInfo.InvariantCulture,
+                    $"{name}: no place - {found.Why}; {found.Matchable} of its {found.Lines} doodad lines stand in the area, {found.ByModel} told by their model")
+                    + (said.Count > 0 ? " - " + string.Join("; ", said) : string.Empty));
+                continue;
+            }
+
+            lines.Add(string.Create(CultureInfo.InvariantCulture,
+                $"{name}: {found.Places.Count} place{(found.Places.Count == 1 ? string.Empty : "s")}, {found.ByModel} of {found.Matchable} doodads told by their model - ")
+                + string.Join("; ", said));
+        }
+
+        string line = string.Create(CultureInfo.InvariantCulture, $"rooms: {placed.Count - unplaced} placed by their doodads at {places} places")
+            + (unplaced > 0 ? string.Create(CultureInfo.InvariantCulture, $", {unplaced} with no place") : string.Empty);
+        return (line, string.Join('\n', lines));
+    }
+
+    /// <summary>
+    /// A survey of the entity maps in a line and its detail: the three numbers, then each room's doodad lines against what was found, each path found and how many stand, and the paths found nowhere - see SleepingDoodads.
+    /// </summary>
+    /// <param name="done">The survey.</param>
+    /// <param name="searched">The rooms with their files read, or null while they are not.</param>
+    public static (string Said, string Detail) Doodads(DoodadSurvey done, IReadOnlyList<(string Room, RoomLayout Layout, RoomSearch Search)>? searched)
+    {
+        ArgumentNullException.ThrowIfNull(done);
+        if (done.Why.Length > 0)
+        {
+            return ("doodads: " + done.Why, string.Empty);
+        }
+
+        var byPath = new Dictionary<string, (int All, int Asleep)>(StringComparer.OrdinalIgnoreCase);
+        foreach (DoodadSighting one in done.Found)
+        {
+            (int all, int asleep) = byPath.GetValueOrDefault(one.Path);
+            byPath[one.Path] = (all + 1, asleep + (one.Asleep ? 1 : 0));
+        }
+
+        string said = string.Create(CultureInfo.InvariantCulture,
+            $"doodads: {done.Found.Count} entities stand where the rooms name a doodad, on {byPath.Count} paths - sleeping map {done.SleepingNodes} of {done.SleepingSize} walked,"
+            + $" awake {done.AwakeNodes}, {done.Named} with a path, read in {done.Milliseconds:0} ms");
+
+        var lines = new List<string>();
+        var unfound = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach ((string room, RoomLayout layout, _) in searched ?? [])
+        {
+            var stubs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            int named = 0, found = 0, standing = 0;
+            foreach (RoomDoodad doodad in layout.Doodads)
+            {
+                if (doodad.Stub.Length == 0)
+                {
+                    continue;
+                }
+
+                named++;
+                bool known = byPath.TryGetValue(doodad.Stub, out (int All, int Asleep) count);
+                found += known ? 1 : 0;
+                if (stubs.Add(doodad.Stub))
+                {
+                    standing += count.All;
+                    if (!known)
+                    {
+                        unfound.Add(doodad.Stub);
+                    }
+                }
+            }
+
+            lines.Add(named == 0
+                ? TerrainRooms.NameFor(room) + ": its doodad lines name no stub"
+                : string.Create(CultureInfo.InvariantCulture,
+                    $"{TerrainRooms.NameFor(room)}: {found} of its {named} doodad lines name a path found in the area, {standing} such entities over {stubs.Count} paths"));
+        }
+
+        foreach ((string path, (int all, int asleep)) in byPath.OrderByDescending(one => one.Value.All).ThenBy(one => one.Key, StringComparer.OrdinalIgnoreCase))
+        {
+            lines.Add(string.Create(CultureInfo.InvariantCulture, $"{path}: {all} entities, {asleep} asleep"));
+        }
+
+        if (unfound.Count > 0)
+        {
+            lines.Add("found nowhere: " + string.Join(", ", unfound));
+        }
+
+        return (said, string.Join('\n', lines));
+    }
+
+    /// <summary>
+    /// Every sighting of a survey as a table: id, path, model, where it stands, and which map it came out of - the finder's whole input, so a placing can be redone by hand.
+    /// </summary>
+    public static string Sightings(DoodadSurvey done)
+    {
+        ArgumentNullException.ThrowIfNull(done);
+        var said = new StringBuilder();
+        said.Append(Say(done.Found.Count)).AppendLine(" sightings; position in world units, z the game's way up");
+        said.AppendLine("id\tpath\tmodel\tx\ty\tz\tmap");
+        foreach (DoodadSighting one in done.Found)
+        {
+            said.Append(one.Id.ToString(CultureInfo.InvariantCulture)).Append('\t').Append(one.Path).Append('\t').Append(one.Model)
+                .Append('\t').Append(Num(one.X)).Append('\t').Append(Num(one.Y)).Append('\t').Append(Num(one.Z))
+                .Append('\t').AppendLine(one.Asleep ? "sleeping" : "awake");
+        }
+
+        return said.ToString();
+    }
+
+    /// <summary>A line and its detail as one text, the way the hover reads it.</summary>
+    public static string Lined((string Said, string Detail) text) => text.Detail.Length > 0 ? text.Said + '\n' + text.Detail : text.Said;
 
     private static string Say(int number) => number.ToString(CultureInfo.InvariantCulture);
 

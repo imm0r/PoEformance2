@@ -283,7 +283,13 @@ public sealed record OverlaySettings(
 
     // The key that writes a capture of the spot the player stands on into its own folder - see
     // CaptureReport. Zero is "not set" here too and resolves to F9 in the overlay.
-    [property: JsonPropertyName("captureKey")] int CaptureKey = 0)
+    [property: JsonPropertyName("captureKey")] int CaptureKey = 0,
+
+    // Which parts of a capture are NOT written, by the catalogue's keys - see CaptureParts. The
+    // off ones rather than the on ones, and null until somebody unticks one, for the hidden tabs'
+    // reason: a part added in a later build is then written without anybody asking, and an
+    // untouched file gains no key.
+    [property: JsonPropertyName("captureOff")] IReadOnlyList<string>? CaptureOff = null)
 {
     /// <summary>How the tool's own windows look. The defaults until somebody says otherwise.</summary>
     /// <remarks>
@@ -306,6 +312,9 @@ public sealed record OverlaySettings(
 
     /// <summary>The noise classes let through, empty until somebody lets one through.</summary>
     public IReadOnlyList<string> NoiseOffOrEmpty => NoiseOff ?? [];
+
+    /// <summary>The capture parts switched off, empty until somebody unticks one.</summary>
+    public IReadOnlyList<string> CaptureOffOrEmpty => CaptureOff ?? [];
 
     /// <summary>The entity kinds the browser leaves out, empty until somebody hides one.</summary>
     public IReadOnlyList<string> HiddenEntitiesOrEmpty => HiddenEntities ?? [];

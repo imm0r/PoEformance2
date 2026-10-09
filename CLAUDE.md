@@ -28,8 +28,9 @@ already cost real time on this project.
   The model pane has the same thing for its OWN pictures: the corner button "probe", then a
   click, lists every surface under that pixel (material, blend, program or texture, which
   doodad or tile piece, depths), and counts how each translucent layer came out over the
-  whole picture. "copy probe" puts it on the clipboard — ask for that text before theorising
-  about why a tile or room looks wrong.
+  whole picture. The capture key (F9, "Capture for Diagnosis") writes it to `model-probe.txt`
+  in the capture's zip, beside every other diagnosis the tool can give — ask for that capture
+  before theorising about why a tile or room looks wrong.
 - **`adamthedash/poe_data_tools`** is to the game's FILE formats what GameHelper2 is to its
   memory: working parsers for `.ao`, `.sm`, `.smd`, `.fmt`, `.mat` and `.ast`. Clone it and
   read the parser, not a diagram of it — `crates/poe_data_tools-lib/src/file_parsers/`.

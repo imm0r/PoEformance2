@@ -49,7 +49,7 @@ The schema is simultaneously:
 | `LiveMemoryReader` | ReadProcessMemory against the running game (read-only handle) |
 | `RecordingMemoryReader` | wraps another reader, writes every successful read to a file |
 | `ReplayMemoryReader` | replays a recorded file as if it were the live process, with frame seeking |
-| `TapMemoryReader` | passes reads through, and records a stretch of them on demand - the capture key's memory half, held open while the capture's one full read runs inside it |
+| `TapMemoryReader` | passes reads through, and records a stretch of them on demand - the capture key's memory half, held open while the pass reading what the capture's ticked parts ask for runs inside it (`CaptureParts`, `CaptureMemory`) |
 
 Consequences, in increasing order of importance:
 

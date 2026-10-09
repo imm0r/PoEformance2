@@ -548,17 +548,14 @@ public sealed class SceneLightPanel : IMovableSun
         }
 
         ImGuiText.Wrapped(OverlayInk.Quiet, ImGuiText.Escape(said));
-        if (!running && _verdict is { } verdict)
+        if (!running && _verdict is not null)
         {
-            OverlayLayout.Flow(ImGui.CalcTextSize("copy report").X + (ImGui.GetStyle().FramePadding.X * 2f), right, start);
-            if (ImGui.SmallButton("copy report##scene-hunt-copy"))
-            {
-                ImGui.SetClipboardText(verdict.Report);
-            }
-
-            OverlayLayout.Hint("The whole report - every reading, where each was found, the raw angles beside them - for pasting.");
+            ImGuiText.Wrapped(OverlayInk.Quiet, "the whole report - every reading, where each was found, the raw angles beside them - goes into a capture (scene-light.txt)");
         }
     }
+
+    /// <summary>The last hunt's whole report, for the capture key - null while none has run or one is running.</summary>
+    public string? HuntReport => _hunting is { IsCompleted: false } ? null : _verdict?.Report;
 
     private void StartHunt()
     {

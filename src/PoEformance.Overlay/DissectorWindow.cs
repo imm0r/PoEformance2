@@ -430,7 +430,7 @@ public sealed class DissectorWindow
         _foundWhy = string.Empty;
     }
 
-    /// <summary>What the last search found: each place with what reads round it, a click to go there, and the lot to copy.</summary>
+    /// <summary>What the last search found: each place with what reads round it, and a click to go there. The capture key writes the lot - see <see cref="Report"/>.</summary>
     private void DrawFound()
     {
         if (_found is not { } found)
@@ -445,12 +445,11 @@ public sealed class DissectorWindow
             return;
         }
 
-        if (ImGui.SmallButton("Copy##found"))
+        if (ImGui.IsItemHovered())
         {
-            ImGui.SetClipboardText(PatternHunt.Report(found, _foundNeedles));
+            ImGui.SetTooltip("Every place with the bytes round it, sixteen to a row, goes into a capture (dissector.txt).");
         }
 
-        OverlayLayout.Hint("Every place with the bytes round it, sixteen to a row - to paste where somebody can read it.");
         for (var at = 0; at < found.Sightings.Count; at++)
         {
             PatternSighting one = found.Sightings[at];
@@ -630,11 +629,54 @@ public sealed class DissectorWindow
         string route = _trail.Describe();
         ImGui.SameLine();
         ImGui.TextColored(NameText, route);
-        ImGui.SameLine();
-        if (ImGui.SmallButton("Copy"))
+    }
+
+    /// <summary>
+    /// The dissector as it stands, for the capture key: the places open with their labels, the route walked to them, and the last search's report - or null where it is untouched.
+    /// </summary>
+    /// <remarks>
+    /// THE THREE THINGS A CONVERSATION ABOUT A STRUCTURE NEEDS: which address was being read and
+    /// what sent us there, the hops that led to it - the route is what gets written into the
+    /// schema's notes - and what the search for a name turned up, with the bytes round each place.
+    /// </remarks>
+    public string? Report()
+    {
+        bool placed = _places.Count > 1 || _places[0].Address != 0;
+        if (!placed && _trail.IsEmpty && _found is null)
         {
-            ImGui.SetClipboardText(route);
+            return null;
         }
+
+        var said = new System.Text.StringBuilder();
+        if (placed)
+        {
+            said.AppendLine("=== places open, side by side");
+            for (var at = 0; at < _places.Count; at++)
+            {
+                Place place = _places[at];
+                said.Append(CultureInfo.InvariantCulture, $"{at + 1}: 0x{place.Address:X}");
+                if (place.Label.Length > 0)
+                {
+                    said.Append("  ").Append(place.Label);
+                }
+
+                said.AppendLine();
+            }
+        }
+
+        if (!_trail.IsEmpty)
+        {
+            said.AppendLine("=== the route walked to them");
+            said.AppendLine(_trail.Describe());
+        }
+
+        if (_found is { } found)
+        {
+            said.AppendLine("=== what the last search found");
+            said.AppendLine(PatternHunt.Report(found, _foundNeedles));
+        }
+
+        return said.ToString().TrimEnd();
     }
 
     /// <summary>

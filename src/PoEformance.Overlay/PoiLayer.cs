@@ -471,7 +471,7 @@ public sealed class PoiLayer
     /// dissector show, so a route's end can be put beside an entity's. A route ends where it was
     /// asked to, except a room's, which ends on the room's own ground (see RoomRoute) - so a room
     /// row shows that point, not the room's middle. The stops are under the pointer on their count;
-    /// the copy button takes the lot as text.
+    /// the capture key writes the lot as text (routes.txt) - see <see cref="RoutesReport"/>.
     /// </remarks>
     public void DrawActiveRoutes(WorldSnapshot snapshot)
     {
@@ -498,17 +498,6 @@ public sealed class PoiLayer
         {
             _planner.Clear();
             return;
-        }
-
-        ImGui.SameLine();
-        if (ImGui.SmallButton("copy##routes-copy"))
-        {
-            ImGui.SetClipboardText(RoutesSaid(targets, player));
-        }
-
-        if (ImGui.IsItemHovered())
-        {
-            ImGui.SetTooltip("Copies where you stand and every route below - its end and its stops - in world units.");
         }
 
         if (!ImGui.BeginTable("##routes-active", 7, ImGuiTableFlags.SizingFixedFit | ImGuiTableFlags.RowBg))
@@ -596,7 +585,14 @@ public sealed class PoiLayer
         return said.ToString().TrimEnd();
     }
 
-    /// <summary>Where you stand and every route, as the copy button puts it on the clipboard.</summary>
+    /// <summary>Where you stand and every route - its end and its stops - in world units, for the capture key; null while there is no route.</summary>
+    public string? RoutesReport(WorldEntity? player)
+    {
+        IReadOnlyList<RouteTarget> targets = _planner.Targets;
+        return targets.Count == 0 ? null : RoutesSaid(targets, player);
+    }
+
+    /// <summary>Where you stand and every route, as the capture writes it.</summary>
     private string RoutesSaid(IReadOnlyList<RouteTarget> targets, WorldEntity? player)
     {
         var said = new System.Text.StringBuilder();

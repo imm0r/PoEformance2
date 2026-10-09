@@ -3147,9 +3147,9 @@ internal static class Program
         overlay.SurveyDoodads = paths => PoEformance.Game.World.SleepingDoodads.Read(reader, schema, world.LastAreaInstance, paths);
 
         // The capture key's memory: a recording started on demand, and inside it ONE pass that reads
-        // everything this tool can read from nothing - see CaptureMemory. The recording stays open
-        // until the pass is done, and keeps reads as large as the terrain's. The statics go in
-        // first, as --record writes them, or the recording could not be replayed.
+        // what the ticked parts of the capture ask for, from nothing - see CaptureMemory. The
+        // recording stays open until the pass is done, and keeps reads as large as the terrain's.
+        // The statics go in first, as --record writes them, or the recording could not be replayed.
         if (reader is TapMemoryReader tap)
         {
             KeyValuePair<string, string>[] notes =
@@ -3158,7 +3158,7 @@ internal static class Program
                     RecordingFormat.StaticNotePrefix + one.Name,
                     one.Address.ToString("X", System.Globalization.CultureInfo.InvariantCulture))),
             ];
-            overlay.RecordMemory = folder =>
+            overlay.RecordMemory = ask =>
             {
                 if (tap.Recording)
                 {
@@ -3167,7 +3167,7 @@ internal static class Program
 
                 var passed = new TaskCompletionSource();
                 Task<long>? recorded = tap.Start(
-                    File.Create(Path.Combine(folder, PoEformance.Features.CaptureReport.MemoryFile)),
+                    File.Create(Path.Combine(ask.Folder, PoEformance.Features.CaptureReport.MemoryFile)),
                     notes,
                     new TapRecording(PoEformance.Features.CaptureReport.MemoryFrames)
                     {
@@ -3187,11 +3187,14 @@ internal static class Program
                     try
                     {
                         // A FRESH animation table, so every animation the game names is asked for
-                        // again inside the recording rather than served from this session's copy.
+                        // again inside the recording rather than served from this session's copy -
+                        // loaded only where the pass reads the world, which is what names them.
+                        PoEformance.Game.Components.AnimationNames? animations = PoEformance.Features.CaptureMemory.ReadsWorld(ask.Reads)
+                            ? PoEformance.Game.Components.AnimationNames.Load(FindDataFile("animations.tsv"))
+                            : null;
                         index = PoEformance.Features.CaptureMemory.Pass(
-                            reader, schema, gameStatesStatic, rotation, itemNames, world.LandmarkNames,
-                            PoEformance.Game.Components.AnimationNames.Load(FindDataFile("animations.tsv")),
-                            scale, fileRoot, areaCounter);
+                            reader, schema, gameStatesStatic, rotation, itemNames, world.LandmarkNames, animations,
+                            scale, fileRoot, areaCounter, ask.Reads);
                     }
                     catch (Exception exception)
                     {
@@ -3202,10 +3205,11 @@ internal static class Program
                         passed.TrySetResult();
                     }
 
-                    await File.WriteAllTextAsync(Path.Combine(folder, PoEformance.Features.CaptureMemory.IndexFile), index).ConfigureAwait(false);
+                    await File.WriteAllTextAsync(Path.Combine(ask.Folder, PoEformance.Features.CaptureMemory.IndexFile), index).ConfigureAwait(false);
                     long bytes = await recorded.ConfigureAwait(false);
                     return $"{bytes / 1024} KB: the overlay's own reads for {PoEformance.Features.CaptureReport.MemoryFrames} reader ticks and "
-                        + $"one pass reading everything again from nothing - replay with --replay; {PoEformance.Features.CaptureMemory.IndexFile} says what the pass read where";
+                        + $"one pass reading {PoEformance.Features.CaptureMemory.Said(ask.Reads)} from nothing - replay with --replay; "
+                        + $"{PoEformance.Features.CaptureMemory.IndexFile} says what the pass read where";
                 });
             };
         }

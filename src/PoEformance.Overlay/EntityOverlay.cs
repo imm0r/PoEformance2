@@ -385,6 +385,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         HideWindowsBehindPanels = settings.HideWindowsBehindPanels;
         ScreenshotKey = settings.ScreenshotKey;
         _capture.Key = settings.CaptureKey;
+        _capture.Off = settings.CaptureOffOrEmpty;
         KeepOut = settings.MapKeepOutOrDefault;
         _projectiles.Enabled = settings.ShowProjectiles;
         _projectiles.ShowTrails = settings.ProjectileTrails;
@@ -497,6 +498,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             HideWindowsBehindPanels = HideWindowsBehindPanels,
             ScreenshotKey = ScreenshotKey,
             CaptureKey = _capture.Key,
+
+            // Null once every part is on again, so an untouched file gains no key - the hidden tabs' bargain.
+            CaptureOff = _capture.Off is { Count: > 0 } captureOff ? captureOff : null,
             MapKeepOut = KeepOut,
 
             // FROM THE WINDOW WHERE THERE IS ONE, and from the file where there is not: a build
@@ -2287,11 +2291,16 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 : null,
             () => _areaRooms is not null && _snapshot.Terrain is TerrainGrid { Ground: not null },
             () => _areaRooms?.Progress ?? (0, 0),
+            () => _areaRooms,
             () => LoadedFiles?.Invoke() ?? [],
             () => Version)
         {
             Changed = () => SettingsChanged?.Invoke(),
         };
+
+        // THE PANES' PROBE is offered here rather than where each book is attached: there are four
+        // panes and one part, and the books arrive in any order.
+        _capture.Offer(CaptureParts.ModelProbe, ProbeReports);
 
         // The entry card takes its plates from the same cache the markers use, so a picture
         // that cannot be loaded is reported in one place and given up on once.
@@ -2403,12 +2412,36 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     private readonly CaptureKey _capture;
 
     /// <summary>
-    /// Starts the memory half of a capture in its folder, or null where one is already running - set by whoever owns the reader. Unset, the capture says it has none. See CaptureKey.RecordMemory.
+    /// Starts the memory half of a capture - the recording, and the pass inside it reading what the ask says - or null where one is already running. Set by whoever owns the reader; unset, the capture says it has none. See CaptureKey.RecordMemory.
     /// </summary>
-    public Func<string, Task<string>?>? RecordMemory
+    public Func<CaptureMemoryAsk, Task<string>?>? RecordMemory
     {
         get => _capture.RecordMemory;
         set => _capture.RecordMemory = value;
+    }
+
+    /// <summary>Every model pane's probe lines, each under its book's name - the capture's model-probe part; null where no pane is probing.</summary>
+    private string? ProbeReports()
+    {
+        System.Text.StringBuilder? said = null;
+        foreach (MonsterPortrait? pane in (MonsterPortrait?[])[_monsterBook?.Model, _itemBook?.Model, _tileBook?.Model, _effectBook?.Model])
+        {
+            if (pane?.ProbeReport() is not { } lines)
+            {
+                continue;
+            }
+
+            said ??= new System.Text.StringBuilder();
+            if (said.Length > 0)
+            {
+                said.AppendLine();
+            }
+
+            said.Append("=== the ").Append(pane.Book).AppendLine(" book's pane");
+            said.AppendLine(lines);
+        }
+
+        return said?.ToString().TrimEnd();
     }
 
     /// <summary>Why this session has no memory recording to offer the capture, where <see cref="RecordMemory"/> is not set.</summary>
@@ -2430,7 +2463,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// <summary>
     /// Reads the area's entity maps once for the paths given - the rooms' doodad stubs - and where each stands; set by whoever owns the reader, before the tile book is attached. See SleepingDoodads.
     /// </summary>
-    /// <remarks>The tile book's "doodads in this area" button runs it on its own task. Unset, there is no button.</remarks>
+    /// <remarks>AreaRooms runs it on its own task once the rooms are read, and the map places the rooms by it. Unset, the map falls back to the arrangement and the capture's doodad parts say why they are empty.</remarks>
     public Func<IReadOnlySet<string>, DoodadSurvey>? SurveyDoodads { get; set; }
 
     /// <summary>
@@ -2879,6 +2912,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             page: Atlas, pageLabel: "Atlas",
             live: () => watch.Checked.Count > 0 ? $"Debug Log ({watch.Checked.Count})###atlas-log" : "Debug Log###atlas-log");
 
+        // The check's report whole, for a capture - the window's filter is for reading, not sending.
+        _capture.Offer(CaptureParts.AtlasLog, () => watch.Checked is { Count: > 0 } report ? string.Join('\n', report) : null);
+
         if (visible)
         {
             _tools.Show("atlas");
@@ -3207,6 +3243,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // and nothing says that comes first.
         var window = new DissectorWindow(inspector) { Hunt = (needles, progress) => HuntPatterns?.Invoke(needles, progress) };
         _dissector = window;
+        _capture.Offer(CaptureParts.Dissector, window.Report);
         _tools.Add(
             110, DissectorTab, "Memory Dissector", window.DrawTab, window.Idle,
             page: Entities, pageLabel: EntitiesLabel);
@@ -3521,6 +3558,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         Capture(window.Model);
         _tileBook = window;
 
+        // THE BOOK'S TWO DIAGNOSES FOR THE CAPTURE KEY: the picked row's folds, and the light hunt's report.
+        _capture.Offer(CaptureParts.RoomPick, window.PickedReport);
+        _capture.Offer(CaptureParts.SceneLight, () => lighting.HuntReport);
+
         _tools.Add(
             93, "tile-book", "Tile Book", window.DrawTab,
             page: Entities, pageLabel: EntitiesLabel);
@@ -3575,6 +3616,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _tools.Add(
             69, "routes-active", "Active Routes", () => poi.DrawActiveRoutes(_snapshot),
             page: Routes, pageLabel: "Routes", live: () => poi.ActiveRoutesLabel);
+        _capture.Offer(CaptureParts.Routes, () => poi.RoutesReport(_snapshot.Player));
         _tools.Add(69, "routes-settings", "Settings", poi.DrawRouteSettings, page: Routes, pageLabel: "Routes");
 
         // TABS, the atlas page's reason: the list is watched while playing, the switches are set
