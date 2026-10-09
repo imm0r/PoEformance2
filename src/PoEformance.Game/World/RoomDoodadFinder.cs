@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Numerics;
 using PoEformance.Game.Files;
 using PoEformance.Game.Ui;
@@ -16,6 +17,12 @@ public sealed record RoomDoodadPlace(RoomCandidate Where, int Hits, int Lines, f
     /// How many of the room's tiles the ground-and-tile search found agreeing at this very place, or -1 where that search did not list it - the tie-breaker where two variants share every doodad, see <see cref="RoomDoodadFinder.Settle"/>.
     /// </summary>
     public int TilesAgree { get; init; } = -1;
+
+    /// <summary>How many of the room's matchable prop lines - the plain doodads, which stay put - have an entity here: the count that made it a place. See RoomDoodad.IsProp.</summary>
+    public int PropHits { get; init; }
+
+    /// <summary>How many prop lines were matchable - what <see cref="PropHits"/> is out of.</summary>
+    public int Props { get; init; }
 
     /// <summary>
     /// The entities the hits are - as indices into the sightings the place was found in, ascending - so two rooms' places can be asked whether they stand on the same doodads. See <see cref="RoomDoodadFinder.Settle"/>.
@@ -61,6 +68,9 @@ public sealed record RoomDoodadPlaces(IReadOnlyList<RoomDoodadPlace> Places, int
     /// <summary>No place, and why.</summary>
     public static RoomDoodadPlaces Not(int lines, int matchable, string why) => new([], lines, matchable, 0, why);
 
+    /// <summary>How many of the matchable lines are plain props - the ones that decide a place where there are enough of them. See RoomDoodad.IsProp.</summary>
+    public int Props { get; init; }
+
     /// <summary>The places given up to another room that stands on the same tiles with more of its doodads, each with that room - see <see cref="RoomDoodadFinder.Settle"/>.</summary>
     public IReadOnlyList<(RoomDoodadPlace Place, string To)> Yielded { get; init; } = [];
 }
@@ -92,6 +102,15 @@ public sealed record RoomDoodadPlaces(IReadOnlyList<RoomDoodadPlace> Places, int
 /// WHAT IS NOT CONCLUDED: a line whose path and model stand nowhere in the area - the boss room's
 /// controllers and markers, which the game does not make visible entities of - is left out of the
 /// count rather than counted against the room.
+///
+/// THE PROPS DECIDE, THE SCRIPTED OBJECTS ONLY COUNT. Two captures of The Assembly forty minutes
+/// apart (RoomDoodad.IsProp has the figures) showed a wall room lose its place between them: three
+/// power-line pieces inside it had gone - the game lays and lifts those as the player powers the
+/// lines - and 36 of 50 became 33, under the two thirds. Not one plain prop had moved. So where a
+/// room has <see cref="FewestLines"/> matchable props, the two thirds is of them and it is their
+/// hits that have to reach it; the lines of scripted objects - power lines, checkpoints, an NPC, a
+/// detonator - vote, are counted, and are reported, but a place is not lost for their absence, and
+/// no ring is drawn for one. A room with too few props is placed by every line, as before.
 ///
 /// ONE ROOM PER DOODAD, SETTLED AFTER: Atziri's temple loads every variant of a room - five biome
 /// floors, four commander rooms - and the variants share most of their doodads, so each one's vote
@@ -157,7 +176,8 @@ public static class RoomDoodadFinder
 
         // EACH LINE'S CANDIDATES: the entities of its path whose model is its own, or that have none to say.
         var candidates = new List<int>[doodads.Count];
-        int lines = 0, matchable = 0, byModel = 0;
+        var prop = new bool[doodads.Count];
+        int lines = 0, matchable = 0, byModel = 0, props = 0;
         for (var line = 0; line < doodads.Count; line++)
         {
             RoomDoodad doodad = doodads[line];
@@ -194,6 +214,11 @@ public static class RoomDoodadFinder
                 candidates[line] = mine;
                 matchable++;
                 byModel += modelled ? 1 : 0;
+                if (doodad.IsProp)
+                {
+                    prop[line] = true;
+                    props++;
+                }
             }
         }
 
@@ -201,12 +226,16 @@ public static class RoomDoodadFinder
         {
             return RoomDoodadPlaces.Not(lines, matchable, matchable == 0
                 ? (lines == 0 ? "its doodad lines name no stub" : "none of its doodads stands in the area")
-                : $"only {matchable} of its doodads stand in the area - fewer than {FewestLines} say nothing");
+                : $"only {matchable} of its doodads stand in the area - fewer than {FewestLines} say nothing") with { Props = props };
         }
+
+        // THE PROPS DECIDE where there are enough of them - see the class remarks.
+        bool byProps = props >= FewestLines;
+        int needed = Math.Max(FewestLines, (((byProps ? props : matchable) * 2) + 2) / 3);
 
         // THE VOTE: for each way round, where each pair of a line and one of its entities puts the corner.
         float side = WithinUnits;
-        var votes = new Dictionary<(int Turn, int X, int Y), HashSet<int>>();
+        var votes = new Dictionary<(int Turn, int X, int Y), Voters>();
         for (var turn = 0; turn < 8; turn++)
         {
             (int wide, int tall) = (turn & 1) == 0 ? (width, height) : (height, width);
@@ -228,31 +257,40 @@ public static class RoomDoodadFinder
                         continue;
                     }
 
-                    if (!votes.TryGetValue((turn, x, y), out HashSet<int>? voters))
+                    if (!votes.TryGetValue((turn, x, y), out Voters? voters))
                     {
-                        voters = [];
+                        voters = new Voters();
                         votes[(turn, x, y)] = voters;
                     }
 
-                    voters.Add(line);
+                    if (voters.Lines.Add(line) && prop[line])
+                    {
+                        voters.Props++;
+                    }
                 }
             }
         }
 
-        // THE PLACES: every tile with two thirds of the matchable lines behind it, each checked line by
+        // THE PLACES: every tile with two thirds of the deciding lines behind it, each checked line by
         // line - an entity within a tile of where the line stands, EACH ENTITY TO ONE LINE, the nearest
         // pairs first, as LaidRoomModels pairs them: without a model to tell them apart two lines a
         // tile apart would both claim the one entity between them. Told apart by footprint, so a room
         // symmetric enough to fit one place several ways round is one place.
-        int needed = Math.Max(FewestLines, ((matchable * 2) + 2) / 3);
         var places = new List<RoomDoodadPlace>();
         var stands = new Vector2[doodads.Count];
         var pairs = new List<(float Distance, int Line, int Entity)>();
         var lineTaken = new bool[doodads.Count];
         var entityTaken = new HashSet<int>();
-        foreach (((int turn, int x, int y), HashSet<int> voters) in votes)
+        (int Turn, int X, int Y, int Counted) best = (0, 0, 0, -1);
+        foreach (((int turn, int x, int y), Voters voters) in votes)
         {
-            if (voters.Count < needed)
+            int counted = byProps ? voters.Props : voters.Lines.Count;
+            if (counted > best.Counted)
+            {
+                best = (turn, x, y, counted);
+            }
+
+            if (counted < needed)
             {
                 continue;
             }
@@ -282,7 +320,7 @@ public static class RoomDoodadFinder
             pairs.Sort((a, b) => a.Distance.CompareTo(b.Distance));
             Array.Clear(lineTaken);
             entityTaken.Clear();
-            int hits = 0;
+            int hits = 0, propHits = 0;
             float off = 0f;
             foreach ((float distance, int line, int one) in pairs)
             {
@@ -290,19 +328,21 @@ public static class RoomDoodadFinder
                 {
                     lineTaken[line] = true;
                     hits++;
+                    propHits += prop[line] ? 1 : 0;
                     off += distance;
                 }
             }
 
-            if (hits < needed)
+            if ((byProps ? propHits : hits) < needed)
             {
                 continue;
             }
 
+            // THE RINGS: the deciding lines without an entity - a scripted object's absence is play, not a miss.
             var missing = new List<Vector2>(matchable - hits);
             for (var line = 0; line < doodads.Count; line++)
             {
-                if (candidates[line] is not null && !lineTaken[line])
+                if (candidates[line] is not null && !lineTaken[line] && (!byProps || prop[line]))
                 {
                     missing.Add(stands[line]);
                 }
@@ -312,7 +352,12 @@ public static class RoomDoodadFinder
             var entities = new int[hits];
             entityTaken.CopyTo(entities);
             Array.Sort(entities);
-            places.Add(new RoomDoodadPlace(new RoomCandidate(x, y, turn, wide, tall, hits, matchable), hits, matchable, off / hits, missing) { Entities = entities });
+            places.Add(new RoomDoodadPlace(new RoomCandidate(x, y, turn, wide, tall, hits, matchable), hits, matchable, off / hits, missing)
+            {
+                Entities = entities,
+                PropHits = propHits,
+                Props = props,
+            });
         }
 
         places.Sort((a, b) =>
@@ -334,7 +379,20 @@ public static class RoomDoodadFinder
             }
         }
 
-        return new RoomDoodadPlaces(kept, lines, matchable, byModel, kept.Count > 0 ? string.Empty : "no tile collects two thirds of its doodads");
+        string why = kept.Count > 0 ? string.Empty
+            : best.Counted < 0 ? "no tile collects two thirds of its " + (byProps ? "props" : "doodads")
+            : string.Create(
+                CultureInfo.InvariantCulture,
+                $"no tile collects two thirds of its {(byProps ? "props" : "doodads")} - the most, {best.Counted} of {needed} needed, at tile {best.X}, {best.Y}, {RoomFinder.Said(best.Turn)}");
+        return new RoomDoodadPlaces(kept, lines, matchable, byModel, why) { Props = props };
+    }
+
+    /// <summary>The lines voting for one tile, and how many of them are props.</summary>
+    private sealed class Voters
+    {
+        public HashSet<int> Lines { get; } = [];
+
+        public int Props { get; set; }
     }
 
     /// <summary>

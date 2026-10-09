@@ -224,23 +224,24 @@ public class CaptureReportTests
     public void THEPLACINGIsSaidAsTheTileBookShowsIt()
     {
         RoomLayout square = RoomArrangementTests.Square();
-        var laid = new RoomDoodadPlace(new RoomCandidate(5, 7, 1, 3, 3, 12, 12), 12, 12, 4.2f, []) { TilesAgree = 9 };
+        var laid = new RoomDoodadPlace(new RoomCandidate(5, 7, 1, 3, 3, 12, 12), 12, 12, 4.2f, []) { TilesAgree = 9, PropHits = 9, Props = 9 };
         var yielded = new RoomDoodadPlace(new RoomCandidate(5, 7, 1, 3, 3, 10, 12), 10, 12, 3f, []);
         (string Room, RoomLayout Layout, RoomDoodadPlaces Places)[] placed =
         [
             ("Metadata/Terrain/Rooms/desert.arm", square, new RoomDoodadPlaces([laid], 12, 12, 12, string.Empty)),
-            ("Metadata/Terrain/Rooms/grass.arm", square, new RoomDoodadPlaces([], 12, 10, 10, "every place it found stands on another room's tiles")
+            ("Metadata/Terrain/Rooms/grass.arm", square, new RoomDoodadPlaces([], 12, 10, 10, "every place it found stands on another room's doodads")
             {
                 Yielded = [(yielded, "Metadata/Terrain/Rooms/desert.arm")],
+                Props = 8,
             }),
         ];
 
         (string said, string detail) = CaptureReport.Placed(placed);
         Assert.Equal("rooms: 1 placed by their doodads at 1 places, 1 with no place", said);
         string[] lines = detail.Split('\n');
-        Assert.Equal("desert: 1 place, 12 of 12 doodads told by their model - tile 5, 7, turned 90: 12 of 12 doodads within a tile, off 4 on average, 9 tiles agree", lines[0]);
+        Assert.Equal("desert: 1 place, 12 of 12 doodads told by their model - tile 5, 7, turned 90: 12 of 12 doodads within a tile (9 of 9 props), off 4 on average, 9 tiles agree", lines[0]);
         Assert.Equal(
-            "grass: no place - every place it found stands on another room's tiles; 10 of its 12 doodad lines stand in the area, 10 told by their model - yielded tile 5, 7, turned 90 (10 of 12) to desert",
+            "grass: no place - every place it found stands on another room's doodads; 10 of its 12 doodad lines stand in the area, 8 of them props, 10 told by their model - yielded tile 5, 7, turned 90 (10 of 12) to desert",
             lines[1]);
     }
 

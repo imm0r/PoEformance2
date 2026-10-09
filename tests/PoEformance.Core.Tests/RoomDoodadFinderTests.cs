@@ -80,11 +80,80 @@ public class RoomDoodadFinderTests
         Assert.Equal((8, 2, 3, 4, 5), (place.Where.X, place.Where.Y, place.Where.Turn, place.Hits, place.Lines));
         Assert.Equal(Expected(Lines[4], 8, 2, turn: 3), Assert.Single(place.Missing));
 
-        // One more taken away: three of five is under two thirds, and the room has no place.
+        // One more taken away: three of five is under two thirds, and the room has no place - and says
+        // how near the nearest tile came.
         sightings.RemoveAt(1);
         RoomDoodadPlaces less = RoomDoodadFinder.Find(Lines, Width, Height, sightings, 40, 40);
         Assert.Empty(less.Places);
-        Assert.Equal("no tile collects two thirds of its doodads", less.Why);
+        Assert.StartsWith("no tile collects two thirds of its props - the most, 3 of 4 needed, at tile ", less.Why, StringComparison.Ordinal);
+        Assert.Equal(5, less.Props);
+    }
+
+    /// <summary>
+    /// The props decide and the scripted objects only count: a room whose power lines are lifted keeps its place on its props, with the lines reported beside them and no ring for one; a room with too few props is placed by every line.
+    /// </summary>
+    [Fact]
+    public void THEPROPSDecideAndTheScriptedObjectsOnlyCount()
+    {
+        const string PowerLine = "Metadata/Terrain/Gallows/Act3/3_6_2/Objects/GlyphPowerLine";
+        RoomDoodad[] lines =
+        [
+            new(10, 5, 0f, 1f, "Metadata/Doodads/Pillar_01.ao", Plain),
+            new(50, 20, 0f, 1f, "Metadata/Doodads/Pillar_02.ao", Plain),
+            new(80, 60, 0f, 1f, "Metadata/Doodads/Crate_01.ao", Plain),
+            new(30, 65, 0f, 1f, "Metadata/Doodads/Brazier_01.ao", Plain),
+            new(12, 40, 0f, 1f, "Metadata/Doodads/Rail.ao", PowerLine),
+            new(35, 40, 0f, 1f, "Metadata/Doodads/Rail.ao", PowerLine),
+            new(58, 40, 0f, 1f, "Metadata/Doodads/Rail.ao", PowerLine),
+            new(81, 40, 0f, 1f, "Metadata/Doodads/Rail.ao", PowerLine),
+        ];
+        Assert.Equal([true, true, true, true, false, false, false, false], lines.Select(line => line.IsProp));
+
+        // Every prop stands, one rail of four: four of four props is a place; four of eight lines would not have been.
+        var sightings = new List<DoodadSighting>();
+        uint id = 1;
+        foreach (RoomDoodad line in lines[..5])
+        {
+            sightings.Add(At(line, 6, 4, turn: 2, id++));
+        }
+
+        // The other rails stand elsewhere in the area, so their lines are matchable.
+        sightings.Add(At(lines[5], 30, 30, turn: 0, id++));
+        RoomDoodadPlaces found = RoomDoodadFinder.Find(lines, Width, Height, sightings, 60, 60);
+        Assert.Equal((8, 8, 4), (found.Lines, found.Matchable, found.Props));
+        RoomDoodadPlace place = Assert.Single(found.Places);
+        Assert.Equal((6, 4, 2, 5, 8, 4, 4), (place.Where.X, place.Where.Y, place.Where.Turn, place.Hits, place.Lines, place.PropHits, place.Props));
+        Assert.Empty(place.Missing);
+
+        // One prop standing elsewhere instead: three of four props is still a place, and the prop missing
+        // here gets its ring - the rails none. (Taken out of the area altogether it would not be matchable,
+        // and a line that stands nowhere is not counted against the room.)
+        sightings[0] = At(lines[0], 40, 40, turn: 0, 99);
+        RoomDoodadPlace fewer = Assert.Single(RoomDoodadFinder.Find(lines, Width, Height, sightings, 60, 60).Places);
+        Assert.Equal((4, 3, 4), (fewer.Hits, fewer.PropHits, fewer.Props));
+        Assert.Equal(Expected(lines[0], 6, 4, turn: 2), Assert.Single(fewer.Missing));
+
+        // Two props elsewhere: two of four is under two thirds, however many rails stand.
+        sightings[1] = At(lines[1], 40, 40, turn: 0, 98);
+        RoomDoodadPlaces none = RoomDoodadFinder.Find(lines, Width, Height, sightings, 60, 60);
+        Assert.Empty(none.Places);
+        Assert.StartsWith("no tile collects two thirds of its props - the most, 2 of 3 needed", none.Why, StringComparison.Ordinal);
+
+        // A room of two props and four rails has too few props to decide by: every line counts, as before.
+        RoomDoodad[] railRoom = [lines[0], lines[1], lines[4], lines[5], lines[6], lines[7]];
+        var rails = new List<DoodadSighting>();
+        id = 1;
+        foreach (RoomDoodad line in railRoom[..5])
+        {
+            rails.Add(At(line, 6, 4, turn: 2, id++));
+        }
+
+        RoomDoodadPlaces byAll = RoomDoodadFinder.Find(railRoom, Width, Height, rails, 60, 60);
+        Assert.Equal(2, byAll.Props);
+        // Six lines matchable - the sixth rail by the other rails' entities, which carry its model - five hit, the sixth ringed: every line counts here.
+        RoomDoodadPlace all = Assert.Single(byAll.Places);
+        Assert.Equal((5, 6, 2, 2), (all.Hits, all.Lines, all.PropHits, all.Props));
+        Assert.Single(all.Missing);
     }
 
     /// <summary>Too few of its doodads in the area, or none, is said rather than voted on.</summary>
