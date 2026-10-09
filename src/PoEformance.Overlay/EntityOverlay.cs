@@ -1327,23 +1327,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     }
 
     /// <summary>The area's rooms, by file, made again only when the tile book's "here" list is a new one.</summary>
-    private string[] AreaRoomFiles()
-    {
-        IReadOnlyDictionary<string, int> here = TilesHere();
-        if (!ReferenceEquals(here, _roomFilesOf))
-        {
-            _roomFilesOf = here;
-            _roomFiles = [.. here.Keys.Where(TileBook.IsRoom).Order(StringComparer.OrdinalIgnoreCase)];
-        }
-
-        return _roomFiles;
-    }
-
-    private IReadOnlyDictionary<string, int>? _roomFilesOf;
-    private string[] _roomFiles = [];
+    /// <summary>Every room the area may have laid - the loaded list's and its room sets', cached on the list's identity. See AreaRoomSet.</summary>
+    private IReadOnlyList<string> AreaRoomFiles()
+        => _areaRooms?.RoomSet(LoadedFiles?.Invoke() ?? []) ?? [];
 
     /// <summary>
-    /// Every room the area loaded, outlined on the large map with its name, where the tile book's option asks for it - see <see cref="AreaRooms"/>.
+    /// Every room the area may have laid, outlined on the large map with its name where it stands, where the tile book's option asks for it - see <see cref="AreaRooms"/>.
     /// </summary>
     /// <remarks>
     /// ASKED FOR ON ANY MAP, DRAWN ON THE LARGE ONE: the search starts while the minimap is up, so the
@@ -1656,7 +1645,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         (uint corner, uint tile, uint joined) = MissInks();
         Missed(draw, map, player, ghost.Grid, ghost.Misses, corner, tile, joined, 1f);
 
-        RoomLayout? layout = _areaRooms?.Last?.Layouts.GetValueOrDefault(ghost.Room);
+        RoomLayout? layout = _areaRooms?.LayoutOf(ghost.Room);
         Named(draw, corners, ghost.Room, ghost.Where, layout, name, plate, RoomFont());
     }
 
@@ -2286,9 +2275,17 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _capture = new CaptureKey(
             () => _snapshot,
             () => _tracked,
-            () => _snapshot.Terrain is TerrainGrid grid && _areaRooms is not null
-                ? _areaRooms.Arranged(grid, AreaRoomFiles(), _tileBook?.RoomsOverlap ?? RoomOverlap.Rims)
-                : null,
+            () =>
+            {
+                // ASKING STARTS THE WORK, as the map's own ask does - see AreaRooms.Arranged.
+                if (_snapshot.Terrain is not TerrainGrid grid || _areaRooms is null)
+                {
+                    return null;
+                }
+
+                _areaRooms.Arranged(grid, AreaRoomFiles(), _tileBook?.RoomsOverlap ?? RoomOverlap.Rims);
+                return _areaRooms.Standing;
+            },
             () => _areaRooms is not null && _snapshot.Terrain is TerrainGrid { Ground: not null },
             () => _areaRooms?.Progress ?? (0, 0),
             () => _areaRooms,

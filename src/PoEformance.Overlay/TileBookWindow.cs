@@ -420,26 +420,28 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         if (rooms.Running)
         {
             (int done, int of) = rooms.Progress;
-            string searched = string.Create(CultureInfo.InvariantCulture, $"rooms: {done} of {of} searched");
+            string searched = string.Create(CultureInfo.InvariantCulture, $"rooms: {done} of {of} {(rooms.ReadDoodads is null ? "searched" : "read")}");
             OverlayLayout.Flow(end, ImGui.CalcTextSize(searched).X, right, 0f);
             ImGui.TextDisabled(searched);
             return;
         }
 
-        if (rooms.Last is not { } arranged)
+        // BY THEIR DOODADS where the entities can be read - what the map draws - else by the arrangement.
+        if (rooms.ReadDoodads is not null ? rooms.Rooms is null : rooms.Last is null)
         {
             OverlayLayout.Flow(end, ImGui.CalcTextSize("rooms: open a map to start").X, right, 0f);
             ImGui.TextDisabled("rooms: open a map to start");
             return;
         }
 
-        // BY THEIR DOODADS where the entities can be read - what the map draws - else by the arrangement.
         if (rooms.ReadDoodads is not null)
         {
             end = PlacedSaid(rooms, end, right);
             DoodadsBox(rooms, end, right);
             return;
         }
+
+        RoomArrangement arranged = rooms.Last!;
 
         // THE LINE AND ITS HOVER ARE THE CAPTURE'S TEXT - see CaptureReport.Arranged - so what a
         // capture writes is what the window showed, word for word.
@@ -468,8 +470,8 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         if (rooms.Placed is not { } placed)
         {
             string waiting = rooms.Surveying
-                ? "rooms: searched - reading the area's doodads to place them..."
-                : "rooms: searched - the area's doodads are not read";
+                ? "rooms: read - placing them by the area's doodads..."
+                : "rooms: read - the area's doodads are not read";
             OverlayLayout.Flow(end, ImGui.CalcTextSize(waiting).X, right, 0f);
             ImGui.TextDisabled(waiting);
             return ImGui.GetItemRectMax().X;
@@ -524,7 +526,7 @@ public sealed class TileBookWindow : BookWindow<TileBook>
         if (!ReferenceEquals(done, _doodadsSaidOf))
         {
             _doodadsSaidOf = done;
-            (_doodadsSaid, _doodadsDetail) = CaptureReport.Doodads(done, rooms.Searched);
+            (_doodadsSaid, _doodadsDetail) = CaptureReport.Doodads(done, rooms.Rooms);
         }
 
         OverlayLayout.Flow(end, ImGui.CalcTextSize(_doodadsSaid).X, right, 0f);

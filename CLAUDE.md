@@ -153,13 +153,21 @@ are regression tests against real memory. A recording can only contain reads the
 build actually performed, so a new diagnostic needs a fresh recording.
 
 A capture (F9) is the same idea for a whole question: its zip holds the pictures, every
-room file of the area and every doodad entity with its model and position, so the room
-placing runs again here without the game -
+room file of the area's room set and every doodad entity with its model and position, so the
+room placing runs again here without the game -
 `POEF_CAPTURE=<unpacked folder> dotnet test tests/PoEformance.Core.Tests --filter CaptureReplay`
 writes `placing-replay.txt` beside the capture's files. Two captures of one area forty
 minutes apart are how it was learned that the power-line pieces and checkpoints come and go
 with play while the plain props never move; hold a finder change against a capture before
 asking for a screenshot.
+
+**The loaded-file list is not the area.** It names what was loaded since the area change, and
+a file still cached from an earlier instance of the same map is not loaded again and not
+listed: The Assembly's list carried ten of its fifty-three rooms, neither the boss room nor
+the entrance among them, and for a while "the boss room is not placed" was read as a placing
+fault. The area's room set (`generate.rs`, which the list does carry) names every room the
+generator may lay, and `AreaRoomSet` places all of them. A list that lacks a thing is not
+evidence the area lacks it.
 
 ## Raise the version on every push
 

@@ -31,7 +31,8 @@ public class CaptureReplayTests
 
         string replay = Replay(folder);
         File.WriteAllText(Path.Combine(folder, "placing-replay.txt"), replay);
-        Assert.StartsWith("rooms: ", replay, StringComparison.Ordinal);
+        Assert.StartsWith("grid ", replay, StringComparison.Ordinal);
+        Assert.Contains("\nrooms: ", replay, StringComparison.Ordinal);
     }
 
     /// <summary>rooms-placed.txt as the tool would write it from the capture's room files and sightings.</summary>
@@ -55,7 +56,8 @@ public class CaptureReplayTests
         }
 
         return string.Create(CultureInfo.InvariantCulture, $"grid {tilesX} x {tilesY} tiles, {survey.Found.Count} sightings, {rooms.Count} rooms\n")
-            + CaptureReport.Lined(CaptureReport.Placed(placed)) + "\n\n" + CaptureReport.PlacedEntities(placed, survey);
+            + CaptureReport.Lined(CaptureReport.Placed(placed)) + "\n\n" + CaptureReport.PlacedEntities(placed, survey)
+            + "\n" + CaptureReport.Lined(CaptureReport.Doodads(survey, rooms));
     }
 
     /// <summary>Every room of room-files.txt, each block under its "##### path" header parsed as the file.</summary>

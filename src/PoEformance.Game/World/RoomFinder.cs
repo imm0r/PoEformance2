@@ -190,6 +190,41 @@ public sealed record RoomSearch(IReadOnlyList<RoomCandidate> Candidates, int Cor
 }
 
 /// <summary>
+/// Scores single placements of one room against the area's ground and tiles - for a place found some other way, such as by the room's doodads. See <see cref="RoomFinder.Scorer"/>.
+/// </summary>
+/// <remarks>Not thread-safe against itself: it reads each tile file's identity once and keeps it, so one call at a time.</remarks>
+public sealed class RoomScorer
+{
+    private readonly RoomPlacements _placements;
+
+    internal RoomScorer(RoomPlacements placements)
+    {
+        _placements = placements;
+    }
+
+    /// <summary>Whether the tiles laid are to hand - without them a score counts corners alone and agrees with no tile.</summary>
+    public bool Checks => _placements.Checks;
+
+    /// <summary>The footprint's size laid one of the eight ways.</summary>
+    public (int Wide, int Tall) Size(int turn) => _placements.Size(turn);
+
+    /// <summary>
+    /// One placement scored in full - its corners and tiles against the area, and where they part - or null where the footprint would lie outside the area.
+    /// </summary>
+    public RoomPlace? Score(int x, int y, int turn)
+    {
+        (int wide, int tall) = _placements.Size(turn & 7);
+        if (x < 0 || y < 0 || x + wide > _placements.TilesX || y + tall > _placements.TilesY)
+        {
+            return null;
+        }
+
+        RoomCandidate scored = _placements.Scored(x, y, turn & 7);
+        return new RoomPlace(scored, _placements.Misses(scored));
+    }
+}
+
+/// <summary>
 /// Finds where a room the area loaded was laid, by its ground.
 /// </summary>
 /// <remarks>
@@ -410,6 +445,68 @@ public static class RoomFinder
             OverridesWhy = room.OverridesWhy,
             Placements = placements,
         };
+    }
+
+    /// <summary>
+    /// A scorer for single placements of the room - the same yardstick <see cref="Find"/> ranks by, without the search - or null and why where the room cannot be stamped against this area.
+    /// </summary>
+    /// <remarks>
+    /// FOR A PLACE THE DOODADS FOUND. The search tries every tile of the area eight ways round and
+    /// takes seconds a room; with the area's whole room set to place - fifty rooms and more - that is
+    /// minutes nobody waits. The doodads say where a room stands in milliseconds, and the tiles are
+    /// then asked about that one place: how many of its slots the laid tiles agree with, which is
+    /// what tells two variants apart that share every doodad (RoomDoodadFinder.Settle).
+    /// </remarks>
+    /// <param name="room">The room, read with its slots.</param>
+    /// <param name="ground">The area's ground types per tile corner.</param>
+    /// <param name="tilesX">The area's tiles across.</param>
+    /// <param name="tilesY">The area's tiles down.</param>
+    /// <param name="tiles">The tiles actually laid; null scores corners alone.</param>
+    /// <param name="identity">A tile file's identity, or null where it does not read.</param>
+    /// <param name="walkable">Which tiles have walkable ground, to tell a join among the misses; null leaves that out.</param>
+    public static (RoomScorer? Scorer, string Why) Scorer(
+        RoomLayout room,
+        TerrainGroundTypes ground,
+        int tilesX,
+        int tilesY,
+        TerrainTiles? tiles = null,
+        Func<string, TileIdentity?>? identity = null,
+        bool[]? walkable = null)
+    {
+        ArgumentNullException.ThrowIfNull(room);
+        ArgumentNullException.ThrowIfNull(ground);
+        if (!room.Ready)
+        {
+            return (null, $"the room did not read: {room.Why}");
+        }
+
+        if (room.Slots.Count == 0)
+        {
+            return (null, room.SlotsWhy.Length > 0 ? $"the room's grid did not read: {room.SlotsWhy}" : "the room has no slot grid");
+        }
+
+        if (!ground.Trusted)
+        {
+            return (null, $"the area's ground types are not to be trusted: {ground.Note}");
+        }
+
+        if (tilesX <= 0 || tilesY <= 0)
+        {
+            return (null, "no grid to lay it on");
+        }
+
+        (Dictionary<(int U, int V), int>? stamp, int left, int free, _, string why) = Stamped(room, ground);
+        if (stamp is null)
+        {
+            return (null, why);
+        }
+
+        if (stamp.Count == 0)
+        {
+            return (null, $"the room names no corner's ground in a one by one k slot - {left} bigger slots left out, {free} corners unnamed");
+        }
+
+        return (new RoomScorer(new RoomPlacements(room, stamp, ground, tilesX, tilesY, tiles, identity, walkable)), string.Empty);
     }
 
     /// <summary>

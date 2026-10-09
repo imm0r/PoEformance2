@@ -90,9 +90,12 @@ In the overlay, **F9** (rebindable under Appearance → Keys → Capture for Dia
 of the spot you stand on into `captures/<time> <area>/` beside the tool and packs it into
 `<time> <area>.zip` beside the folder, ready to send. What goes in is a **catalogue of parts**, each
 with a box under the key - tick what the question is about: a picture with and one without the
-overlay; every entity; the area's loaded files, environments and room files; the rooms around you with
-their light data, every room as the ground-and-tile search arranged it, and the Tile Book's picked row;
-the doodad survey with every sighting and every room as its doodads place it; what the diagnostic
+overlay; every entity; the area's loaded files, environments and every room file of its room set (the
+`.rs` the area loaded names the rooms the loaded-file list leaves out once an earlier instance cached
+them - The Assembly's list had ten of fifty-three, neither the boss room nor the entrance among them);
+the rooms around you with their light data, every room as the ground-and-tile search arranged it where
+no entities can be read, and the Tile Book's picked row; the doodad survey with every sighting and
+every room of the set as its doodads place it; what the diagnostic
 windows hold as the key goes down - the active routes, the light hunt's report, the model probe,
 the Memory Dissector's places and search, the atlas check; and a memory recording that `--replay`
 reads. Inside that recording the ticked parts are read once more from nothing - the world with
