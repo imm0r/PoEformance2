@@ -326,11 +326,18 @@ env_map_rotation)`, System.Numerics' own order, the order the camera matrix is k
 found alone is taken. In AzmerianRanges (phi 2.33874, theta 2.32128) it found one reading's vector
 and its negative, nine copies each and every copy beside the other, sixteen bytes apart: phi is the
 sun's height and theta its bearing, and of the two signs only one puts the sun above the ground -
-`SceneLight.GameSun`, drawn ever since, the panel's choice gone. The sky's turn was not found, as
-written or transposed, so the hunt now also looks for every other arrangement of the same turns
-(each about any axis, either way, after any of the 48 swaps and flips of the axes - 587 needles for
-AzmerianRanges, found by a binary search over their first floats), reads back 256 bytes either side
-of the sun's vector to show what the game keeps beside it, and looks through 16 GB rather than 8.
+`SceneLight.GameSun`, drawn ever since, the panel's choice gone. The bytes read back round those
+copies showed what they are: the shadow cascades' boxes along the light, each face a plane and the
+opposite face its negative, beside the camera frustum's corners - so the axis is the game's and the
+sign the ground's. The sky's turn was not among the first candidates, as written or transposed, so
+the hunt looks for every other arrangement of the same turns (each about any axis, either way, after
+any of the 48 swaps and flips of the axes - 572 needles for AzmerianRanges, found by a binary search
+over their first floats) through 16 GB. One stood out: 37 copies, nearly all at offset 0x80 of a
+256-byte block, the stride of Direct3D 12's constant buffers - rows (cos h, 0, sin h), (-sin h, 0,
+cos h), (0, -1, 0), the world's axes swapped to the cube's (`SceneLight.CubeSwap`, its up plus y) and
+turned about that up by minus hor_angle (`SceneLight.CubeTurnFrom`). The cube is authored y-up, and
+the picture had been reading its sky off the z faces. How vert_angle tips it waits on a hunt in an
+area that has one.
 
 **The colour grade** (`ColourGrade`) is `post_transform`'s 3D table applied as `ApplyColorGrading`
 does with GGG_POE_1 off: divided by the brightest channel past one, looked up trilinearly by the

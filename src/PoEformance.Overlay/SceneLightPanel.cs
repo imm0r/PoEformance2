@@ -125,6 +125,7 @@ public sealed class SceneLightPanel : IMovableSun
     private float _cubeWidest;
     private int[] _cubeRows = [0];
     private int[] _cubeRowOf = [0, 0, 0, 0, 0];
+    private string _skySaid = string.Empty;
 
     private Task<FloatHuntResult>? _hunting;
     private LightHunt? _huntOf;
@@ -652,16 +653,20 @@ public sealed class SceneLightPanel : IMovableSun
                 : Throws(SceneLight.SunFrom(phi, theta, SceneLight.GameSun), frame)
             : "the environment gives no sun angles";
 
-        // ONLY THE TURNS THAT DIFFER: with one of the two angles nought the four orders come to one or
-        // two turns, and offering four rows that draw the same picture read as a switch that did nothing.
+        // THE TURN BY hor_angle IS THE GAME'S (SceneLight.CubeTurnFrom); only vert_angle's tip is a
+        // candidate, and only the tips that differ are offered - with vert_angle nought there is none.
         float horizontal = env.HorAngle ?? 0f, vertical = env.VertAngle ?? 0f;
         float h = horizontal * 180f / MathF.PI, v = vertical * 180f / MathF.PI;
-        var turns = new List<Matrix4x4> { Matrix4x4.Identity };
-        var rows = new List<int> { 0 };
-        var labels = new List<string> { "not turned" };
+        string round = string.Create(CultureInfo.InvariantCulture, $"turned {h:0}° round");
+        _skySaid = horizontal == 0f && vertical == 0f
+            ? "not turned - the environment gives no hor_angle or vert_angle; its up is still the world's"
+            : string.Create(CultureInfo.InvariantCulture, $"{round} about its up, as the game holds it");
+        var turns = new List<Matrix4x4>();
+        var rows = new List<int>();
+        var labels = new List<string>();
         int cubes = Enum.GetValues<SceneLight.CubeReading>().Length;
         _cubeRowOf = new int[cubes];
-        for (var reading = 1; reading < cubes; reading++)
+        for (var reading = 0; reading < cubes; reading++)
         {
             Matrix4x4 turn = SceneLight.CubeTurnFrom(horizontal, vertical, (SceneLight.CubeReading)reading);
             int same = turns.FindIndex(one => Near(one, turn));
@@ -674,11 +679,12 @@ public sealed class SceneLightPanel : IMovableSun
             _cubeRowOf[reading] = turns.Count;
             turns.Add(turn);
             rows.Add(reading);
-            bool aboutX = (SceneLight.CubeReading)reading is SceneLight.CubeReading.ZThenX or SceneLight.CubeReading.XThenZ;
-            bool turnFirst = (SceneLight.CubeReading)reading is SceneLight.CubeReading.ZThenX or SceneLight.CubeReading.ZThenY;
-            string tip = string.Create(CultureInfo.InvariantCulture, $"tipped {v:0}° about {(aboutX ? "x" : "y")}");
-            string round = string.Create(CultureInfo.InvariantCulture, $"turned {h:0}° round");
-            string how = vertical == 0f ? round : horizontal == 0f ? tip : turnFirst ? $"{round}, then {tip}" : $"{tip}, then {round}";
+            var which = (SceneLight.CubeReading)reading;
+            string tip = string.Create(CultureInfo.InvariantCulture,
+                $"tipped {v:0}° about {(which is SceneLight.CubeReading.RoundThenTipX or SceneLight.CubeReading.TipXThenRound ? "x" : "z")}");
+            string how = which == SceneLight.CubeReading.Round ? $"{round}, not tipped"
+                : which is SceneLight.CubeReading.RoundThenTipX or SceneLight.CubeReading.RoundThenTipZ ? $"{round}, then {tip}"
+                : $"{tip}, then {round}";
             labels.Add(string.Create(CultureInfo.InvariantCulture, $"{how} (reading {reading + 1})"));
         }
 
@@ -688,7 +694,7 @@ public sealed class SceneLightPanel : IMovableSun
     }
 
     /// <summary>
-    /// The sky: the turns the environment's two angles can give it, or why there is nothing to choose - a cube that lights nothing here, or no turn at all.
+    /// The sky: how the game turns it, the tips vert_angle may give it where it has one, or why there is nothing to see - a cube that lights nothing here.
     /// </summary>
     private void SkyRow()
     {
@@ -697,12 +703,14 @@ public sealed class SceneLightPanel : IMovableSun
             : _cube is null ? "no sky cube read - see details"
             : env.GiEnvOcclusion is >= 1f ? string.Create(CultureInfo.InvariantCulture,
                 $"lights nothing here: gi_env_occlusion {env.GiEnvOcclusion:0.##} leaves all the light from around to the game's own GI, which is not drawn - the flat ambient stands in")
-            : _cubeRows.Length < 2 ? "not turned - the environment gives no hor_angle or vert_angle"
+            : _cubeRows.Length < 2 ? _skySaid
             : string.Empty;
         if (why.Length > 0)
         {
             ImGui.AlignTextToFramePadding();
             ImGuiText.Wrapped(OverlayInk.Quiet, ImGuiText.Escape(why));
+            OverlayLayout.Hint("The sky is the light that comes from all around - the environment's cube. The game swaps the world's axes to the cube's,"
+                + " whose up is its plus y, and turns it about that up by hor_angle - found in its memory (SceneLight.CubeTurnFrom).");
             return;
         }
 
@@ -714,9 +722,9 @@ public sealed class SceneLightPanel : IMovableSun
             _version++;
         }
 
-        OverlayLayout.Hint("The sky is the light that comes from all around - the environment's cube - and the environment turns it by two angles:"
-            + " hor_angle round the up axis, vert_angle tipped over. In which order, and about which axis it tips, is worked out on the processor and"
-            + " written in no file, so the turns those orders give are offered - only the ones that differ. \"find the readings\" asks the game.");
+        OverlayLayout.Hint("The sky is the light that comes from all around - the environment's cube. Its turn by hor_angle about its up is the game's,"
+            + " found in its memory; how vert_angle tips it was not seen yet, so the tips that differ are offered."
+            + " \"find the readings\" in an area with a vert_angle asks the game.");
     }
 
     /// <summary>What a sun shining this way does on the game's screen: where the shadows fall, and how high it stands.</summary>

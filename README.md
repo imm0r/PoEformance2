@@ -107,7 +107,8 @@ their `.ao` Lights blocks. Each part has its own switch, the environment's colou
 How the sun's phi and theta become its direction was asked of the game itself - *find the readings*
 searches its memory for every candidate's vector - and the one it holds is the one drawn: phi is the
 sun's height, theta its bearing; the row says where its shadows fall on the game's screen. The sky's
-two angles are still candidates, offered only where they can change the picture. A *free sun* stands
+turn was found the same way - the cube's up is the world's, hor_angle turns it about that - and only
+how vert_angle tips it is still a candidate, offered where it can change the picture. A *free sun* stands
 anywhere - two sliders, or shift + drag in the model window, its shadows coarse while it moves.
 
 The overlay draws the area's layout **on the game's own map** — including the parts not

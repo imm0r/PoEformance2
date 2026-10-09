@@ -52,7 +52,14 @@ public sealed class LightHunt
     /// <summary>Most of the other arrangements of the cube's turn listed when found.</summary>
     private const int MostArrangementsSaid = 24;
 
-    private static readonly string[] CubeOrders = ["", "turned by hor, then tipped about x by vert", "tipped about x by vert, then turned by hor", "turned by hor, then tipped about y by vert", "tipped about y by vert, then turned by hor"];
+    private static readonly string[] CubeOrders =
+    [
+        "axes swapped to the cube's, turned about its up by -hor",
+        "axes swapped, turned about the cube's up by -hor, then tipped about its x by vert",
+        "axes swapped, tipped about the cube's x by vert, then turned about its up by -hor",
+        "axes swapped, turned about the cube's up by -hor, then tipped about its z by vert",
+        "axes swapped, tipped about the cube's z by vert, then turned about its up by -hor",
+    ];
 
     private readonly List<Entry> _entries;
     private readonly Func<int, string> _sunName;
@@ -116,11 +123,6 @@ public sealed class LightHunt
             var built = new List<(int Reading, Matrix4x4 Turn)>();
             foreach (SceneLight.CubeReading reading in Enum.GetValues<SceneLight.CubeReading>())
             {
-                if (reading == SceneLight.CubeReading.None)
-                {
-                    continue;
-                }
-
                 Matrix4x4 turn = SceneLight.CubeTurnFrom(horizontal, vertical, reading);
                 int same = built.FindIndex(one => Near(one.Turn, turn));
                 if (same >= 0)
@@ -261,7 +263,7 @@ public sealed class LightHunt
         var cubeFound = new List<int>();
         if (_entries.Exists(one => one.What == What.Cube))
         {
-            report.AppendLine("cube - each reading's env_map_rotation, the shaders' mul(float4(dir, 0), env_map_rotation): as written is the order the picture uses, transposed the inverse turn:");
+            report.AppendLine("cube - each reading's env_map_rotation, the shaders' mul(float4(dir, 0), env_map_rotation): as written is the order the picture uses, transposed the inverse turn; reading 1 is the game's turn as found, the rest add vert_angle's candidate tips:");
             for (var at = 0; at < _entries.Count; at++)
             {
                 Entry entry = _entries[at];
@@ -280,7 +282,7 @@ public sealed class LightHunt
 
             foreach ((int reading, int same) in _sameCube)
             {
-                report.Append(CultureInfo.InvariantCulture, $"  cube reading {reading + 1} is reading {same + 1}'s turn for these angles - one of them is nought - so the two cannot be told apart here").AppendLine();
+                report.Append(CultureInfo.InvariantCulture, $"  cube reading {reading + 1} is reading {same + 1}'s turn for these angles - with vert_angle nought, or one angle nought, the two cannot be told apart here").AppendLine();
             }
 
             int arrangements = _entries.Count(one => one.What == What.CubeOther);

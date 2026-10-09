@@ -33,11 +33,12 @@ public enum SceneAmbient
 /// <item>THE EXPOSURE - ApplyToneMapping with GGG_POE_1 off: the colour times <c>max(1, exposure)</c>.</item>
 /// </list>
 ///
-/// WHAT THE SHADERS DO NOT SAY is turned into vectors on the processor, and those are the candidate
-/// readings, each held against the game by a screenshot rather than chosen: how the .env's phi and
-/// theta make the sun's direction (<see cref="SunReading"/>), how hor_angle and vert_angle make
-/// env_map_rotation (<see cref="CubeReading"/>), and which number a room light's light_position_data.a
-/// is (<see cref="PointShape"/>). The player light's radius and height are in no file read so far.
+/// WHAT THE SHADERS DO NOT SAY is turned into vectors on the processor, and those were candidate
+/// readings until the game's memory answered them: how the .env's phi and theta make the sun's
+/// direction (<see cref="GameSun"/>) and how hor_angle makes env_map_rotation (<see cref="CubeTurnFrom"/>)
+/// were both found by LightHunt. How vert_angle tips the cube (<see cref="CubeReading"/>) and which
+/// number a room light's light_position_data.a is (<see cref="PointShape"/>) are candidates still, and
+/// the player light's radius and height are in no file read so far.
 ///
 /// WHERE GI OWNS THE AMBIENT (gi_env_occlusion one, Seepage among them) the game's own global
 /// illumination stands in for the cube, and that is not something this draws: the flat ambient is
@@ -212,23 +213,23 @@ public sealed class SceneLight
         ElevationPhiFalling,
     }
 
-    /// <summary>How hor_angle and vert_angle make env_map_rotation - candidate readings.</summary>
+    /// <summary>How vert_angle tips env_map_rotation - candidate readings; the turn by hor_angle is the game's own, see <see cref="CubeTurnFrom"/>.</summary>
     public enum CubeReading
     {
-        /// <summary>No turn at all.</summary>
-        None,
+        /// <summary>The turn alone, vert_angle left out - what the game holds where vert_angle is nought.</summary>
+        Round,
 
-        /// <summary>About z by hor_angle, then about x by vert_angle.</summary>
-        ZThenX,
+        /// <summary>Turned, then tipped about the cube's x by vert_angle.</summary>
+        RoundThenTipX,
 
-        /// <summary>About x by vert_angle, then about z by hor_angle.</summary>
-        XThenZ,
+        /// <summary>Tipped about the cube's x by vert_angle, then turned.</summary>
+        TipXThenRound,
 
-        /// <summary>About z by hor_angle, then about y by vert_angle.</summary>
-        ZThenY,
+        /// <summary>Turned, then tipped about the cube's z by vert_angle.</summary>
+        RoundThenTipZ,
 
-        /// <summary>About y by vert_angle, then about z by hor_angle.</summary>
-        YThenZ,
+        /// <summary>Tipped about the cube's z by vert_angle, then turned.</summary>
+        TipZThenRound,
     }
 
     /// <summary>
@@ -319,8 +320,8 @@ public sealed class SceneLight
     /// <summary>The diffuse cube, where <see cref="Ambient"/> is <see cref="SceneAmbient.Cube"/>.</summary>
     public CubeMap? Cube { get; init; }
 
-    /// <summary>env_map_rotation: what a normal is put through before the cube is read.</summary>
-    public Matrix4x4 CubeTurn { get; init; } = Matrix4x4.Identity;
+    /// <summary>env_map_rotation: what a normal is put through before the cube is read - the world's axes as the cube's unless the environment turns it, see <see cref="CubeTurnFrom"/>.</summary>
+    public Matrix4x4 CubeTurn { get; init; } = CubeSwap;
 
     /// <summary>cube_brightness.x - env_brightness.</summary>
     public float CubeBrightness { get; init; } = 1f;
@@ -348,11 +349,13 @@ public sealed class SceneLight
     /// <remarks>
     /// FOUND IN THE GAME'S MEMORY, not chosen (LightHunt, AzmerianRanges, phi 2.33874 theta 2.32128):
     /// of the eight readings' vectors only this one's and its negative were there, nine copies each,
-    /// every copy of one with the other sixteen bytes on - the game keeps the light's way and the way
-    /// to the light side by side. That settles which angle is the height and which the bearing, and
-    /// the ground settles the sign: of the two, only this reading puts the sun above the ground (its
-    /// light travels plus z, the game's up being minus z), and the area is lit by a sun. The other
-    /// one of the pair would light nothing but undersides.
+    /// every copy of one with the other sixteen bytes on. The bytes round them say what they are: the
+    /// shadow cascades' boxes along the light, each face a plane - a normal and a distance - and the
+    /// opposite face its negative, beside the camera frustum's eight corners and its planes. That
+    /// settles the light's axis - which angle is the height and which the bearing - and the ground
+    /// settles its sign, which a box's two faces cannot: of the two, only this reading puts the sun
+    /// above the ground (its light travels plus z, the game's up being minus z), and the area is lit
+    /// by a sun. The other would light nothing but undersides.
     ///
     /// phi and theta nearly equal there, so the hunt's own words are what tell height from bearing:
     /// the readings that swap them were not found, though they draw within a few degrees of this one.
@@ -398,15 +401,44 @@ public sealed class SceneLight
         return (round, height);
     }
 
-    /// <summary>env_map_rotation as the reading takes hor_angle and vert_angle.</summary>
-    public static Matrix4x4 CubeTurnFrom(float horizontal, float vertical, CubeReading reading) => reading switch
+    /// <summary>
+    /// The world's axes as the cube's: x stays, the world's y is the cube's z, and the world's up - minus z - is the cube's up, plus y.
+    /// </summary>
+    public static Matrix4x4 CubeSwap { get; } = new(
+        1f, 0f, 0f, 0f,
+        0f, 0f, 1f, 0f,
+        0f, -1f, 0f, 0f,
+        0f, 0f, 0f, 1f);
+
+    /// <summary>
+    /// env_map_rotation: the world's axes swapped to the cube's, turned about the cube's up by minus hor_angle, and tipped by vert_angle as the reading takes it.
+    /// </summary>
+    /// <remarks>
+    /// FOUND IN THE GAME'S MEMORY (LightHunt, AzmerianRanges, hor_angle 0.19198, vert_angle absent):
+    /// none of the first candidates - turns about the world's own axes - was there, as written or
+    /// transposed, but among every arrangement of the same turn one stood out, 37 copies, nearly all at
+    /// offset 0x80 of a 256-byte block - the stride Direct3D 12 lays constant buffers out in. Its rows
+    /// are (cos h, 0, sin h), (-sin h, 0, cos h), (0, -1, 0): <see cref="CubeSwap"/> times a turn about
+    /// y by minus h. Read as the shaders read it - mul(float4(dir, 0), env_map_rotation), the row vector
+    /// System.Numerics multiplies too - the world's up becomes the cube's plus y and the ground turns
+    /// about it by hor_angle, which is the only reading of it that makes "hor" horizontal. So the cube
+    /// is authored y-up, and before this its sky was read off its plus and minus z faces.
+    ///
+    /// HOW vert_angle TIPS IT was not seen - AzmerianRanges has none - so <see cref="CubeReading"/> offers
+    /// the tips about the cube's x and z either side of the turn until a hunt where it is set says.
+    /// </remarks>
+    public static Matrix4x4 CubeTurnFrom(float horizontal, float vertical, CubeReading reading)
     {
-        CubeReading.ZThenX => Matrix4x4.CreateRotationZ(horizontal) * Matrix4x4.CreateRotationX(vertical),
-        CubeReading.XThenZ => Matrix4x4.CreateRotationX(vertical) * Matrix4x4.CreateRotationZ(horizontal),
-        CubeReading.ZThenY => Matrix4x4.CreateRotationZ(horizontal) * Matrix4x4.CreateRotationY(vertical),
-        CubeReading.YThenZ => Matrix4x4.CreateRotationY(vertical) * Matrix4x4.CreateRotationZ(horizontal),
-        _ => Matrix4x4.Identity,
-    };
+        Matrix4x4 round = Matrix4x4.CreateRotationY(-horizontal);
+        return CubeSwap * (reading switch
+        {
+            CubeReading.RoundThenTipX => round * Matrix4x4.CreateRotationX(vertical),
+            CubeReading.TipXThenRound => Matrix4x4.CreateRotationX(vertical) * round,
+            CubeReading.RoundThenTipZ => round * Matrix4x4.CreateRotationZ(vertical),
+            CubeReading.TipZThenRound => Matrix4x4.CreateRotationZ(vertical) * round,
+            _ => round,
+        });
+    }
 
     /// <summary>
     /// One pixel lit: its albedo under every light, the ambient, the specular light of a glossy material, exposed - linear.
