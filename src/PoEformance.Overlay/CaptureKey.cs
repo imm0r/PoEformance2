@@ -426,6 +426,23 @@ internal sealed class CaptureKey
             }
         }
 
+        if (On(CaptureParts.RoomFiles))
+        {
+            if (read is null)
+            {
+                parts.Add($"{CaptureReport.RoomFilesFile}  not written: no install to read them from");
+            }
+            else
+            {
+                Part(CaptureReport.RoomFilesFile, () =>
+                {
+                    string files = CaptureReport.RoomFiles(read, run.Loaded);
+                    File.WriteAllText(At(CaptureReport.RoomFilesFile), files);
+                    return files[..files.IndexOf('\n')];
+                });
+            }
+        }
+
         if (On(CaptureParts.RoomsNear))
         {
             if (read is null)
@@ -487,7 +504,8 @@ internal sealed class CaptureKey
                 Part(CaptureReport.PlacedFile, () =>
                 {
                     (string said, string detail) = CaptureReport.Placed(placed);
-                    File.WriteAllText(At(CaptureReport.PlacedFile), CaptureReport.Lined((said, detail)));
+                    string entities = run.Survey is { } survey ? "\n\n" + CaptureReport.PlacedEntities(placed, survey) : string.Empty;
+                    File.WriteAllText(At(CaptureReport.PlacedFile), CaptureReport.Lined((said, detail)) + entities);
                     return said;
                 });
             }

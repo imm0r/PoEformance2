@@ -83,6 +83,9 @@ public static class CaptureParts
     /// <summary>The area's environment and the rooms' around the player.</summary>
     public const string Environments = "environments";
 
+    /// <summary>Every room file the area loaded, whole.</summary>
+    public const string RoomFiles = "room-files";
+
     /// <summary>The rooms arranged around the player, with their lights and files.</summary>
     public const string RoomsNear = "rooms-near";
 
@@ -143,6 +146,9 @@ public static class CaptureParts
             CaptureReads.Loaded),
         new(Environments, "Area files", "the environments", CaptureReport.EnvironmentsFile,
             "The area's own environment and those the rooms around you name, whole - the light, the fog, the sky."),
+        new(RoomFiles, "Area files", "the room files", CaptureReport.RoomFilesFile,
+            "Every room file (.arm) the area loaded, whole: the doodad lines and the slots each room is placed by. With "
+            + "doodads.txt it is the whole of what the placing works from, so a placing can be run again without the game."),
 
         new(RoomsNear, "Rooms by ground and tiles", "the rooms around you", CaptureReport.RoomsFile,
             "Every room arranged within three tiles of yours, its doodads' lights and the pieces attached to them, and the file "
