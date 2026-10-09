@@ -177,6 +177,37 @@ public class LightHuntTests
         Assert.Equal(SceneLight.CubeSwap, new SceneLight([], SceneLight.PointShape.Zero, null).CubeTurn);
     }
 
+    /// <summary>The area's dust colour is looked for exactly, said beside the sun's vector it sits near, and read back with what lies round it.</summary>
+    [Fact]
+    public void THEDUSTCOLOURIsFoundExactlyAndSaidBesideTheSun()
+    {
+        EnvironmentSettings env = EnvironmentSettings.Read("dusty.env", Encoding.UTF8.GetBytes(
+            """{ "directional_light": { "multiplier": 1.0, "phi": 0.7, "theta": 2.2 }, "area": { "dust_color": [ 0.87177, 0.44367, 0.00906 ] } }"""));
+        LightHunt hunt = LightHunt.For("dusty.env", env, one => $"reading {one + 1}", out string why)!;
+        Assert.True(why.Length == 0, why);
+
+        Vector3 held = SceneLight.SunFrom(0.7f, 2.2f, SceneLight.GameSun);
+        var bytes = new byte[0x2000];
+        Floats(bytes, 0x800, held.X, held.Y, held.Z);
+        Floats(bytes, 0xC00, 0.87177f, 0.44367f, 0.00906f);
+        Floats(bytes, 0x900, 0.87177f, 0.44367f, 0.009f);
+        (FakeMemoryReader memory, Space space) = Memory(bytes);
+
+        LightHuntVerdict verdict = hunt.Read(FloatHunt.Run(memory, space, hunt.Needles));
+
+        Assert.Contains($"dust - area.dust_color 0.87177 0.44367 0.00906, exactly: 1 place: 0x20000C00 (reading {(int)SceneLight.GameSun + 1} 1024 bytes before)", verdict.Report, StringComparison.Ordinal);
+        Assert.Contains("beside area.dust_color at 0x20000C00:", verdict.Report, StringComparison.Ordinal);
+    }
+
+    /// <summary>And an environment whose only finding would be its dust colour is still worth a hunt.</summary>
+    [Fact]
+    public void ADUSTCOLOURAloneIsSomethingToLookFor()
+    {
+        EnvironmentSettings env = EnvironmentSettings.Read("dust.env", Encoding.UTF8.GetBytes("""{ "area": { "dust_color": [ 0.4995, 0.44231, 0.37867 ] } }"""));
+        Assert.NotNull(LightHunt.For("dust.env", env, one => one.ToString(System.Globalization.CultureInfo.InvariantCulture), out string why));
+        Assert.Empty(why);
+    }
+
     /// <summary>An environment with no sun angles and no cube turn has nothing to look for, and says so.</summary>
     [Fact]
     public void ANENVIRONMENTWithNothingToFindSaysSo()

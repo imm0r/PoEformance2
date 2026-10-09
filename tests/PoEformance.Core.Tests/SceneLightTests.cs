@@ -136,6 +136,23 @@ public class SceneLightTests
         Assert.False(EnvironmentSettings.Read("none.env", null).Ready);
     }
 
+    /// <summary>An area's dust colour is area.dust_color; where the file sets none it is the assumed grey, said as assumed.</summary>
+    [Fact]
+    public void THEDUSTCOLOURIsTheAreasAndTheAssumedGreyWhereItSetsNone()
+    {
+        EnvironmentSettings dusty = EnvironmentSettings.Read("d.env", Encoding.UTF8.GetBytes(
+            """{ "area": { "dust_color": [ 0.87177, 0.44367, 0.00906 ], "ground_scale": 0.004 } }"""));
+        Assert.Equal(new Vector3(0.87177f, 0.44367f, 0.00906f), dusty.Dust);
+        Assert.Equal(dusty.Dust, dusty.DustColour);
+        Assert.DoesNotContain(dusty.Assumed(), one => one.StartsWith("area.dust_color", StringComparison.Ordinal));
+
+        EnvironmentSettings bare = EnvironmentSettings.Read("b.env", Encoding.UTF8.GetBytes("""{ "camera": { "exposure": 1.0 } }"""));
+        Assert.Null(bare.Dust);
+        Assert.Equal(EnvironmentSettings.AssumedDust, bare.DustColour);
+        Assert.Contains("area.dust_color absent, taken as 0.5 grey", bare.Assumed());
+        Assert.Equal(EnvironmentSettings.AssumedDust, EnvironmentSettings.None.DustColour);
+    }
+
     // ---- a room's lights ----
 
     /// <summary>

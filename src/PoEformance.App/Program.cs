@@ -3130,6 +3130,12 @@ internal static class Program
         {
             overlay.HuntFloats = (needles, anchor, progress) => Task.Run(() => PoEformance.Core.Diagnostics.FloatHunt.Run(
                 reader, space, needles, anchor, progress, budget: 2 * PoEformance.Core.Diagnostics.HeapScan.ByteBudget));
+
+            // AND THE DISSECTOR'S FIND - a text, or pointers to an address - nearest the game's own image
+            // first: a name the engine keeps among its code's constants is there, and in address order the
+            // image comes last of all, past the heaps and the driver mappings.
+            overlay.HuntPatterns = (needles, progress) => Task.Run(() => PoEformance.Core.Diagnostics.PatternHunt.Run(
+                reader, space, needles, reader.ModuleBase, progress, budget: 2 * PoEformance.Core.Diagnostics.HeapScan.ByteBudget));
         }
 
         // The capture key's memory: a recording started on demand, and inside it ONE pass that reads

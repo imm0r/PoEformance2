@@ -37,6 +37,9 @@ public sealed record LightHuntVerdict(string Report, string Summary, int? Sun, i
 ///
 /// THE RAW ANGLES ARE LOOKED FOR TOO, exactly, so a vector found near its environment's phi and theta
 /// reads as the environment's own rather than a coincidence elsewhere in the heap.
+///
+/// AND THE DUST COLOUR, exactly as area.dust_color gives it: 411 environments set none, and where the
+/// game keeps the colour it does use there is the one place that says what it is.
 /// </remarks>
 public sealed class LightHunt
 {
@@ -159,9 +162,17 @@ public sealed class LightHunt
             }
         }
 
-        if (!entries.Exists(one => one.What is What.Sun or What.Cube or What.CubeOther))
+        // THE DUST COLOUR AS THE FILE GIVES IT, exactly, with what lies round it: found once beside the
+        // sun or the angles, the same offset reads the colour the engine holds in an area whose file sets
+        // none - which is what EnvironmentSettings.AssumedDust stands in for until then.
+        if (environment.Dust is { } dust)
         {
-            why = "the environment gives neither a sun's angles nor a cube turn";
+            entries.Add(new Entry(What.Dust, -1, false, false, new FloatNeedle("area.dust_color", [dust.X, dust.Y, dust.Z], 0f, Around)));
+        }
+
+        if (!entries.Exists(one => one.What is What.Sun or What.Cube or What.CubeOther or What.Dust))
+        {
+            why = "the environment gives neither a sun's angles, a cube turn nor a dust colour";
             return null;
         }
 
@@ -257,6 +268,23 @@ public sealed class LightHunt
         foreach (int at in Enumerable.Range(0, _entries.Count).Where(one => _entries[one].What == What.Angle))
         {
             report.Append(CultureInfo.InvariantCulture, $"{_entries[at].Needle.Name} {_entries[at].Needle.Values[0]:0.#####}, exactly: {Places(found[at], capped.Contains(at), unsearched.Contains(at), null)}").AppendLine();
+        }
+
+        foreach (int at in Enumerable.Range(0, _entries.Count).Where(one => _entries[one].What == What.Dust))
+        {
+            // BESIDE THE SUN'S VECTOR AS WELL AS THE ANGLES: the vector is the copy the renderer keeps.
+            var marks = new List<(string Name, ulong At)>(angles);
+            for (var sunAt = 0; sunAt < _entries.Count; sunAt++)
+            {
+                if (_entries[sunAt].What == What.Sun)
+                {
+                    marks.AddRange(found[sunAt].Select(place => (_sunName(_entries[sunAt].Reading), place)));
+                }
+            }
+
+            float[] rgb = _entries[at].Needle.Values;
+            report.Append(CultureInfo.InvariantCulture,
+                $"dust - area.dust_color {rgb[0]:0.#####} {rgb[1]:0.#####} {rgb[2]:0.#####}, exactly: {Places(found[at], capped.Contains(at), unsearched.Contains(at), marks)}").AppendLine();
         }
 
         int? cube = null;
@@ -532,6 +560,7 @@ public sealed class LightHunt
         Cube,
         CubeOther,
         Angle,
+        Dust,
     }
 
     private readonly record struct Entry(What What, int Reading, bool Transposed, bool Padded, FloatNeedle Needle);

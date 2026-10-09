@@ -274,10 +274,10 @@ public static class ShadeHlsl
     /// <param name="program">The program.</param>
     /// <param name="firstSheet">The texture slot its first sheet is read from; the rest follow.</param>
     /// <remarks>
-    /// <c>ShadeRun(SamplerState wrap, float2 uv, float3 place, float3 turn, float4 tint, float behind, float clock, float4 eye)</c>:
+    /// <c>ShadeRun(SamplerState wrap, float2 uv, float3 place, float3 turn, float4 tint, float behind, float clock, float4 eye, float3 dust)</c>:
     /// the coordinates, the place and the interpolated normal in the model's space, the vertex
-    /// colour, the solid depth behind (<see cref="Nothing"/> where none), the clock and the way into
-    /// the picture - ShadeProgram's fixed registers, in its order.
+    /// colour, the solid depth behind (<see cref="Nothing"/> where none), the clock, the way into
+    /// the picture and the area's dust colour - ShadeProgram's fixed registers, in its order.
     /// </remarks>
     public static string Of(ShadeProgram program, int firstSheet)
     {
@@ -294,7 +294,7 @@ public static class ShadeHlsl
         hlsl.Append("static const bool ShadeHasGloss = ").Append(Truth(program.HasGloss)).AppendLine(";");
         hlsl.Append("static const bool ShadeUsesDepth = ").Append(Truth(program.UsesDepth)).AppendLine(";");
         hlsl.AppendLine(Library);
-        hlsl.AppendLine("ShadeOut ShadeRun(SamplerState wrap, float2 uv, float3 place, float3 turn, float4 tint, float behind, float clock, float4 eye)");
+        hlsl.AppendLine("ShadeOut ShadeRun(SamplerState wrap, float2 uv, float3 place, float3 turn, float4 tint, float behind, float clock, float4 eye, float3 dust)");
         hlsl.AppendLine("{");
 
         // THE FIXED REGISTERS, as Colour and Preset set them.
@@ -326,6 +326,7 @@ public static class ShadeHlsl
         }
 
         hlsl.AppendLine("    float4 r10 = float4(0.0, 0.0, 0.0, 0.0);");
+        hlsl.AppendLine("    float4 r11 = float4(dust, 0.0);");
 
         // EVERY OTHER REGISTER STARTS AT NOUGHT, as the processor's zeroed scratch does - a swizzle
         // writes part of one and leaves the rest as it found it.
@@ -367,7 +368,7 @@ public static class ShadeHlsl
     }
 
     /// <summary>The registers the mesh and the drawing set before the program's own - ShadeProgram's Fixed.</summary>
-    private const int FixedRegisters = ShadeProgram.Dropped + 1;
+    private const int FixedRegisters = ShadeProgram.Dust + 1;
 
     /// <summary>One step as one statement - ShadeProgram.Run's case for its op.</summary>
     private static void Step(StringBuilder hlsl, ShadeProgram program, ShadeProgram.Step step, ref int parallax)

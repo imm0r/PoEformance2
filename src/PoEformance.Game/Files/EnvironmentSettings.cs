@@ -5,7 +5,7 @@ using System.Text.Json;
 namespace PoEformance.Game.Files;
 
 /// <summary>
-/// The parts of an area's <c>.env</c> that light it: the sun, the player's light, the environment cube and how bright it is, the exposure.
+/// The parts of an area's <c>.env</c> that light and colour it: the sun, the player's light, the environment cube and how bright it is, the exposure, the dust colour.
 /// </summary>
 /// <remarks>
 /// THE KEYS ARE THE INSTALL'S, counted over all 861 files by the env survey (2026-10-08) - every
@@ -39,6 +39,7 @@ namespace PoEformance.Game.Files;
 /// <param name="GiEnvOcclusion">global_illumination.gi_env_occlusion: how much of the cube's diffuse light the game's own GI replaces.</param>
 /// <param name="Exposure">camera.exposure.</param>
 /// <param name="PostTransform">post_transform.texture - the colour grade, a 3D table - or empty.</param>
+/// <param name="Dust">area.dust_color: what a material's DustColor reads - see ShadeProgram.Dust.</param>
 /// <param name="Why">Why nothing was read, or empty.</param>
 public sealed record EnvironmentSettings(
     string Path,
@@ -59,11 +60,23 @@ public sealed record EnvironmentSettings(
     float? GiEnvOcclusion,
     float? Exposure,
     string PostTransform,
+    Vector3? Dust,
     string Why = "")
 {
     /// <summary>Nothing read.</summary>
     public static EnvironmentSettings None { get; } = new(
-        string.Empty, null, null, null, null, null, null, null, string.Empty, string.Empty, null, null, null, null, null, null, null, string.Empty, "no environment");
+        string.Empty, null, null, null, null, null, null, null, string.Empty, string.Empty, null, null, null, null, null, null, null, string.Empty, null, "no environment");
+
+    /// <summary>
+    /// The dust colour taken where an environment gives none, or no environment is chosen - a grey of a half.
+    /// </summary>
+    /// <remarks>
+    /// AN ASSUMPTION, AND SAID AS ONE (see <see cref="Assumed"/>): 411 of the install's 861 .env files
+    /// set no area.dust_color, and what the engine puts in its place is written nowhere this tool reads.
+    /// The light panel's search of the game's memory looks for an area's dust colour, so that where the
+    /// game keeps it can be read in an area whose file sets none.
+    /// </remarks>
+    public static Vector3 AssumedDust { get; } = new(0.5f);
 
     private static readonly JsonDocumentOptions Lenient = new()
     {
@@ -79,6 +92,9 @@ public sealed record EnvironmentSettings(
 
     /// <summary>The player's light: its colour times its intensity.</summary>
     public Vector3 PlayerLight => (PlayerColour ?? Vector3.One) * (PlayerIntensity ?? 1f);
+
+    /// <summary>The dust colour a material's DustColor reads: the file's, or <see cref="AssumedDust"/>.</summary>
+    public Vector3 DustColour => Dust ?? AssumedDust;
 
     /// <summary>
     /// What each key the file left out was taken as, one line each - the assumptions a lit picture rests on.
@@ -105,6 +121,7 @@ public sealed record EnvironmentSettings(
         Missing(VertAngle is null, "environment_mapping.vert_angle", "0");
         Missing(GiEnvOcclusion is null, "global_illumination.gi_env_occlusion", "0");
         Missing(Exposure is null, "camera.exposure", "1");
+        Missing(Dust is null, "area.dust_color", "0.5 grey");
         return said;
     }
 
@@ -148,7 +165,8 @@ public sealed record EnvironmentSettings(
                 Number(mapping, "vert_angle"),
                 Number(Section(root, "global_illumination"), "gi_env_occlusion"),
                 Number(Section(root, "camera"), "exposure"),
-                Text(Section(root, "post_transform"), "texture"));
+                Text(Section(root, "post_transform"), "texture"),
+                Colour(Section(root, "area"), "dust_color"));
         }
         catch (JsonException fault)
         {
@@ -167,7 +185,8 @@ public sealed record EnvironmentSettings(
         return string.Create(
             CultureInfo.InvariantCulture,
             $"sun {Say(SunLight)} phi {Say(Phi)} theta {Say(Theta)}{(SunShadows == true ? " shadows" : string.Empty)}; player {Say(PlayerLight)}; "
-            + $"cube x{Say(EnvBrightness)} hor {Say(HorAngle)} vert {Say(VertAngle)} gi occlusion {Say(GiEnvOcclusion)}; exposure {Say(Exposure)}");
+            + $"cube x{Say(EnvBrightness)} hor {Say(HorAngle)} vert {Say(VertAngle)} gi occlusion {Say(GiEnvOcclusion)}; exposure {Say(Exposure)}; "
+            + $"dust {(Dust is { } dust ? Say(dust) : "-")}");
     }
 
     private static JsonElement Section(JsonElement root, string name)

@@ -2363,6 +2363,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     /// </remarks>
     public Func<IReadOnlyList<FloatNeedle>, ulong, FloatHuntProgress, Task<FloatHuntResult>?>? HuntFloats { get; set; }
 
+    /// <summary>
+    /// Starts a search of the whole of the game's memory for runs of bytes - set by whoever owns the reader. See PatternHunt.
+    /// </summary>
+    /// <remarks>The Memory Dissector's find: a text, or the pointers to the address on show. Unset, it is not offered.</remarks>
+    public Func<IReadOnlyList<PatternNeedle>, FloatHuntProgress, Task<PatternHuntResult>?>? HuntPatterns { get; set; }
+
     /// <summary>Delete - what the screenshot key is until somebody chooses another.</summary>
     private const int DefaultScreenshotKey = 0x2E;
 
@@ -3121,7 +3127,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     public void AttachDissector(StructureInspector inspector, bool visible = false)
     {
         ArgumentNullException.ThrowIfNull(inspector);
-        var window = new DissectorWindow(inspector);
+        // ASKED FOR WHEN PRESSED, not when attached: the reader's search is set by whoever owns it,
+        // and nothing says that comes first.
+        var window = new DissectorWindow(inspector) { Hunt = (needles, progress) => HuntPatterns?.Invoke(needles, progress) };
         _dissector = window;
         _tools.Add(
             110, DissectorTab, "Memory Dissector", window.DrawTab, window.Idle,
@@ -3419,6 +3427,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
                 Environments = () => EnvironmentFiles,
                 Loaded = () => LoadedFiles?.Invoke() ?? [],
                 SceneLit = lighting.For,
+                SceneDust = lighting.Dust,
                 Sun = lighting,
             },
         };
