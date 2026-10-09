@@ -126,13 +126,15 @@ public class ModelGpuTests
             ShadowSide = ShadowMap.Coarse,
             FlatAmbient = 0.08f,
         };
-        Same(new ModelScene(
-            Stage(),
-            Turn: -0.2f,
-            Tilt: 0.25f,
-            Skins: [Plain(new Vector4(0.5f, 0.6f, 0.7f, 1f)), Plain(Vector4.One)],
-            Blends: [MaterialBlend.Opaque, MaterialBlend.ShadowOnly],
-            Light: light));
+        Same(
+            new ModelScene(
+                Stage(),
+                Turn: -0.2f,
+                Tilt: 0.25f,
+                Skins: [Plain(new Vector4(0.5f, 0.6f, 0.7f, 1f)), Plain(Vector4.One)],
+                Blends: [MaterialBlend.Opaque, MaterialBlend.ShadowOnly],
+                Light: light),
+            draws: 2);
     }
 
     /// <summary>Point lights through their grid, the player's among them, with the exposure on top.</summary>
@@ -179,17 +181,18 @@ public class ModelGpuTests
         Same(new ModelScene(Ball(), Turn: 2.4f, Tilt: -0.5f, Light: light));
     }
 
-    /// <summary>The scene drawn by both, compared - the card's after drawing it this many times, so a kept shadow map is held to the processor's too.</summary>
+    /// <summary>
+    /// The scene drawn by both, compared - after each of the card's draws, so the frame that draws the shadow map and the frames that keep it are each held to the processor's.
+    /// </summary>
+    /// <remarks>
+    /// EVERY DRAW, NOT THE LAST: a shadow map read as nothing on the frame it was drawn passed here
+    /// while only the second draw was compared - that one read the kept map.
+    /// </remarks>
     private static void Same(ModelScene scene, int draws = 1)
     {
         var canvas = new MeshPicture.Canvas(Side) { Light = scene.Light };
         GamePicture expected = MeshPicture.Of(
             scene.Mesh, canvas, scene.Turn, scene.Tilt, scene.Ink, scene.Skin, scene.Zoom, scene.Pan, scene.Skins, scene.Blends);
-        Compared(expected.Rgba, Drawn(scene, draws));
-    }
-
-    private static byte[] Drawn(ModelScene scene, int draws = 1)
-    {
         using ModelGpu? gpu = ModelGpu.Warp(out string why);
         Assert.True(gpu is not null, why);
         Assert.True(gpu.Can(scene, null, out why), why);
@@ -197,8 +200,17 @@ public class ModelGpuTests
         for (var draw = 0; draw < draws; draw++)
         {
             Assert.True(gpu.Draw(target, scene, out why), why);
+            Compared(expected.Rgba, gpu.Read(target));
         }
+    }
 
+    private static byte[] Drawn(ModelScene scene)
+    {
+        using ModelGpu? gpu = ModelGpu.Warp(out string why);
+        Assert.True(gpu is not null, why);
+        Assert.True(gpu.Can(scene, null, out why), why);
+        using ModelTarget target = gpu.Target(Side);
+        Assert.True(gpu.Draw(target, scene, out why), why);
         return gpu.Read(target);
     }
 

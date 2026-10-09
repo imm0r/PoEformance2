@@ -136,6 +136,12 @@ public sealed partial class ModelGpu
             Written(_part, new Vector4(view is null ? 0f : 1f, view is null ? -1f : MeshPicture.CutoutAlpha, 0f, 0f));
             context.DrawIndexed(run.Count * 3, run.First * 3, 0);
         }
+
+        // TAKEN OFF AS A TARGET BEFORE IT IS BOUND FOR READING: a resource still bound for output is
+        // set to a shader slot as NULL by the runtime, and a NULL map reads nought everywhere - every
+        // pixel in shadow, on every frame the map was drawn on. The first WARP run caught it on the
+        // coarse map; the full one passed only because it was drawn twice, the second from the kept map.
+        context.OMSetRenderTargets((ID3D11RenderTargetView)null!, null);
     }
 
     /// <summary>What the lit drawing bound for reading, taken off again - the shadow map is a target the next time it is drawn.</summary>
