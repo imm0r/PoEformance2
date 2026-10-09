@@ -238,6 +238,13 @@ public static class CaptureReport
         }
 
         said.AppendLine();
+        if (snapshot.Terrain is TerrainGrid terrain)
+        {
+            // The grid's size, so a placing can be run again from the capture on the same grid.
+            said.Append("terrain  ").Append(Say(terrain.Width)).Append(" x ").Append(Say(terrain.Height)).Append(" cells, ")
+                .Append(Say(terrain.TilesX)).Append(" x ").Append(Say(terrain.TilesY)).AppendLine(" tiles");
+        }
+
         said.AppendLine();
         said.AppendLine("=== rooms around the player");
         if (rooms is null)
@@ -441,7 +448,7 @@ public static class CaptureReport
             foreach (RoomDoodadPlace place in found.Places)
             {
                 said.Add(string.Create(CultureInfo.InvariantCulture,
-                    $"tile {place.Where.X}, {place.Where.Y}, {RoomFinder.Said(place.Where.Turn)}: {place.Hits} of {place.Lines} doodads within a tile, off {place.MeanOff:0} on average")
+                    $"tile {place.Where.X}, {place.Where.Y}, {RoomFinder.Said(place.Where.Turn)}: {place.Hits} of {place.Lines} doodads within a tile ({place.PropHits} of {place.Props} props), off {place.MeanOff:0} on average")
                     + (place.TilesAgree >= 0 ? string.Create(CultureInfo.InvariantCulture, $", {place.TilesAgree} tiles agree") : ", not on the tile search's list"));
             }
 
@@ -455,7 +462,7 @@ public static class CaptureReport
             if (found.Places.Count == 0)
             {
                 lines.Add(string.Create(CultureInfo.InvariantCulture,
-                    $"{name}: no place - {found.Why}; {found.Matchable} of its {found.Lines} doodad lines stand in the area, {found.ByModel} told by their model")
+                    $"{name}: no place - {found.Why}; {found.Matchable} of its {found.Lines} doodad lines stand in the area, {found.Props} of them props, {found.ByModel} told by their model")
                     + (said.Count > 0 ? " - " + string.Join("; ", said) : string.Empty));
                 continue;
             }

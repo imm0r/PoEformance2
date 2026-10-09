@@ -37,6 +37,20 @@ public readonly record struct RoomDoodad(int X, int Y, float Turn, float Scale, 
     /// cell rounds; the doodad heights line says how far each is from where the entity really is.
     /// </remarks>
     public Vector2? Exact { get; init; }
+
+    /// <summary>
+    /// Whether the line is a plain prop - a stub under <c>Metadata/MiscellaneousObjects/Doodad</c> - rather than a scripted object the game spawns and removes with play.
+    /// </summary>
+    /// <remarks>
+    /// SEEN IN TWO CAPTURES OF ONE AREA, forty minutes apart, the player on the same spot: of 844
+    /// doodad entities not one plain prop moved or went, while 17 power-line pieces
+    /// (Gallows/.../Objects/GlyphPowerLine, MachinariumPoweredObject) had gone, 10 more had come, and a
+    /// checkpoint (Checkpoints/Checkpoint_Endgame) had appeared where the player had touched it. A
+    /// room's props say where it stands for as long as the area lasts; its scripted objects say what
+    /// the player has done. So the props decide a placing - see RoomDoodadFinder - and the others are
+    /// counted beside them.
+    /// </remarks>
+    public bool IsProp => Stub.StartsWith("Metadata/MiscellaneousObjects/Doodad", StringComparison.OrdinalIgnoreCase);
 }
 
 /// <summary>

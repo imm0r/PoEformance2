@@ -152,6 +152,15 @@ are the reason offsets can be diagnosed from Linux, and committed ones under `te
 are regression tests against real memory. A recording can only contain reads the running
 build actually performed, so a new diagnostic needs a fresh recording.
 
+A capture (F9) is the same idea for a whole question: its zip holds the pictures, every
+room file of the area and every doodad entity with its model and position, so the room
+placing runs again here without the game -
+`POEF_CAPTURE=<unpacked folder> dotnet test tests/PoEformance.Core.Tests --filter CaptureReplay`
+writes `placing-replay.txt` beside the capture's files. Two captures of one area forty
+minutes apart are how it was learned that the power-line pieces and checkpoints come and go
+with play while the plain props never move; hold a finder change against a capture before
+asking for a screenshot.
+
 ## Raise the version on every push
 
 `ToolVersion.Number` goes up by one patch with **every** push — one edit, one file, no
