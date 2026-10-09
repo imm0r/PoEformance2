@@ -479,6 +479,8 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             ImGui.SetTooltip(ImGuiText.Escape(_roomsDetail));
         }
 
+        end = Copied(end, right, "##roomsarrangedcopy", _roomsSaid, _roomsDetail,
+            "Copies the line and every line of its hover: where each room was arranged by its ground and tiles, what disagrees there, and how many of its tiles can be walked.");
         DoodadsBox(rooms, end, right);
     }
 
@@ -548,6 +550,27 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             ImGui.SetTooltip(ImGuiText.Escape(_placedDetail));
         }
 
+        return Copied(end, right, "##roomsplacedcopy", _placedSaid, _placedDetail,
+            "Copies the line and every line of its hover: each room's places with their hits, lines, offset and tiles agreeing, what it yielded to whom, or why it has none.");
+    }
+
+    /// <summary>
+    /// A "copy" button beside a line whose hover is the detail, putting both on the clipboard - the hover is cut off in a screenshot, and the lines are what gets sent. Returns where the button ended.
+    /// </summary>
+    private static float Copied(float end, float right, string id, string said, string detail, string hint)
+    {
+        OverlayLayout.Flow(end, ImGui.CalcTextSize("copy").X + (2f * ImGui.GetStyle().FramePadding.X), right, 0f);
+        if (ImGui.SmallButton("copy" + id))
+        {
+            ImGui.SetClipboardText(detail.Length > 0 ? said + '\n' + detail : said);
+        }
+
+        end = ImGui.GetItemRectMax().X;
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(hint);
+        }
+
         return end;
     }
 
@@ -614,16 +637,8 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             ImGui.SetTooltip(ImGuiText.Escape(_doodadsDetail));
         }
 
-        OverlayLayout.Flow(end, ImGui.CalcTextSize("copy").X + (2f * ImGui.GetStyle().FramePadding.X), right, 0f);
-        if (ImGui.SmallButton("copy##roomdoodadscopy"))
-        {
-            ImGui.SetClipboardText(_doodadsSaid + '\n' + _doodadsDetail);
-        }
-
-        if (ImGui.IsItemHovered())
-        {
-            ImGui.SetTooltip("Copies the line and every line of its hover: each room's share of doodads found, and each path found with how many entities carry it.");
-        }
+        Copied(end, right, "##roomdoodadscopy", _doodadsSaid, _doodadsDetail,
+            "Copies the line and every line of its hover: each room's share of doodads found, and each path found with how many entities carry it.");
     }
 
     /// <summary>
