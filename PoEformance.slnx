@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/ClickableTransparentOverlay/ClickableTransparentOverlay.csproj" />
     <Project Path="src/PoEformance.App/PoEformance.App.csproj" />
     <Project Path="src/PoEformance.Config/PoEformance.Config.csproj" />
     <Project Path="src/PoEformance.Core/PoEformance.Core.csproj" />

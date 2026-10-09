@@ -10,14 +10,14 @@
     <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="ClickableTransparentOverlay" Version="11.1.0" />
-    <!-- Pinned explicitly: the version ClickableTransparentOverlay pulls in transitively
-         (3.1.6) carries known high-severity advisories. A direct reference wins over the
-         transitive one, so this keeps the restore clean of NU1903/NU1902. -->
+    <!-- Pinned explicitly: upstream ClickableTransparentOverlay asks for 3.1.6, which carries
+         known high-severity advisories. The vendored copy asks for 3.1.12 as well. -->
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PoEformance.Features\PoEformance.Features.csproj" />
+    <!-- VENDORED, NOT THE PACKAGE: see src/ClickableTransparentOverlay/NOTICE.md. -->
+    <ProjectReference Include="..\ClickableTransparentOverlay\ClickableTransparentOverlay.csproj" />
   </ItemGroup>
   <!-- Pictures the tool draws by default, INSIDE the assembly rather than beside the
        executable. A loose file can be deleted, missed by a copy, or lost when a new build is
