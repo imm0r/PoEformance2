@@ -69,6 +69,37 @@
   // are answered in different places, so "no hovered slot" was carried over to a slot that
   // exists. A negative result is about the thing it tested; say which thing.
 
+  // ── THE ORDER OF A MATERIAL'S SHADER STAGES IS A TABLE IN THE CLIENT ──────────────
+  // No shader source lists it, and ShadeProgram.Stages needed it: a graph writes a colour "at
+  // Texturing_Calc", another at "Texturing", and which runs first decides what is drawn. Found
+  // 2026-10-09 (0.5.5, owner, Memory Dissector's find - PatternHunt) by searching the running game
+  // for the names themselves:
+  //   - AN ARRAY OF MSVC std::string IN THE CLIENT'S IMAGE, 0x20 bytes an entry (16 bytes of text
+  //     or a heap pointer, then size, then capacity - 0x0F for an inline name, 0x1F once it is
+  //     on the heap). That run it began at 0x7FF7BF1AC980 - the module base was not printed, so
+  //     its offset in the image is not known, and nothing here reads it. Ten entries were seen
+  //     back to back: UVSetup, UVSetup_Calc, UVSetup_Final, Texturing_Init, Texturing,
+  //     Texturing_Calc, Texturing_Final, PreLighting (inline, sizes 7 to 15), then PreLighting_Calc
+  //     and PreLighting_Final as pointers to 0x32B36056880 and 0x32B360568A0 (the first with size
+  //     0x10 and capacity 0x1F; the second's were past the bytes printed).
+  //   - THOSE HEAP NAMES SIT IN ONE BLOCK, 0x20 apart, in the order the pipeline runs:
+  //     ProjectionTransform_Final, VertexOutput_Calc/_Final/_Pass, PreLighting_Calc/_Final,
+  //     CustomLighting_Calc/_Final, LightingEnd_Calc. That the allocation order is the
+  //     pipeline's is what makes the inline run's order readable as the order stages run in.
+  //   - TWO DECOYS, so the next search does not settle on either: the same names lie in the
+  //     image's string-literal pool (0x7FF7BDDA2740 that run, packed between ComputeInit,
+  //     FogStage and PixelOutput in an order that means nothing), and inside every loaded
+  //     .fxgraph as UTF-16 JSON ("stage": "Texturing_Calc"). The first search, for
+  //     "Texturing_Calc", found 33 places: 31 of those graphs, the pool, and one entry of the
+  //     table (0x7FF7BF1ACA20). The searches for "UVSetup" and "PreLighting_Calc" then showed
+  //     the entries round it and the heap block its later entries point at.
+  // It agrees with what the graphs showed before it was found - AGT_DesertDust at Texturing_Calc
+  // lays dust over the colour DielectricSpecGlossBN wrote at Texturing_Init, and
+  // ParallaxUvSpaceContactFade at Texturing_Final fades the alpha that graph wrote - and it
+  // replaced the rule that left a write out whenever the plain stage, _Calc and _Final of one
+  // family both touched a colour. Not written into "structs": it is code-side knowledge,
+  // carried by ShadeProgram.Stages, and the address is one launch's.
+
   "version": 1,
   "gameVersion": "0.5.5 (2026-09-04 content patch: GameState, AreaInstance, UiElementBase, MapUiElement and ImportantUiElements re-based 2026-09-11, agreeing with GameHelper2 main a99b8ba; the game chain and AreaInstance confirmed live the same day by session-2026-09-live.rec, the UiElement flags and StringId by session-2026-09-panels.rec and session-2026-09-maphunt.rec, the maps by the latter through MapViewports, RightPanelPtr by session-2026-09-browser.rec, ItemPtr by session-2026-09-itempick.rec; TextPtr moved to 0x360 on session-2026-09-text.rec's evidence and awaits the browser showing text there; earlier: AreaInstance +0x08 wave 2026-08; base port: AHK tool v0.45.13.298, 2026-07)",
 
@@ -505,6 +536,16 @@
         "BaseEnvFilePtr": { "offset": "0x08", "type": "ptr", "comment": "Wide string, the .env file the area is lit by - Base_ENVFile." }
       },
       "consts": { "ComputedRowSize": "0x75" }
+    },
+
+    "ParsedEnvironment": {
+      "comment": "AN AREA'S .env AS THE CLIENT HOLDS IT ONCE PARSED - measured, not reached: nothing in this schema points here, and the object's own START IS NOT KNOWN, so the offsets below are counted from directional_light.phi, the first field the hunt found. WHY IT IS HERE AT ALL: 411 of the install's 861 .env files set no area.dust_color, and what a material's DustColor node reads in their areas is written in no file - the engine supplies it. EnvironmentSettings.AssumedDust stands in with a grey of a half and says so on every lit picture; this struct is where the engine's own value is read instead. MEASURED 2026-10-09 (0.5.5, owner, Tile Book light panel's 'find the readings' - LightHunt over FloatHunt) in Excavation, whose .env gives phi 2.14668, theta 2.1642, hor_angle -1.32641 and dust_color 0.4936 0.32918 0.21288, each searched for exactly: phi in SIX places (0x32C443CD608, 0x32C2AE2BE10, 0x32C62FD5C10, 0x32C21AC5608, 0x32C1F868020, 0x32C74D60820) and hor_angle 0xD0 after every one of them; theta 0x338 after four of the six (theta was found in four places in all, so the two copies at ...608 hold no float of that value anywhere the hunt looked); and the dust colour, among the 64-plus places the file's colour was found, exactly 0x360 after phi in the FIVE copies the report listed by name - 0x290 after hor_angle at ...CD968 and ...C5968, 0x28 after theta at ...2C170, ...D5F70 and ...68380. The sixth copy's dust may be among the places not printed; it was not seen either way. So the three offsets agree from three angles across five copies, which is what makes the colour's place a finding rather than a coincidence. READ BY LightHunt (through DustPlace.From): the hunt asks for phi and hor_angle with a window reaching the colour after each, and prints what lies there - beside a file that sets a colour, the two agreeing says the place still holds; beside one that sets none, it is the engine's own. A content patch that moves it shows as 'NOT the file's' in an area that sets one; edit the offsets here, no rebuild. NOT TO BE CONFUSED WITH a second kind of copy: the same colour also lies at 0x32B6DF51234 and 0x32B6F511A34 that run, as four floats with w 0, then two floats of 0.004 and what read as camera matrices - and the two copies' matrices differ in their last digits, so that block moves with the camera and is not the parsed file. Nothing there names the environment, so it is not the place to read a default from; what it is was not settled.",
+      "fields": {
+        "Phi": { "offset": "0x00", "type": "f32", "comment": "directional_light.phi, radians, as the file gives it - the anchor the offsets below are counted from, not the object's first field." },
+        "HorAngle": { "offset": "0xD0", "type": "f32", "comment": "environment_mapping.hor_angle, radians. 0xD0 after phi in all six copies measured." },
+        "Theta": { "offset": "0x338", "type": "f32", "comment": "directional_light.theta, radians. 0x338 after phi in four of the six copies; the other two hold no float of theta's value there, so this is the weakest of the four offsets and nothing reads it." },
+        "DustColor": { "offset": "0x360", "type": "f32", "comment": "area.dust_color: red; green at +0x364, blue at +0x368 - the colour a material's DustColor node reads (ShadeProgram.Dust). Seen 0x360 after phi, 0x290 after hor_angle and 0x28 after theta. In an area whose .env sets none, what lies here is the engine's default - still to be read (2026-10-09)." }
+      }
     },
 
     "EndgameMapsRow": {

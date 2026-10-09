@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Numerics;
 using System.Text;
 using PoEformance.Core.Diagnostics;
+using PoEformance.Core.Schema;
 using PoEformance.Game.Files;
 
 namespace PoEformance.Game.Diagnostics;
@@ -12,6 +13,31 @@ namespace PoEformance.Game.Diagnostics;
 /// <param name="Sun">The sun reading whose vector the game holds, where exactly one's is found - an index into <see cref="SceneLight.SunReading"/>.</param>
 /// <param name="Cube">The cube reading whose turn the game holds as written, where exactly one's is - an index into <see cref="SceneLight.CubeReading"/>.</param>
 public sealed record LightHuntVerdict(string Report, string Summary, int? Sun, int? Cube);
+
+/// <summary>
+/// Where the parsed environment keeps area.dust_color, counted from the two angles the light hunt finds it by - the offset schema's ParsedEnvironment.
+/// </summary>
+/// <param name="AfterPhi">Bytes from directional_light.phi to the colour's red.</param>
+/// <param name="AfterHor">Bytes from environment_mapping.hor_angle to it.</param>
+public sealed record DustPlace(int AfterPhi, int AfterHor)
+{
+    /// <summary>The place a schema struct states, or null where it lacks one of Phi, HorAngle and DustColor or puts the colour before either angle.</summary>
+    /// <remarks>
+    /// READ OFF THE SCHEMA rather than kept here, because it is an offset like any other: it was
+    /// measured in one client, and the next may move it. A move shows in the report as the colour read
+    /// beside the angles disagreeing with the file's own, and is put right in the schema alone.
+    /// </remarks>
+    public static DustPlace? From(StructDef? layout)
+    {
+        if (layout?.Field("DustColor") is not { } dust || layout.Field("Phi") is not { } phi || layout.Field("HorAngle") is not { } hor)
+        {
+            return null;
+        }
+
+        int afterPhi = dust.Offset - phi.Offset, afterHor = dust.Offset - hor.Offset;
+        return afterPhi > 0 && afterHor > 0 ? new DustPlace(afterPhi, afterHor) : null;
+    }
+}
 
 /// <summary>
 /// Asks the game which candidate reading of an environment's sun and cube angles it uses, by looking for each reading's vector and matrix in its memory.
@@ -39,7 +65,9 @@ public sealed record LightHuntVerdict(string Report, string Summary, int? Sun, i
 /// reads as the environment's own rather than a coincidence elsewhere in the heap.
 ///
 /// AND THE DUST COLOUR, exactly as area.dust_color gives it: 411 environments set none, and where the
-/// game keeps the colour it does use there is the one place that says what it is.
+/// game keeps the colour it does use there is the one place that says what it is. That place was found
+/// this way, beside phi and hor_angle, and is the offset schema's ParsedEnvironment; handed in as a
+/// <see cref="DustPlace"/>, the hunt reads what lies there beside every phi and hor_angle it finds.
 /// </remarks>
 public sealed class LightHunt
 {
@@ -67,14 +95,16 @@ public sealed class LightHunt
     private readonly List<Entry> _entries;
     private readonly Func<int, string> _sunName;
     private readonly Dictionary<int, int> _sameCube;
+    private readonly DustPlace? _dust;
 
-    private LightHunt(string path, EnvironmentSettings environment, List<Entry> entries, Dictionary<int, int> sameCube, Func<int, string> sunName)
+    private LightHunt(string path, EnvironmentSettings environment, List<Entry> entries, Dictionary<int, int> sameCube, Func<int, string> sunName, DustPlace? dust)
     {
         Path = path;
         Environment = environment;
         _entries = entries;
         _sameCube = sameCube;
         _sunName = sunName;
+        _dust = dust;
         Needles = [.. entries.Select(one => one.Needle)];
     }
 
@@ -94,7 +124,8 @@ public sealed class LightHunt
     /// <param name="environment">The environment, read.</param>
     /// <param name="sunName">What a sun reading is called in the panel, by its index.</param>
     /// <param name="why">Why there is nothing to look for, or empty.</param>
-    public static LightHunt? For(string path, EnvironmentSettings environment, Func<int, string> sunName, out string why)
+    /// <param name="dust">Where the parsed environment keeps the dust colour beside phi and hor_angle, or null not to read it there.</param>
+    public static LightHunt? For(string path, EnvironmentSettings environment, Func<int, string> sunName, out string why, DustPlace? dust = null)
     {
         ArgumentNullException.ThrowIfNull(environment);
         ArgumentNullException.ThrowIfNull(sunName);
@@ -115,7 +146,7 @@ public sealed class LightHunt
                     new FloatNeedle($"sun reading {(int)reading + 1}", [travels.X, travels.Y, travels.Z], Tolerance, Around)));
             }
 
-            entries.Add(Angle("phi", phi));
+            entries.Add(Angle("phi", phi, Reach(dust?.AfterPhi)));
             entries.Add(Angle("theta", theta));
         }
 
@@ -153,7 +184,7 @@ public sealed class LightHunt
 
             if (environment.HorAngle is { } h)
             {
-                entries.Add(Angle("hor_angle", h));
+                entries.Add(Angle("hor_angle", h, Reach(dust?.AfterHor)));
             }
 
             if (environment.VertAngle is { } v)
@@ -165,9 +196,9 @@ public sealed class LightHunt
         // THE DUST COLOUR AS THE FILE GIVES IT, exactly, with what lies round it: found once beside the
         // sun or the angles, the same offset reads the colour the engine holds in an area whose file sets
         // none - which is what EnvironmentSettings.AssumedDust stands in for until then.
-        if (environment.Dust is { } dust)
+        if (environment.Dust is { } colour)
         {
-            entries.Add(new Entry(What.Dust, -1, false, false, new FloatNeedle("area.dust_color", [dust.X, dust.Y, dust.Z], 0f, Around)));
+            entries.Add(new Entry(What.Dust, -1, false, false, new FloatNeedle("area.dust_color", [colour.X, colour.Y, colour.Z], 0f, Around)));
         }
 
         if (!entries.Exists(one => one.What is What.Sun or What.Cube or What.CubeOther or What.Dust))
@@ -176,7 +207,7 @@ public sealed class LightHunt
             return null;
         }
 
-        return new LightHunt(path, environment, entries, sameCube, sunName);
+        return new LightHunt(path, environment, entries, sameCube, sunName, dust);
     }
 
     /// <summary>What a finished hunt found, said.</summary>
@@ -325,10 +356,45 @@ public sealed class LightHunt
             cube = cubeFound.Count == 1 ? cubeFound[0] : null;
         }
 
+        // THE DUST COLOUR WHERE THE PARSED ENVIRONMENT KEEPS IT, read beside phi and hor_angle rather
+        // than looked for: in an area whose file sets none, that is the only way to see what the engine
+        // uses instead. Beside a file that sets one, the two agreeing says the place is still right.
+        if (_dust is not { } place)
+        {
+            report.AppendLine("dust beside the angles: not read - the offset schema states no ParsedEnvironment with Phi, HorAngle and DustColor");
+        }
+        else
+        {
+            var dustSaid = false;
+            foreach (FloatDump dump in result.Dumps ?? [])
+            {
+                if (_entries[dump.Needle].What != What.Angle || DustBeside(dump, _entries[dump.Needle].Needle.Name, place) is not { } beside)
+                {
+                    continue;
+                }
+
+                if (!dustSaid)
+                {
+                    report.Append(CultureInfo.InvariantCulture,
+                        $"dust beside the angles - the parsed environment keeps area.dust_color 0x{place.AfterPhi:X} bytes after phi and 0x{place.AfterHor:X} after hor_angle; {(env.Dust is { } dust ? $"the file's is {Say(dust)}" : "the file sets none, so this is the engine's own")}:").AppendLine();
+                    dustSaid = true;
+                }
+
+                report.Append(CultureInfo.InvariantCulture,
+                    $"  beside {_entries[dump.Needle].Needle.Name} at 0x{dump.At:X}: {Say(beside)}{(env.Dust is { } file ? (beside == file ? " - the file's" : " - NOT the file's") : string.Empty)}").AppendLine();
+            }
+        }
+
         // WHAT THE GAME KEEPS BESIDE THE SUN'S VECTOR, a row of eight floats at a time, the vector's
-        // own in brackets - the cube's turn and the light's other numbers may sit next to it.
+        // own in brackets - the cube's turn and the light's other numbers may sit next to it. The
+        // angles' own windows are only there for the dust, said above.
         foreach (FloatDump dump in result.Dumps ?? [])
         {
+            if (_entries[dump.Needle].What == What.Angle)
+            {
+                continue;
+            }
+
             report.Append(CultureInfo.InvariantCulture, $"beside {_entries[dump.Needle].Needle.Name} at 0x{dump.At:X}:").AppendLine();
             Dumped(report, dump, _entries[dump.Needle].Needle.Values.Length);
         }
@@ -352,7 +418,7 @@ public sealed class LightHunt
         return new LightHuntVerdict(report.ToString(), summary, sun, cube);
     }
 
-    private static Entry Angle(string name, float value) => new(What.Angle, -1, false, false, new FloatNeedle(name, [value], 0f));
+    private static Entry Angle(string name, float value, int around = 0) => new(What.Angle, -1, false, false, new FloatNeedle(name, [value], 0f, around));
 
     /// <summary>
     /// Every arrangement of the environment's two turns but the readings' own: each turn about any of the three axes, either way, in either order, after any of the 48 swaps and flips of the axes - each matrix once, in both layouts.
@@ -456,6 +522,24 @@ public sealed class LightHunt
         _ => Matrix4x4.CreateRotationZ(angle),
     };
 
+    /// <summary>How far round an angle is read back to reach the dust colour this many bytes after it - nought, for no window, where it is not read.</summary>
+    private static int Reach(int? after) => after is { } bytes ? bytes + (3 * sizeof(float)) : 0;
+
+    /// <summary>The three floats where the dust colour lies after an angle, out of what was read round it - null where the window does not reach.</summary>
+    private static Vector3? DustBeside(FloatDump dump, string angle, DustPlace place)
+    {
+        int after = angle switch
+        {
+            "phi" => place.AfterPhi,
+            "hor_angle" => place.AfterHor,
+            _ => -1,
+        };
+        long at = (long)(dump.At - dump.From) + after;
+        return after < 0 || at < 0 || at + (3 * sizeof(float)) > dump.Bytes.Length
+            ? null
+            : new Vector3(BitConverter.ToSingle(dump.Bytes, (int)at), BitConverter.ToSingle(dump.Bytes, (int)at + 4), BitConverter.ToSingle(dump.Bytes, (int)at + 8));
+    }
+
     /// <summary>A dump as rows of eight floats, each row's first offset from the needle's place, the needle's own floats in brackets.</summary>
     private static void Dumped(StringBuilder report, FloatDump dump, int length)
     {
@@ -553,6 +637,8 @@ public sealed class LightHunt
     }
 
     private static string Say(float? value) => value is { } one ? one.ToString("0.#####", CultureInfo.InvariantCulture) : "absent";
+
+    private static string Say(Vector3 value) => string.Create(CultureInfo.InvariantCulture, $"{value.X:0.#####} {value.Y:0.#####} {value.Z:0.#####}");
 
     private enum What
     {

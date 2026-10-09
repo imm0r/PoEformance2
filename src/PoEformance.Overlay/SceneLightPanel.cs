@@ -88,6 +88,7 @@ public sealed class SceneLightPanel : IMovableSun
     private readonly Func<(float X, float Y, float Ground)?> _player;
     private readonly Func<SceneLight.GroundOnScreen?> _screen;
     private readonly Func<IReadOnlyList<FloatNeedle>, FloatHuntProgress, Task<FloatHuntResult>?>? _hunt;
+    private readonly DustPlace? _dustPlace;
 
     private bool _on;
     private bool _points = true;
@@ -147,13 +148,15 @@ public sealed class SceneLightPanel : IMovableSun
     /// <param name="player">The player's place in the world and the ground's height under it, or null.</param>
     /// <param name="screen">How the area's ground runs on the game's screen by the live camera, or null where it is not known - see <see cref="SceneLight.GroundOnScreen"/>.</param>
     /// <param name="hunt">Starts a search of the game's memory for these needles, or null where there is no reader that can - see <see cref="FloatHunt"/>.</param>
+    /// <param name="dust">Where the parsed environment keeps its dust colour, from the offset schema - or null, and the hunt does not read it there.</param>
     public SceneLightPanel(
         Func<string, byte[]?>? read,
         Func<IReadOnlyList<string>> environments,
         Func<string> areaEnvironment,
         Func<(float X, float Y, float Ground)?> player,
         Func<SceneLight.GroundOnScreen?>? screen = null,
-        Func<IReadOnlyList<FloatNeedle>, FloatHuntProgress, Task<FloatHuntResult>?>? hunt = null)
+        Func<IReadOnlyList<FloatNeedle>, FloatHuntProgress, Task<FloatHuntResult>?>? hunt = null,
+        DustPlace? dust = null)
     {
         _read = read;
         _environments = environments;
@@ -161,6 +164,7 @@ public sealed class SceneLightPanel : IMovableSun
         _player = player;
         _screen = screen ?? (() => null);
         _hunt = hunt;
+        _dustPlace = dust;
     }
 
     /// <inheritdoc/>
@@ -570,7 +574,7 @@ public sealed class SceneLightPanel : IMovableSun
         EnvironmentSettings env = string.Equals(path, _loadedPath, StringComparison.OrdinalIgnoreCase)
             ? _environment
             : EnvironmentSettings.Read(path, _read(path.Replace('\\', '/').Trim()));
-        LightHunt? asked = LightHunt.For(path, env, SunReported, out string why);
+        LightHunt? asked = LightHunt.For(path, env, SunReported, out string why, _dustPlace);
         if (asked is null)
         {
             _huntWhy = why;

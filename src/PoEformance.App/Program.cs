@@ -3126,6 +3126,9 @@ internal static class Program
         // THE LIGHT PANEL'S SEARCH of the game's memory, off the frame - see FloatHunt and LightHunt.
         // Set before the books are attached, which take it as they are made. Twice HeapScan's budget:
         // the first hunt in AzmerianRanges stopped at eight gigabytes with the sky's turn not found.
+        // And where the parsed environment keeps its dust colour, which that search reads beside the
+        // angles it finds - an offset like any other, so the schema's.
+        overlay.EnvironmentDust = PoEformance.Game.Diagnostics.DustPlace.From(schema.Structs.GetValueOrDefault("ParsedEnvironment"));
         if (reader is IMemoryRegions space)
         {
             overlay.HuntFloats = (needles, anchor, progress) => Task.Run(() => PoEformance.Core.Diagnostics.FloatHunt.Run(

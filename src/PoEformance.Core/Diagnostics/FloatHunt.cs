@@ -199,11 +199,16 @@ public static class FloatHunt
     }
 
     /// <summary>The bytes round the first places of each needle that asked for them, windows that overlap one already read left out.</summary>
+    /// <remarks>
+    /// THE NARROWEST WINDOWS FIRST, then by address: a wide window asked for to read one value well
+    /// past its needle - the light hunt's dust colour, 0x360 bytes after phi - would otherwise swallow
+    /// a narrow one asked for to be printed whole, the sun's vector among them.
+    /// </remarks>
     private static List<FloatDump> Dumps(IMemoryReader reader, IReadOnlyList<FloatNeedle> needles, List<FloatSighting> sightings)
     {
         var dumps = new List<FloatDump>();
         var taken = new int[needles.Count];
-        foreach (FloatSighting one in sightings.OrderBy(sighting => sighting.At))
+        foreach (FloatSighting one in sightings.OrderBy(sighting => Math.Clamp(needles[sighting.Needle].Around, 0, MostAround)).ThenBy(sighting => sighting.At))
         {
             int around = Math.Clamp(needles[one.Needle].Around, 0, MostAround);
             if (around == 0 || taken[one.Needle] >= MostDumps || dumps.Exists(dump => one.At >= dump.From && one.At < dump.From + (ulong)dump.Bytes.Length))

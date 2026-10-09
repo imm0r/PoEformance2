@@ -840,31 +840,37 @@ public class ShadeProgramTests
     }
 
     /// <summary>
-    /// Texturing_Calc runs after Texturing_Init - the dust lays itself over the colour - but its order against plain Texturing is not known.
+    /// Texturing_Calc runs after Texturing_Init and after plain Texturing alike - the engine's own table of stage names has them in that order - so the halving lays itself over either.
     /// </summary>
-    [Fact]
-    public void CALCRunsAfterInitButItsOrderAgainstThePlainStageIsNotGuessed()
+    [Theory]
+    [InlineData("Texturing_Init")]
+    [InlineData("Texturing")]
+    public void CALCRunsAfterInitAndAfterThePlainStage(string first)
     {
-        ShadeProgram darkened = Bound(ShadeProgram.Compile(
+        ShadeProgram darkened = Bound(Checked(ShadeProgram.Compile(
         [
-            (Instance("Metadata/Red.fxgraph"), Graph(Constant(1f, 0f, 0f))),
+            (Instance("Metadata/Red.fxgraph"), Graph(Constant(1f, 0f, 0f).Replace("Texturing_Init", first, StringComparison.Ordinal))),
             (Instance("Metadata/Halved.fxgraph"), Graph(Halving("Texturing_Calc"))),
-        ]).Program, []);
+        ])), []);
         Assert.Equal(["Metadata/Red.fxgraph", "Metadata/Halved.fxgraph"], darkened.Graphs);
         AssertClose(MeshPicture.Of(Quad(), 64, skins: [Sheet(Srgb(0.5f), 0, 0)]), MeshPicture.Of(Quad(), 64, shades: [darkened]));
+    }
 
-        ShadeCompile unordered = ShadeProgram.Compile(
+    /// <summary>And _Final after _Calc: a halving at Texturing_Final halves what Texturing_Calc made, whichever graph the material names first.</summary>
+    [Fact]
+    public void ANDFINALRunsAfterCalcWhateverTheMaterialsOrder()
+    {
+        ShadeProgram halved = Bound(Checked(ShadeProgram.Compile(
         [
-            (Instance("Metadata/Red.fxgraph"), Graph(Constant(1f, 0f, 0f).Replace("Texturing_Init", "Texturing", StringComparison.Ordinal))),
-            (Instance("Metadata/Halved.fxgraph"), Graph(Halving("Texturing_Calc"))),
-        ]);
-        Assert.NotNull(unordered.Program);
-        Assert.Equal(["Metadata/Red.fxgraph"], unordered.Program.Graphs);
-        Assert.Equal(["Halved at Texturing_Calc, whose order against Texturing is not known"], unordered.Skipped);
+            (Instance("Metadata/Late.fxgraph"), Graph(Halving("Texturing_Final"))),
+            (Instance("Metadata/Red.fxgraph"), Graph(Constant(1f, 0f, 0f).Replace("Texturing_Init", "Texturing_Calc", StringComparison.Ordinal))),
+        ])), []);
+        Assert.Equal(["Metadata/Red.fxgraph", "Metadata/Late.fxgraph"], halved.Graphs);
+        AssertClose(MeshPicture.Of(Quad(), 64, skins: [Sheet(Srgb(0.5f), 0, 0)]), MeshPicture.Of(Quad(), 64, shades: [halved]));
     }
 
     /// <summary>
-    /// Two unordered stages both touching the normal hold back the normal's writes, not a colour that reads no normal.
+    /// Two stages of one family both touching the normal run in the table's order, and the colour beside them is drawn.
     /// </summary>
     /// <remarks>AddDetailMap at Texturing beside AGT_DesertDust at Texturing_Calc, cut down to the part that matters.</remarks>
     [Fact]
