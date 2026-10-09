@@ -14,7 +14,7 @@ namespace PoEformance.Game.World;
 public sealed record RoomDoodadPlace(RoomCandidate Where, int Hits, int Lines, float MeanOff, IReadOnlyList<Vector2> Missing)
 {
     /// <summary>
-    /// How many of the room's tiles the ground-and-tile search found agreeing at this very place, or -1 where that search did not list it - the tie-breaker where two variants share every doodad, see <see cref="RoomDoodadFinder.Settle"/>.
+    /// How many of the room's slots the tiles laid at this very place agree with (RoomFinder.Scorer), or -1 where the room could not be scored against the area - the tie-breaker where two variants share every prop, see <see cref="RoomDoodadFinder.Settle"/>.
     /// </summary>
     public int TilesAgree { get; init; } = -1;
 
@@ -112,13 +112,23 @@ public sealed record RoomDoodadPlaces(IReadOnlyList<RoomDoodadPlace> Places, int
 /// detonator - vote, are counted, and are reported, but a place is not lost for their absence, and
 /// no ring is drawn for one. A room with too few props is placed by every line, as before.
 ///
+/// WHY THE SCRIPTED OBJECTS COME AND GO: they are the server's entities, and the client holds one
+/// only while it stands inside the client's network bubble; the props the client builds itself
+/// from the room files, so they stand across the whole area from the first frame. A third capture
+/// of The Assembly had one checkpoint entity in the client while the game's map drew four. So a
+/// scripted object's PRESENCE is evidence - it is where its line says - and its absence is none.
+///
 /// ONE ROOM PER DOODAD, SETTLED AFTER: Atziri's temple loads every variant of a room - five biome
 /// floors, four commander rooms - and the variants share most of their doodads, so each one's vote
 /// lands on the tile where the one the game laid stands, with the shared lines behind it. The
 /// entities there belong to one room, and it is the one whose doodads are all present: the laid
 /// variant hits every line it has, a variant not laid hits only the shared ones. So where two
-/// rooms' places stand on the same tiles AND on the same entities, the place with the most hits
-/// keeps them, a tie going to the higher share, and the other yields - see <see cref="Settle"/>.
+/// rooms' places stand on the same tiles AND on the same entities, the place with the most PROP
+/// hits keeps them, a tie going to the higher share of its props, then to the tiles, then to every
+/// line, and the other yields - see <see cref="Settle"/>. The props lead for the reason above: a
+/// checkpoint variant of a wall room lost all three of its places on 27 of 28 against the plain
+/// room's 27 of 27, and the one line it lacked was its checkpoint, outside the bubble. A scripted
+/// object that IS present still decides for its variant, through the hits after the tiles.
 /// Rims may be shared, as RoomArrangement allows, since rooms that join lay their rims on one row.
 ///
 /// THE ENTITIES DECIDE, NOT THE TILES ALONE. The first rule gave the tiles to the surest room and
@@ -129,10 +139,11 @@ public sealed record RoomDoodadPlaces(IReadOnlyList<RoomDoodadPlace> Places, int
 /// its doodads: half of them or more claimed by the other. Two rooms on one footprint with nothing
 /// in common are two rooms the game laid there, and the map draws both.
 ///
-/// AND WHERE THE DOODADS CANNOT TELL, THE TILES DO: the temple's commander rooms with three open
+/// AND WHERE THE PROPS CANNOT TELL, THE TILES DO: the temple's commander rooms with three open
 /// sides and with four carry the same 97 doodads, every one of them standing at the one tile, and
-/// differ only in the tiles along their sides. The ground-and-tile search already scored that place
-/// for both (RoomFinder), so its tile agreement is the next key after the share - RoomDoodadPlace.TilesAgree.
+/// differ only in the tiles along their sides; the checkpoint variant of a wall room carries the
+/// plain room's props and differs in five of its nine grid lines. The tiles laid at the place are
+/// scored for each (RoomFinder.Scorer), and that agreement is the key after the props - RoomDoodadPlace.TilesAgree.
 /// </remarks>
 public static class RoomDoodadFinder
 {
@@ -412,9 +423,12 @@ public static class RoomDoodadFinder
             return settled;
         }
 
-        // SUREST FIRST: the most hits, then the greater share of its lines hit, then the tiles the
-        // other search found agreeing there, then the more lines it has to hit, then the name and the
-        // place, so an area settles the same way every time.
+        // SUREST FIRST, BY THE PROPS: the most prop hits, then the greater share of its props hit,
+        // then the tiles agreeing there, then every line - the most hits, the greater share - then
+        // the more lines it has to hit, then the name and the place, so an area settles the same way
+        // every time. The props lead because a scripted object's absence is no evidence and its
+        // presence is - see the class remarks - so a present one still tells two variants apart,
+        // after the tiles, while an absent one costs its variant nothing.
         var all = new List<(int Room, RoomDoodadPlace Place)>();
         for (var one = 0; one < rooms.Count; one++)
         {
@@ -426,15 +440,20 @@ public static class RoomDoodadFinder
 
         all.Sort((a, b) =>
         {
-            int order = b.Place.Hits.CompareTo(a.Place.Hits);
-            order = order != 0 ? order : ((double)b.Place.Hits / b.Place.Lines).CompareTo((double)a.Place.Hits / a.Place.Lines);
+            int order = b.Place.PropHits.CompareTo(a.Place.PropHits);
+            order = order != 0 ? order : Share(b.Place.PropHits, b.Place.Props).CompareTo(Share(a.Place.PropHits, a.Place.Props));
             order = order != 0 ? order : b.Place.TilesAgree.CompareTo(a.Place.TilesAgree);
+            order = order != 0 ? order : b.Place.Hits.CompareTo(a.Place.Hits);
+            order = order != 0 ? order : Share(b.Place.Hits, b.Place.Lines).CompareTo(Share(a.Place.Hits, a.Place.Lines));
             order = order != 0 ? order : b.Place.Lines.CompareTo(a.Place.Lines);
             order = order != 0 ? order : string.CompareOrdinal(rooms[a.Room].Room, rooms[b.Room].Room);
             order = order != 0 ? order : a.Place.Where.Y.CompareTo(b.Place.Where.Y);
             order = order != 0 ? order : a.Place.Where.X.CompareTo(b.Place.Where.X);
             return order != 0 ? order : a.Place.Where.Turn.CompareTo(b.Place.Where.Turn);
         });
+
+        // A room with no props at all is placed by every line, and its places tie on the props.
+        static double Share(int hits, int of) => of > 0 ? (double)hits / of : 0d;
 
         // EACH PLACE AGAINST THE ONES KEPT BEFORE IT: it yields to the first that stands on its tiles
         // past the rims and on half its entities or more. A few dozen places an area, so every pair

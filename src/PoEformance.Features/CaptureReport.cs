@@ -463,15 +463,16 @@ public static class CaptureReport
             foreach (RoomDoodadPlace place in found.Places)
             {
                 said.Add(string.Create(CultureInfo.InvariantCulture,
-                    $"tile {place.Where.X}, {place.Where.Y}, {RoomFinder.Said(place.Where.Turn)}: {place.Hits} of {place.Lines} doodads within a tile ({place.PropHits} of {place.Props} props), off {place.MeanOff:0} on average")
-                    + (place.TilesAgree >= 0 ? string.Create(CultureInfo.InvariantCulture, $", {place.TilesAgree} tiles agree") : ", not on the tile search's list"));
+                    $"tile {place.Where.X}, {place.Where.Y}, {RoomFinder.Said(place.Where.Turn)}: {place.Hits} of {place.Lines} doodads within a tile ({place.PropHits} of {place.Props} props), off {place.MeanOff:0} on average, {Tiles(place)}"));
             }
 
-            // WHAT IT GAVE UP, AND TO WHOM: a variant not laid votes for the laid one's tile - see RoomDoodadFinder.Settle.
+            // WHAT IT GAVE UP, AND TO WHOM, with the same figures as a kept place - the props and the
+            // tiles are what settled it, and a yield is the line somebody reads when the name on the
+            // map is the wrong variant. See RoomDoodadFinder.Settle.
             foreach ((RoomDoodadPlace place, string to) in found.Yielded)
             {
                 said.Add(string.Create(CultureInfo.InvariantCulture,
-                    $"yielded tile {place.Where.X}, {place.Where.Y}, {RoomFinder.Said(place.Where.Turn)} ({place.Hits} of {place.Lines}) to {TerrainRooms.NameFor(to)}"));
+                    $"yielded tile {place.Where.X}, {place.Where.Y}, {RoomFinder.Said(place.Where.Turn)} ({place.Hits} of {place.Lines}, {place.PropHits} of {place.Props} props, {Tiles(place)}) to {TerrainRooms.NameFor(to)}"));
             }
 
             if (found.Places.Count == 0)
@@ -490,6 +491,10 @@ public static class CaptureReport
         string line = string.Create(CultureInfo.InvariantCulture, $"rooms: {placed.Count - unplaced} placed by their doodads at {places} places")
             + (unplaced > 0 ? string.Create(CultureInfo.InvariantCulture, $", {unplaced} with no place") : string.Empty);
         return (line, string.Join('\n', lines));
+
+        // The tiles' verdict at the place, or that the room could not be scored against this area's ground - see RoomFinder.Scorer.
+        static string Tiles(RoomDoodadPlace place)
+            => place.TilesAgree >= 0 ? string.Create(CultureInfo.InvariantCulture, $"{place.TilesAgree} tiles agree") : "tiles not scored";
     }
 
     /// <summary>
