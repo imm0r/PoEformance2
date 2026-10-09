@@ -291,14 +291,16 @@
             this.fontSampler = device.CreateSamplerState(samplerDesc);
         }
 
-        IntPtr RegisterTexture(ID3D11ShaderResourceView texture)
+        // PoEformance: internal rather than private, so the overlay can hand ImGui a view of its own - see NOTICE.md.
+        internal IntPtr RegisterTexture(ID3D11ShaderResourceView texture)
         {
             var imguiID = texture.NativePointer;
             textureResources.TryAdd(imguiID, texture);
             return imguiID;
         }
 
-        ID3D11ShaderResourceView? DeRegisterTexture(IntPtr texturePtr)
+        // PoEformance: internal rather than private - see NOTICE.md.
+        internal ID3D11ShaderResourceView? DeRegisterTexture(IntPtr texturePtr)
         {
             if (textureResources.Remove(texturePtr, out var texture))
             {

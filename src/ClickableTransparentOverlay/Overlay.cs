@@ -463,6 +463,34 @@
             return false;
         }
 
+        // PoEformance: the device, for drawing on it - see NOTICE.md.
+
+        /// <summary>
+        /// Gets the Direct3D 11 device the overlay draws with. Free-threaded: resources may be made on any thread.
+        /// Null until the overlay has initialized.
+        /// </summary>
+        protected ID3D11Device Device => this.device;
+
+        /// <summary>
+        /// Gets the device's immediate context. Only for the render thread - inside <see cref="Render"/>.
+        /// Whatever it is left set to, the ImGui renderer sets its own state after <see cref="Render"/> returns.
+        /// </summary>
+        protected ID3D11DeviceContext DeviceContext => this.deviceContext;
+
+        /// <summary>
+        /// Hands ImGui a texture the caller made and keeps: the handle draws it, as a handle from
+        /// <see cref="AddOrGetImagePointer(string, Image{Rgba32}, bool, out IntPtr)"/> does. Render thread only.
+        /// </summary>
+        /// <param name="view">The view; it stays the caller's to release, after <see cref="DropView"/>.</param>
+        /// <returns>The handle ImGui draws it by.</returns>
+        protected IntPtr AddView(ID3D11ShaderResourceView view) => this.renderer.RegisterTexture(view);
+
+        /// <summary>
+        /// Takes a view handed over by <see cref="AddView"/> back from ImGui without releasing it. Render thread only.
+        /// </summary>
+        /// <returns>true if ImGui held it.</returns>
+        protected bool DropView(IntPtr handle) => this.renderer.DeRegisterTexture(handle) != null;
+
         #endregion
 
         protected virtual void Dispose(bool disposing)
@@ -613,13 +641,24 @@
 
         private async Task InitializeResources()
         {
-            D3D11.D3D11CreateDevice(
+            // PoEformance: the newest feature level the card has rather than 10.0 alone - shader model 5
+            // and BC6H/BC7 textures need 11.0 - and 10.0 still where nothing newer is offered. See NOTICE.md.
+            if (D3D11.D3D11CreateDevice(
                 null,
                 DriverType.Hardware,
                 DeviceCreationFlags.None,
-                new[] { FeatureLevel.Level_10_0 },
+                new[] { FeatureLevel.Level_11_1, FeatureLevel.Level_11_0, FeatureLevel.Level_10_1, FeatureLevel.Level_10_0 },
                 out this.device,
-                out this.deviceContext);
+                out this.deviceContext).Failure)
+            {
+                D3D11.D3D11CreateDevice(
+                    null,
+                    DriverType.Hardware,
+                    DeviceCreationFlags.None,
+                    new[] { FeatureLevel.Level_10_0 },
+                    out this.device,
+                    out this.deviceContext);
+            }
             this.selfPointer = Kernel32.GetModuleHandle(null);
             this.wndClass = new WNDCLASSEX
             {
