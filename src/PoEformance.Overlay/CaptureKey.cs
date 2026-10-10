@@ -75,6 +75,7 @@ internal sealed class CaptureKey
     private readonly Func<(int Done, int Of)> _roomsProgress;
     private readonly Func<AreaRooms?> _areaRooms;
     private readonly Func<IReadOnlyList<string>> _loaded;
+    private readonly Func<IReadOnlyList<string>> _masters;
     private readonly Func<string> _version;
 
     /// <summary>The parts switched off, by key - what the settings keep. See CaptureParts.</summary>
@@ -99,6 +100,7 @@ internal sealed class CaptureKey
     /// <param name="roomsProgress">How far the rooms' reading or search is.</param>
     /// <param name="areaRooms">The area's rooms as read, surveyed and placed, for the room parts - or null where there is no install to read them from.</param>
     /// <param name="loaded">The files the area loaded.</param>
+    /// <param name="masters">Every master (<c>.tsi</c>) the install has, as its index lists them - for the room set where the loaded list names neither set nor master. See AreaRoomSet.</param>
     /// <param name="version">The version and build, as the title bar has them.</param>
     public CaptureKey(
         Func<WorldSnapshot> snapshot,
@@ -108,6 +110,7 @@ internal sealed class CaptureKey
         Func<(int Done, int Of)> roomsProgress,
         Func<AreaRooms?> areaRooms,
         Func<IReadOnlyList<string>> loaded,
+        Func<IReadOnlyList<string>> masters,
         Func<string> version)
     {
         _snapshot = snapshot;
@@ -117,6 +120,7 @@ internal sealed class CaptureKey
         _roomsProgress = roomsProgress;
         _areaRooms = areaRooms;
         _loaded = loaded;
+        _masters = masters;
         _version = version;
     }
 
@@ -264,6 +268,7 @@ internal sealed class CaptureKey
         {
             Overlay = On(CaptureParts.OverlayPicture) ? ScreenCapture.Grab(client.X, client.Y, client.Width, client.Height) : null,
             Loaded = _loaded(),
+            Masters = _masters(),
 
             // NO HIDING where the game alone is not wanted: the frames drawn empty are for that picture.
             Stage = On(CaptureParts.GamePicture) ? Stage.Hiding : Stage.Rooms,
@@ -429,7 +434,7 @@ internal sealed class CaptureKey
             {
                 Part(CaptureReport.RoomFilesFile, () =>
                 {
-                    string files = CaptureReport.RoomFiles(read, run.Loaded);
+                    string files = CaptureReport.RoomFiles(read, run.Loaded, run.Masters);
                     File.WriteAllText(At(CaptureReport.RoomFilesFile), files);
                     return files[..files.IndexOf('\n')];
                 });
@@ -749,6 +754,9 @@ internal sealed class CaptureKey
         public byte[]? Game { get; set; }
 
         public IReadOnlyList<string> Loaded { get; init; } = [];
+
+        /// <summary>Every master the install has, as the index listed them on the press - the third road to the room set, see AreaRoomSet.</summary>
+        public IReadOnlyList<string> Masters { get; init; } = [];
 
         /// <summary>The windows' diagnoses as they stood on the press, one per ticked part that offers one - null text for nothing there.</summary>
         public List<(CapturePart Part, string? Text)> Reports { get; } = [];

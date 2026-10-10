@@ -195,7 +195,7 @@ public class CaptureReportTests
 
         string said = CaptureReport.RoomFiles(Read, ["tiles/floor.tdt", "rooms/a.arm", "Metadata/Terrain/Test/generate.rs", "rooms/gone.arm", "rooms/b.arm"]).ReplaceLineEndings("\n");
         Assert.StartsWith(
-            "4 room files the area may lay - the loaded list's and its room sets'\n\n##### rooms/a.arm\nversion 36\nthe a room\n\n##### rooms/b.arm\nversion 36\nthe b room\n\n##### rooms/c.arm\nversion 36\nthe c room\n\n##### rooms/gone.arm\n(not in the install)\n",
+            "4 room files the area may lay - the loaded list's and every room of the sets its files and the install's masters name\n\n##### rooms/a.arm\nversion 36\nthe a room\n\n##### rooms/b.arm\nversion 36\nthe b room\n\n##### rooms/c.arm\nversion 36\nthe c room\n\n##### rooms/gone.arm\n(not in the install)\n",
             said,
             StringComparison.Ordinal);
         Assert.DoesNotContain("floor.tdt", said, StringComparison.Ordinal);

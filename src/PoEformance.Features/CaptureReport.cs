@@ -583,14 +583,15 @@ public static class CaptureReport
     /// THE WHOLE SET, not the loaded list's rooms alone - see AreaRoomSet for the ten of fifty-three.
     /// </remarks>
     /// <param name="read">How to get a file out of the install, by path.</param>
-    /// <param name="loaded">The files the area loaded - the room files among them and every room of its room sets are printed.</param>
-    public static string RoomFiles(Func<string, byte[]?> read, IReadOnlyList<string> loaded)
+    /// <param name="loaded">The files the area loaded - the room files among them and every room of the sets its files and the masters name are printed.</param>
+    /// <param name="masters">Every master the install has, as its index lists them - see AreaRoomSet.</param>
+    public static string RoomFiles(Func<string, byte[]?> read, IReadOnlyList<string> loaded, IReadOnlyList<string>? masters = null)
     {
         ArgumentNullException.ThrowIfNull(read);
         ArgumentNullException.ThrowIfNull(loaded);
         var said = new StringBuilder();
-        List<string> rooms = AreaRoomSet.Files(loaded, read);
-        said.Append(Say(rooms.Count)).AppendLine(" room files the area may lay - the loaded list's and its room sets'");
+        List<string> rooms = AreaRoomSet.Files(loaded, read, masters);
+        said.Append(Say(rooms.Count)).AppendLine(" room files the area may lay - the loaded list's and every room of the sets its files and the install's masters name");
         said.AppendLine();
         foreach (string path in rooms)
         {

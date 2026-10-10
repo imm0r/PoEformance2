@@ -175,8 +175,11 @@ the entrance among them, and for a while "the boss room is not placed" was read 
 fault. The area's room set (`generate.rs`) names every room the generator may lay, and
 `AreaRoomSet` places all of them. A fresh instance's list carries the set; a re-entered
 instance is not generated again and its list carried the master (`master.tsi`) instead,
-whose `RoomSet` line names the set, so both are read. A list that lacks a thing is not
-evidence the area lacks it.
+whose `RoomSet` line names the set; The Stone Citadel's list carried neither, both cached
+from an earlier visit. So three roads are read: the listed sets, the listed masters, and
+the masters the install's index lists in the folder above the rooms' `Rooms/` - where 456
+of RePoE's 458 map graphs keep theirs. A list that lacks a thing is not evidence the area
+lacks it.
 
 ## Raise the version on every push
 
