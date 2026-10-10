@@ -3379,7 +3379,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
             // THE INSTALL'S OWN ANSWER for a boss's arena, by the area's terrain folder - see AreaArenas.
             // The lists arrive from the install's walk and the graphs from the file, both read when asked.
-            ArenasOf = readFile is null ? null : area => AreaArenas.Of(readFile, AreaGraphs.FoldersOf(area), TileFiles, TileSets),
+            ArenasOf = area => AreaArenas.Find(readFile, AreaGraphs.FoldersOf(area), TileFiles, TileSets),
         };
 
         window.Show(columns, rail, model, columnWidths, panes);
