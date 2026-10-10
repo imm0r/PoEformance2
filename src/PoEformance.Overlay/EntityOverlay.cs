@@ -5998,6 +5998,15 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             return false;
         }
 
+        // A monster the game has taken out of the fight - imprisoned by essences, a boss
+        // between phases. It stands there with a full bar and the map drew a rare's dot on the
+        // essence icon, which is how the two were told apart in the first place; see
+        // HiddenMonsters. The prison object keeps its own icon, so the place is still marked.
+        if (entity.IsHidden)
+        {
+            return false;
+        }
+
         if (entity.Kind != EntityKind.WorldItem)
         {
             return true;

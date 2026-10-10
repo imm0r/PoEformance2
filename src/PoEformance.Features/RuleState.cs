@@ -475,6 +475,11 @@ public sealed record RuleState
     ///
     /// Nothing filters remembered entities here because nothing that MOVES is ever remembered
     /// (see <see cref="EntityMemory"/>), so a monster cannot arrive from that half of the list.
+    ///
+    /// A HIDDEN monster is left out entirely rather than flagged: imprisoned by essences, or a
+    /// boss between phases, it has a full bar and a targetable byte and nothing can hit it,
+    /// and a rule that counted it fired Spark at a prison the moment the cursor came near.
+    /// Out of the list, no fact and no aim can reach it - see <see cref="HiddenMonsters"/>.
     /// </remarks>
     private static List<NearMonster> NearbyMonsters(WorldSnapshot snapshot, WorldEntity? player)
     {
@@ -489,6 +494,7 @@ public sealed record RuleState
             if (entity.Kind != EntityKind.Monster
                 || entity.IsFriendly
                 || entity.IsEffect
+                || entity.IsHidden
                 || !entity.Life.IsValid
                 || entity.Life.Current <= 0)
             {

@@ -72,7 +72,9 @@ public sealed class HealthBarLayer
             // Friendly excluded: the bar answers "how close is this to dying", which is a
             // question about a threat. Your own minions and totems are numerous and would
             // bury the monsters the bars exist for.
-            if (monster.Kind != EntityKind.Monster || monster.IsFriendly || !monster.Life.IsValid)
+            // Hidden excluded too: a monster imprisoned by essences has a full bar and cannot be
+            // hit, and a bar over it answers a question nobody can act on - see HiddenMonsters.
+            if (monster.Kind != EntityKind.Monster || monster.IsFriendly || monster.IsHidden || !monster.Life.IsValid)
             {
                 continue;
             }

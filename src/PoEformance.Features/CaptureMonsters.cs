@@ -77,6 +77,7 @@ public static class CaptureMonsters
             said.Append("  position ").Append(Num(monster.WorldX)).Append(' ').Append(Num(monster.WorldY)).Append(' ').Append(Num(monster.WorldZ))
                 .Append("   life ").Append(monster.Life.IsValid ? $"{Say(monster.Life.Current)}/{Say(monster.Life.Max)} ({Say(monster.Life.Percent)}%)" : "unread")
                 .Append("   targetable ").Append(Said(monster.Targetable))
+                .Append("   hidden ").Append(monster.IsHidden ? "yes" : "no")
                 .Append("   friendly ").Append(monster.IsFriendly ? "yes" : "no")
                 .Append("   effect ").AppendLine(monster.IsEffect ? "yes" : "no");
 
