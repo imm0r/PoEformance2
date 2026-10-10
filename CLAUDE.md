@@ -172,8 +172,10 @@ room is named once the player has been near its checkpoint, and stays named afte
 a file still cached from an earlier instance of the same map is not loaded again and not
 listed: The Assembly's list carried ten of its fifty-three rooms, neither the boss room nor
 the entrance among them, and for a while "the boss room is not placed" was read as a placing
-fault. The area's room set (`generate.rs`, which the list does carry) names every room the
-generator may lay, and `AreaRoomSet` places all of them. A list that lacks a thing is not
+fault. The area's room set (`generate.rs`) names every room the generator may lay, and
+`AreaRoomSet` places all of them. A fresh instance's list carries the set; a re-entered
+instance is not generated again and its list carried the master (`master.tsi`) instead,
+whose `RoomSet` line names the set, so both are read. A list that lacks a thing is not
 evidence the area lacks it.
 
 ## Raise the version on every push
