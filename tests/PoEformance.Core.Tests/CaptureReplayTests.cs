@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Numerics;
 using System.Text;
 using PoEformance.Core.Memory;
 using PoEformance.Features;
@@ -188,7 +189,41 @@ public class CaptureReplayTests
                 said.AppendLine(byTiles.Why.Length > 0 ? " - " + byTiles.Why : string.Empty);
                 foreach (RoomTilePlace place in byTiles.Places)
                 {
-                    said.AppendLine(CultureInfo.InvariantCulture, $"    tile {place.Where.X}, {place.Where.Y}, {RoomFinder.Said(place.Where.Turn)}: {place.Where.BigAgree} of {place.Where.Big} big slots, {place.Where.TilesAgree} of {place.Where.Tiles} slots alike, on {Short(place.Anchor)} laid {place.AnchorLaid}x at {place.AnchorX}, {place.AnchorY}");
+                    said.AppendLine(CultureInfo.InvariantCulture, $"    tile {place.Where.X}, {place.Where.Y}, {RoomFinder.Said(place.Where.Turn)}: {place.Where.BigAgree} of {place.Where.Big} big slots, {place.Where.TilesAgree} of {place.Where.Tiles} slots alike, on {Short(place.Anchor)} laid {place.AnchorLaid}x at {place.AnchorX}, {place.AnchorY}{(place.AnchorTagged ? ", tagged" : string.Empty)}");
+                }
+
+                // WHY A LONELY LINE PICKED OR DID NOT: where each place puts the line, against the nearest
+                // entity of the line's path - for the places whose footprint covers an entity's tile.
+                float side = RoomDoodadFinder.WithinUnits;
+                foreach (RoomDoodad line in layout.Doodads)
+                {
+                    if (line.Stub.Length == 0)
+                    {
+                        continue;
+                    }
+
+                    List<DoodadSighting> entities = [.. placing.Survey.Found.Where(one => string.Equals(one.Path, line.Stub, StringComparison.OrdinalIgnoreCase))];
+                    if (entities.Count == 0)
+                    {
+                        continue;
+                    }
+
+                    said.AppendLine(CultureInfo.InvariantCulture, $"    line {Short(line.Stub)} at {line.X}, {line.Y} cells of the room: {entities.Count} entities - {string.Join("; ", entities.Select(one => string.Create(CultureInfo.InvariantCulture, $"{one.X:0}, {one.Y:0} (tile {one.X / side:0.0}, {one.Y / side:0.0})")))}");
+                    foreach (RoomTilePlace place in byTiles.Places)
+                    {
+                        RoomCandidate at = place.Where;
+                        bool covers = entities.Any(one => one.X / side >= at.X && one.X / side < at.X + at.Width && one.Y / side >= at.Y && one.Y / side < at.Y + at.Height);
+                        if (!covers)
+                        {
+                            continue;
+                        }
+
+                        Matrix3x2 laying = RoomFinder.Laying(layout.Width, layout.Height, at.Turn);
+                        Vector2 inRoom = Vector2.Transform(new Vector2(line.X, line.Y) / TerrainGrid.CellsPerTile, laying);
+                        var where = new Vector2(at.X + inRoom.X, at.Y + inRoom.Y) * side;
+                        float nearest = entities.Min(one => Vector2.Distance(new Vector2(one.X, one.Y), where));
+                        said.AppendLine(CultureInfo.InvariantCulture, $"      place tile {at.X}, {at.Y}, {RoomFinder.Said(at.Turn)} covers an entity: the line stands at tile {where.X / side:0.0}, {where.Y / side:0.0}, the nearest entity {nearest:0} units off ({(nearest <= side ? "within a tile - confirms" : "too far")})");
+                    }
                 }
             }
 
