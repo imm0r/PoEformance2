@@ -96,24 +96,26 @@ public sealed class MonsterPortrait
 
     /// <summary>The buttons down the picture's right edge, top to bottom, as indices into the arrays below.</summary>
     /// <remarks>
-    /// THE CARD'S, THE LIGHT'S, THE ORBIT'S AND THE PROBE'S, in that order because that is the order
-    /// asked for. The orbit button was there first and alone; the other three were words beside the
-    /// rate in the opposite corner, and three words in a row over a picture read as a caption rather
-    /// than as controls. As art they are the orbit's size and hang in one column with it. The card's
-    /// and the light's are skipped where they have nothing to switch - no card, no specular colour -
-    /// and the rest close up.
+    /// THE CARD'S, THE LIGHT'S, THE ORBIT'S, THE PROBE'S AND THE CLOCK'S, in that order because that
+    /// is the order asked for. The orbit button was there first and alone; the others were words -
+    /// three beside the rate in the opposite corner, Pause at the end of the animation row - and
+    /// three words in a row over a picture read as a caption rather than as controls. As art they
+    /// are the orbit's size and hang in one column with it. The card's and the light's are skipped
+    /// where they have nothing to switch - no card, no specular colour - and the clock's where
+    /// nothing plays; the rest close up.
     /// </remarks>
     private const int CardSide = 0;
     private const int LightSide = 1;
     private const int OrbitSide = 2;
     private const int ProbeSide = 3;
-    private const int Sides = 4;
+    private const int ClockSide = 4;
+    private const int Sides = 5;
 
     /// <summary>The ids ImGui knows the edge buttons by.</summary>
-    private static readonly string[] SideIds = ["##monster-card", "##monster-light", "##monster-orbit", "##monster-probe"];
+    private static readonly string[] SideIds = ["##monster-card", "##monster-light", "##monster-orbit", "##monster-probe", "##monster-clock"];
 
     /// <summary>The art on the edge buttons, by the end of each manifest resource name - the project file pins them.</summary>
-    private static readonly string[] SideArt = ["3dMV_cpugpu.png", "3dMV_light.png", "3dMV_orbit.png", "3dMV_probe.png"];
+    private static readonly string[] SideArt = ["3dMV_cpugpu.png", "3dMV_light.png", "3dMV_orbit.png", "3dMV_probe.png", "3dMV_clock.png"];
 
     /// <summary>How many panes have been made, so each one's keys are its own.</summary>
     private static int s_panes;
@@ -592,7 +594,7 @@ public sealed class MonsterPortrait
         _release = release;
         _unpack = unpack;
         _sizes = new PictureLadder(most);
-        _sideKeys = [_prefix + "card", _prefix + "light", _prefix + "orbit", _prefix + "probe"];
+        _sideKeys = [_prefix + "card", _prefix + "light", _prefix + "orbit", _prefix + "probe", _prefix + "clock"];
     }
 
     /// <summary>
@@ -1294,8 +1296,6 @@ public sealed class MonsterPortrait
         if (_pose is null || !_model.Moves)
         {
             Rate(draw, corner);
-            _cornered = false;
-            ClockToggle(corner);
         }
 
         ImGui.SetCursorScreenPos(below);
@@ -1342,29 +1342,6 @@ public sealed class MonsterPortrait
 
     /// <summary>The rate's shadow: black, mostly opaque.</summary>
     private const uint RateShadow = 0xC0000000;
-
-    /// <summary>
-    /// Pause or Play beside the rate, where the picture runs with the clock and has no animation row to carry the button.
-    /// </summary>
-    /// <remarks>
-    /// THE ROW'S OWN BUTTON, for the pictures without the row: a tile runs with the clock as a monster
-    /// runs an animation, and there was no way to stop one - the row holding Pause is drawn only where
-    /// there is something to play. Paused, the picture goes back to the pane's own rung and holds still.
-    /// Drawn after the picture, so it takes the click - see the grip in <see cref="Draw"/>.
-    /// </remarks>
-    private void ClockToggle(Vector2 corner)
-    {
-        if (!HasClock())
-        {
-            return;
-        }
-
-        Cornered(corner);
-        if (ImGui.SmallButton(_playing ? "Pause##monster-clock" : "Play##monster-clock"))
-        {
-            _playing = !_playing;
-        }
-    }
 
     /// <summary>
     /// What the load is doing while it runs: the step, how far into it, for how long - and a bar for the step.
@@ -1452,24 +1429,7 @@ public sealed class MonsterPortrait
     private IReadOnlyList<string> _probeLines = [];
     private IReadOnlyList<string> _layerLines = [];
 
-    /// <summary>Whether a button already sits in the picture's corner row this frame - see <see cref="Cornered"/>.</summary>
-    private bool _cornered;
-
-    /// <summary>Puts the next corner button beside the rate, or beside the button before it.</summary>
-    private void Cornered(Vector2 corner)
-    {
-        if (_cornered)
-        {
-            ImGui.SameLine();
-            return;
-        }
-
-        float inset = ImGui.GetStyle().ItemSpacing.X;
-        ImGui.SetCursorScreenPos(new Vector2(corner.X + (inset * 2f) + ImGui.CalcTextSize(RateRoom).X, corner.Y + inset));
-        _cornered = true;
-    }
-
-    /// <summary>The room the rate is given, three digits wide, so the button beside it does not shuffle as the number changes.</summary>
+    /// <summary>The room the rate is given in the animation row, three digits wide, so it does not shuffle as the number changes.</summary>
     private const string RateRoom = "999 fps card";
 
     /// <summary>
@@ -1567,8 +1527,7 @@ public sealed class MonsterPortrait
     private const float Least = 48f;
 
     /// <summary>
-    /// The row above the picture: which animation, of how many, and whether it runs, with the
-    /// pane's own frame rate before the button.
+    /// The row above the picture: which animation, of how many, with the pane's own frame rate at the right.
     /// </summary>
     /// <remarks>
     /// ONLY WHERE THERE IS SOMETHING TO PLAY. A monster with no skeleton, or one whose keyframes
@@ -1577,11 +1536,11 @@ public sealed class MonsterPortrait
     /// file lacking.
     ///
     /// THE LAYOUT IS THE ONE ASKED FOR, item by item: a label, a combo only as wide as its longest
-    /// name, the count after it, all at the left; and at the right edge of the picture the rate
-    /// and then the button. The rate's width is reserved for three digits so the button does not
-    /// shuffle as the number changes, and the right-hand pair never runs back over the left-hand
-    /// three on a narrow pane - it goes past the picture's edge instead, where it can still be
-    /// read.
+    /// name, the count after it, all at the left; and at the right edge of the picture the rate.
+    /// The rate's width is reserved for three digits so it does not shuffle as the number changes,
+    /// and it never runs back over the left-hand three on a narrow pane - it goes past the
+    /// picture's edge instead, where it can still be read. Pause sat after the rate once; it is
+    /// the clock button in the column down the picture's edge now, with the other switches.
     /// </remarks>
     private void Controls(float side)
     {
@@ -1625,23 +1584,14 @@ public sealed class MonsterPortrait
         ImGui.AlignTextToFramePadding();
         ImGui.TextDisabled(_count);
 
-        string toggle = _playing ? "Pause" : "Play";
-        float button = ImGui.CalcTextSize("Pause").X + (style.FramePadding.X * 2f);
         float reserved = ImGui.CalcTextSize(RateRoom).X;
         ImGui.SameLine();
-        float left = MathF.Max(ImGui.GetCursorScreenPos().X, row.X + side - (reserved + style.ItemSpacing.X + button));
+        float left = MathF.Max(ImGui.GetCursorScreenPos().X, row.X + side - reserved);
 
         string rate = RateText();
         ImGui.SetCursorScreenPos(new Vector2(left + reserved - ImGui.CalcTextSize(rate).X, row.Y));
         ImGui.AlignTextToFramePadding();
         ImGui.TextDisabled(rate);
-
-        ImGui.SameLine();
-        ImGui.SetCursorScreenPos(new Vector2(left + reserved + style.ItemSpacing.X, row.Y));
-        if (ImGui.Button(toggle + "##monster-play", new Vector2(button, 0f)))
-        {
-            _playing = !_playing;
-        }
     }
 
     /// <summary>The combo's width: its longest name, the frame's padding and the arrow.</summary>
@@ -1808,12 +1758,13 @@ public sealed class MonsterPortrait
             at + ((size - ImGui.CalcTextSize(said)) * 0.5f), ImGui.GetColorU32(ImGuiCol.Text), said);
     }
 
-    /// <summary>Whether an edge button has anything to switch this frame: the card's needs a card, the light's a specular colour.</summary>
+    /// <summary>Whether an edge button has anything to switch this frame: the card's needs a card, the light's a specular colour, the clock's something that plays.</summary>
     private bool Hung(int which)
         => which switch
         {
             CardSide => Card is not null,
             LightSide => HasShine(),
+            ClockSide => HasClock() || (_pose is not null && _model.Moves),
             _ => true,
         };
 
@@ -1863,7 +1814,8 @@ public sealed class MonsterPortrait
     /// AWAY FROM THE START, NOT "ON", because the four do not share a sense of on. The orbit tinted
     /// while it runs and the probe while it listens read alike; a card tinted while it draws, which
     /// it does from the first frame, would be the one button lit on a pane nobody has touched. So
-    /// the tint says "you changed this": the flat light, the processor, the running orbit, the probe.
+    /// the tint says "you changed this": the flat light, the processor, the running orbit, the probe,
+    /// the paused clock.
     /// </remarks>
     private bool Lit(int which)
         => which switch
@@ -1871,6 +1823,7 @@ public sealed class MonsterPortrait
             CardSide => Card is { On: false },
             LightSide => FlatLight,
             OrbitSide => _orbiting,
+            ClockSide => !_playing,
             _ => _probing,
         };
 
@@ -1885,6 +1838,7 @@ public sealed class MonsterPortrait
             CardSide => Card is { On: true } ? "card" : "processor",
             LightSide => FlatLight ? "flat light" : "game light",
             OrbitSide => _orbiting ? "stop" : "orbit",
+            ClockSide => _playing ? "Pause" : "Play",
             _ => _probing ? "probe: on" : "probe",
         };
 
@@ -1906,6 +1860,9 @@ public sealed class MonsterPortrait
                 break;
             case ProbeSide:
                 ProbeToggled();
+                break;
+            case ClockSide:
+                _playing = !_playing;
                 break;
             default:
                 break;
@@ -1938,6 +1895,11 @@ public sealed class MonsterPortrait
                     + "what drew it, where it came from, and for a mixed layer how far in front of the solid behind it lies and its alpha.\n"
                     + "While on, every drawing also counts how each translucent material came out over the whole picture.\n"
                     + "The capture key writes the lines to model-probe.txt.");
+                break;
+            case ClockSide:
+                ImGui.SetTooltip(_playing
+                    ? "Playing: the animation runs, or the picture runs with the game's clock. Press to pause."
+                    : "Paused: the picture holds still at the pane's own size. Press to play.");
                 break;
             default:
                 break;

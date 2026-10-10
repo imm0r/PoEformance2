@@ -17,7 +17,7 @@ namespace PoEformance.Core.Tests;
 public class PortraitArtTests
 {
     /// <summary>How many buttons hang down the edge, so a name dropped from the list is noticed too.</summary>
-    private const int Sides = 4;
+    private const int Sides = 5;
 
     /// <summary>The repository root, found by a file only it has.</summary>
     private static string RepositoryRoot
