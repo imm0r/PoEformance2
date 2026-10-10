@@ -1326,10 +1326,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         return at;
     }
 
-    /// <summary>The area's rooms, by file, made again only when the tile book's "here" list is a new one.</summary>
-    /// <summary>Every room the area may have laid - the loaded list's and its room sets', cached on the list's identity. See AreaRoomSet.</summary>
+    /// <summary>Every room the area may have laid - the loaded list's and the sets its files and the install's masters name, cached on both lists' identities. See AreaRoomSet.</summary>
     private IReadOnlyList<string> AreaRoomFiles()
-        => _areaRooms?.RoomSet(LoadedFiles?.Invoke() ?? []) ?? [];
+        => _areaRooms?.RoomSet(LoadedFiles?.Invoke() ?? [], TileSets) ?? [];
 
     /// <summary>
     /// Every room the area may have laid, outlined on the large map with its name where it stands, where the tile book's option asks for it - see <see cref="AreaRooms"/>.
@@ -2290,6 +2289,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             () => _areaRooms?.Progress ?? (0, 0),
             () => _areaRooms,
             () => LoadedFiles?.Invoke() ?? [],
+            () => TileSets,
             () => Version)
         {
             Changed = () => SettingsChanged?.Invoke(),

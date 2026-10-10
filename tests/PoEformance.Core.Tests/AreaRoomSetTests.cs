@@ -109,6 +109,59 @@ public class AreaRoomSetTests
         Assert.Equal(["gone.rs", "Metadata/Terrain/Maps/Gone/gone.rs"], asked.Where(path => path.Contains("gone", StringComparison.Ordinal)));
     }
 
+    /// <summary>
+    /// A list carrying neither set nor master, as The Stone Citadel's did: the masters the install's index lists directly in the folder above the rooms' Rooms/ are read, every one of them, and not one a folder deeper or in another area's folder.
+    /// </summary>
+    [Fact]
+    public void THEINSTALLSMastersBesideTheRoomsNameTheSetWhereTheListCarriesNeither()
+    {
+        var asked = new List<string>();
+        byte[]? Read(string path)
+        {
+            asked.Add(path);
+            return path switch
+            {
+                "Metadata/Terrain/Maps/Test/master.tsi" => Encoding.UTF8.GetBytes("RoomSet \"generate.rs\"\n"),
+                "Metadata/Terrain/Maps/Test/holodeck_master.tsi" => Encoding.UTF8.GetBytes("RoomSet \"holodeck_generate.rs\"\n"),
+                "Metadata/Terrain/Maps/Test/generate.rs" => Encoding.UTF8.GetBytes("version 2\n\"Metadata/Terrain/Maps/Test/Rooms/Unique/boss_01.arm\"\n\"Metadata/Terrain/Maps/Test/Rooms/Abyss/2open_st_01.arm\"\n"),
+                "Metadata/Terrain/Maps/Test/holodeck_generate.rs" => Encoding.UTF8.GetBytes("version 2\n\"Metadata/Terrain/Maps/Test/Rooms/Unique/Holodeck.arm\"\n"),
+                _ => null,
+            };
+        }
+
+        string[] install =
+        [
+            "Metadata/Terrain/Maps/Other/master.tsi",
+            "Metadata/Terrain/Maps/Test/Graphs/deeper.tsi",
+            "Metadata/Terrain/Maps/Test/master.tsi",
+            "Metadata/Terrain/Maps/Test/holodeck_master.tsi",
+            "Metadata/Terrain/Maps/Testing/master.tsi",
+        ];
+
+        List<string> files = AreaRoomSet.Files(
+            ["Metadata/Terrain/Maps/Test/Rooms/Surgical/1x1_1open_03.arm", "Metadata/Terrain/Maps/Test/Rooms/Unique/boss_01.arm", "Metadata/Terrain/Maps/Test/Tiles/floor.tdt"],
+            Read,
+            install);
+
+        Assert.Equal(
+            [
+                "Metadata/Terrain/Maps/Test/Rooms/Abyss/2open_st_01.arm",
+                "Metadata/Terrain/Maps/Test/Rooms/Surgical/1x1_1open_03.arm",
+                "Metadata/Terrain/Maps/Test/Rooms/Unique/boss_01.arm",
+                "Metadata/Terrain/Maps/Test/Rooms/Unique/Holodeck.arm",
+            ],
+            files);
+        Assert.DoesNotContain(asked, path => path.Contains("Other", StringComparison.Ordinal) || path.Contains("deeper", StringComparison.Ordinal) || path.Contains("Testing", StringComparison.Ordinal));
+        Assert.Equal(2, asked.Count(path => path.EndsWith(".tsi", StringComparison.Ordinal)));
+
+        // The same masters where the list carries the set itself and no room: the set is read once, the
+        // other master's set beside it, and the three rooms are the two sets'.
+        asked.Clear();
+        Assert.Equal(3, AreaRoomSet.Files(["Metadata/Terrain/Maps/Test/generate.rs"], Read, install).Count);
+        Assert.Equal(1, asked.Count(path => path == "Metadata/Terrain/Maps/Test/generate.rs"));
+        Assert.Equal(1, asked.Count(path => path == "Metadata/Terrain/Maps/Test/holodeck_generate.rs"));
+    }
+
     /// <summary>A list with no room and no set is no rooms, and nothing is read for it.</summary>
     [Fact]
     public void ALISTWithoutRoomsIsNoRooms()

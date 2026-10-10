@@ -52,8 +52,9 @@ public sealed class AreaRooms
     private TerrainGrid? _grid;
     private int _rooms = -1;
 
-    /// <summary>The area's room set, cached on the loaded list's identity - see <see cref="RoomSet"/>.</summary>
+    /// <summary>The area's room set, cached on the loaded list's and the masters' identities - see <see cref="RoomSet"/>.</summary>
     private IReadOnlyList<string>? _setOf;
+    private IReadOnlyList<string>? _setMasters;
     private IReadOnlyList<string> _set = [];
 
     /// <summary>The rooms' files being read, and read.</summary>
@@ -187,15 +188,19 @@ public sealed class AreaRooms
     }
 
     /// <summary>
-    /// Every room the area may have laid - the loaded list's <c>.arm</c> files and every room of its room sets - cached on the list's identity, which changes only with the area. See AreaRoomSet.
+    /// Every room the area may have laid - the loaded list's <c>.arm</c> files and every room of the sets its files and the install's masters name - cached on the list's and the masters' identities, which change only with the area and the index's one walk. See AreaRoomSet.
     /// </summary>
-    public IReadOnlyList<string> RoomSet(IReadOnlyList<string> loaded)
+    /// <param name="loaded">The files the area loaded.</param>
+    /// <param name="masters">Every master (<c>.tsi</c>) the install has, as its index lists them - empty until the walk has run.</param>
+    public IReadOnlyList<string> RoomSet(IReadOnlyList<string> loaded, IReadOnlyList<string> masters)
     {
         ArgumentNullException.ThrowIfNull(loaded);
-        if (!ReferenceEquals(loaded, _setOf))
+        ArgumentNullException.ThrowIfNull(masters);
+        if (!ReferenceEquals(loaded, _setOf) || !ReferenceEquals(masters, _setMasters))
         {
             _setOf = loaded;
-            _set = AreaRoomSet.Files(loaded, _read);
+            _setMasters = masters;
+            _set = AreaRoomSet.Files(loaded, _read, masters);
         }
 
         return _set;

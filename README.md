@@ -91,9 +91,9 @@ of the spot you stand on into `captures/<time> <area>/` beside the tool and pack
 `<time> <area>.zip` beside the folder, ready to send. What goes in is a **catalogue of parts**, each
 with a box under the key - tick what the question is about: a picture with and one without the
 overlay; every entity; the area's loaded files, environments and every room file of its room set (the
-`.rs` the area loaded, or the one its `master.tsi` names, lists the rooms the loaded-file list leaves
-out once an earlier instance cached them - The Assembly's list had ten of fifty-three, neither the
-boss room nor the entrance among them);
+`.rs` the area loaded, or the one its `master.tsi` names, or the ones the masters beside its rooms
+name, lists the rooms the loaded-file list leaves out once an earlier instance cached them - The
+Assembly's list had ten of fifty-three, neither the boss room nor the entrance among them);
 the rooms around you with their light data, every room as the ground-and-tile search arranged it where
 no entities can be read, and the Tile Book's picked row; the doodad survey with every sighting, the
 scripted objects remembered from the network bubble since among them, and every room of the set as
