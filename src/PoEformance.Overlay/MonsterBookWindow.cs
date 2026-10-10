@@ -522,6 +522,7 @@ public sealed class MonsterBookWindow : BookWindow<MonsterBook>
 
         Identity(_of, one, chosen);
         ModelTools(one, chosen, one.Name is { Length: > 0 } named ? named : Tail(chosen));
+        Stage(chosen);
         ImGui.Separator();
 
         // NOTHING IS PLACED BESIDE ANYTHING HERE ANY MORE, and that is the whole of what the model
@@ -535,6 +536,155 @@ public sealed class MonsterBookWindow : BookWindow<MonsterBook>
         Words("Skills", _of.Skills(one));
         Mods(_of, one, _said);
         Words("Built on", one.Inherits ?? []);
+    }
+
+    /// <summary>The tile chosen in the Tile Book, by path, or empty - so a monster can be stood on whatever tile that book is open at.</summary>
+    public Func<string>? TileChoice { get; set; }
+
+    /// <summary>
+    /// The game's light for the picture, drawn under the stage - see SceneLightPanel. Null leaves the picture under its own lamp.
+    /// </summary>
+    /// <remarks>
+    /// THE TILE BOOK'S PANEL, OF THIS BOOK'S OWN: a stage and the monster on it are one mesh, so the
+    /// light built for it - the area's sun, its sky, the shadows the sun casts - falls on the arena
+    /// and on the monster alike, and the monster shades the ground as the arena's own props do.
+    /// </remarks>
+    public SceneLightPanel? Lighting { get; init; }
+
+    /// <summary>A tile typed in by path, to stand the monster on. See <see cref="Stage"/>.</summary>
+    private string _stagePath = string.Empty;
+
+    /// <summary>The most a typed tile path may be.</summary>
+    private const uint StagePathLength = 300;
+
+    /// <summary>
+    /// Where the monster stands: on nothing, in one of the arenas known for it, on the Tile Book's tile, or on a tile named by path.
+    /// </summary>
+    /// <remarks>
+    /// THE ARENAS KNOWN FOR A MONSTER COME TWO WAYS, and the fold lists both: the tiles written down
+    /// against its picture family by somebody who stood in the room (BossIcons.TilesOf), and the arena
+    /// tiles seen in the areas the game lists it as the boss of (AreaBosses.AreasOf, then the pane's
+    /// ArenasIn - the terrain under the player, and logs/boss-arenas.tsv). Worked out while the combo is
+    /// open and not per frame: three walks over small tables, for a list that is read while it is open.
+    ///
+    /// ONLY TILES, never a room from its file: a room's floor is chosen when the area is generated, so
+    /// an .arm alone is doodads over nothing, and a monster standing on nothing is what the bare picture
+    /// already shows. Every boss arena is a tile. The stage is drawn without its black walls, which from
+    /// any angle but the game's are a slab in front of the arena - see TileModels.BlackWall.
+    /// </remarks>
+    private void Stage(string chosen)
+    {
+        if (Model is not { } model || !model.Possible)
+        {
+            return;
+        }
+
+        if (!OverlayLayout.Subsection("Stage"))
+        {
+            return;
+        }
+
+        ImGui.Indent();
+        try
+        {
+            string current = model.Stage;
+            string shown = current.Length == 0 ? "none" : Tail(TileKey.Read(current).Path);
+            ImGui.SetNextItemWidth(MathF.Max(120f, ImGui.GetContentRegionAvail().X * 0.6f));
+            if (ImGui.BeginCombo("stands on##monster-stage", ImGuiText.Escape(shown)))
+            {
+                if (ImGui.Selectable("none##monster-stage-none", current.Length == 0))
+                {
+                    model.Stage = string.Empty;
+                }
+
+                foreach (string tile in Arenas(model, chosen))
+                {
+                    Offer(model, "arena: " + Tail(tile), tile);
+                }
+
+                string pick = TileChoice?.Invoke() ?? string.Empty;
+                if (pick.Length > 0)
+                {
+                    Offer(model, "the Tile Book's: " + Tail(pick), pick);
+                }
+
+                ImGui.EndCombo();
+            }
+
+            OverlayLayout.Hint("The monster drawn standing in the middle of a terrain tile, at the size the game draws it,"
+                + " on the tile's ground. The arenas listed are the ones written down for this boss and the ones"
+                + " seen in the areas the game lists it as the boss of; the Tile Book's tile is whatever that book is open at."
+                + " The picture frames the whole tile - the wheel zooms in on the monster.");
+
+            ImGui.SetNextItemWidth(MathF.Max(120f, ImGui.GetContentRegionAvail().X * 0.6f));
+            bool typed = ImGui.InputText("##monster-stage-path", ref _stagePath, StagePathLength, ImGuiInputTextFlags.EnterReturnsTrue);
+            ImGui.SameLine();
+            if ((ImGui.Button("stand on this tile##monster-stage-typed") || typed) && _stagePath.Trim().Length > 0)
+            {
+                model.Stage = Key(_stagePath.Trim());
+            }
+
+            OverlayLayout.Hint("Any tile's .tdt path, as the Tile Book lists it.");
+
+            if (Lighting is { } lighting && OverlayLayout.Subsection("Light"))
+            {
+                lighting.Draw(model.Showing);
+            }
+        }
+        finally
+        {
+            ImGui.Unindent();
+        }
+    }
+
+    /// <summary>One stage in the combo, chosen where it is the one the pane stands on.</summary>
+    private static void Offer(MonsterPortrait model, string label, string tile)
+    {
+        string key = Key(tile);
+        if (ImGui.Selectable(ImGuiText.Escape(label) + "##monster-stage-" + tile, string.Equals(model.Stage, key, StringComparison.Ordinal)))
+        {
+            model.Stage = key;
+        }
+
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip(ImGuiText.Escape(tile));
+        }
+    }
+
+    /// <summary>The key the pane loads a stage under: the tile, without its black walls.</summary>
+    private static string Key(string tile) => new TileKey(tile, Walls: false).ToString();
+
+    /// <summary>The arena tiles known for a monster, distinct - see <see cref="Stage"/>.</summary>
+    private static IReadOnlyList<string> Arenas(MonsterPortrait model, string chosen)
+    {
+        if (model.Icons is not { } icons)
+        {
+            return [];
+        }
+
+        var found = new List<string>();
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (string tile in icons.TilesOf(BossIcons.FamilyOfPath(chosen)))
+        {
+            if (seen.Add(tile))
+            {
+                found.Add(tile);
+            }
+        }
+
+        foreach (string area in icons.Bosses.AreasOf(chosen))
+        {
+            foreach (string tile in model.ArenasIn?.Invoke(area) ?? [])
+            {
+                if (seen.Add(tile))
+                {
+                    found.Add(tile);
+                }
+            }
+        }
+
+        return found;
     }
 
     private static void Identity(MonsterVarieties all, MonsterVariety one, string chosen)

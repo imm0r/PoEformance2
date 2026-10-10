@@ -519,8 +519,15 @@ public sealed class MonsterPortrait
     private float _frame;
     private bool _playing = true;
     private string _stillWhy = string.Empty;
+
+    /// <summary>The line about the stage the monster stands on, or why there is none - see MonsterModel.StageSaid.</summary>
+    private string _stage = string.Empty;
     private Vector3[] _posed = [];
     private Vector3[] _posedNormals = [];
+
+    /// <summary>The monster's own vertices posed, where he stands on a stage - written over his slice of the above. See <see cref="Posed"/>.</summary>
+    private Vector3[] _actorPosed = [];
+    private Vector3[] _actorNormals = [];
 
     /// <summary>The lines that change when a model or its keyframes land, built then and not per frame.</summary>
     private string _cost = string.Empty;
@@ -657,7 +664,11 @@ public sealed class MonsterPortrait
             return all;
         }
 
-        if (!Masked)
+        // A STAGE IS DRAWN THE TILE BOOK'S WAY whatever this pane's switches say - every blend as its
+        // material spells it, or its ground layers are slabs of mud and its shadow casters black
+        // slabs - and the monster on it this pane's way, so he is drawn as he is drawn alone.
+        int stage = _model.Actor is { } actor ? _model.Mesh.Shapes.Count - actor.Mesh.Shapes.Count : 0;
+        if (!Masked && stage == 0)
         {
             return null;
         }
@@ -669,7 +680,9 @@ public sealed class MonsterPortrait
             var kept = new MaterialBlend[all.Count];
             for (var one = 0; one < kept.Length; one++)
             {
-                kept[one] = all[one] is MaterialBlend.Cutout or MaterialBlend.ShadowOnly ? all[one] : MaterialBlend.Opaque;
+                kept[one] = one < stage || (Masked && all[one] is MaterialBlend.Cutout or MaterialBlend.ShadowOnly)
+                    ? all[one]
+                    : MaterialBlend.Opaque;
             }
 
             _masked = kept;
@@ -710,8 +723,13 @@ public sealed class MonsterPortrait
     public Action<bool>? FlatLightChanged { get; set; }
 
     /// <summary>The programs the picture is drawn with: none unshaded, else the flat or the glossy list - see <see cref="FlatLight"/>.</summary>
+    /// <remarks>
+    /// A STAGE IS ALWAYS DRAWN FROM ITS GRAPHS, as the tile book draws it: a staged model's lists carry
+    /// the stage's programs and, where this pane is unshaded, nothing for the monster's shapes - so he
+    /// is drawn from his texture as he is alone, and the ground under him is the tile book's ground.
+    /// </remarks>
     private IReadOnlyList<ShadeProgram?>? ShadesOf(MonsterModel model)
-        => !Shaded ? null : FlatLight || model.GlossShades.Count == 0 ? model.Shades : model.GlossShades;
+        => !Shaded && !model.Staged ? null : FlatLight || model.GlossShades.Count == 0 ? model.Shades : model.GlossShades;
 
     /// <summary>The list the last picture was drawn with, compared by reference - a press of the light button redraws.</summary>
     private IReadOnlyList<ShadeProgram?>? _drawnShades;
@@ -823,6 +841,19 @@ public sealed class MonsterPortrait
     /// the body, paid on every click in a list somebody scrolls. See MonsterModels.Dressing.
     /// </remarks>
     public bool Parts { get; set; } = true;
+
+    /// <summary>
+    /// The terrain tile the monster is stood on, as a <see cref="TileKey"/> string, or empty for the monster alone - see StagedModels.
+    /// </summary>
+    /// <remarks>
+    /// PART OF WHAT IS ASKED FOR, like <see cref="Parts"/>: the stage is read from the install and joined
+    /// onto the monster at load, so a change of stage goes back for both. Only a book that loads its
+    /// model the usual way takes one; a book with a <see cref="Load"/> of its own draws what that says.
+    /// </remarks>
+    public string Stage { get; set; } = string.Empty;
+
+    /// <summary>The stage the running load was asked for, so a change of it is a new load.</summary>
+    private string _stagedOn = string.Empty;
 
     /// <summary>
     /// Called when one of the capture settings moved, so the choice is written down.
@@ -1988,9 +2019,14 @@ public sealed class MonsterPortrait
         }
 
         _status.Add(_orbiting ? Orbiting : Sun is not null ? SunGestures : Gestures);
-        if (Ground)
+        if (Ground && !_model.Staged)
         {
             _status.Add(FloorSaid);
+        }
+
+        if (_stage.Length > 0)
+        {
+            _status.Add(_stage);
         }
 
         // WHERE THE FILES WENT, and it stays up until the next export rather than flashing: the
@@ -2543,6 +2579,8 @@ public sealed class MonsterPortrait
         string still = _model.Move.Length > 0 ? _model.Move : _stillWhy;
         _still = still.Length > 0 ? "still: " + ImGuiText.Escape(still) : string.Empty;
 
+        _stage = _model.StageSaid.Length > 0 ? ImGuiText.Escape(_model.StageSaid) : string.Empty;
+
         _shaders = ShowShaders && _model.Shaders.Count > 0
             ? "shaders: " + ImGuiText.Escape(string.Join(", ", _model.Shaders.Select(Tail)))
             : string.Empty;
@@ -2701,6 +2739,7 @@ public sealed class MonsterPortrait
         _cost = string.Empty;
         _paint = string.Empty;
         _still = string.Empty;
+        _stage = string.Empty;
         _shaders = string.Empty;
         _blend = string.Empty;
         _graphs = string.Empty;
@@ -2718,12 +2757,14 @@ public sealed class MonsterPortrait
         // THE SWITCH IS PART OF WHAT WAS ASKED FOR, not a way of drawing what is already loaded:
         // the pieces are read from the install, so turning them on has to go back for them. The
         // model stays on screen while it reloads, which is what makes the toggle feel like one.
-        if (string.Equals(path, _wanted, StringComparison.Ordinal) && _dressed == Parts)
+        if (string.Equals(path, _wanted, StringComparison.Ordinal) && _dressed == Parts
+            && string.Equals(_stagedOn, Stage, StringComparison.Ordinal))
         {
             return;
         }
 
         _wanted = path;
+        _stagedOn = Stage;
         _model = MonsterModel.None;
         Why = string.Empty;
 
@@ -2760,11 +2801,12 @@ public sealed class MonsterPortrait
         bool wearing = Parts;
         _dressed = wearing;
         bool shaded = Shaded;
+        string stage = Stage;
         Func<Func<string, byte[]?>, MonsterVariety, string, bool, ModelProgress, MonsterModel>? load = Load;
         var progress = new ModelProgress();
         _progress = progress;
         _loading = load is null
-            ? Task.Run(() => MonsterModels.Of(read, one, wearing, shaded, progress))
+            ? Task.Run(() => StagedModels.Of(read, one, stage, wearing, shaded, progress))
             : Task.Run(() => load(read, one, path, wearing, progress));
     }
 
@@ -2862,6 +2904,20 @@ public sealed class MonsterPortrait
         {
             _posed = new Vector3[count];
             _posedNormals = new Vector3[count];
+        }
+
+        // ON A STAGE THE POSE MOVES THE MONSTER'S SLICE ALONE, so the rest of the arrays hold the stage
+        // as the join laid it - filled once here, and never written by a frame. See Posed.
+        if (_model.Actor is { } actor)
+        {
+            _model.Mesh.Positions.CopyTo(_posed, 0);
+            _model.Mesh.Normals.CopyTo(_posedNormals, 0);
+            int own = actor.Mesh.Positions.Length;
+            if (_actorPosed.Length != own)
+            {
+                _actorPosed = new Vector3[own];
+                _actorNormals = new Vector3[own];
+            }
         }
 
         // THE BARE NUMBER IN BRACKETS, because the label before the combo already says what is
@@ -2983,7 +3039,7 @@ public sealed class MonsterPortrait
             _shine = _model.Shades.Any(one => one is { HasSpecular: true }) || !ReferenceEquals(_model.GlossShades, _model.Shades);
         }
 
-        return Shaded && _shine;
+        return (Shaded || _model.Staged) && _shine;
     }
 
     /// <summary>The model <see cref="_shine"/> was worked out for.</summary>
@@ -3174,7 +3230,7 @@ public sealed class MonsterPortrait
             if (moving)
             {
                 _pose!.Take(_tracks!, _frame);
-                _pose.Move(_model.Mesh, _posed, _posedNormals);
+                Posed();
                 lowest = Lowest(_posed);
             }
             else
@@ -3349,6 +3405,14 @@ public sealed class MonsterPortrait
     /// </remarks>
     private void Planted(float lowest)
     {
+        // On a stage the lowest point is the stage's, and the floor the notice is about is not drawn.
+        if (_model.Staged)
+        {
+            _planted = string.Empty;
+            _plantedAt = int.MinValue;
+            return;
+        }
+
         int whole = (int)MathF.Round(lowest);
         if (whole == _plantedAt)
         {
@@ -3357,6 +3421,36 @@ public sealed class MonsterPortrait
 
         _plantedAt = whole;
         _planted = ModelFloor.Planted(lowest, _model.Mesh.Most.Z - _model.Mesh.Least.Z);
+    }
+
+    /// <summary>
+    /// Moves the mesh into the pose the skeleton holds: the whole of it, or on a stage the monster's own mesh, written placed over his slice of the joined one.
+    /// </summary>
+    /// <remarks>
+    /// THE STAGE IS NEVER POSED. Its vertices sit in the arrays from <see cref="Rigged"/> on, and a frame
+    /// writes only the monster's - skinned in his own space, then put where the join put him, a scale
+    /// and a move, so the normals turn with him and are made unit length again. A monster's worth of
+    /// vertices a frame, beside a picture that rasterises the whole stage.
+    /// </remarks>
+    private void Posed()
+    {
+        if (_model.Actor is not { } actor)
+        {
+            _pose!.Move(_model.Mesh, _posed, _posedNormals);
+            return;
+        }
+
+        _pose!.Move(actor.Mesh, _actorPosed, _actorNormals);
+        Matrix4x4 place = _model.ActorPlace;
+        int first = _model.ActorFirst;
+        int count = Math.Min(_actorPosed.Length, _posed.Length - first);
+        for (var one = 0; one < count; one++)
+        {
+            _posed[first + one] = Vector3.Transform(_actorPosed[one], place);
+            Vector3 turned = Vector3.TransformNormal(_actorNormals[one], place);
+            float length = turned.Length();
+            _posedNormals[first + one] = length > 1e-6f ? turned / length : _actorNormals[one];
+        }
     }
 
     /// <summary>The largest z among the points, which is the lowest: the model's up is -z.</summary>
@@ -3897,7 +3991,7 @@ public sealed class MonsterPortrait
         if (_tracks is { Ready: true } && _pose is not null)
         {
             _pose.Take(_tracks, _frame);
-            _pose.Move(_model.Mesh, _posed, _posedNormals);
+            Posed();
             return MeshPicture.Of(
                 _model.Mesh, Clocked(canvas), _posed, _posedNormals, _turn, _tilt, Ink,
                 _model.Skin, _zoom, _pan, _model.Skins, Blends(), ShadesOf(_model));
@@ -4154,7 +4248,9 @@ public sealed class MonsterPortrait
 
     private void Floor(ImDrawListPtr draw, Vector2 corner, float side, in MeshPicture.Camera camera)
     {
-        if (!Ground)
+        // A STAGE IS ITS OWN FLOOR: the squares would be drawn at the tile's lowest point, under its
+        // ground, where they say nothing about where the monster stands.
+        if (!Ground || _model.Staged)
         {
             return;
         }

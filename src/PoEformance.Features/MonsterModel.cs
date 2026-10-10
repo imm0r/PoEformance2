@@ -351,6 +351,31 @@ public sealed record MonsterModel(
     /// The materials whose shader graphs read the game's clock, by file - drawn running, as an animation is. See ShadeProgram.UsesTime.
     /// </summary>
     public IReadOnlyList<string> Clocked { get; init; } = [];
+
+    /// <summary>
+    /// The monster alone, where this model is that monster standing on a stage - else null. See StagedModels.
+    /// </summary>
+    /// <remarks>
+    /// KEPT WHOLE, because it is what the pose moves: the skeleton skins the monster's own mesh, and the
+    /// result goes over his slice of <see cref="Mesh"/> - from <see cref="ActorFirst"/> on, through
+    /// <see cref="ActorPlace"/> - while the stage's vertices stay where its file put them.
+    /// </remarks>
+    public MonsterModel? Actor { get; init; }
+
+    /// <summary>Where the actor's vertices begin in <see cref="Mesh"/>. See <see cref="Actor"/>.</summary>
+    public int ActorFirst { get; init; }
+
+    /// <summary>Where the actor was put on the stage: its scale and its place. See <see cref="Actor"/>.</summary>
+    public Matrix4x4 ActorPlace { get; init; } = Matrix4x4.Identity;
+
+    /// <summary>The stage's tile, by path, or empty where the model stands on nothing.</summary>
+    public string Stage { get; init; } = string.Empty;
+
+    /// <summary>What became of the stage asked for: where the monster stands on it, or why there is none.</summary>
+    public string StageSaid { get; init; } = string.Empty;
+
+    /// <summary>Whether this is a monster standing on a stage. See <see cref="Actor"/>.</summary>
+    public bool Staged => Actor is not null;
 }
 
 /// <summary>

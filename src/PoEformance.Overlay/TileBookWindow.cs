@@ -645,6 +645,9 @@ public sealed class TileBookWindow : BookWindow<TileBook>
             : MonsterModel.None with { Why = "the area this place was found in is gone - pick the room's place again" };
     }
 
+    /// <summary>The tile chosen in this book, by path, or empty where nothing or a room is - what the monster book may stand a monster on.</summary>
+    public string ChosenTile => Chosen.Length > 0 && !TileBook.IsRoom(Chosen) ? Chosen : string.Empty;
+
     /// <summary>The mark a key carries for the area a room's place was found in - the grid's own, for this session.</summary>
     public static int Stamp(TerrainGrid grid) => RuntimeHelpers.GetHashCode(grid);
 
