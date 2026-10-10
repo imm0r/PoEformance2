@@ -94,14 +94,29 @@ public sealed class MonsterPortrait
     /// <summary>The id ImGui knows the picture by, which is what makes it something to grab.</summary>
     private const string Grip = "##monster-model";
 
-    /// <summary>The id of the button that starts and stops the orbit.</summary>
-    private const string OrbitId = "##monster-orbit";
+    /// <summary>The buttons down the picture's right edge, top to bottom, as indices into the arrays below.</summary>
+    /// <remarks>
+    /// THE CARD'S, THE LIGHT'S, THE ORBIT'S AND THE PROBE'S, in that order because that is the order
+    /// asked for. The orbit button was there first and alone; the other three were words beside the
+    /// rate in the opposite corner, and three words in a row over a picture read as a caption rather
+    /// than as controls. As art they are the orbit's size and hang in one column with it. The card's
+    /// and the light's are skipped where they have nothing to switch - no card, no specular colour -
+    /// and the rest close up.
+    /// </remarks>
+    private const int CardSide = 0;
+    private const int LightSide = 1;
+    private const int OrbitSide = 2;
+    private const int ProbeSide = 3;
+    private const int Sides = 4;
+
+    /// <summary>The ids ImGui knows the edge buttons by.</summary>
+    private static readonly string[] SideIds = ["##monster-card", "##monster-light", "##monster-orbit", "##monster-probe"];
+
+    /// <summary>The art on the edge buttons, by the end of each manifest resource name - the project file pins them.</summary>
+    private static readonly string[] SideArt = ["3dMV_cpugpu.png", "3dMV_light.png", "3dMV_orbit.png", "3dMV_probe.png"];
 
     /// <summary>How many panes have been made, so each one's keys are its own.</summary>
     private static int s_panes;
-
-    /// <summary>The art on the orbit button, by the end of its manifest resource name.</summary>
-    private const string OrbitArt = "3dMV_orbit.png";
 
     /// <summary>The progress bar's width as a share of the picture's side.</summary>
     private const float ProgressShare = 0.4f;
@@ -109,13 +124,14 @@ public sealed class MonsterPortrait
     /// <summary>The most the progress bar is allowed to be, in font sizes: a wide pane does not need a wide bar.</summary>
     private const float ProgressSpan = 14f;
 
-    /// <summary>How big the orbit button's art is, in frame heights.</summary>
+    /// <summary>How big the edge buttons' art is, in frame heights.</summary>
     /// <remarks>
     /// THREE, and it got there in two steps from the live client. At one it could not be made out
     /// at all - a drawing of a cube inside a broken circle has detail that nineteen pixels cannot
     /// hold, and over a dark backdrop what is left reads as a smudge rather than as a control. At
     /// two it was legible and still asked to grow by half again, which is this. In frame heights
-    /// rather than pixels, so it follows the text size the way every other control does.
+    /// rather than pixels, so it follows the text size the way every other control does. The three
+    /// that joined it are drawn from the same sheet at the same size.
     /// </remarks>
     private const float OrbitFaces = 3f;
 
@@ -131,7 +147,7 @@ public sealed class MonsterPortrait
     private const float SunDisc = 0.4f;
 
     /// <summary>The same line while the orbit runs, when a drag does nothing.</summary>
-    private const string Orbiting = "orbiting · the top-right button stops it · no dragging until then";
+    private const string Orbiting = "orbiting · the orbit button at the right edge stops it · no dragging until then";
 
     /// <summary>The line that says what the floor's squares are.</summary>
     private const string FloorSaid = "floor: 250 units to a tile, ten squares each · x red · y green";
@@ -335,8 +351,8 @@ public sealed class MonsterPortrait
     /// </remarks>
     private readonly string _prefix = $"poeformance.monster.{Interlocked.Increment(ref s_panes)}.";
 
-    /// <summary>The key the renderer holds the orbit button's art under. One upload per pane.</summary>
-    private string OrbitKey => _prefix + "orbit";
+    /// <summary>The keys the renderer holds the edge buttons' art under, by side. One upload each per pane.</summary>
+    private readonly string[] _sideKeys;
 
     private MeshPicture.Canvas? _canvas;
 
@@ -535,7 +551,7 @@ public sealed class MonsterPortrait
     /// <summary>Whether the camera is being carried round the model on its own.</summary>
     private bool _orbiting;
 
-    /// <summary>The orbit button's art, the size it was uploaded at, and whether asking for it failed.</summary>
+    /// <summary>Each edge button's art, the size it was uploaded at, and whether asking for it failed - by side.</summary>
     /// <remarks>
     /// UPLOADED AT THE SIZE IT IS DRAWN, not at the 350 px it ships at: a button's worth of
     /// pixels sampled one to one is crisp, and the same art shrunk by the renderer's bilinear
@@ -543,9 +559,9 @@ public sealed class MonsterPortrait
     /// change of font scale re-uploads it once. Asked for once: a resource that is not there is
     /// a build mistake, and not one to go looking for sixty times a second.
     /// </remarks>
-    private IntPtr _orbit;
-    private int _orbitPixels;
-    private bool _orbitMissing;
+    private readonly IntPtr[] _side = new IntPtr[Sides];
+    private readonly int[] _sidePixels = new int[Sides];
+    private readonly bool[] _sideMissing = new bool[Sides];
 
     /// <summary>Whether the model was being dragged last frame, which is what caps the rung.</summary>
     /// <remarks>
@@ -576,6 +592,7 @@ public sealed class MonsterPortrait
         _release = release;
         _unpack = unpack;
         _sizes = new PictureLadder(most);
+        _sideKeys = [_prefix + "card", _prefix + "light", _prefix + "orbit", _prefix + "probe"];
     }
 
     /// <summary>
@@ -1279,9 +1296,6 @@ public sealed class MonsterPortrait
             Rate(draw, corner);
             _cornered = false;
             ClockToggle(corner);
-            LightToggle(corner);
-            ProbeToggle(corner);
-            CardToggle(corner);
         }
 
         ImGui.SetCursorScreenPos(below);
@@ -1353,36 +1367,6 @@ public sealed class MonsterPortrait
     }
 
     /// <summary>
-    /// The light button beside the rate and the clock's, where the model has a specular colour: the game's light or the flat one.
-    /// </summary>
-    /// <remarks>
-    /// IN THE PICTURE'S CORNER LIKE PAUSE, because it is a question about this picture - why is the
-    /// gold dark, why does this run slowly - and the answer should be a click away from it.
-    /// </remarks>
-    private void LightToggle(Vector2 corner)
-    {
-        if (!HasShine())
-        {
-            return;
-        }
-
-        Cornered(corner);
-        if (ImGui.SmallButton(FlatLight ? "flat light##monster-light" : "game light##monster-light"))
-        {
-            FlatLight = !FlatLight;
-            FlatLightChanged?.Invoke(FlatLight);
-        }
-
-        if (ImGui.IsItemHovered())
-        {
-            ImGui.SetTooltip("How a specular colour is lit - a metal's albedo is black, and its colour is all specular.\n"
-                + "Game light: the game's GGX lobe for the lamp and its environment term, under an environment as bright as the picture's ambient."
-                + " Reads the gloss texture and works out a lobe per pixel.\n"
-                + "Flat light: what the specular colour has past a dielectric's 0.04 is laid onto the albedo and shaded with it. Cheaper.");
-        }
-    }
-
-    /// <summary>
     /// What the load is doing while it runs: the step, how far into it, for how long - and a bar for the step.
     /// </summary>
     /// <remarks>
@@ -1402,36 +1386,24 @@ public sealed class MonsterPortrait
     }
 
     /// <summary>
-    /// The probe button beside the others: while it is on, a click on the picture lists what that pixel is made of, and every drawing counts how its translucent layers came out.
+    /// The probe switched: while it is on, a click on the picture lists what that pixel is made of, and every drawing counts how its translucent layers came out.
     /// </summary>
     /// <remarks>
     /// A DIAGNOSIS ASKED FOR, NOT A FEATURE LEFT RUNNING: off, a drawing does not look at either. See
     /// PictureProbe for what it answers, and MeshPicture's PixelProbe for how it is recorded.
     /// </remarks>
-    private void ProbeToggle(Vector2 corner)
+    private void ProbeToggled()
     {
-        Cornered(corner);
-        if (ImGui.SmallButton(_probing ? "probe: on##monster-probe" : "probe##monster-probe"))
-        {
-            _probing = !_probing;
-            _probeAt = null;
-            _probeLines = [];
-            _layerLines = [];
+        _probing = !_probing;
+        _probeAt = null;
+        _probeLines = [];
+        _layerLines = [];
 
-            // DRAWN AGAIN AT ONCE, so the layers' lines are there without waiting for a turn.
-            _probeAsked = _probing;
-        }
-
-        if (ImGui.IsItemHovered())
-        {
-            ImGui.SetTooltip("Click the picture to list every surface under that pixel, nearest first: material, blend,\n"
-                + "what drew it, where it came from, and for a mixed layer how far in front of the solid behind it lies and its alpha.\n"
-                + "While on, every drawing also counts how each translucent material came out over the whole picture.\n"
-                + "The capture key writes the lines to model-probe.txt.");
-        }
+        // DRAWN AGAIN AT ONCE, so the layers' lines are there without waiting for a turn.
+        _probeAsked = _probing;
     }
 
-    /// <summary>The probe's lines under the picture - see <see cref="ProbeToggle"/>; the capture key writes them, see <see cref="ProbeReport"/>.</summary>
+    /// <summary>The probe's lines under the picture - see <see cref="ProbeToggled"/>; the capture key writes them, see <see cref="ProbeReport"/>.</summary>
     private void Probed()
     {
         if (!_probing)
@@ -1462,7 +1434,7 @@ public sealed class MonsterPortrait
     /// <summary>Whether the probe has lines about the model shown - the frame's own question, asked without building the text.</summary>
     private bool HasProbe => _probing && ReferenceEquals(_probedModel, _model) && _probeLines.Count + _layerLines.Count > 0;
 
-    /// <summary>Whether the probe is on - see <see cref="ProbeToggle"/>.</summary>
+    /// <summary>Whether the probe is on - see <see cref="ProbeToggled"/>.</summary>
     private bool _probing;
 
     /// <summary>Where the last click probed, as a share of the picture from its top left, or null.</summary>
@@ -1780,15 +1752,36 @@ public sealed class MonsterPortrait
         // keeps the height it had, a frame and a button's padding, and only the top edges line up.
         float counter = ImGui.GetFrameHeight() + (style.FramePadding.Y * 2f);
 
+        // THE COLUMN DOWN THE RIGHT EDGE, each button right-aligned on its own width so that the
+        // words, where the art is missing, line up on the edge rather than on the left. The widest
+        // is what the progress bar keeps clear of.
         float art = MathF.Round(ImGui.GetFrameHeight() * OrbitFaces);
-        IntPtr icon = OrbitIcon((int)art);
-        float wide = (icon != IntPtr.Zero ? art : ImGui.CalcTextSize("orbit").X) + (style.FramePadding.X * 2f);
-        ImGui.SetCursorScreenPos(new Vector2(corner.X + side - wide - inset, top));
-
-        bool pressed = icon != IntPtr.Zero ? Orbiter(icon, art) : Worded(wide, counter);
-        if (pressed)
+        float widest = 0f;
+        float hang = top;
+        for (int which = 0; which < Sides; which++)
         {
-            _orbiting = !_orbiting;
+            if (!Hung(which))
+            {
+                continue;
+            }
+
+            IntPtr icon = SideIcon(which, (int)art);
+            bool drawn = icon != IntPtr.Zero;
+            float wide = (drawn ? art : ImGui.CalcTextSize(SideWord(which)).X) + (style.FramePadding.X * 2f);
+            widest = MathF.Max(widest, wide);
+            ImGui.SetCursorScreenPos(new Vector2(corner.X + side - wide - inset, hang));
+
+            if (drawn ? Pictured(which, icon, art) : Worded(which, wide, counter))
+            {
+                Pressed(which);
+            }
+
+            if (ImGui.IsItemHovered())
+            {
+                Tipped(which);
+            }
+
+            hang += (drawn ? art : counter) + style.ItemSpacing.Y;
         }
 
         if (_tracks is not { Ready: true } tracks || !(tracks.Frames > 0f))
@@ -1796,10 +1789,10 @@ public sealed class MonsterPortrait
             return;
         }
 
-        // Kept clear of the button at both ends - the bar is centred, so the room it may take is
-        // twice the gap to the button. On any pane worth reading this is nowhere near binding.
+        // Kept clear of the column at both ends - the bar is centred, so the room it may take is
+        // twice the gap to the column. On any pane worth reading this is nowhere near binding.
         float span = MathF.Min(side * ProgressShare, ImGui.GetFontSize() * ProgressSpan);
-        span = MathF.Min(span, side - (2f * (wide + (2f * inset))));
+        span = MathF.Min(span, side - (2f * (widest + (2f * inset))));
         if (!(span > 1f))
         {
             return;
@@ -1815,8 +1808,17 @@ public sealed class MonsterPortrait
             at + ((size - ImGui.CalcTextSize(said)) * 0.5f), ImGui.GetColorU32(ImGuiCol.Text), said);
     }
 
+    /// <summary>Whether an edge button has anything to switch this frame: the card's needs a card, the light's a specular colour.</summary>
+    private bool Hung(int which)
+        => which switch
+        {
+            CardSide => Card is not null,
+            LightSide => HasShine(),
+            _ => true,
+        };
+
     /// <summary>
-    /// The orbit button itself: the art alone, with no frame of its own under it.
+    /// An edge button itself: the art alone, with no frame of its own under it.
     /// </summary>
     /// <remarks>
     /// NOTHING LIT WHILE NOBODY IS POINTING AT IT, which is what was asked for: the button sat in
@@ -1827,26 +1829,27 @@ public sealed class MonsterPortrait
     /// reach for ImGuiCol_ButtonHovered and ImGuiCol_ButtonActive, which are left alone, so the
     /// control still answers the pointer and only rests invisible.
     ///
-    /// AND RUNNING IS SHOWN BY TINTING THE ART rather than by a colour behind it. A background
-    /// was the first attempt and it is the wrong mechanism here: the art is an OPAQUE black tile
-    /// with a white drawing on it, so anything painted behind reaches only the four rounded
-    /// corners. A tint multiplies instead, which leaves the black tile black and turns the
-    /// drawing itself the accent - the one part of the picture anybody is looking at.
+    /// AND A SWITCH THROWN IS SHOWN BY TINTING THE ART rather than by a colour behind it. A
+    /// background was the first attempt and it is the wrong mechanism here: the art is an OPAQUE
+    /// black tile with a white drawing on it, so anything painted behind reaches only the four
+    /// rounded corners. A tint multiplies instead, which leaves the black tile black and turns the
+    /// drawing itself the accent - the one part of the picture anybody is looking at. See
+    /// <see cref="Lit"/> for which state is the tinted one.
     /// </remarks>
-    private bool Orbiter(IntPtr icon, float art)
+    private bool Pictured(int which, IntPtr icon, float art)
     {
         ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(0f, 0f, 0f, 0f));
         ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 0f);
         try
         {
             return ImGui.ImageButton(
-                OrbitId,
+                SideIds[which],
                 icon,
                 new Vector2(art),
                 Vector2.Zero,
                 Vector2.One,
                 Vector4.Zero,
-                _orbiting ? OverlayInk.Accent : Vector4.One);
+                Lit(which) ? OverlayInk.Accent : Vector4.One);
         }
         finally
         {
@@ -1855,39 +1858,122 @@ public sealed class MonsterPortrait
         }
     }
 
-    /// <summary>The same button where the art could not be loaded, which keeps its frame - a bare word is not a button.</summary>
-    private bool Worded(float wide, float tall)
-        => ImGui.Button((_orbiting ? "stop" : "orbit") + OrbitId, new Vector2(wide, tall));
-
-    /// <summary>The orbit button's art, uploaded at the size it is drawn, or nothing where the resource is not there.</summary>
-    private IntPtr OrbitIcon(int pixels)
-    {
-        if (_orbit != IntPtr.Zero && _orbitPixels == pixels)
+    /// <summary>Whether an edge button's art is tinted: the switch is away from how the pane starts.</summary>
+    /// <remarks>
+    /// AWAY FROM THE START, NOT "ON", because the four do not share a sense of on. The orbit tinted
+    /// while it runs and the probe while it listens read alike; a card tinted while it draws, which
+    /// it does from the first frame, would be the one button lit on a pane nobody has touched. So
+    /// the tint says "you changed this": the flat light, the processor, the running orbit, the probe.
+    /// </remarks>
+    private bool Lit(int which)
+        => which switch
         {
-            return _orbit;
+            CardSide => Card is { On: false },
+            LightSide => FlatLight,
+            OrbitSide => _orbiting,
+            _ => _probing,
+        };
+
+    /// <summary>The same button where the art could not be loaded, which keeps its frame - a bare word is not a button.</summary>
+    private bool Worded(int which, float wide, float tall)
+        => ImGui.Button(SideWord(which) + SideIds[which], new Vector2(wide, tall));
+
+    /// <summary>What an edge button says where it has no art: its state as a word, as the corner buttons said it.</summary>
+    private string SideWord(int which)
+        => which switch
+        {
+            CardSide => Card is { On: true } ? "card" : "processor",
+            LightSide => FlatLight ? "flat light" : "game light",
+            OrbitSide => _orbiting ? "stop" : "orbit",
+            _ => _probing ? "probe: on" : "probe",
+        };
+
+    /// <summary>What a press on an edge button does.</summary>
+    private void Pressed(int which)
+    {
+        switch (which)
+        {
+            case CardSide when Card is { } card:
+                card.On = !card.On;
+                card.Changed?.Invoke(card.On);
+                break;
+            case LightSide:
+                FlatLight = !FlatLight;
+                FlatLightChanged?.Invoke(FlatLight);
+                break;
+            case OrbitSide:
+                _orbiting = !_orbiting;
+                break;
+            case ProbeSide:
+                ProbeToggled();
+                break;
+            default:
+                break;
+        }
+    }
+
+    /// <summary>The tip over an edge button: what the picture it is on will do, and the state the button is in.</summary>
+    private void Tipped(int which)
+    {
+        switch (which)
+        {
+            case CardSide when Card is { } card:
+                CardTip(card);
+                break;
+            case LightSide:
+                ImGui.SetTooltip((FlatLight ? "Flat light on. " : "Game light on. ")
+                    + "How a specular colour is lit - a metal's albedo is black, and its colour is all specular.\n"
+                    + "Game light: the game's GGX lobe for the lamp and its environment term, under an environment as bright as the picture's ambient."
+                    + " Reads the gloss texture and works out a lobe per pixel.\n"
+                    + "Flat light: what the specular colour has past a dielectric's 0.04 is laid onto the albedo and shaded with it. Cheaper.");
+                break;
+            case OrbitSide:
+                ImGui.SetTooltip(_orbiting
+                    ? "Orbiting: the camera is carried round the model. Press to stop."
+                    : "Orbit: carries the camera round the model until pressed again.");
+                break;
+            case ProbeSide:
+                ImGui.SetTooltip((_probing ? "Debug probe on. " : "Debug probe. ")
+                    + "Click the picture to list every surface under that pixel, nearest first: material, blend,\n"
+                    + "what drew it, where it came from, and for a mixed layer how far in front of the solid behind it lies and its alpha.\n"
+                    + "While on, every drawing also counts how each translucent material came out over the whole picture.\n"
+                    + "The capture key writes the lines to model-probe.txt.");
+                break;
+            default:
+                break;
+        }
+    }
+
+    /// <summary>An edge button's art, uploaded at the size it is drawn, or nothing where the resource is not there.</summary>
+    private IntPtr SideIcon(int which, int pixels)
+    {
+        if (_side[which] != IntPtr.Zero && _sidePixels[which] == pixels)
+        {
+            return _side[which];
         }
 
-        if (_orbitMissing || pixels <= 0)
+        if (_sideMissing[which] || pixels <= 0)
         {
             return IntPtr.Zero;
         }
 
-        if (_orbit != IntPtr.Zero)
+        if (_side[which] != IntPtr.Zero)
         {
-            _release?.Invoke(OrbitKey);
-            _orbit = IntPtr.Zero;
+            _release?.Invoke(_sideKeys[which]);
+            _side[which] = IntPtr.Zero;
         }
 
         try
         {
             Assembly assembly = typeof(MonsterPortrait).Assembly;
+            string wanted = SideArt[which];
             string? resource = Array.Find(
                 assembly.GetManifestResourceNames(),
-                candidate => candidate.EndsWith(OrbitArt, StringComparison.OrdinalIgnoreCase));
+                candidate => candidate.EndsWith(wanted, StringComparison.OrdinalIgnoreCase));
             using Stream? stream = resource is null ? null : assembly.GetManifestResourceStream(resource);
             if (stream is null)
             {
-                _orbitMissing = true;
+                _sideMissing[which] = true;
                 return IntPtr.Zero;
             }
 
@@ -1902,21 +1988,21 @@ public sealed class MonsterPortrait
             // The renderer's precondition, asked rather than discovered - see IconCache.Upload.
             if (!image.DangerousTryGetSinglePixelMemory(out _))
             {
-                _orbitMissing = true;
+                _sideMissing[which] = true;
                 return IntPtr.Zero;
             }
 
-            _orbit = _upload!(OrbitKey, image, IconCache.Srgb);
-            _orbitPixels = pixels;
+            _side[which] = _upload!(_sideKeys[which], image, IconCache.Srgb);
+            _sidePixels[which] = pixels;
         }
         catch (Exception exception) when (exception is not (OutOfMemoryException or StackOverflowException))
         {
             // A picture that shipped broken is a build mistake, not something to end a session
             // over; the button falls back to its word.
-            _orbitMissing = true;
+            _sideMissing[which] = true;
         }
 
-        return _orbit;
+        return _side[which];
     }
 
     /// <summary>Gathers this frame's lines under the picture, from strings built when something landed.</summary>
@@ -2618,17 +2704,21 @@ public sealed class MonsterPortrait
             _release?.Invoke(_key);
         }
 
-        if (_orbit != IntPtr.Zero)
+        for (int which = 0; which < Sides; which++)
         {
-            _release?.Invoke(OrbitKey);
+            if (_side[which] != IntPtr.Zero)
+            {
+                _release?.Invoke(_sideKeys[which]);
+            }
+
+            _side[which] = IntPtr.Zero;
+            _sidePixels[which] = 0;
+            _sideMissing[which] = false;
         }
 
         ForgetShots();
         _texture = IntPtr.Zero;
         _key = string.Empty;
-        _orbit = IntPtr.Zero;
-        _orbitPixels = 0;
-        _orbitMissing = false;
         _orbiting = false;
         _shown = string.Empty;
         _model = MonsterModel.None;
@@ -3266,32 +3356,15 @@ public sealed class MonsterPortrait
     }
 
     /// <summary>
-    /// The card's button beside the rate: which of the two draws the pictures, and why the processor drew this one where the card is on.
+    /// The card button's tip: which of the two draws the pictures, and why the processor drew this one where the card is on.
     /// </summary>
-    private void CardToggle(Vector2 corner)
-    {
-        if (Card is not { } card)
-        {
-            return;
-        }
-
-        Cornered(corner);
-        if (ImGui.SmallButton(card.On ? "card##monster-card" : "processor##monster-card"))
-        {
-            card.On = !card.On;
-            card.Changed?.Invoke(card.On);
-        }
-
-        if (ImGui.IsItemHovered())
-        {
-            ImGui.SetTooltip(
-                (card.On
-                    ? "Pictures are drawn on the graphics card where it can draw the same picture as the processor, and on the processor where not."
-                    : "Pictures are drawn on the processor, as before the card could draw them.")
-                + (card.On && !_onCard && _cardWhy.Length > 0 ? "\nThis one on the processor: " + _cardWhy : string.Empty)
-                + "\nThe rate in the corner says which drew the picture shown. One switch for every book.");
-        }
-    }
+    private void CardTip(CardPictures card)
+        => ImGui.SetTooltip(
+            (card.On
+                ? "Pictures are drawn on the graphics card where it can draw the same picture as the processor, and on the processor where not."
+                : "Pictures are drawn on the processor, as before the card could draw them.")
+            + (card.On && !_onCard && _cardWhy.Length > 0 ? "\nThis one on the processor: " + _cardWhy : string.Empty)
+            + "\nThe rate in the corner says which drew the picture shown. One switch for every book.");
 
     /// <summary>Hands a drawn picture to the renderer in place of the one shown.</summary>
     private void Upload(GamePicture drawn)
