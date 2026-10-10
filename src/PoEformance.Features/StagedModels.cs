@@ -22,15 +22,22 @@ namespace PoEformance.Features;
 /// the mesh is that much larger or smaller - the same number ModelFloor.TileOn shrinks the floor's
 /// squares by under a bare picture.
 ///
-/// AND IT STANDS ON THE GROUND, at the tile's middle: the tile's ground is asked how high it is
-/// there - the highest of its surfaces under that point, since the files' up is minus z - and the
-/// monster's lowest point in its bind pose is set on it. Where no ground lies under the middle the
-/// tile's lowest point stands in, and the line under the picture says so.
+/// AND IT STANDS ON THE FLOOR THE PLAYER SEES, at the tile's middle. Not on the tile file's own
+/// "ground" block: on a boss arena that block is the earth under a stone floor built of props, and
+/// the first monster set on it stood a storey under the arena. The floor is the highest surface that
+/// faces up under the middle, over every solid shape of the tile - props and ground alike, cut-out
+/// and mixed shapes (foliage, decals, ground layers) left out - since the game's camera looks down
+/// and what it sees at that point is what is stood on. The files' up is minus z. Where nothing faces
+/// up under the middle the tile's lowest point stands in, and the line under the picture says so.
 /// </remarks>
 public static class StagedModels
 {
     /// <summary>What the monster's shapes are called in the probe's list, beside the tile's own path.</summary>
     public const string ActorSource = "the monster";
+
+    /// <summary>How far from straight up a surface may face and still be a floor: the z of its normal, the files' up being minus z.</summary>
+    /// <remarks>Half, which is sixty degrees from level: a ramp or a stair tread passes, a wall or a cliff face does not.</remarks>
+    private const float FacesUp = -0.5f;
 
     /// <summary>
     /// The monster on its stage - or the monster alone where there is no stage to stand on, with
@@ -57,31 +64,31 @@ public static class StagedModels
         }
 
         TileKey key = TileKey.Read(stage);
-        (MonsterModel tile, SkinnedMesh ground) = TileModels.Stage(
+        MonsterModel tile = TileModels.Of(
             read,
             key.Path,
-            key.Walls,
+            ground: key.Ground,
+            walls: key.Walls,
             shaded: true,
-            key.Tileset.Length > 0 ? TilesetIndex.Overrides(read, key.Tileset) : null,
-            key.Tileset.Length > 0 ? TilesetIndex.Short(key.Tileset) : string.Empty,
-            progress);
+            swaps: key.Tileset.Length > 0 ? TilesetIndex.Overrides(read, key.Tileset) : null,
+            tileset: key.Tileset.Length > 0 ? TilesetIndex.Short(key.Tileset) : string.Empty,
+            progress: progress);
         if (!tile.Ready)
         {
             return actor with { Stage = key.Path, StageSaid = "no stage: " + tile.Why };
         }
 
-        return Staged(actor, tile, ground, one?.ModelSize ?? 0, key.Path);
+        return Staged(actor, tile, one?.ModelSize ?? 0, key.Path);
     }
 
     /// <summary>
-    /// The two joined: the monster placed at the tile's middle, on its ground, at the size the game draws it.
+    /// The two joined: the monster placed at the tile's middle, on its floor, at the size the game draws it.
     /// </summary>
     /// <param name="actor">The monster, ready.</param>
     /// <param name="tile">The stage, ready.</param>
-    /// <param name="ground">The stage's ground apart, to ask how high it is - or none, which puts the monster at the tile's lowest point.</param>
     /// <param name="modelSize">The variety's ModelSizeMultiplier in percent; anything not positive is a hundred.</param>
     /// <param name="stage">The tile's path, for the lines and the probe.</param>
-    public static MonsterModel Staged(MonsterModel actor, MonsterModel tile, SkinnedMesh? ground, int modelSize, string stage)
+    public static MonsterModel Staged(MonsterModel actor, MonsterModel tile, int modelSize, string stage)
     {
         ArgumentNullException.ThrowIfNull(actor);
         ArgumentNullException.ThrowIfNull(tile);
@@ -89,7 +96,7 @@ public static class StagedModels
 
         float scale = modelSize > 0 ? modelSize / 100f : 1f;
         Vector3 middle = (tile.Mesh.Least + tile.Mesh.Most) * 0.5f;
-        bool found = Floor(ground, middle.X, middle.Y, out float floor);
+        bool found = Floor(tile.Mesh, tile.Blends, middle.X, middle.Y, out float floor);
         if (!found)
         {
             floor = tile.Mesh.Most.Z;
@@ -108,7 +115,7 @@ public static class StagedModels
 
         string said = string.Create(
             CultureInfo.InvariantCulture,
-            $"stage: {Tail(stage)} · the monster stands at its middle at {scale:0.##} of its file's size, {(found ? "on the ground there" : "at the tile's lowest point - no ground lies under the middle")}");
+            $"stage: {Tail(stage)} · the monster stands at its middle at {scale:0.##} of its file's size, {(found ? $"on the floor there ({floor:0} on the tile's z)" : "at the tile's lowest point - nothing faces up under the middle")}");
 
         return RoomModels.Piled(joined, pile, actor.Mesh_, [tile, actor]) with
         {
@@ -153,52 +160,76 @@ public static class StagedModels
     }
 
     /// <summary>
-    /// How high the ground is under a point: the highest of its surfaces there, or false where none lies under it.
+    /// How high the floor is under a point: the highest surface facing up there, over the mesh's solid shapes - or false where none does.
     /// </summary>
     /// <remarks>
-    /// EVERY TRIANGLE WHOSE SHADOW COVERS THE POINT, and the least z among them - the files' up is
-    /// minus z, so the least is the highest, which on a ground that is a slab with sides is its top.
-    /// A walk over every triangle once, at load, over a ground of a few thousand of them.
+    /// EVERY SOLID TRIANGLE WHOSE SHADOW COVERS THE POINT AND WHOSE NORMALS FACE UP, and the least z among
+    /// them - the files' up is minus z, so the least is the highest, which is the surface the game's camera
+    /// sees at that point. A shape drawn cut out or mixed is passed over: foliage, a decal, a ground layer
+    /// laid over the floor are not stood on. One walk over the mesh, at load.
     /// </remarks>
-    public static bool Floor(SkinnedMesh? ground, float x, float y, out float height)
+    /// <param name="mesh">The tile's mesh.</param>
+    /// <param name="blends">Each shape's blend, in the mesh's shape order - or null for every shape solid.</param>
+    /// <param name="x">The point, in the mesh's own units.</param>
+    /// <param name="y">The point, in the mesh's own units.</param>
+    /// <param name="height">The floor's z there, where one was found.</param>
+    public static bool Floor(SkinnedMesh? mesh, IReadOnlyList<MaterialBlend>? blends, float x, float y, out float height)
     {
         height = float.PositiveInfinity;
-        if (ground is not { Ready: true })
+        if (mesh is not { Ready: true })
         {
             return false;
         }
 
-        Vector3[] at = ground.Positions;
-        int[] indices = ground.Indices;
+        Vector3[] at = mesh.Positions;
+        Vector3[] up = mesh.Normals;
+        int[] indices = mesh.Indices;
         var found = false;
-        for (var one = 0; one + 2 < indices.Length; one += 3)
+        IReadOnlyList<MeshShape> shapes = mesh.Shapes.Count > 0 ? mesh.Shapes : [new MeshShape(string.Empty, 0, indices.Length)];
+        for (var which = 0; which < shapes.Count; which++)
         {
-            Vector3 a = at[indices[one]];
-            Vector3 b = at[indices[one + 1]];
-            Vector3 c = at[indices[one + 2]];
-
-            // Barycentric in the plane, with a tolerance a little past the edge so a point on a seam
-            // between two triangles is under one of them rather than between both.
-            float area = ((b.X - a.X) * (c.Y - a.Y)) - ((c.X - a.X) * (b.Y - a.Y));
-            if (MathF.Abs(area) < 1e-6f)
+            if (blends is not null && which < blends.Count && blends[which] != MaterialBlend.Opaque)
             {
                 continue;
             }
 
-            float u = (((b.X - x) * (c.Y - y)) - ((c.X - x) * (b.Y - y))) / area;
-            float v = (((c.X - x) * (a.Y - y)) - ((a.X - x) * (c.Y - y))) / area;
-            float w = 1f - u - v;
-            const float Edge = -1e-4f;
-            if (u < Edge || v < Edge || w < Edge)
+            MeshShape shape = shapes[which];
+            int end = Math.Min(shape.From + shape.Count, indices.Length);
+            for (int one = Math.Max(shape.From, 0); one + 2 < end; one += 3)
             {
-                continue;
-            }
+                int ia = indices[one], ib = indices[one + 1], ic = indices[one + 2];
+                Vector3 a = at[ia], b = at[ib], c = at[ic];
 
-            float z = (u * a.Z) + (v * b.Z) + (w * c.Z);
-            if (z < height)
-            {
-                height = z;
-                found = true;
+                // Barycentric in the plane, with a tolerance a little past the edge so a point on a seam
+                // between two triangles is under one of them rather than between both.
+                float area = ((b.X - a.X) * (c.Y - a.Y)) - ((c.X - a.X) * (b.Y - a.Y));
+                if (MathF.Abs(area) < 1e-6f)
+                {
+                    continue;
+                }
+
+                float u = (((b.X - x) * (c.Y - y)) - ((c.X - x) * (b.Y - y))) / area;
+                float v = (((c.X - x) * (a.Y - y)) - ((a.X - x) * (c.Y - y))) / area;
+                float w = 1f - u - v;
+                const float Edge = -1e-4f;
+                if (u < Edge || v < Edge || w < Edge)
+                {
+                    continue;
+                }
+
+                // FACING UP by its normals rather than its winding: the winding's sense is the files' and the
+                // picture lights both sides, while a vertex normal is a direction the file wrote down.
+                if (ia < up.Length && ib < up.Length && ic < up.Length && (up[ia].Z + up[ib].Z + up[ic].Z) / 3f > FacesUp)
+                {
+                    continue;
+                }
+
+                float z = (u * a.Z) + (v * b.Z) + (w * c.Z);
+                if (z < height)
+                {
+                    height = z;
+                    found = true;
+                }
             }
         }
 

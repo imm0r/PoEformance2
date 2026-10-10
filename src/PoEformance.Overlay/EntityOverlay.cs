@@ -1685,6 +1685,9 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
 
     private BossIcons _bossIcons = BossIcons.Empty;
 
+    /// <summary>Which terrain graphs each area is built from, for a boss's arena as a stage - see AreaGraphs. Empty until the file is handed over.</summary>
+    public AreaGraphs AreaGraphs { get; set; } = AreaGraphs.Empty;
+
     /// <summary>
     /// The endgame maps, for the list of which of them still need a boss picture made.
     /// </summary>
@@ -3373,6 +3376,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // READ WHEN ASKED, not captured: the tile book is attached after this one, and the choice
             // is whatever that book is open at when the stage is picked.
             TileChoice = () => _tileBook?.ChosenTile ?? string.Empty,
+
+            // THE INSTALL'S OWN ANSWER for a boss's arena, by the area's terrain folder - see AreaArenas.
+            // The lists arrive from the install's walk and the graphs from the file, both read when asked.
+            ArenasOf = readFile is null ? null : area => AreaArenas.Of(readFile, AreaGraphs.FoldersOf(area), TileFiles, TileSets),
         };
 
         window.Show(columns, rail, model, columnWidths, panes);
