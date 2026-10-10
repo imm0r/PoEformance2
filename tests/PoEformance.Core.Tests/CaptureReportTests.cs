@@ -230,6 +230,41 @@ public class CaptureReportTests
             lines[5]);
     }
 
+    /// <summary>A place by the tiles says its anchor and its slots; an anchor tile drawn for several rooms says which rooms; the line counts the two ways apart.</summary>
+    [Fact]
+    public void PLACEDSaysThePlacesByTilesAndTheTilesDrawnForSeveralRooms()
+    {
+        RoomLayout square = RoomArrangementTests.Square();
+        var byTiles = new RoomDoodadPlace(new RoomCandidate(4, 3, 0, 5, 5, 0, 0) { Tiles = 16, TilesAgree = 16, Big = 2, BigAgree = 2 }, 0, 0, 0f, [])
+        {
+            Anchor = "Metadata/Terrain/Test/gate.tdt",
+            AnchorLaid = 1,
+            TilesAgree = 16,
+        };
+        var shared = new RoomDoodadPlace(new RoomCandidate(9, 5, 0, 6, 6, 0, 0), 0, 0, 0f, [])
+        {
+            Anchor = "Metadata/Terrain/Test/forge_entrance.tdt",
+            AnchorLaid = 1,
+            Variants = ["rooms/entrance_01.arm", "rooms/entrance_02.arm"],
+        };
+        var byDoodads = new RoomDoodadPlace(new RoomCandidate(1, 2, 0, 3, 3, 3, 3), 3, 3, 1f, []) { PropHits = 3, Props = 3, TilesAgree = 5 };
+        (string Room, RoomLayout Layout, RoomDoodadPlaces Places)[] placed =
+        [
+            ("rooms/boss.arm", square, new RoomDoodadPlaces([byDoodads], 3, 3, 3, string.Empty)),
+            ("rooms/ledge_01.arm", square, new RoomDoodadPlaces([byTiles], 1, 0, 0, string.Empty)),
+            ("rooms/entrance", square, new RoomDoodadPlaces([shared], 0, 0, 0, string.Empty)),
+            ("rooms/entrance_01.arm", square, RoomDoodadPlaces.Not(5, 1, "only 1 of its doodads stand in the area - by its tiles one of the rooms drawn once as 'entrance' on the forge_entrance tile at 9, 5")),
+        ];
+
+        (string said, string detail) = CaptureReport.Placed(placed);
+
+        Assert.Equal("rooms: 1 placed by their doodads at 1 places, 2 by their tiles at 2 places, 1 with no place", said);
+        string[] lines = detail.Split('\n');
+        Assert.Equal("ledge_01: 1 place by its tiles - tile 4, 3, as written: every one of its 2 big slots alike on gate, laid 1x, 16 of 16 slots alike", lines[1]);
+        Assert.Equal("entrance: 1 place by its tiles - tile 9, 5: the forge_entrance tile's own footprint, 6 x 6 - entrance_01, entrance_02 all stand on it and the tiles cannot say which, drawn once", lines[2]);
+        Assert.StartsWith("entrance_01: no place - only 1 of its doodads stand in the area - by its tiles one of the rooms drawn once as 'entrance'", lines[3], StringComparison.Ordinal);
+    }
+
     /// <summary>Each place's entities are written by the id the sightings table carries, the yielded places marked.</summary>
     [Fact]
     public void PLACEDEntitiesAreWrittenById()

@@ -29,6 +29,17 @@ public sealed record RoomDoodadPlace(RoomCandidate Where, int Hits, int Lines, f
     /// </summary>
     public IReadOnlyList<int> Entities { get; init; } = [];
 
+    /// <summary>The tile file the place is anchored on where the room was placed by its tiles and not its doodads - empty for a doodad place. See RoomTileFinder.</summary>
+    public string Anchor { get; init; } = string.Empty;
+
+    /// <summary>How often the anchor file is laid in the area - once pins the room by itself.</summary>
+    public int AnchorLaid { get; init; }
+
+    /// <summary>
+    /// The rooms this place stands for where it is an anchor tile's own footprint rather than a room's: one room standing on the tile more than one way round, or several variants the tiles do not tell apart, drawn once under their shared name. Empty for a room's own place.
+    /// </summary>
+    public IReadOnlyList<string> Variants { get; init; } = [];
+
     /// <summary>How many of this place's entities another place also hit - the measure of whether the two are one room's doodads claimed twice.</summary>
     public int Shared(RoomDoodadPlace other)
     {
@@ -517,7 +528,7 @@ public static class RoomDoodadFinder
     /// <summary>
     /// Whether two footprints share a tile past their rims: one inside either rectangle rather than on its outermost row or column, where rooms that join lay their rims on one row - see RoomArrangement.
     /// </summary>
-    private static bool Overlap(RoomCandidate a, RoomCandidate b)
+    internal static bool Overlap(RoomCandidate a, RoomCandidate b)
     {
         int x0 = Math.Max(a.X, b.X), x1 = Math.Min(a.X + a.Width, b.X + b.Width);
         int y0 = Math.Max(a.Y, b.Y), y1 = Math.Min(a.Y + a.Height, b.Y + b.Height);

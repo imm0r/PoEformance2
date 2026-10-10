@@ -171,6 +171,21 @@ presence does, so `DoodadMemory` keeps every scripted object the frame's read li
 for the rest of the instance, and the rooms are placed again when one arrives: a checkpoint
 room is named once the player has been near its checkpoint, and stays named after.
 
+**A room the doodads cannot place is placed by its tiles** (`RoomTileFinder`): Sinter Rift's boss,
+its eight checkpoints and a titan overlay are rooms of big slots alone - no one-by-one slot, so no
+corner stamp for the search, and one scripted object or none for the doodads - while a big slot's
+tile is the room's fingerprint, `boss_01.tdt` laid once in the area. Two things were measured at the
+boss's doodad place before anything was built on them: every big slot's cell carries the FIRST PIECE
+of a tile alike to it (the slot's corner is the tile's corner), and 15 of its 17 big slots were alike
+by the rule that asked the type sets to be equal, 17 of 17 with an unnamed type as any - so an
+unnamed type in a slot is any, as nought is in the stamp (`SlotWants`). A tile several rooms or
+ways round stand on is drawn once as itself under the shared name ("entrance" for `entrance_01` to
+`entrance_04`). A fingerprint is a TAGGED tile laid once - a slot asking for a feature, answered by
+one tile - because a ledge checkpoint's one untagged 3x3 ledge tile is laid ten times (116
+candidates) and another ledge piece laid once stood beside the entrance; a place on anything else
+counts only where a doodad of the room stands in it, the checkpoint itself once the player has
+been near.
+
 **The loaded-file list is not the area.** It names what was loaded since the area change, and
 a file still cached from an earlier instance of the same map is not loaded again and not
 listed: The Assembly's list carried ten of its fifty-three rooms, neither the boss room nor
