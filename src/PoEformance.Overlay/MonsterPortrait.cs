@@ -37,10 +37,11 @@ namespace PoEformance.Overlay;
 /// <see cref="PictureLadder"/>, drawn in bands on every core. It used to be one rung under the
 /// cap as well, and on a 1200 px pane that was a monster drawn at 512 and stretched - the blur
 /// the live client reported once the floor's own staircase was gone. Stop it and the next frame
-/// is drawn at whatever size the pane is, cap or no cap. How many pictures a second that comes
-/// to is shown in the pane's own row, or in the picture's corner where there is no row
-/// (<see cref="RedrawRate"/>), because it is the number that says whether the cap is the right
-/// one for this machine.
+/// is drawn at whatever size the pane is, cap or no cap. THE CARD IS NEVER CAPPED - see
+/// <see cref="Wanted"/>: the cap prices the processor's frame, and the card's costs nothing it
+/// would notice at the top rung. How many pictures a second that comes to is shown in the pane's
+/// own row, or in the picture's corner where there is no row (<see cref="RedrawRate"/>), because
+/// it is the number that says whether the cap is the right one for this machine.
 ///
 /// THE KEYFRAMES ARE UNPACKED ON A TASK, ONE ANIMATION AT A TIME. A bundled rig holds twelve
 /// megabytes of them; the animation being played is a few tens of kilobytes of that, and Oodle
@@ -2829,10 +2830,11 @@ public sealed class MonsterPortrait
             _clock += Math.Clamp(ImGui.GetIO().DeltaTime, 0f, 0.25f);
         }
 
-        // CAPPED WHILE IT IS BEING DRAGGED, ORBITED OR PLAYED, and the pane's own rung the moment
-        // it stops. The work grows with the AREA, and it is while moving that a dropped frame is
-        // felt, so the cap is somebody's answer to what a moving frame may cost; the bands on
-        // every core are what let the usual cap sit at the pane's own size.
+        // CAPPED WHILE IT IS BEING DRAGGED, ORBITED OR PLAYED ON THE PROCESSOR, and the pane's own
+        // rung the moment it stops - or while the card draws, see Wanted. The work grows with the
+        // AREA, and it is while moving that a dropped frame is felt, so the cap is somebody's answer
+        // to what a moving frame may cost the processor; the bands on every core are what let the
+        // usual cap sit at the pane's own size.
         int size = Wanted(side);
         bool posed = _tracks is { Ready: true } && _pose is not null;
 
@@ -2999,9 +3001,24 @@ public sealed class MonsterPortrait
         }
     }
 
-    /// <summary>What the model is drawn at: the rung that covers the pane, capped while it moves.</summary>
+    /// <summary>What the model is drawn at: the rung that covers the pane, capped while it moves on the processor.</summary>
+    /// <remarks>
+    /// THE CAP IS THE PROCESSOR'S. It is somebody's answer to what a moving frame may cost in
+    /// processor time - PictureLadder's measurements are of the rasteriser's bands - and the card
+    /// pays nothing it would notice for the top rung: a 2048 square target is a frame's draw at a
+    /// hundred a second, where the processor's was a quarter of one. Capped on the card, a 3440 px
+    /// monitor's pane played every animation at 1024 and stretched it, which the live client saw as
+    /// textures that went soft the closer the camera came. So where the card drew the picture
+    /// shown, the next one is the pane's own rung whether it moves or not. The card's word is the
+    /// LAST picture's (<see cref="_onCard"/>), since who draws is settled only in the drawing: a
+    /// picture the card hands back to the processor - a material's shader still compiling - costs
+    /// one uncapped frame there, and the next is capped again.
+    /// </remarks>
     private int Wanted(float side)
-        => _held || _orbiting || (_playing && _tracks is { Ready: true }) || Ticking ? _sizes.Moving(side) : _sizes.For(side);
+    {
+        bool moving = _held || _orbiting || (_playing && _tracks is { Ready: true }) || Ticking;
+        return moving && !_onCard ? _sizes.Moving(side) : _sizes.For(side);
+    }
 
     /// <summary>
     /// Whether the picture runs with the clock: a shade program of the model reads <c>Time</c>, and it is playing.

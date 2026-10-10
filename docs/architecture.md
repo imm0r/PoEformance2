@@ -304,7 +304,11 @@ The rasteriser draws in bands of rows on every core now (`MeshPicture.Canvas.Thr
 band walking the triangles in the mesh's order so the picture is the one-threaded one to the
 byte, and that is what pays for the higher rung. A single draw is cheap even at the top, so the
 cap has no business binding the resting size, which it used to, and showed as a picture that
-would not grow with its pane.
+would not grow with its pane. Nor does it bind a picture the graphics card draws: the cap prices
+the processor's frame, and a card frame at the top rung costs nothing anybody notices. Capped on
+the card, a 3440 px monitor's pane played every animation at 1024 and stretched it, which read as
+textures going soft the closer the camera came. `MonsterPortrait.Wanted` takes the pane's own rung
+whenever the last picture shown was the card's.
 
 **A room can be lit the game's way** (`SceneLight`, set on the canvas like the clock). The arithmetic
 is the game's shaders' line for line - `ComputePointLightParamsNew` for a point light,

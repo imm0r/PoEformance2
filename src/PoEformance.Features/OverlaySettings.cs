@@ -271,6 +271,11 @@ public sealed record OverlaySettings(
     // its own size; a wider pane, or a machine with cores to spare, can raise it to 1536 or 2048,
     // and a machine that stutters while an animation plays can lower it.
     //
+    // THE PROCESSOR'S CAP AND NOT THE CARD'S: a picture the graphics card draws is the pane's own
+    // rung whether it moves or not, because the card's frame at the top rung costs nothing anybody
+    // notices and a cap there was a 3440 px monitor's pane playing every animation at 1024,
+    // stretched - see MonsterPortrait.Wanted.
+    //
     // IT ALSO SETS THE MEMORY CEILING indirectly, through the size the picture rests at: the
     // canvas is pixels and depth together, 8 MB at 1024 and 32 MB at 2048, held only while a
     // pane that big is open.
