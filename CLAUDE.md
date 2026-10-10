@@ -163,7 +163,10 @@ asking for a screenshot. The reason they come and go is the network bubble: a sc
 object is the server's entity and the client holds it only while it is near, while the
 props the client builds itself from the room files. A third capture had one checkpoint
 entity in the client while the game's map drew four, and "there is one checkpoint in this
-area" was nearly concluded from it. An entity's absence from the client says nothing.
+area" was nearly concluded from it. An entity's absence from the client says nothing. Its
+presence does, so `DoodadMemory` keeps every scripted object the frame's read lists, by id,
+for the rest of the instance, and the rooms are placed again when one arrives: a checkpoint
+room is named once the player has been near its checkpoint, and stays named after.
 
 **The loaded-file list is not the area.** It names what was loaded since the area change, and
 a file still cached from an earlier instance of the same map is not loaded again and not

@@ -116,7 +116,7 @@ public class CaptureReplayTests
             found.Add(new DoodadSighting(
                 uint.Parse(cells[0], CultureInfo.InvariantCulture), cells[1], cells[2],
                 float.Parse(cells[3], CultureInfo.InvariantCulture), float.Parse(cells[4], CultureInfo.InvariantCulture), float.Parse(cells[5], CultureInfo.InvariantCulture),
-                cells[6] == "sleeping"));
+                cells[6] == "sleeping") { Remembered = cells[6] == "remembered" });
         }
 
         return new DoodadSurvey(0, 0, 0, 0, found, 0d, string.Empty);

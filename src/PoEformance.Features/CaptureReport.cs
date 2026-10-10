@@ -511,15 +511,21 @@ public static class CaptureReport
         }
 
         var byPath = new Dictionary<string, (int All, int Asleep)>(StringComparer.OrdinalIgnoreCase);
+        var remembered = 0;
         foreach (DoodadSighting one in done.Found)
         {
             (int all, int asleep) = byPath.GetValueOrDefault(one.Path);
             byPath[one.Path] = (all + 1, asleep + (one.Asleep ? 1 : 0));
+            remembered += one.Remembered ? 1 : 0;
         }
 
+        // THE BUBBLE'S OWN, counted apart: a remembered sighting is a scripted object the frame's read
+        // listed at some moment since the survey - see DoodadMemory - and its number says how much of
+        // the placing the survey alone could not have given.
         string said = string.Create(CultureInfo.InvariantCulture,
             $"doodads: {done.Found.Count} entities stand where the rooms name a doodad, on {byPath.Count} paths - sleeping map {done.SleepingNodes} of {done.SleepingSize} walked,"
-            + $" awake {done.AwakeNodes}, {done.Named} with a path, read in {done.Milliseconds:0} ms");
+            + $" awake {done.AwakeNodes}, {done.Named} with a path, read in {done.Milliseconds:0} ms")
+            + (remembered > 0 ? string.Create(CultureInfo.InvariantCulture, $", {remembered} remembered from the bubble since") : string.Empty);
 
         var lines = new List<string>();
         var unfound = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -648,7 +654,7 @@ public static class CaptureReport
         {
             said.Append(one.Id.ToString(CultureInfo.InvariantCulture)).Append('\t').Append(one.Path).Append('\t').Append(one.Model)
                 .Append('\t').Append(Num(one.X)).Append('\t').Append(Num(one.Y)).Append('\t').Append(Num(one.Z))
-                .Append('\t').AppendLine(one.Asleep ? "sleeping" : "awake");
+                .Append('\t').AppendLine(one.Remembered ? "remembered" : one.Asleep ? "sleeping" : "awake");
         }
 
         return said.ToString();

@@ -94,8 +94,9 @@ overlay; every entity; the area's loaded files, environments and every room file
 `.rs` the area loaded names the rooms the loaded-file list leaves out once an earlier instance cached
 them - The Assembly's list had ten of fifty-three, neither the boss room nor the entrance among them);
 the rooms around you with their light data, every room as the ground-and-tile search arranged it where
-no entities can be read, and the Tile Book's picked row; the doodad survey with every sighting and
-every room of the set as its doodads place it; what the diagnostic
+no entities can be read, and the Tile Book's picked row; the doodad survey with every sighting, the
+scripted objects remembered from the network bubble since among them, and every room of the set as
+its doodads place it; what the diagnostic
 windows hold as the key goes down - the active routes, the light hunt's report, the model probe,
 the Memory Dissector's places and search, the atlas check; and a memory recording that `--replay`
 reads. Inside that recording the ticked parts are read once more from nothing - the world with
