@@ -69,6 +69,9 @@ public static class CaptureReport
     /// <summary>Every room file the area loaded, whole.</summary>
     public const string RoomFilesFile = "room-files.txt";
 
+    /// <summary>Every tile file the area laid, as a room's slot asks about it.</summary>
+    public const string TileIdentitiesFile = "tile-identities.txt";
+
     /// <summary>The survey of the entity maps for the rooms' doodads, and every sighting.</summary>
     public const string DoodadsFile = "doodads.txt";
 
@@ -598,6 +601,54 @@ public static class CaptureReport
             said.Append("##### ").AppendLine(path);
             byte[]? file = read(path);
             said.AppendLine(file is { Length: > 0 } ? StatDescriptionFiles.Decode(file).TrimEnd() : "(not in the install)");
+            said.AppendLine();
+        }
+
+        return said.ToString();
+    }
+
+    /// <summary>
+    /// Every distinct tile file the area laid, with what a room's slot is checked against - size, tag, edge and corner ground types - one tab-separated line a file, or why it did not read.
+    /// </summary>
+    /// <remarks>
+    /// WHAT THE SEARCH NEEDS THAT THE RECORDING CANNOT HOLD. The recording keeps the terrain whole - which
+    /// tile file sits on every cell - but a slot is checked against the file's own definition
+    /// (RoomPlacements), and the files are the install's, not memory's. With them here the
+    /// ground-and-tile search runs again from a capture on any machine, held against the places the
+    /// doodads found: the one measure of whether the tiles alone can place a room the doodads cannot,
+    /// which The Stone Citadel's corridors without a doodad line made a question. See CaptureReplayTests.
+    /// </remarks>
+    /// <param name="read">How to get a file out of the install, by path.</param>
+    /// <param name="tiles">The tiles the area laid, whose distinct files are listed.</param>
+    public static string TileIdentities(Func<string, byte[]?> read, TerrainTiles tiles)
+    {
+        ArgumentNullException.ThrowIfNull(read);
+        ArgumentNullException.ThrowIfNull(tiles);
+        var said = new StringBuilder();
+        said.Append(Say(tiles.Paths.Count)).AppendLine(" tile files laid in the area, each as a room's slot asks about it - tab-separated, or why it did not read");
+        said.AppendLine();
+        said.AppendLine("path\twidth\theight\ttag\tedge down\tedge right\tedge up\tedge left\tground down-left\tground down-right\tground up-right\tground up-left");
+        foreach (string path in tiles.Paths.Order(StringComparer.OrdinalIgnoreCase))
+        {
+            (TileDefinition definition, string why) = TileModels.Defined(read, path);
+            said.Append(path).Append('\t');
+            if (TileIdentity.Of(definition) is not { } identity)
+            {
+                said.Append("(not read: ").Append(why.Length > 0 ? why : definition.Why).AppendLine(")");
+                continue;
+            }
+
+            said.Append(CultureInfo.InvariantCulture, $"{identity.Width}\t{identity.Height}\t{identity.Tag}");
+            foreach (string edge in identity.Edges)
+            {
+                said.Append('\t').Append(edge);
+            }
+
+            foreach (string ground in identity.Grounds)
+            {
+                said.Append('\t').Append(ground);
+            }
+
             said.AppendLine();
         }
 

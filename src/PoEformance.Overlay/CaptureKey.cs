@@ -441,6 +441,27 @@ internal sealed class CaptureKey
             }
         }
 
+        if (On(CaptureParts.TileIdentities))
+        {
+            if (read is null)
+            {
+                parts.Add($"{CaptureReport.TileIdentitiesFile}  not written: no install to read them from");
+            }
+            else if (run.Snapshot.Terrain is not TerrainGrid { Tiles: { } laid })
+            {
+                parts.Add($"{CaptureReport.TileIdentitiesFile}  not written: the terrain's tiles were not read");
+            }
+            else
+            {
+                Part(CaptureReport.TileIdentitiesFile, () =>
+                {
+                    string identities = CaptureReport.TileIdentities(read, laid);
+                    File.WriteAllText(At(CaptureReport.TileIdentitiesFile), identities);
+                    return identities[..identities.IndexOf('\n')];
+                });
+            }
+        }
+
         if (On(CaptureParts.RoomsNear))
         {
             if (read is null)

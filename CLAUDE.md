@@ -156,7 +156,10 @@ A capture (F9) is the same idea for a whole question: its zip holds the pictures
 room file of the area's room set and every doodad entity with its model and position, so the
 room placing runs again here without the game -
 `POEF_CAPTURE=<unpacked folder> dotnet test tests/PoEformance.Core.Tests --filter CaptureReplay`
-writes `placing-replay.txt` beside the capture's files. Two captures of one area forty
+writes `placing-replay.txt` beside the capture's files, and `search-replay.txt`: the
+ground-and-tile search over the recording's terrain, each laid tile read from the capture's
+`tile-identities.txt`, with every place the doodads found scored by the same yardstick and
+ranked against the search's list - the measure of what the tiles alone can place. Two captures of one area forty
 minutes apart are how it was learned that the power-line pieces and checkpoints come and go
 with play while the plain props never move; hold a finder change against a capture before
 asking for a screenshot. The reason they come and go is the network bubble: a scripted

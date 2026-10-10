@@ -202,6 +202,34 @@ public class CaptureReportTests
         Assert.DoesNotContain("generate.rs", said, StringComparison.Ordinal);
     }
 
+    /// <summary>Every distinct laid tile file is printed once, in path order, with its identity's twelve columns - or why it did not read - under a header that says the count.</summary>
+    [Fact]
+    public void TILEIDENTITIESArePrintedForEveryLaidFile()
+    {
+        byte[]? Read(string path) => path switch
+        {
+            "Metadata/Terrain/Test/wall.tdt" => TileFilesTests.Tdt(edge: "Metadata/Terrain/Test/wall.et", grounds: true),
+            "Metadata/Terrain/Test/bare.tdt" => TileFilesTests.Tdt(inherits: "Metadata/Terrain/Test/gone.tdt"),
+            _ => null,
+        };
+
+        // Three files over four tiles: one read whole, one inheriting from a file that is not there, one absent.
+        var tiles = new TerrainTiles(
+            ["Metadata/Terrain/Test/wall.tdt", "Metadata/Terrain/Test/bare.tdt", "Metadata/Terrain/Test/Absent.tdt"],
+            [0, 1, 2, 0], new byte[4], new byte[4], new sbyte[4], 2, 2);
+
+        string[] lines = CaptureReport.TileIdentities(Read, tiles).ReplaceLineEndings("\n").Split('\n');
+        Assert.Equal("3 tile files laid in the area, each as a room's slot asks about it - tab-separated, or why it did not read", lines[0]);
+        Assert.Equal(string.Empty, lines[1]);
+        Assert.Equal("path\twidth\theight\ttag\tedge down\tedge right\tedge up\tedge left\tground down-left\tground down-right\tground up-right\tground up-left", lines[2]);
+        Assert.StartsWith("Metadata/Terrain/Test/Absent.tdt\t(not read: ", lines[3], StringComparison.Ordinal);
+        Assert.StartsWith("Metadata/Terrain/Test/bare.tdt\t(not read: ", lines[4], StringComparison.Ordinal);
+        Assert.Equal(
+            "Metadata/Terrain/Test/wall.tdt\t2\t1\tarena_tag\tMetadata/Terrain/Test/wall.et\tMetadata/Terrain/Test/wall.et\tMetadata/Terrain/Test/wall.et\tMetadata/Terrain/Test/wall.et"
+            + "\tMetadata/Terrain/Test/sand.gt\tMetadata/Terrain/Test/sand.gt\tMetadata/Terrain/Test/rock.gt\t",
+            lines[5]);
+    }
+
     /// <summary>Each place's entities are written by the id the sightings table carries, the yielded places marked.</summary>
     [Fact]
     public void PLACEDEntitiesAreWrittenById()

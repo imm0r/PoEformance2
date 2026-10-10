@@ -95,7 +95,8 @@ overlay; every entity; the area's loaded files, environments and every room file
 name, lists the rooms the loaded-file list leaves out once an earlier instance cached them - The
 Assembly's list had ten of fifty-three, neither the boss room nor the entrance among them);
 the rooms around you with their light data, every room as the ground-and-tile search arranged it where
-no entities can be read, and the Tile Book's picked row; the doodad survey with every sighting, the
+no entities can be read, the Tile Book's picked row, and every laid tile's definition as a room's slot
+asks about it (with the recording's terrain, the search runs again from the capture); the doodad survey with every sighting, the
 scripted objects remembered from the network bubble since among them, and every room of the set as
 its doodads place it; what the diagnostic
 windows hold as the key goes down - the active routes, the light hunt's report, the model probe,
