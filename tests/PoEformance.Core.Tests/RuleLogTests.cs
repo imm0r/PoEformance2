@@ -274,12 +274,11 @@ public class RuleLogTests
             new Rule(
                 "ps",
                 "Power Siphon",
-                RuleCondition.Of(RuleFact.InGame),
+                RuleCondition.Of(RuleFact.MonsterCountWithin, Compare.AtLeast, 1) with { Argument = 1000 },
                 [new RuleEffect(RuleEffectKind.KeyPress)
                 {
                     Key = "T",
                     AimAt = AimTarget.Rare,
-                    AimRadius = 1000,
                     AimAtOrBelowPercent = 10,
                 }])
             { Enabled = true },
@@ -298,7 +297,7 @@ public class RuleLogTests
     };
 
     private static NearMonster Rare(ulong address, int life, int max, double distance = 10)
-        => new(distance, ItemRarity.Rare, (float)distance, 0, 100d * life / max, 10f, address, life, max);
+        => new(distance, ItemRarity.Rare, (float)distance, 0, 100d * life / max, 10f, address, life, max, Targetable: true);
 
     [Fact]
     public void TheCullTraceReadsAsTheStepsItActuallyTook()

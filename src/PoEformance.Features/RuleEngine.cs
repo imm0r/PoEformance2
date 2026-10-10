@@ -709,7 +709,16 @@ public sealed class RuleEngine
         AimPoint? aim = null;
         if (effect.Aims)
         {
-            if (state.AimTarget(effect.AimRadius, Rarity(effect.AimAt), effect.AimAtOrBelowPercent)
+            if (!RuleFacts.HasRange(rule.Condition))
+            {
+                // Where to aim comes from the rule's range conditions, and this rule has none.
+                // Its own reason rather than "nothing to aim at": that one is a room that says
+                // no, this one is a rule written wrong, and only the second needs the editor.
+                Block("no range condition to aim in");
+                return;
+            }
+
+            if (state.AimTarget(rule.Condition, Rarity(effect.AimAt), effect.AimAtOrBelowPercent)
                 is not NearMonster target)
             {
                 // Reported and NOT stamped as acted, on the same argument as an unbound key: a

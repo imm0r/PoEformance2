@@ -949,7 +949,9 @@ export class RulesPanel {
       at.appendChild(option);
     }
 
-    at.title = "Puts the pointer on a monster before acting, then puts it back. The press only "
+    at.title = "Puts the pointer on a monster before acting, then puts it back. Looks in the "
+      + "'within' conditions of this rule - the monsters they count are the ones it picks "
+      + "from - and skips anything the game would not let a click land on. The press only "
       + "happens if the game agrees that monster is under the pointer - so a miss costs a "
       + "skipped cast, never one into empty floor.";
     at.addEventListener("change", () => change({ aimAt: at.value }));
@@ -958,9 +960,7 @@ export class RulesPanel {
     wrap.appendChild(at);
 
     if ((effect.aimAt ?? "None") !== "None") {
-      wrap.appendChild(word("within"));
-      wrap.appendChild(this.number(effect.aimRadius ?? 1000, 1, 10000, 10, (v) => change({ aimRadius: v })));
-      wrap.appendChild(word("u, at or below"));
+      wrap.appendChild(word("in the rule's ranges, at or below"));
       wrap.appendChild(this.number(
         effect.aimAtOrBelowPercent ?? 100, 0, 100, 1, (v) => change({ aimAtOrBelowPercent: v })));
       wrap.appendChild(word("%"));
