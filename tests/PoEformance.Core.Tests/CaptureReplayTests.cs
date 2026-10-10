@@ -18,16 +18,20 @@ namespace PoEformance.Core.Tests;
 /// Run it with <c>POEF_CAPTURE=&lt;folder&gt; dotnet test --filter CaptureReplay</c>.
 ///
 /// THE SEARCH REPLAY ANSWERS ONE QUESTION: whether the tiles alone could place a room its doodads
-/// cannot - a corridor with no doodad line, of which The Stone Citadel has several. The recording holds
-/// the terrain whole (the capture's world pass reads it), the room files are beside it, and
-/// tile-identities.txt says what each laid tile's file asks - a capture from 0.1.155 on; without it the
-/// search scores corners alone and says so. The places the doodads found are where the truth is, so each
-/// is scored by the search's own yardstick and ranked against its list: a search that puts them first,
-/// and alone, can be trusted with a room that has no doodads, and one that does not cannot. Both halves
-/// of that comparison are printed, per room.
+/// cannot - a corridor with no doodad line, of which The Stone Citadel has several, or a room of big
+/// slots alone, which is every checkpoint and the boss of Sinter Rift. The recording holds the terrain
+/// whole (the capture's world pass reads it), the room files are beside it, and tile-identities.txt
+/// says what each laid tile's file asks - a capture from 0.1.155 on; without it the search scores
+/// corners alone and says so. Three things are printed so both halves of every comparison are on the
+/// page: how often each tile file was laid (a file laid once pins a room by itself), what each kind of
+/// slot in a room asks and which laid files answer it by RoomPlacements' own rule, and the search's best
+/// places beside each place the doodads found, scored by the same yardstick and ranked.
 /// </remarks>
 public class CaptureReplayTests
 {
+    /// <summary>How many of the rarest laid files are listed.</summary>
+    private const int RarestListed = 40;
+
     /// <summary>The capture's folder, from POEF_CAPTURE - or null, and the replay does nothing.</summary>
     private static string? Folder => Environment.GetEnvironmentVariable("POEF_CAPTURE");
 
@@ -70,7 +74,7 @@ public class CaptureReplayTests
     }
 
     /// <summary>
-    /// search-replay.txt: every room searched by its ground and tiles over the recording's terrain - its best places, how many tie at the top, and where each place its doodads found ranks by the same yardstick.
+    /// search-replay.txt: the laid tile files rarest first, then every room - what each kind of its slots asks and which laid files answer, the tiles under each place its doodads found, and its search by ground and tiles with the doodad places ranked by the same yardstick.
     /// </summary>
     public static string SearchReplay(string folder)
     {
@@ -84,29 +88,103 @@ public class CaptureReplayTests
         }
 
         Placing placing = Place(folder);
-        Func<string, TileIdentity?>? identity = Identities(folder, out int identities);
-        said.AppendLine(identity is null
+        Dictionary<string, TileIdentity>? identities = Identities(folder);
+        Func<string, TileIdentity?>? identity = identities is null ? null : file => identities.GetValueOrDefault(file);
+        said.AppendLine(identities is null
             ? $"no {CaptureReport.TileIdentitiesFile} in the capture - the tiles are not checked, the corners alone are"
-            : string.Create(CultureInfo.InvariantCulture, $"{identities} tile identities from {CaptureReport.TileIdentitiesFile}"));
+            : string.Create(CultureInfo.InvariantCulture, $"{identities.Count} tile identities from {CaptureReport.TileIdentitiesFile}"));
         if (grid.TilesX != placing.TilesX || grid.TilesY != placing.TilesY)
         {
             said.AppendLine(CultureInfo.InvariantCulture, $"the recording's grid is {grid.TilesX} x {grid.TilesY} tiles where capture.txt says {placing.TilesX} x {placing.TilesY} - the recording's is searched");
         }
 
+        // HOW ALONE EACH LAID FILE IS: a file laid once pins whatever room asks for it.
+        Dictionary<string, int> cells = Cells(grid.Tiles);
+        if (identities is not null && cells.Count > 0)
+        {
+            said.AppendLine();
+            said.AppendLine(CultureInfo.InvariantCulture, $"=== the {cells.Count} tile files laid, rarest first: cells, and how often each was laid (cells over its size)");
+            foreach ((string path, int count) in cells.OrderBy(one => Instances(one.Key, one.Value, identities)).ThenBy(one => one.Key, StringComparer.OrdinalIgnoreCase).Take(RarestListed))
+            {
+                said.Append("  ").AppendLine(LaidSaid(path, count, identities, grid.Tiles));
+            }
+
+            if (cells.Count > RarestListed)
+            {
+                said.AppendLine(CultureInfo.InvariantCulture, $"  ... and {cells.Count - RarestListed} more");
+            }
+        }
+
         bool[] walkable = grid.WalkableTileMask();
-        said.AppendLine();
         for (var one = 0; one < placing.Rooms.Count; one++)
         {
             (string room, RoomLayout layout) = placing.Rooms[one];
-            string name = Path.GetFileNameWithoutExtension(room);
+            said.AppendLine();
+            said.Append("=== ").Append(Path.GetFileNameWithoutExtension(room)).Append(CultureInfo.InvariantCulture, $", {layout.Width} x {layout.Height}").AppendLine();
+
+            // THE ROOM'S ASKS, each kind of slot once, and the laid files alike by RoomPlacements' own
+            // rule: the size as an unordered pair, the tag where the slot names one, the edge and ground
+            // types as sets. A kind with one file alike, laid once, is the room's own fingerprint.
+            if (identities is not null)
+            {
+                foreach (Ask ask in Asks(layout))
+                {
+                    List<string> alike = [.. identities.Where(laid => Alike(ask, laid.Value)).Select(laid => laid.Key).OrderBy(path => path, StringComparer.OrdinalIgnoreCase)];
+                    said.Append("  slot ").Append(ask.Said).Append(CultureInfo.InvariantCulture, $": {alike.Count} laid files alike");
+                    if (alike.Count is > 0 and <= 4)
+                    {
+                        said.Append(" - ").Append(string.Join("; ", alike.Select(path => LaidSaid(path, cells.GetValueOrDefault(path), identities, grid.Tiles))));
+                    }
+
+                    said.AppendLine();
+                }
+            }
+
+            // THE OTHER HALF, FIRST: what lies under each place the doodads found, whether or not the search
+            // can run - and for a place laid as written, every big slot against the tile on its own cell, by
+            // the strict rule and with an unnamed type as any, so the rule can be held against a known place.
+            RoomDoodadPlaces places = placing.Placed[one].Places;
+            foreach (RoomDoodadPlace place in places.Places)
+            {
+                RoomCandidate at = place.Where;
+                said.AppendLine(CultureInfo.InvariantCulture, $"  doodads at tile {at.X}, {at.Y}, {RoomFinder.Said(at.Turn)}, {at.Width} x {at.Height} on the grid - laid under it: {Under(grid.Tiles, at)}");
+                if (at.Turn != 0 || identities is null || grid.Tiles is not { } laidTiles)
+                {
+                    continue;
+                }
+
+                for (var line = 0; line < layout.Height; line++)
+                {
+                    for (var column = 0; column < layout.Width; column++)
+                    {
+                        RoomSlot slot = layout.SlotAt(column, line);
+                        if (!slot.IsTile || (slot.Width == 1 && slot.Height == 1))
+                        {
+                            continue;
+                        }
+
+                        Ask ask = AskOf(layout, slot);
+                        string path = laidTiles.PathAt(at.X + column, at.Y + line);
+                        TileIdentity? laid = identities.GetValueOrDefault(path);
+                        string verdict = laid is null ? "no identity" : Alike(ask, laid) ? "alike" : Loosely(ask, laid) ? "alike with an unnamed type as any" : "unlike";
+
+                        // AND WHICH PIECE of its file the tile on the slot's own cell is: (0, 0) there says the
+                        // slot's corner is the tile's corner, which is what pins a placement to the tile and not
+                        // merely into it. The placement is -1 without the rotation tables, which a replay has not.
+                        (int pieceX, int pieceY) = laidTiles.SubAt(at.X + column, at.Y + line);
+                        said.AppendLine(CultureInfo.InvariantCulture, $"    slot {column}, {line} {ask.Said} - laid {(laid is null ? Short(path) : LaidSaid(path, 0, identities, null))} piece {pieceX}, {pieceY} placement {laidTiles.PlacementAt(at.X + column, at.Y + line)}: {verdict}");
+                    }
+                }
+            }
+
             RoomSearch search = RoomFinder.Find(layout, ground, grid.TilesX, grid.TilesY, grid.Tiles, identity, walkable: walkable);
             if (search.Why.Length > 0)
             {
-                said.Append(name).Append(": no search - ").AppendLine(search.Why);
+                said.Append("  no search - ").AppendLine(search.Why);
                 continue;
             }
 
-            said.Append(name).Append(CultureInfo.InvariantCulture, $": {search.Fits} places fit every corner, {search.Candidates.Count} listed by their {(search.TileChecked ? "tiles, then corners" : "corners")} - {search.Corners} corners in the stamp, {search.Free} free, {search.Left} big slots left out").AppendLine();
+            said.Append(CultureInfo.InvariantCulture, $"  search: {search.Fits} places fit every corner, {search.Candidates.Count} listed by their {(search.TileChecked ? "tiles, then corners" : "corners")} - {search.Corners} corners in the stamp, {search.Free} free, {search.Left} big slots left out").AppendLine();
 
             // HOW ALONE THE BEST PLACE IS: every listed place scoring exactly as the first does.
             var ties = 0;
@@ -129,13 +207,21 @@ public class CaptureReplayTests
                 said.AppendLine(CultureInfo.InvariantCulture, $"  {ties} places tie at the top");
             }
 
-            // THE OTHER HALF: each place the doodads found, scored by the same yardstick and ranked against the list.
-            RoomDoodadPlaces places = placing.Placed[one].Places;
+            // WHERE THE BEST PLACE PARTS WITH THE AREA, slot by slot: which asks the tiles there do not answer.
+            if (search.Candidates.Count > 0)
+            {
+                foreach (RoomPart part in search.Parts(search.Candidates[0]).Where(part => !part.IsCorner).Take(10))
+                {
+                    said.AppendLine(CultureInfo.InvariantCulture, $"    slot {part.RoomU}, {part.RoomV} at tile {part.X}, {part.Y} ({(part.Sides.Length > 0 ? part.Sides : "inside")}, {part.Join}): wants {part.Wanted} - laid {part.Laid}");
+                }
+            }
+
             if (places.Places.Count == 0)
             {
                 continue;
             }
 
+            // THE DOODAD PLACES BY THE SEARCH'S OWN YARDSTICK, ranked against its list.
             (RoomScorer? scorer, string why) = RoomFinder.Scorer(layout, ground, grid.TilesX, grid.TilesY, grid.Tiles, identity, walkable);
             foreach (RoomDoodadPlace place in places.Places)
             {
@@ -184,6 +270,200 @@ public class CaptureReplayTests
         => string.Create(
             CultureInfo.InvariantCulture,
             $"{(rank > 0 ? rank + ". " : string.Empty)}tile {where.X}, {where.Y}, {RoomFinder.Said(where.Turn)}: {where.TilesAgree} of {where.Tiles} tiles agree, {where.Matched} of {where.Corners} corners, {RoomArrangement.Beside(where, misses)}% beside, {misses.Elsewhere} misses at no join");
+
+    /// <summary>What a kind of slot asks of the tile under it, in the terms RoomPlacements compares: the size, the tag, the edge and ground types sorted.</summary>
+    private sealed record Ask(int Width, int Height, string Tag, string[] Edges, string[] Grounds)
+    {
+        public string Said => string.Create(
+            CultureInfo.InvariantCulture,
+            $"{Width}x{Height}{(Tag.Length > 0 ? " \"" + Tag + "\"" : string.Empty)} edges [{string.Join(", ", Edges.Select(Short))}] grounds [{string.Join(", ", Grounds.Select(Short))}]");
+    }
+
+    /// <summary>Each kind of slot in a room once, in the order its first slot comes.</summary>
+    private static List<Ask> Asks(RoomLayout room)
+    {
+        var asks = new List<Ask>();
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        for (var line = 0; line < room.Height; line++)
+        {
+            for (var column = 0; column < room.Width; column++)
+            {
+                RoomSlot slot = room.SlotAt(column, line);
+                if (!slot.IsTile)
+                {
+                    continue;
+                }
+
+                Ask ask = AskOf(room, slot);
+                if (seen.Add(ask.Said))
+                {
+                    asks.Add(ask);
+                }
+            }
+        }
+
+        return asks;
+    }
+
+    /// <summary>What one slot asks, in RoomPlacements' terms.</summary>
+    private static Ask AskOf(RoomLayout room, RoomSlot slot)
+        => new(
+            slot.Width,
+            slot.Height,
+            room.Named(slot.Tag),
+            Sorted([room.Named(slot.Edge(0)), room.Named(slot.Edge(1)), room.Named(slot.Edge(2)), room.Named(slot.Edge(3))]),
+            Sorted([room.Named(slot.Ground(0)), room.Named(slot.Ground(1)), room.Named(slot.Ground(2)), room.Named(slot.Ground(3))]));
+
+    /// <summary>Whether a laid file answers a slot's ask - RoomPlacements.Compare's rule, kept in step with it by hand.</summary>
+    private static bool Alike(Ask ask, TileIdentity laid)
+        => SameSize(ask, laid)
+            && (ask.Tag.Length == 0 || string.Equals(ask.Tag, laid.Tag, StringComparison.OrdinalIgnoreCase))
+            && Sorted(laid.Edges).AsSpan().SequenceEqual(ask.Edges, StringComparer.OrdinalIgnoreCase)
+            && Sorted(laid.Grounds).AsSpan().SequenceEqual(ask.Grounds, StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// The same, with an unnamed type in the ask taken as any - the reading the ground stamp gives nought (RoomFinder: a corner type nought names nothing). A hypothesis to hold against a known place, not the tool's rule.
+    /// </summary>
+    private static bool Loosely(Ask ask, TileIdentity laid)
+        => SameSize(ask, laid)
+            && (ask.Tag.Length == 0 || string.Equals(ask.Tag, laid.Tag, StringComparison.OrdinalIgnoreCase))
+            && Covers(laid.Edges, ask.Edges)
+            && Covers(laid.Grounds, ask.Grounds);
+
+    private static bool SameSize(Ask ask, TileIdentity laid)
+        => (laid.Width == ask.Width && laid.Height == ask.Height) || (laid.Width == ask.Height && laid.Height == ask.Width);
+
+    /// <summary>Whether every named type the ask lists is among the laid ones, each laid one answering at most one ask.</summary>
+    private static bool Covers(IReadOnlyList<string> laid, string[] asks)
+    {
+        List<string> pool = [.. laid.Select(one => one.Replace('\\', '/'))];
+        foreach (string ask in asks)
+        {
+            if (ask.Length == 0)
+            {
+                continue;
+            }
+
+            int found = pool.FindIndex(one => string.Equals(one, ask, StringComparison.OrdinalIgnoreCase));
+            if (found < 0)
+            {
+                return false;
+            }
+
+            pool.RemoveAt(found);
+        }
+
+        return true;
+    }
+
+    private static string[] Sorted(IEnumerable<string> four)
+    {
+        string[] sorted = [.. four.Select(one => one.Replace('\\', '/'))];
+        Array.Sort(sorted, StringComparer.OrdinalIgnoreCase);
+        return sorted;
+    }
+
+    /// <summary>A path's last name without its extension, or a dash for none.</summary>
+    private static string Short(string path) => path.Length == 0 ? "-" : Path.GetFileNameWithoutExtension(path);
+
+    /// <summary>How many cells each tile file covers in the area.</summary>
+    private static Dictionary<string, int> Cells(TerrainTiles? tiles)
+    {
+        var cells = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        if (tiles is null)
+        {
+            return cells;
+        }
+
+        for (var y = 0; y < tiles.Height; y++)
+        {
+            for (var x = 0; x < tiles.Width; x++)
+            {
+                string path = tiles.PathAt(x, y);
+                if (path.Length > 0)
+                {
+                    cells[path] = cells.GetValueOrDefault(path) + 1;
+                }
+            }
+        }
+
+        return cells;
+    }
+
+    /// <summary>How often a file was laid: its cells over its size, rounded up - one where its size is not known.</summary>
+    private static int Instances(string path, int cells, Dictionary<string, TileIdentity> identities)
+    {
+        int size = identities.TryGetValue(path, out TileIdentity? identity) ? Math.Max(1, identity.Width * identity.Height) : cells;
+        return (cells + size - 1) / Math.Max(1, size);
+    }
+
+    /// <summary>A laid file in a line: its path under Metadata/Terrain, size, tag, edges and grounds, cells and times laid - and where, for a file laid once.</summary>
+    private static string LaidSaid(string path, int cells, Dictionary<string, TileIdentity> identities, TerrainTiles? tiles)
+    {
+        string name = path.StartsWith("Metadata/Terrain/", StringComparison.OrdinalIgnoreCase) ? path["Metadata/Terrain/".Length..] : path;
+        if (!identities.TryGetValue(path, out TileIdentity? identity))
+        {
+            return string.Create(CultureInfo.InvariantCulture, $"{name}  (no identity)  {cells} cells");
+        }
+
+        var said = new StringBuilder(name);
+        said.Append(CultureInfo.InvariantCulture, $"  {identity.Width}x{identity.Height}{(identity.Tag.Length > 0 ? " \"" + identity.Tag + "\"" : string.Empty)}");
+        said.Append(CultureInfo.InvariantCulture, $" edges [{string.Join(", ", identity.Edges.Select(Short))}] grounds [{string.Join(", ", identity.Grounds.Select(Short))}]");
+        if (cells > 0)
+        {
+            int laid = Instances(path, cells, identities);
+            said.Append(CultureInfo.InvariantCulture, $"  {cells} cells = laid {laid}x");
+            if (laid == 1 && tiles is not null && Bounds(tiles, path) is var (x0, y0, x1, y1))
+            {
+                said.Append(CultureInfo.InvariantCulture, $" at tiles {x0}..{x1}, {y0}..{y1}");
+            }
+        }
+
+        return said.ToString();
+    }
+
+    /// <summary>The tiles a file covers, as the corners of their bounding box - or null where it covers none.</summary>
+    private static (int X0, int Y0, int X1, int Y1)? Bounds(TerrainTiles tiles, string path)
+    {
+        int x0 = int.MaxValue, y0 = int.MaxValue, x1 = -1, y1 = -1;
+        for (var y = 0; y < tiles.Height; y++)
+        {
+            for (var x = 0; x < tiles.Width; x++)
+            {
+                if (string.Equals(tiles.PathAt(x, y), path, StringComparison.OrdinalIgnoreCase))
+                {
+                    x0 = Math.Min(x0, x);
+                    y0 = Math.Min(y0, y);
+                    x1 = Math.Max(x1, x);
+                    y1 = Math.Max(y1, y);
+                }
+            }
+        }
+
+        return x1 < 0 ? null : (x0, y0, x1, y1);
+    }
+
+    /// <summary>The distinct files laid under a footprint, most cells first.</summary>
+    private static string Under(TerrainTiles? tiles, RoomCandidate at)
+    {
+        if (tiles is null)
+        {
+            return "(tiles not read)";
+        }
+
+        var under = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        for (var y = at.Y; y < at.Y + at.Height; y++)
+        {
+            for (var x = at.X; x < at.X + at.Width; x++)
+            {
+                string path = tiles.PathAt(x, y);
+                under[path.Length > 0 ? path : "(none)"] = under.GetValueOrDefault(path.Length > 0 ? path : "(none)") + 1;
+            }
+        }
+
+        return string.Join(", ", under.OrderByDescending(one => one.Value).ThenBy(one => one.Key, StringComparer.OrdinalIgnoreCase)
+            .Select(one => string.Create(CultureInfo.InvariantCulture, $"{Short(one.Key)} x{one.Value}")));
+    }
 
     /// <summary>A capture's rooms placed by their doodads, as the tool would place them.</summary>
     /// <param name="Rooms">Every room of room-files.txt, read.</param>
@@ -258,9 +538,8 @@ public class CaptureReplayTests
     /// <summary>
     /// Each laid tile file's identity from tile-identities.txt, by path - or null where the capture has none (before 0.1.155), and the search scores corners alone.
     /// </summary>
-    private static Func<string, TileIdentity?>? Identities(string folder, out int count)
+    private static Dictionary<string, TileIdentity>? Identities(string folder)
     {
-        count = 0;
         string path = Path.Combine(folder, CaptureReport.TileIdentitiesFile);
         if (!File.Exists(path))
         {
@@ -281,8 +560,7 @@ public class CaptureReplayTests
             known[cells[0]] = new TileIdentity(width, height, cells[3], cells[4..8], cells[8..12]);
         }
 
-        count = known.Count;
-        return file => known.GetValueOrDefault(file);
+        return known;
     }
 
     /// <summary>Every room of room-files.txt, each block under its "##### path" header parsed as the file.</summary>
