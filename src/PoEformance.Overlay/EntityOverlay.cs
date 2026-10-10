@@ -3359,6 +3359,10 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             // that has the tool and not the game. The unpacker is the install's own Oodle, which
             // is what an animation's keyframes come out of the skeleton file through.
             Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize, unpack) { Book = "monster" },
+
+            // READ WHEN ASKED, not captured: the tile book is attached after this one, and the choice
+            // is whatever that book is open at when the stage is picked.
+            TileChoice = () => _tileBook?.ChosenTile ?? string.Empty,
         };
 
         window.Show(columns, rail, model, columnWidths, panes);

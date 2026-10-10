@@ -126,7 +126,29 @@ public static class TileModels
         return (model, ground, wide, tall);
     }
 
-    /// <summary>The walk behind <see cref="Of"/> and <see cref="Apart"/>.</summary>
+    /// <summary>
+    /// One tile as a stage for a monster: drawn whole, as <see cref="Of"/> draws it, with its ground given apart as well.
+    /// </summary>
+    /// <remarks>
+    /// THE GROUND TWICE, in the model and on its own, because the stage needs it both ways: drawn under
+    /// the monster, and asked how high it is where he stands - see StagedModels. The second copy is one
+    /// join of the ground pieces, at load.
+    /// </remarks>
+    internal static (MonsterModel Model, SkinnedMesh Ground) Stage(
+        Func<string, byte[]?> read,
+        string path,
+        bool walls,
+        bool shaded,
+        IReadOnlyDictionary<string, string>? swaps,
+        string tileset,
+        ModelProgress? progress)
+    {
+        (MonsterModel model, SkinnedMesh ground, _, _) = Built(
+            read, path, true, walls, shaded, swaps, tileset, default, new MonsterModels.Paints { Progress = progress }, apart: false, groundToo: true);
+        return (model, ground);
+    }
+
+    /// <summary>The walk behind <see cref="Of"/>, <see cref="Apart"/> and <see cref="Stage"/>.</summary>
     private static (MonsterModel Model, SkinnedMesh Ground, int Width, int Height) Built(
         Func<string, byte[]?> read,
         string path,
@@ -137,7 +159,8 @@ public static class TileModels
         string tileset,
         TileOrientation laid,
         MonsterModels.Paints? paints,
-        bool apart)
+        bool apart,
+        bool groundToo = false)
     {
         long bytes = 0;
         var files = 0;
@@ -237,11 +260,12 @@ public static class TileModels
         // THE GROUND AFTER THE PROPS, so the props' shapes keep the numbers the runs gave them and
         // every ground shape comes after - unnamed, and so unpainted. Or apart, where asked.
         SkinnedMesh groundApart = SkinnedMesh.None;
-        if (apart)
+        if (apart || groundToo)
         {
             groundApart = SkinnedMesh.Joined(grounds);
         }
-        else
+
+        if (!apart)
         {
             joins.AddRange(grounds);
         }

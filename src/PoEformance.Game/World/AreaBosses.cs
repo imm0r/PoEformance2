@@ -115,6 +115,39 @@ public sealed class AreaBosses
             : [];
 
     /// <summary>
+    /// The areas a monster is listed as the boss of, sorted - the table read backwards.
+    /// </summary>
+    /// <remarks>
+    /// A WALK OVER EVERY AREA, a few hundred, asked when a monster is chosen in a book and not per
+    /// frame; an index the other way would have to be rebuilt on every <see cref="Learn"/> for a
+    /// question asked a handful of times a session.
+    /// </remarks>
+    /// <param name="path">The monster's metadata path, as the table spells it.</param>
+    public IReadOnlyList<string> AreasOf(string? path)
+    {
+        if (path is not { Length: > 0 })
+        {
+            return [];
+        }
+
+        var areas = new List<string>();
+        foreach ((string area, IReadOnlyList<string> bosses) in Volatile.Read(ref _live))
+        {
+            foreach (string boss in bosses)
+            {
+                if (string.Equals(boss, path, StringComparison.OrdinalIgnoreCase))
+                {
+                    areas.Add(area);
+                    break;
+                }
+            }
+        }
+
+        areas.Sort(StringComparer.OrdinalIgnoreCase);
+        return areas;
+    }
+
+    /// <summary>
     /// Takes the game's own Bosses column for every area it lists, and returns how many moved.
     /// </summary>
     /// <remarks>

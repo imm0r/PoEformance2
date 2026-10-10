@@ -375,6 +375,36 @@ public sealed class BossIcons
         return clean.ToString();
     }
 
+    /// <summary>
+    /// The arena tiles written down for a boss's picture family, with their extension - where somebody stood in the room and said so.
+    /// </summary>
+    /// <remarks>
+    /// THE TILE TABLE READ BACKWARDS, for the model pane's stage: an entry pairs a tile to a family so
+    /// the arena wears the boss's picture, and the same pair says which tile the boss stands in. A walk
+    /// over the table, which holds a few dozen entries, asked when a monster is chosen and not per frame.
+    /// </remarks>
+    /// <param name="family">The family, as <see cref="FamilyOfPath"/> spells it.</param>
+    public IReadOnlyList<string> TilesOf(string family)
+    {
+        ArgumentNullException.ThrowIfNull(family);
+        if (family.Length == 0)
+        {
+            return [];
+        }
+
+        var tiles = new List<string>();
+        foreach ((string tile, string named) in _byTile)
+        {
+            if (string.Equals(named, family, StringComparison.OrdinalIgnoreCase))
+            {
+                tiles.Add(tile + TileExtension);
+            }
+        }
+
+        tiles.Sort(StringComparer.OrdinalIgnoreCase);
+        return tiles;
+    }
+
     /// <summary>The monsters the game lists as an area's bosses, best first.</summary>
     public IReadOnlyList<string> BossesIn(string areaId)
     {
