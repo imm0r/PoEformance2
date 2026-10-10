@@ -304,7 +304,14 @@ public sealed record WorldEntity(
     // effect on file carries the same generic VisibleServerGroundEffect. Resolving the row to a
     // name (and to the buffs that decide whether it damages anybody) needs the game's data
     // files, so it happens a layer up - see GroundEffectTypeTable.
-    int? GroundType = null)
+    int? GroundType = null,
+
+    // Whether anything can target this monster RIGHT NOW - the Targetable byte, as the corpse
+    // filter already reads it. Null is "could not say": no component, or a read that failed.
+    // Carried because a rule wants it and nothing else here kept it: a boss between phases
+    // and a monster still spawning both stand in every count with a full health bar, and a
+    // skill fired at either is mana spent on something the game refuses to hit.
+    bool? Targetable = null)
 {
     /// <summary>Whether this comes from memory rather than from the game's current list.</summary>
     public bool IsRemembered => RememberedForMs is not null;
@@ -1559,7 +1566,8 @@ public sealed class WorldReader
                 GroundSeconds: ReadGroundSeconds(entity),
                 GroundRadius: ReadGroundRadius(entity),
                 Beam: ReadBeam(entity),
-                GroundType: ReadGroundType(entity));
+                GroundType: ReadGroundType(entity),
+                Targetable: signs.Targetable);
 
             entities.Add(world);
             if (address == chain.PlayerEntity)

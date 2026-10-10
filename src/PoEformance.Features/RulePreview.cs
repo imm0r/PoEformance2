@@ -84,13 +84,18 @@ public static class RulePreview
         var found = new List<PreviewFact>();
         if (condition is not null)
         {
-            WalkFacts(condition, state, found, 0);
+            WalkFacts(condition, [], state, found, 0);
         }
 
         return found;
     }
 
-    private static void WalkFacts(RuleCondition node, RuleState state, List<PreviewFact> found, int depth)
+    private static void WalkFacts(
+        RuleCondition node,
+        IReadOnlyList<RuleCondition> beside,
+        RuleState state,
+        List<PreviewFact> found,
+        int depth)
     {
         if (depth > RuleCondition.MaxDepth || found.Count >= MaxFacts)
         {
@@ -101,7 +106,7 @@ public static class RulePreview
         {
             foreach (RuleCondition child in node.Children)
             {
-                WalkFacts(child, state, found, depth + 1);
+                WalkFacts(child, node.Children, state, found, depth + 1);
             }
 
             return;
@@ -109,11 +114,23 @@ public static class RulePreview
 
         FactInfo info = RuleFacts.Describe(node.Fact);
         string no = node.Negate ? "not " : string.Empty;
-        bool holds = node.Holds(state, QuietTimers, "preview");
+
+        // With its neighbours, as the engine evaluates it: a leaf asked on its own would
+        // answer IsTargetable as if it stood beside nothing.
+        bool holds = node.Holds(state, QuietTimers, "preview", beside);
 
         if (node.Fact == RuleFact.EverySeconds)
         {
             found.Add(new PreviewFact($"{no}every {Show(node.Argument)}s", holds, Known: true));
+            return;
+        }
+
+        if (node.Fact == RuleFact.IsTargetable && !RuleFacts.HasRange(beside))
+        {
+            // The one "no" that is a rule written wrong rather than a room that says no, and
+            // from the overlay the two look the same. Known is false so it is drawn the way
+            // an unreadable number is: a question with nothing to answer it.
+            found.Add(new PreviewFact($"{no}IsTargetable (no range condition beside it)", holds, Known: false));
             return;
         }
 
