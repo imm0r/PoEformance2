@@ -57,7 +57,14 @@ public readonly record struct RoomDoodad(int X, int Y, float Turn, float Scale, 
     /// whole area from the first frame. The game names no checkpoint in its UI either, beyond the
     /// one being hovered, so there is no second road to the ones outside the bubble.
     /// </remarks>
-    public bool IsProp => Stub.StartsWith("Metadata/MiscellaneousObjects/Doodad", StringComparison.OrdinalIgnoreCase);
+    public bool IsProp => IsPropPath(Stub);
+
+    /// <summary>Whether a stub is a plain prop's - see <see cref="IsProp"/>. For an entity's path as much as a line's.</summary>
+    public static bool IsPropPath(string stub)
+    {
+        ArgumentNullException.ThrowIfNull(stub);
+        return stub.StartsWith("Metadata/MiscellaneousObjects/Doodad", StringComparison.OrdinalIgnoreCase);
+    }
 }
 
 /// <summary>

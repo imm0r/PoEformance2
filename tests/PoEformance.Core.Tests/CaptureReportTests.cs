@@ -297,6 +297,12 @@ public class CaptureReportTests
         Assert.Equal($"7\t{Plain}\tMetadata/Doodads/Pot_01.ao\t1250.5\t2000\t-115\tsleeping", table[2]);
         Assert.Equal($"9\t{Plain}\t\t1300\t2100\t0\tawake", table[3]);
 
+        // A sighting remembered from the bubble is counted on the line and named in the table.
+        const string Checkpoint = "Metadata/MiscellaneousObjects/Checkpoints/Checkpoint_Endgame";
+        DoodadSurvey withMemory = survey with { Found = [.. survey.Found, new DoodadSighting(177, Checkpoint, string.Empty, 10309.78f, 10461.96f, -370f, false) { Remembered = true }] };
+        Assert.EndsWith(", read in 47 ms, 1 remembered from the bubble since", CaptureReport.Doodads(withMemory, null).Said, StringComparison.Ordinal);
+        Assert.EndsWith($"177\t{Checkpoint}\t\t10309.78\t10461.96\t-370\tremembered", CaptureReport.Sightings(withMemory).TrimEnd(), StringComparison.Ordinal);
+
         Assert.Equal(("doodads: not in an area", string.Empty), CaptureReport.Doodads(DoodadSurvey.Not("not in an area"), null));
     }
 

@@ -4122,6 +4122,11 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         // or not somebody happened to have the map up when they walked past it.
         _unrecognised.Note(_snapshot);
 
+        // THE ROOMS' SCRIPTED OBJECTS, for the same reason: a checkpoint passes through the frame's
+        // read while the player is near it, map up or not, and the rooms are placed by what has
+        // been near at any moment of the instance - see DoodadMemory.
+        _areaRooms?.Noticed(_snapshot.AreaHash, _snapshot.Entities);
+
         // The same argument, one step stronger: an arena is cleared during a fight, which is
         // the one moment nobody has their map up. Watched every frame so the marker has
         // already changed by the time anybody opens it.

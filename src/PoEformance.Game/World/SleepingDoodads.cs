@@ -14,7 +14,11 @@ namespace PoEformance.Game.World;
 /// <param name="Y">Where it stands, in world units.</param>
 /// <param name="Z">Its z, counted the game's way - up is minus.</param>
 /// <param name="Asleep">Whether it came out of the sleeping map rather than the awake one.</param>
-public readonly record struct DoodadSighting(uint Id, string Path, string Model, float X, float Y, float Z, bool Asleep);
+public readonly record struct DoodadSighting(uint Id, string Path, string Model, float X, float Y, float Z, bool Asleep)
+{
+    /// <summary>Whether it comes from the frame's read of the network bubble at some earlier moment rather than from the survey's walk - see DoodadMemory.</summary>
+    public bool Remembered { get; init; }
+}
 
 /// <summary>What one read of the area's entity maps for the rooms' doodads came to - see <see cref="SleepingDoodads"/>.</summary>
 /// <param name="SleepingSize">How many entities the sleeping map says it holds.</param>
