@@ -21,8 +21,8 @@ namespace PoEformance.Core.Tests;
 /// </remarks>
 public class TileFilesTests
 {
-    /// <summary>A version 7 definition: a string table, then the references and the size.</summary>
-    private static byte[] Tdt(string inherits = "", string template = "Art/Models/Terrain/Test/Arena.tgt",
+    /// <summary>A version 7 definition: a string table, then the references and the size. Shared with the capture's tests, which print one.</summary>
+    internal static byte[] Tdt(string inherits = "", string template = "Art/Models/Terrain/Test/Arena.tgt",
         int width = 2, int height = 1, int version = 7, bool grounds = false, string edge = "edge")
     {
         // THE TABLE STARTS WITH AN EMPTY STRING, so offset zero means "nothing" the way the game's

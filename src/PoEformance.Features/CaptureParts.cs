@@ -95,6 +95,9 @@ public static class CaptureParts
     /// <summary>The Tile Book's picked row against the rooms on the map, and where it parts with the area.</summary>
     public const string RoomPick = "room-pick";
 
+    /// <summary>Every tile file the area laid, as a room's slot asks about it.</summary>
+    public const string TileIdentities = "tile-identities";
+
     /// <summary>The survey of the area's entity maps for the rooms' doodads, every sighting listed.</summary>
     public const string Doodads = "doodads";
 
@@ -159,6 +162,9 @@ public static class CaptureParts
         new(RoomPick, "Rooms by ground and tiles", "the Tile Book's picked row", CaptureReport.PickFile,
             "The row picked in the Tile Book's room list held against the rooms on the map, and every place it parts with the "
             + "area - the two folds under the list. Nothing where no row is picked."),
+        new(TileIdentities, "Rooms by ground and tiles", "the laid tiles' definitions", CaptureReport.TileIdentitiesFile,
+            "Every distinct tile file the area laid, with what a room's slot is checked against - size, tag, edge and corner ground "
+            + "types. With the recording's terrain and room-files.txt it is what the ground-and-tile search runs again from without the game."),
 
         new(Doodads, "Rooms by doodads", "the doodads found", CaptureReport.DoodadsFile,
             "The survey of the area's entity maps for the rooms' doodads: each room's share, each path found and how many stand, "
