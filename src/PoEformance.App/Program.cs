@@ -3183,7 +3183,7 @@ internal static class Program
                 PoEformance.Game.Ui.UiScale scale = feed.Viewport;
                 return Task.Run(async () =>
                 {
-                    string index;
+                    PoEformance.Features.CapturePass pass;
                     try
                     {
                         // A FRESH animation table, so every animation the game names is asked for
@@ -3192,20 +3192,36 @@ internal static class Program
                         PoEformance.Game.Components.AnimationNames? animations = PoEformance.Features.CaptureMemory.ReadsWorld(ask.Reads)
                             ? PoEformance.Game.Components.AnimationNames.Load(FindDataFile("animations.tsv"))
                             : null;
-                        index = PoEformance.Features.CaptureMemory.Pass(
+                        pass = PoEformance.Features.CaptureMemory.Pass(
                             reader, schema, gameStatesStatic, rotation, itemNames, world.LandmarkNames, animations,
                             scale, fileRoot, areaCounter, ask.Reads);
                     }
                     catch (Exception exception)
                     {
-                        index = $"the pass failed: {exception}";
+                        pass = new PoEformance.Features.CapturePass($"the pass failed: {exception}", new Dictionary<string, string>());
                     }
                     finally
                     {
                         passed.TrySetResult();
                     }
 
-                    await File.WriteAllTextAsync(Path.Combine(ask.Folder, PoEformance.Features.CaptureMemory.IndexFile), index).ConfigureAwait(false);
+                    await File.WriteAllTextAsync(Path.Combine(ask.Folder, PoEformance.Features.CaptureMemory.IndexFile), pass.Index).ConfigureAwait(false);
+
+                    // The files only the pass can write - a monster's mods are read nowhere else -
+                    // beside the index, each on its own so one failing loses only itself.
+                    foreach ((string file, string text) in pass.Files)
+                    {
+                        try
+                        {
+                            await File.WriteAllTextAsync(Path.Combine(ask.Folder, file), text).ConfigureAwait(false);
+                        }
+                        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+                        {
+                            await File.AppendAllTextAsync(
+                                Path.Combine(ask.Folder, PoEformance.Features.CaptureMemory.IndexFile),
+                                $"\n{file} could not be written: {exception.Message}\n").ConfigureAwait(false);
+                        }
+                    }
                     long bytes = await recorded.ConfigureAwait(false);
                     return $"{bytes / 1024} KB: the overlay's own reads for {PoEformance.Features.CaptureReport.MemoryFrames} reader ticks and "
                         + $"one pass reading {PoEformance.Features.CaptureMemory.Said(ask.Reads)} from nothing - replay with --replay; "

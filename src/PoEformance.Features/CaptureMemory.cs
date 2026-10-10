@@ -16,6 +16,11 @@ namespace PoEformance.Features;
 /// <param name="Reads">What the ticked parts need read once more - see <see cref="CaptureParts.Reads"/>.</param>
 public sealed record CaptureMemoryAsk(string Folder, CaptureReads Reads);
 
+/// <summary>What one pass produced: its index, and the files the ticked parts had it write beside the recording.</summary>
+/// <param name="Index">What the pass read where - memory.txt.</param>
+/// <param name="Files">Each file by name, with its text - the parts that only the pass can write, such as monsters.txt.</param>
+public sealed record CapturePass(string Index, IReadOnlyDictionary<string, string> Files);
+
 /// <summary>
 /// The memory half of a capture: what the ticked parts need, read once more from nothing inside the recording - and an index of it.
 /// </summary>
@@ -59,8 +64,8 @@ public static class CaptureMemory
     /// <summary>The size the capture's recording stops growing at.</summary>
     public const long MaxTotalBytes = 96L * 1024 * 1024;
 
-    /// <summary>Whether the pass reads the world for these asks - asked for itself, or by the sweep, which follows the entities the world read lists.</summary>
-    public static bool ReadsWorld(CaptureReads reads) => (reads & (CaptureReads.World | CaptureReads.Sweep)) != 0;
+    /// <summary>Whether the pass reads the world for these asks - asked for itself, or by the sweep and the monsters, which follow the entities the world read lists.</summary>
+    public static bool ReadsWorld(CaptureReads reads) => (reads & (CaptureReads.World | CaptureReads.Sweep | CaptureReads.Monsters)) != 0;
 
     /// <summary>What the pass reads, in a few words - for the line that says what the recording holds.</summary>
     public static string Said(CaptureReads reads)
@@ -86,6 +91,11 @@ public static class CaptureMemory
             parts.Add("both entity maps with every named entity's model");
         }
 
+        if ((reads & CaptureReads.Monsters) != 0)
+        {
+            parts.Add("every monster's mods");
+        }
+
         if ((reads & CaptureReads.Sweep) != 0)
         {
             parts.Add("the raw bytes of the roots, one hop beyond them and the components around you");
@@ -95,7 +105,7 @@ public static class CaptureMemory
     }
 
     /// <summary>
-    /// The pass: whatever <paramref name="reads"/> asks for, in the order the stages need each other. Returns the index.
+    /// The pass: whatever <paramref name="reads"/> asks for, in the order the stages need each other. Returns the index and the files only the pass can write.
     /// </summary>
     /// <param name="reader">The recording's reader, so every read lands in it.</param>
     /// <param name="schema">The offsets.</param>
@@ -108,7 +118,7 @@ public static class CaptureMemory
     /// <param name="fileRoot">The FileRoot static, or zero.</param>
     /// <param name="areaCounter">The AreaChangeCounter static, or zero.</param>
     /// <param name="reads">What the ticked parts need - see <see cref="CaptureParts.Reads"/>.</param>
-    public static string Pass(
+    public static CapturePass Pass(
         IMemoryReader reader,
         OffsetSchema schema,
         ulong gameStatesStatic,
@@ -124,12 +134,13 @@ public static class CaptureMemory
         ArgumentNullException.ThrowIfNull(reader);
         ArgumentNullException.ThrowIfNull(schema);
         var said = new StringBuilder();
+        var written = new Dictionary<string, string>(StringComparer.Ordinal);
         long started = Environment.TickCount64;
         said.Append("the pass reads ").AppendLine(Said(reads));
         if (reads == CaptureReads.None)
         {
             said.AppendLine("the recording holds the overlay's own reads alone - no ticked part asked for more");
-            return said.ToString();
+            return new CapturePass(said.ToString(), written);
         }
 
         WorldSnapshot? snapshot = null;
@@ -204,6 +215,17 @@ public static class CaptureMemory
                     $"sleeping map {survey.SleepingNodes} of {survey.SleepingSize} walked, awake {survey.AwakeNodes}, {survey.Named} with a path, {survey.Found.Count} with a position"));
         }
 
+        if ((reads & CaptureReads.Monsters) != 0 && snapshot is not null)
+        {
+            // After the world read it lists from, before the sweep: a mod walk per monster is a
+            // few reads each, and the file is the one the before-and-after comparison is made on.
+            long monstersFrom = Environment.TickCount64;
+            string report = CaptureMonsters.Report(reader, schema, snapshot, names);
+            written[CaptureReport.MonstersFile] = report;
+            said.AppendLine().Append("=== every monster's mods, buffs and targetable byte, and the marked places beside them: ").AppendLine(Ms(monstersFrom));
+            said.Append(CaptureReport.MonstersFile).Append(": ").AppendLine(report[..Math.Max(0, report.IndexOf('\n'))]);
+        }
+
         if ((reads & CaptureReads.Sweep) != 0 && snapshot is not null)
         {
             long sweptFrom = Environment.TickCount64;
@@ -217,7 +239,7 @@ public static class CaptureMemory
         }
 
         said.AppendLine().Append("the whole pass took ").AppendLine(Ms(started));
-        return said.ToString();
+        return new CapturePass(said.ToString(), written);
     }
 
     private static string Ms(long from) => $"{Environment.TickCount64 - from} ms";
