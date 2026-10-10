@@ -130,21 +130,30 @@ public sealed record RuleCondition
     /// reference plugin's expression form makes the user do, with a copy-pasted rule silently
     /// sharing its original's timer as the reward for forgetting.
     /// </param>
-    public bool Holds(RuleState state, RuleTimers timers, string key)
+    /// <param name="beside">
+    /// The conditions this one is grouped with, when it is evaluated out of its tree - the
+    /// preview walks leaves one at a time and still has to answer them as the rule would. Left
+    /// out, a root condition has no neighbours, which is the truth of a root.
+    /// </param>
+    public bool Holds(RuleState state, RuleTimers timers, string key, IReadOnlyList<RuleCondition>? beside = null)
     {
         ArgumentNullException.ThrowIfNull(state);
         ArgumentNullException.ThrowIfNull(timers);
 
         int ordinal = 0;
-        return Holds(state, timers, key, ref ordinal);
+        return Holds(state, timers, key, ref ordinal, beside ?? []);
     }
 
-    private bool Holds(RuleState state, RuleTimers timers, string key, ref int ordinal)
+    private bool Holds(
+        RuleState state, RuleTimers timers, string key, ref int ordinal, IReadOnlyList<RuleCondition> beside)
     {
         bool answer;
         if (Kind == ConditionKind.Fact)
         {
-            answer = RuleFacts.Holds(this, state, timers, $"{key}#{ordinal++}");
+            // A leaf is handed the group it sits in, and that is the one way a leaf here
+            // learns anything beyond the game: IsTargetable asks about the monsters its
+            // neighbours select, so a box in the editor is the scope of the question.
+            answer = RuleFacts.Holds(this, state, timers, $"{key}#{ordinal++}", beside);
         }
         else if (Children.Count == 0)
         {
@@ -168,7 +177,7 @@ public sealed record RuleCondition
         int held = 0;
         foreach (RuleCondition child in Children)
         {
-            if (child.Holds(state, timers, key, ref ordinal))
+            if (child.Holds(state, timers, key, ref ordinal, Children))
             {
                 held++;
             }

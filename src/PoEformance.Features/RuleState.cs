@@ -521,7 +521,11 @@ public sealed record RuleState
 
                 // The UNRESERVED pool, so this number and the percentage above share a
                 // denominator - see NearMonster.Pool.
-                entity.Life.Unreserved));
+                entity.Life.Unreserved,
+
+                // Only an explicit yes. Null is a component nobody could read, and the rule
+                // this feeds presses keys - see AnyTargetableIn.
+                entity.Targetable == true));
         }
 
         found.Sort(static (left, right) => left.Distance.CompareTo(right.Distance));
@@ -563,6 +567,161 @@ public sealed record RuleState
 
         return total;
     }
+
+    /// <summary>
+    /// Whether any monster the range conditions among these select can be targeted right now.
+    /// </summary>
+    /// <remarks>
+    /// The one fact that asks about its NEIGHBOURS. "Is something targetable" has no meaning
+    /// without saying which monsters, and the rule has already said: the 'within' conditions
+    /// it is grouped with name a centre, a radius, a rarity and whether a wall is in the way.
+    /// So IsTargetable asks exactly the monsters those count - beside RareOrUniqueCountWithin
+    /// only the rares and uniques, beside MonsterCountInSight only the reachable ones - and
+    /// holds when one of them answers yes. Any of them: a rule wired as "A or B" is a rule
+    /// about either region, and so is the question.
+    ///
+    /// Groups among the neighbours are walked into, so an IsTargetable beside two boxes sees
+    /// the range conditions in both. Beside no range condition at all the answer is NO rather
+    /// than "any monster anywhere": a condition that fires on a targetable monster three
+    /// screens away would press keys at nothing, and <see cref="RuleFacts.HasRange"/> lets the
+    /// preview say which of the two kinds of no this is.
+    ///
+    /// WHY THE BYTE IS WORTH A CONDITION. Every count here is of LIVE monsters, and alive is
+    /// not the same as hittable: a boss between its phases and a monster still rising out of
+    /// the ground both carry a full health bar and read untargetable, and a skill cast at
+    /// either is mana spent on something the game refuses to hit. The byte is the game's own
+    /// answer - see Targetable.IsTargetable in the schema, the same byte the corpse filter
+    /// trusts - and a monster whose byte could not be read is NOT targetable here, on the
+    /// null rule that runs through this sheet: a rule that presses a key stays quiet on a
+    /// guess.
+    /// </remarks>
+    public bool AnyTargetableIn(IReadOnlyList<RuleCondition> beside)
+    {
+        ArgumentNullException.ThrowIfNull(beside);
+        return AnyTargetableIn(beside, 0);
+    }
+
+    private bool AnyTargetableIn(IReadOnlyList<RuleCondition> conditions, int depth)
+    {
+        if (depth > RuleCondition.MaxDepth)
+        {
+            return false;
+        }
+
+        foreach (RuleCondition condition in conditions)
+        {
+            if (condition.Kind != ConditionKind.Fact)
+            {
+                if (AnyTargetableIn(condition.Children, depth + 1))
+                {
+                    return true;
+                }
+
+                continue;
+            }
+
+            FactInfo info = RuleFacts.Describe(condition.Fact);
+            if (info.Argument != FactArgument.Distance)
+            {
+                continue;
+            }
+
+            if (info.AtCursor
+                ? AnyTargetableAtCursor(condition.Fact, condition.Argument)
+                : AnyTargetableWithin(condition.Fact, condition.Argument))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>A targetable monster among those a player-centred range fact counts.</summary>
+    private bool AnyTargetableWithin(RuleFact fact, double distance)
+    {
+        bool inSight = fact == RuleFact.MonsterCountInSight;
+        TerrainGrid? grid = null;
+        int fromX = 0, fromY = 0;
+        if (inSight)
+        {
+            // The same answer MonsterCountInSight gives while the terrain is loading: nothing
+            // is in sight, so nothing in sight is targetable.
+            if (Terrain is not TerrainGrid loaded || PlayerAt is not (float px, float py))
+            {
+                return false;
+            }
+
+            grid = loaded;
+            (fromX, fromY) = Cell(px, py);
+        }
+
+        foreach (NearMonster monster in Monsters)
+        {
+            // Sorted nearest first, so the first one out of range ends the walk.
+            if (monster.Distance > distance)
+            {
+                break;
+            }
+
+            if (!monster.Targetable || !Counted(fact, monster))
+            {
+                continue;
+            }
+
+            if (grid is TerrainGrid walkable)
+            {
+                (int toX, int toY) = Cell(monster.WorldX, monster.WorldY);
+                if (!walkable.IsClearLine(fromX, fromY, toX, toY))
+                {
+                    continue;
+                }
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>A targetable monster among those a cursor-centred range fact counts.</summary>
+    private bool AnyTargetableAtCursor(RuleFact fact, double distance)
+    {
+        if (CursorGround is not (float cx, float cy))
+        {
+            return false;
+        }
+
+        foreach (NearMonster monster in Monsters)
+        {
+            // Not sorted by this measure - see CountAtCursor - so every monster is looked at.
+            if (monster.Targetable && Counted(fact, monster) && Away(monster, cx, cy) <= distance)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Whether a range fact would count this monster, radius aside.
+    /// </summary>
+    /// <remarks>
+    /// Each fact's own filter, restated in one place so IsTargetable asks the same monsters
+    /// its neighbour counts. The life facts are the subtle ones: <see cref="LowestWithin"/>
+    /// skips a monster with no reading rather than ranking it lowest, so one with no reading
+    /// is not among the monsters that fact is about.
+    /// </remarks>
+    private static bool Counted(RuleFact fact, NearMonster monster) => fact switch
+    {
+        RuleFact.RareOrUniqueCountWithin or RuleFact.RareOrUniqueCountAtCursor => RareOrUnique(monster.Rarity),
+        RuleFact.LowestMonsterLifePercent or RuleFact.LowestMonsterLifePercentAtCursor => monster.LifePercent is not null,
+        RuleFact.LowestMagicMonsterLifePercent => monster.Rarity == ItemRarity.Magic && monster.LifePercent is not null,
+        RuleFact.LowestRareMonsterLifePercent => monster.Rarity == ItemRarity.Rare && monster.LifePercent is not null,
+        RuleFact.LowestUniqueMonsterLifePercent => monster.Rarity == ItemRarity.Unique && monster.LifePercent is not null,
+        _ => true,
+    };
 
     /// <summary>
     /// The monster an aiming effect should put the cursor on, or null when there is none.
@@ -751,6 +910,11 @@ public sealed record RuleState
 /// performed on it is equality. That is what keeps the exception from becoming the door the
 /// type was shaped to close.
 /// </param>
+/// <param name="Targetable">
+/// Whether the game would let a click land on it right now. False for a byte that could not
+/// be read as well as for a 0, because the one rule asking (<see cref="RuleState.AnyTargetableIn"/>)
+/// presses keys on a yes.
+/// </param>
 public readonly record struct NearMonster(
     double Distance,
     ItemRarity Rarity,
@@ -760,7 +924,8 @@ public readonly record struct NearMonster(
     float WorldZ = 0,
     ulong Address = 0,
     int Life = 0,
-    int LifeMax = 0)
+    int LifeMax = 0,
+    bool Targetable = false)
 {
     /// <summary>Its pool as the log prints it - "1240/3600 34%", or empty when unread.</summary>
     /// <remarks>

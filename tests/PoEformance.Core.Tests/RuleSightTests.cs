@@ -15,7 +15,7 @@ namespace PoEformance.Core.Tests;
 public class RuleSightTests
 {
     /// <summary>A grid from rows of '.' (walkable) and '#' (solid), packed as the game packs it.</summary>
-    private static TerrainGrid Grid(params string[] rows)
+    internal static TerrainGrid Grid(params string[] rows)
     {
         int width = rows[0].Length;
         int stride = (width + 1) / 2;
@@ -36,7 +36,7 @@ public class RuleSightTests
     }
 
     /// <summary>The middle of grid cell (x, y), in world units.</summary>
-    private static (float X, float Y) At(int cellX, int cellY)
+    internal static (float X, float Y) At(int cellX, int cellY)
         => ((cellX + 0.5f) * PoEformance.Game.Ui.MapView.WorldToGrid,
             (cellY + 0.5f) * PoEformance.Game.Ui.MapView.WorldToGrid);
 

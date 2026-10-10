@@ -55,6 +55,7 @@ public enum RuleFact
     LowestRareMonsterLifePercent,
     LowestUniqueMonsterLifePercent,
     LowestMonsterLifePercentAtCursor,
+    IsTargetable,
 
     HasBuff,
     BuffTimeLeft,
@@ -174,6 +175,7 @@ public static class RuleFacts
         new(RuleFact.LowestRareMonsterLifePercent, "LowestRareMonsterLifePercent", FactShape.Number, FactArgument.Distance, "%", "Life of the weakest live RARE monster within a radius of the player. No rare in range is no answer, so every comparison says no."),
         new(RuleFact.LowestUniqueMonsterLifePercent, "LowestUniqueMonsterLifePercent", FactShape.Number, FactArgument.Distance, "%", "Life of the weakest live UNIQUE monster within a radius of the player - the boss threshold. No unique in range is no answer, so every comparison says no."),
         new(RuleFact.LowestMonsterLifePercentAtCursor, "LowestMonsterLifePercentAtCursor", FactShape.Number, FactArgument.Distance, "%", "Life of the weakest live monster within a radius of where the CURSOR points - the question a skill aimed at something asks. No answer while the pointer is off the game.", AtCursor: true),
+        new(RuleFact.IsTargetable, "IsTargetable", FactShape.Flag, FactArgument.None, "", "At least one of the monsters the range conditions BESIDE IT select can be targeted right now - the game's own byte, the one that decides whether a click lands. Put it in the same box as a 'within' condition: beside MonsterCountAtCursor(400) it asks the monsters within 400 of the cursor, beside RareOrUniqueCountWithin(300) only the rares and uniques within 300, beside MonsterCountInSight only the ones with a clear line. Every range condition in its box counts, and those in boxes wired into it; beside none it is never true. A boss between phases and a monster still spawning are in the count and not targetable, and a monster whose byte cannot be read counts as not targetable."),
 
         new(RuleFact.HasBuff, "HasBuff", FactShape.Flag, FactArgument.Text, "", "A buff or debuff whose name contains this is on the player."),
         new(RuleFact.BuffTimeLeft, "BuffTimeLeft", FactShape.Number, FactArgument.Text, "s", "Seconds left on that buff. A buff nobody has is no answer, not zero."),
@@ -207,13 +209,23 @@ public static class RuleFacts
     /// <summary>
     /// Whether one leaf holds.
     /// </summary>
+    /// <param name="beside">
+    /// The other conditions in the leaf's group, for the one fact that asks about ITS
+    /// NEIGHBOURS rather than about the game: <see cref="RuleFact.IsTargetable"/>. Empty for a
+    /// leaf standing alone, which is the only state a caption placeholder or a root leaf has.
+    /// </param>
     /// <remarks>
     /// A flag answers itself. A NUMBER goes through <see cref="Satisfies"/>, and the whole
     /// point of that is what happens when the number is not known: the comparison says no,
     /// whichever way round it was written. An unreadable life pool must not satisfy "below
     /// 35", and an empty room must not satisfy "the nearest rare is at least 100 away".
     /// </remarks>
-    internal static bool Holds(RuleCondition leaf, RuleState state, RuleTimers timers, string key)
+    internal static bool Holds(
+        RuleCondition leaf,
+        RuleState state,
+        RuleTimers timers,
+        string key,
+        IReadOnlyList<RuleCondition>? beside = null)
     {
         FactInfo info = Describe(leaf.Fact);
 
@@ -227,8 +239,40 @@ public static class RuleFacts
         }
 
         return info.Shape == FactShape.Flag
-            ? Flag(leaf, state)
+            ? Flag(leaf, state, beside ?? [])
             : Satisfies(Answer(leaf, state), leaf.Compare, leaf.Value);
+    }
+
+    /// <summary>
+    /// Whether any condition in these, or in a group among them, measures a radius.
+    /// </summary>
+    /// <remarks>
+    /// The same walk <see cref="RuleState.AnyTargetableIn"/> makes, asked a different
+    /// question: not "is one of those monsters targetable" but "is there anything to ask".
+    /// The preview needs the second answer on its own, because an IsTargetable beside no
+    /// range condition is false in the same way as one beside a room full of untargetable
+    /// monsters, and only one of those is a rule written wrong.
+    /// </remarks>
+    public static bool HasRange(IReadOnlyList<RuleCondition> conditions, int depth = 0)
+    {
+        ArgumentNullException.ThrowIfNull(conditions);
+
+        if (depth > RuleCondition.MaxDepth)
+        {
+            return false;
+        }
+
+        foreach (RuleCondition condition in conditions)
+        {
+            if (condition.Kind == ConditionKind.Fact
+                ? Describe(condition.Fact).Argument == FactArgument.Distance
+                : HasRange(condition.Children, depth + 1))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>Whether a number satisfies a comparison. An absent number never does.</summary>
@@ -256,7 +300,7 @@ public static class RuleFacts
         };
     }
 
-    private static bool Flag(RuleCondition leaf, RuleState state) => leaf.Fact switch
+    private static bool Flag(RuleCondition leaf, RuleState state, IReadOnlyList<RuleCondition> beside) => leaf.Fact switch
     {
         RuleFact.InGame => state.InGame,
         RuleFact.GameFocused => state.GameFocused,
@@ -270,6 +314,7 @@ public static class RuleFacts
         RuleFact.AreaContains => state.AreaContains(leaf.Text),
         RuleFact.FlaskActive => state.FlaskActive(Slot(leaf)),
         RuleFact.FlaskReady => state.FlaskReady(Slot(leaf)),
+        RuleFact.IsTargetable => state.AnyTargetableIn(beside),
         _ => false,
     };
 
