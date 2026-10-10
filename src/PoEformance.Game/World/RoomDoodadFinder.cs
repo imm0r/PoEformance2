@@ -40,6 +40,9 @@ public sealed record RoomDoodadPlace(RoomCandidate Where, int Hits, int Lines, f
     /// </summary>
     public IReadOnlyList<string> Variants { get; init; } = [];
 
+    /// <summary>Whether the footprint drawn for the <see cref="Variants"/> is the room's whole one, every way it stands on the tile agreeing on it, rather than the anchor tile's own. False for a room's own place.</summary>
+    public bool WholeRoom { get; init; }
+
     /// <summary>How many of this place's entities another place also hit - the measure of whether the two are one room's doodads claimed twice.</summary>
     public int Shared(RoomDoodadPlace other)
     {

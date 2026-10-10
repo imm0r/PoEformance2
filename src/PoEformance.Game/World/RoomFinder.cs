@@ -567,6 +567,29 @@ public static class RoomFinder
     }
 
     /// <summary>
+    /// The area cell a slot's footprint starts on, for a candidate laid one of the eight ways: the lowest corner of the slot's rectangle laid that way - where its tile's first piece sits.
+    /// </summary>
+    /// <remarks>
+    /// NOT THE SLOT'S OWN CELL TURNED. A tile's first piece is the lowest corner of its LAID footprint
+    /// whichever way it went - measured over three Sinter Rift captures on every laid file at every
+    /// placement, oblong ones included, the pieces running right and down from it in the area's own
+    /// axes - while the origin cell of a three by three slot turned a quarter lands on the far side of
+    /// its footprint. Two opposite corners of the rectangle go to two opposite corners of its image,
+    /// so the lower of their two images is the image's corner.
+    /// </remarks>
+    public static (int X, int Y) CornerOf(int column, int line, int slotWidth, int slotHeight, int width, int height, int turn)
+    {
+        (int ax, int ay) = CellOf(column, line, width, height, turn);
+        if (slotWidth == 1 && slotHeight == 1)
+        {
+            return (ax, ay);
+        }
+
+        (int bx, int by) = CellOf(column + slotWidth - 1, line + slotHeight - 1, width, height, turn);
+        return (Math.Min(ax, bx), Math.Min(ay, by));
+    }
+
+    /// <summary>
     /// The matrix taking a point of the room as its file has it - (u, v) in tiles, u along its columns and v along its lines - to the footprint of a candidate laid one of the eight ways, in tiles from the footprint's corner.
     /// </summary>
     /// <remarks>

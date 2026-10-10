@@ -16,7 +16,7 @@ namespace PoEformance.Game.World;
 public sealed record RoomTilePlace(RoomCandidate Where, string Anchor, int AnchorLaid, int AnchorX, int AnchorY, int AnchorWide, int AnchorTall, bool AnchorTagged);
 
 /// <summary>Where a room's big slots' tiles say it stands - every place - or why nowhere.</summary>
-/// <param name="Places">The places, most slots agreeing first, one per footprint.</param>
+/// <param name="Places">The places, most slots agreeing first - a footprint stood on several ways round is several places, one a way.</param>
 /// <param name="Why">Why there is no place, or empty.</param>
 public sealed record RoomTilePlaces(IReadOnlyList<RoomTilePlace> Places, string Why)
 {
@@ -33,6 +33,12 @@ public sealed record RoomTilePlaces(IReadOnlyList<RoomTilePlace> Places, string 
     public int Tried { get; init; }
 }
 
+/// <summary>A place one of a room's few doodad lines confirms - see <see cref="RoomTileFinder.Claims"/>.</summary>
+/// <param name="Place">The place.</param>
+/// <param name="Entity">The entity confirming it, as an index into the sightings given: the one nearest to where the place puts a line of its path.</param>
+/// <param name="Units">How far that entity stands from where the line is put, in world units - within a tile.</param>
+public sealed record RoomTileClaim(RoomTilePlace Place, int Entity, float Units);
+
 /// <summary>
 /// Finds where a room was laid by its big slots' tiles - for the rooms the doodads cannot place.
 /// </summary>
@@ -48,6 +54,17 @@ public sealed record RoomTilePlaces(IReadOnlyList<RoomTilePlace> Places, string 
 /// seventeen tiles were laid every one of the eight ways between them, first piece on the slot's cell
 /// all the same - so a room with one big slot and nothing to fix the way round stays undecided.
 ///
+/// THE FIRST PIECE IS THE LAID FOOTPRINT'S LOWEST CORNER whichever way the tile went: measured over
+/// three Sinter Rift captures on every laid file at every placement, square and oblong - SteamVent_03's
+/// 2x3 laid 3x2 at placements 4 and 6, StSW_TitanFeature01's 6x3 laid 3x6 at 4 and 5 - with the pieces
+/// running right and down from it in the area's own axes. So a turned big slot's corner is the lowest
+/// corner of its rectangle turned (RoomFinder.CornerOf), NOT its origin cell turned, which for a three
+/// by three slot turned a quarter lands on the far side of the footprint: taken for the corner, it put
+/// the StoneCircle two tiles left of its tile and a second checkpoint room inside the first, each
+/// "confirmed" by a line that landed near enough through the symmetry of a small room. And a footprint
+/// is kept once a WAY ROUND, not once: the ways put a doodad line in different places, and the one way
+/// the checkpoint stood at was the one a footprint kept once had dropped.
+///
 /// ANCHORED ON THE RAREST. Every cell carrying the first piece of a tile alike to the room's rarest big
 /// kind of slot is where that slot's corner could be; each of the eight ways round gives the footprint's
 /// corner from it. A candidate is a place when EVERY big slot has a tile alike with its first piece on
@@ -57,7 +74,9 @@ public sealed record RoomTilePlaces(IReadOnlyList<RoomTilePlace> Places, string 
 /// WHAT IT CANNOT TELL: a room with one big slot and nothing to fix the way round stands on its tile
 /// several ways, and variants of a room - Sinter Rift's four entrances share one ForgeEntrance slot and
 /// differ in slots the tiles do not tell apart - stand on one tile together. <see cref="Settled"/> draws
-/// such a tile's own footprint once, under the name the rooms share, which is what was asked for.
+/// the footprint they agree on, or the tile's own where they do not, once under the name the rooms share:
+/// Sinter Rift's two entrances that fit stand on one 12 by 12 footprint, and their checkpoint stands in
+/// it and outside the 6 by 6 forge tile that used to be drawn for them.
 ///
 /// A FINGERPRINT IS A FEATURE TILE LAID ONCE - a slot that names a tag, asking for a feature and not a
 /// piece of terrain, answered by one tile in the area. Sinter Rift's ledge checkpoints are one untagged
@@ -203,14 +222,24 @@ public static class RoomTileFinder
             }
         }
 
+        // A BIG SLOT'S TILE LAID WHOLE: its first piece on the slot's corner and its last on the far one -
+        // the pieces run right and down from the first in the area's own axes, see the class remarks.
+        bool Whole(Slot one, int cx, int cy, int id, int turn)
+        {
+            (int wide, int tall) = (turn & 1) == 0 ? (one.Width, one.Height) : (one.Height, one.Width);
+            return tiles.SubAt(cx, cy) is (0, 0)
+                && tiles.IdAt(cx + wide - 1, cy + tall - 1) == id
+                && tiles.SubAt(cx + wide - 1, cy + tall - 1) == (wide - 1, tall - 1);
+        }
+
         // THE CANDIDATES: each anchor slot on each anchor cell, each of the eight ways round; a candidate
-        // stands when every big slot has a tile alike with its first piece on the slot's own cell.
+        // stands when every big slot has a tile alike laid whole on the slot's rectangle that way round.
         RoomCandidate? Scored(int x, int y, int turn, int wide, int tall)
         {
             int count = 0, agree = 0, big = 0, bigAgree = 0;
             foreach (Slot one in slots)
             {
-                (int sx, int sy) = RoomFinder.CellOf(one.Column, one.Line, room.Width, room.Height, turn);
+                (int sx, int sy) = RoomFinder.CornerOf(one.Column, one.Line, one.Width, one.Height, room.Width, room.Height, turn);
                 int id = tiles.IdAt(x + sx, y + sy);
                 byte verdict = (uint)id < (uint)files ? Verdict(one.Kind, id) : SlotWants.Unknown;
                 if (verdict == SlotWants.Unknown)
@@ -225,7 +254,7 @@ public static class RoomTileFinder
 
                 count++;
                 big += one.Big ? 1 : 0;
-                bool alike = verdict == SlotWants.Alike && (!one.Big || tiles.SubAt(x + sx, y + sy) is (0, 0));
+                bool alike = verdict == SlotWants.Alike && (!one.Big || Whole(one, x + sx, y + sy, id, turn));
                 if (alike)
                 {
                     agree++;
@@ -253,7 +282,7 @@ public static class RoomTileFinder
             {
                 for (var turn = 0; turn < 8; turn++)
                 {
-                    (int dx, int dy) = RoomFinder.CellOf(anchoring.Column, anchoring.Line, room.Width, room.Height, turn);
+                    (int dx, int dy) = RoomFinder.CornerOf(anchoring.Column, anchoring.Line, anchoring.Width, anchoring.Height, room.Width, room.Height, turn);
                     int x = cx - dx;
                     int y = cy - dy;
                     (int wide, int tall) = (turn & 1) == 0 ? (room.Width, room.Height) : (room.Height, room.Width);
@@ -273,9 +302,10 @@ public static class RoomTileFinder
             }
         }
 
-        // MOST SLOTS AGREEING FIRST, then the grid's order, so an area settles the same way every time;
-        // one place per footprint, as the doodads keep them: a room symmetric enough to stand one place
-        // several ways round is one place.
+        // MOST SLOTS AGREEING FIRST, then the grid's order, so an area settles the same way every time.
+        // EVERY WAY ROUND IS KEPT - a footprint stood on several ways is several places, not one: the way
+        // round is what a doodad line tells apart (Confirmed), and Settled draws a footprint stood on
+        // several ways once. Kept once per footprint, the way the checkpoint stood was the one dropped.
         places.Sort((a, b) =>
         {
             int order = b.Where.TilesAgree.CompareTo(a.Where.TilesAgree);
@@ -284,20 +314,10 @@ public static class RoomTileFinder
             return order != 0 ? order : a.Where.Turn.CompareTo(b.Where.Turn);
         });
 
-        var kept = new List<RoomTilePlace>(places.Count);
-        var footprints = new HashSet<(int X, int Y, int Wide, int Tall)>();
-        foreach (RoomTilePlace place in places)
-        {
-            if (footprints.Add((place.Where.X, place.Where.Y, place.Where.Width, place.Where.Height)))
-            {
-                kept.Add(place);
-            }
-        }
-
         string said = SlotWants.Said(kinds[anchor]);
         return new RoomTilePlaces(
-            kept,
-            kept.Count > 0 ? string.Empty : string.Create(CultureInfo.InvariantCulture, $"none of {tried.Count} candidates on its {said} slot's tile has every big slot alike"))
+            places,
+            places.Count > 0 ? string.Empty : string.Create(CultureInfo.InvariantCulture, $"none of {tried.Count} candidates on its {said} slot's tile has every big slot alike"))
         {
             Anchor = said,
             Anchors = anchorCells[anchor].Count,
@@ -306,15 +326,26 @@ public static class RoomTileFinder
     }
 
     /// <summary>
-    /// The places a room's few doodad lines confirm: one with an entity of a line's path and model within a tile of where the place puts the line - the lines too few for RoomDoodadFinder to place the room by, enough to pick among places its tiles found. Every place, unconfirmed, where no line has an entity anywhere, since a scripted object's absence says nothing; every place too where lines have entities and none stands at any place, the entities being some other instance's.
+    /// The places a room's few doodad lines confirm - <see cref="Claims"/> without the entities - or every place, unconfirmed, where none is: where no line has an entity anywhere, since a scripted object's absence says nothing, and where the entities stand at no place, being some other instance's.
+    /// </summary>
+    /// <returns>The places kept, and whether a doodad picked them.</returns>
+    public static (IReadOnlyList<RoomTilePlace> Places, bool Confirmed) Confirmed(
+        IReadOnlyList<RoomTilePlace> places, IReadOnlyList<RoomDoodad> doodads, int width, int height, IReadOnlyList<DoodadSighting> sightings)
+    {
+        ArgumentNullException.ThrowIfNull(places);
+        List<RoomTileClaim> claims = Claims(places, doodads, width, height, sightings);
+        return claims.Count > 0 ? ([.. claims.Select(claim => claim.Place)], true) : (places, false);
+    }
+
+    /// <summary>
+    /// The places a room's few doodad lines confirm, each with the entity confirming it: one of a line's path and model within a tile of where the place puts the line, the nearest where several are - the lines too few for RoomDoodadFinder to place the room by, enough to pick among places its tiles found. None where no line has an entity anywhere, or where the entities stand at no place.
     /// </summary>
     /// <param name="places">The places the tiles found.</param>
     /// <param name="doodads">The room's doodad lines.</param>
     /// <param name="width">The room's grid across, in tiles.</param>
     /// <param name="height">The room's grid down.</param>
-    /// <param name="sightings">The area's doodad entities.</param>
-    /// <returns>The places kept, and whether a doodad picked them.</returns>
-    public static (IReadOnlyList<RoomTilePlace> Places, bool Confirmed) Confirmed(
+    /// <param name="sightings">The area's doodad entities, which the claims index.</param>
+    public static List<RoomTileClaim> Claims(
         IReadOnlyList<RoomTilePlace> places, IReadOnlyList<RoomDoodad> doodads, int width, int height, IReadOnlyList<DoodadSighting> sightings)
     {
         ArgumentNullException.ThrowIfNull(places);
@@ -322,7 +353,7 @@ public static class RoomTileFinder
         ArgumentNullException.ThrowIfNull(sightings);
         if (places.Count == 0 || width <= 0 || height <= 0)
         {
-            return (places, false);
+            return [];
         }
 
         // THE LINES WITH AN ENTITY SOMEWHERE: by path, and by model where both have one - as the finder pairs them.
@@ -354,45 +385,42 @@ public static class RoomTileFinder
 
         if (lines.Count == 0)
         {
-            return (places, false);
+            return [];
         }
 
         float side = RoomDoodadFinder.WithinUnits;
-        var confirmed = new List<RoomTilePlace>();
+        var claims = new List<RoomTileClaim>();
         foreach (RoomTilePlace place in places)
         {
             Matrix3x2 laying = RoomFinder.Laying(width, height, place.Where.Turn);
-            var stands = false;
+            int nearest = -1;
+            float units = float.MaxValue;
             foreach ((RoomDoodad line, List<int> entities) in lines)
             {
                 Vector2 at = Vector2.Transform(new Vector2(line.X, line.Y) / TerrainGrid.CellsPerTile, laying);
                 var where = new Vector2(place.Where.X + at.X, place.Where.Y + at.Y) * side;
                 foreach (int one in entities)
                 {
-                    if (Vector2.Distance(new Vector2(sightings[one].X, sightings[one].Y), where) <= side)
+                    float off = Vector2.Distance(new Vector2(sightings[one].X, sightings[one].Y), where);
+                    if (off < units)
                     {
-                        stands = true;
-                        break;
+                        units = off;
+                        nearest = one;
                     }
-                }
-
-                if (stands)
-                {
-                    break;
                 }
             }
 
-            if (stands)
+            if (nearest >= 0 && units <= side)
             {
-                confirmed.Add(place);
+                claims.Add(new RoomTileClaim(place, nearest, units));
             }
         }
 
-        return confirmed.Count > 0 ? (confirmed, true) : (places, false);
+        return claims;
     }
 
     /// <summary>
-    /// Every room the doodads could not place, placed by its tiles and settled: a place standing on a doodad place's tiles past the rims yields to it; a place on a tile laid more than once is kept only where a doodad of the room picks it; the places on ONE anchor tile that are not told apart - one room several ways round, or several variants of a room - become that tile's own footprint, drawn once under the name the rooms share. See the class remarks.
+    /// Every room the doodads could not place, placed by its tiles and settled: a place standing on a doodad place's tiles past the rims yields to it; a place on a tile laid more than once is kept only where a doodad of the room picks it, and an entity that places of several footprints claim picks the nearest line's footprint alone; the places on ONE anchor tile that are not told apart - one room several ways round, or several variants of a room - become the footprint they agree on, or that tile's own where they do not, drawn once under the name the rooms share. See the class remarks.
     /// </summary>
     /// <param name="placed">Every room with the places its doodads found, settled - returned with the tile places added, and a room for each shared tile after them.</param>
     /// <param name="tilePlaces">Each room's places by its tiles, by file and layout - cached by the caller, the terrain not changing under a placing again.</param>
@@ -416,9 +444,9 @@ public static class RoomTileFinder
             }
         }
 
-        // EACH ROOM'S PLACES, standing clear of the doodads' and confirmed where a line can - by the
-        // cell of the anchor slot, so the places on one tile are seen together.
-        var byAnchor = new Dictionary<(int X, int Y), List<(int Room, RoomTilePlace Place)>>();
+        // EACH ROOM'S PLACES, standing clear of the doodads', and the claims its lines make on the area's
+        // entities - the entity nearest to where a place puts a line, within a tile (Claims).
+        var asked = new List<(int Room, RoomTilePlaces Found, List<RoomTilePlace> Clear, List<RoomTileClaim> Claims)>();
         var whys = new string?[placed.Count];
         for (var one = 0; one < placed.Count; one++)
         {
@@ -462,14 +490,62 @@ public static class RoomTileFinder
                 continue;
             }
 
-            // A DOODAD PICKS, OR THE ANCHOR MUST BE A FEATURE TILE LAID ONCE - see the class remarks.
-            (IReadOnlyList<RoomTilePlace> confirmed, bool byDoodad) = Confirmed(clear, layout.Doodads, layout.Width, layout.Height, sightings);
-            IReadOnlyList<RoomTilePlace> picked = byDoodad ? confirmed : [.. confirmed.Where(place => place.AnchorTagged && place.AnchorLaid == 1)];
+            asked.Add((one, found, clear, Claims(clear, layout.Doodads, layout.Width, layout.Height, sightings)));
+        }
+
+        // ONE ENTITY, ONE FOOTPRINT: a doodad is laid by one room, so where places of several footprints
+        // claim one entity, the footprint whose line stands nearest to it keeps the claim and the others
+        // lose theirs - the entrance's own checkpoint had confirmed a checkpoint room's place inside the
+        // entrance, its line within a tile of the entity where the entrance's stood 8 units off. The ways
+        // round and the variants standing on the winning footprint keep their claims with it.
+        var best = new Dictionary<int, (int Room, RoomCandidate Where, float Units)>();
+        foreach ((int room, _, _, List<RoomTileClaim> claims) in asked)
+        {
+            foreach (RoomTileClaim claim in claims)
+            {
+                if (!best.TryGetValue(claim.Entity, out (int Room, RoomCandidate Where, float Units) held) || claim.Units < held.Units)
+                {
+                    best[claim.Entity] = (room, claim.Place.Where, claim.Units);
+                }
+            }
+        }
+
+        // A DOODAD PICKS, OR THE ANCHOR MUST BE A FEATURE TILE LAID ONCE - see the class remarks. The places
+        // kept are gathered by the cell of the anchor slot, so the places on one tile are seen together.
+        float side = RoomDoodadFinder.WithinUnits;
+        var byAnchor = new Dictionary<(int X, int Y), List<(int Room, RoomTilePlace Place)>>();
+        foreach ((int one, RoomTilePlaces found, List<RoomTilePlace> clear, List<RoomTileClaim> claims) in asked)
+        {
+            var confirmed = new List<RoomTilePlace>();
+            RoomTileClaim? lost = null;
+            foreach (RoomTileClaim claim in claims)
+            {
+                if (SameFootprint(best[claim.Entity].Where, claim.Place.Where))
+                {
+                    confirmed.Add(claim.Place);
+                }
+                else if (lost is null || claim.Units < lost.Units)
+                {
+                    lost = claim;
+                }
+            }
+
+            IReadOnlyList<RoomTilePlace> picked = confirmed.Count > 0 ? confirmed : [.. clear.Where(place => place.AnchorTagged && place.AnchorLaid == 1)];
             if (picked.Count == 0)
             {
-                whys[one] = string.Create(
+                string why = string.Create(
                     CultureInfo.InvariantCulture,
-                    $"the tiles alike to its {found.Anchor} slot stand {clear.Count} times in the area, none of them a tagged feature tile laid once, and no doodad of its picks one");
+                    $"the tiles alike to its {found.Anchor} slot give {clear.Count} place{(clear.Count == 1 ? string.Empty : "s")} in the area over every way round, none on a tagged feature tile laid once, and no doodad of its picks one");
+                if (lost is not null)
+                {
+                    (int winner, _, float nearer) = best[lost.Entity];
+                    DoodadSighting entity = sightings[lost.Entity];
+                    why += string.Create(
+                        CultureInfo.InvariantCulture,
+                        $" - the {SlotWants.Short(entity.Path)} at tile {entity.X / side:0.0}, {entity.Y / side:0.0} is {TerrainRooms.NameFor(placed[winner].Room)}'s, whose line stands {nearer:0} units from it where this room's stands {lost.Units:0}");
+                }
+
+                whys[one] = why;
                 continue;
             }
 
@@ -485,7 +561,8 @@ public static class RoomTileFinder
             }
         }
 
-        // EACH ANCHOR TILE SETTLED: one room one way round keeps its footprint; else the tile's own, once.
+        // EACH ANCHOR TILE SETTLED: one room one way round keeps its footprint; several ways round or several
+        // rooms agreeing on one footprint keep that footprint, drawn once; disagreeing, the tile's own.
         var kept = new List<RoomDoodadPlace>?[placed.Count];
         var under = new List<string>?[placed.Count];
         var shared = new List<(string Room, RoomLayout Layout, RoomDoodadPlaces Places)>();
@@ -508,11 +585,22 @@ public static class RoomTileFinder
             }
 
             RoomTilePlace first = standing[0].Place;
-            var outline = new RoomDoodadPlace(new RoomCandidate(anchorX, anchorY, first.Where.Turn, first.AnchorWide, first.AnchorTall, 0, 0), 0, 0, 0f, [])
+            var whole = true;
+            foreach ((_, RoomTilePlace place) in standing)
+            {
+                if (!SameFootprint(place.Where, first.Where))
+                {
+                    whole = false;
+                    break;
+                }
+            }
+
+            var outline = new RoomDoodadPlace(whole ? first.Where : new RoomCandidate(anchorX, anchorY, first.Where.Turn, first.AnchorWide, first.AnchorTall, 0, 0), 0, 0, 0f, [])
             {
                 Anchor = first.Anchor,
                 AnchorLaid = first.AnchorLaid,
                 Variants = [.. rooms.Select(room => placed[room].Room)],
+                WholeRoom = whole,
             };
 
             if (rooms.Count == 1)
@@ -527,7 +615,9 @@ public static class RoomTileFinder
             shared.Add((path[..(path.LastIndexOf('/') + 1)] + stem, placed[rooms[0]].Layout, new RoomDoodadPlaces([outline], 0, 0, 0, string.Empty)));
             foreach (int room in rooms)
             {
-                (under[room] ??= []).Add(string.Create(CultureInfo.InvariantCulture, $"'{stem}' on the {SlotWants.Short(first.Anchor)} tile at {anchorX}, {anchorY}"));
+                (under[room] ??= []).Add(whole
+                    ? string.Create(CultureInfo.InvariantCulture, $"'{stem}' at tile {first.Where.X}, {first.Where.Y}, {first.Where.Width} x {first.Where.Height}")
+                    : string.Create(CultureInfo.InvariantCulture, $"'{stem}' on the {SlotWants.Short(first.Anchor)} tile at {anchorX}, {anchorY}"));
             }
         }
 
@@ -556,6 +646,10 @@ public static class RoomTileFinder
         result.AddRange(shared);
         return result;
     }
+
+    /// <summary>Whether two places have one footprint: corner and size, whichever way round each stands.</summary>
+    private static bool SameFootprint(RoomCandidate one, RoomCandidate other)
+        => one.X == other.X && one.Y == other.Y && one.Width == other.Width && one.Height == other.Height;
 
     /// <summary>
     /// What a set of room names share, for the one outline drawn for them all: their common start, less a trailing number and its underscore - entrance_01 to entrance_04 are "entrance" - or the names themselves where they share nothing.

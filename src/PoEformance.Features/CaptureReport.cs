@@ -517,20 +517,26 @@ public static class CaptureReport
         static string Tiles(RoomDoodadPlace place)
             => place.TilesAgree >= 0 ? string.Create(CultureInfo.InvariantCulture, $"{place.TilesAgree} tiles agree") : "tiles not scored";
 
-        // A place by the tiles: a room's own, anchored on a tile, or an anchor tile's footprint drawn once
-        // for the room or rooms standing on it that the tiles cannot tell apart - see RoomTileFinder.
+        // A place by the tiles: a room's own, anchored on a tile; or a footprint drawn once for the room or
+        // rooms standing on a tile that the tiles cannot tell apart - the room's whole footprint where
+        // every way they stand agrees on it, the anchor tile's own where not - see RoomTileFinder.
         static string ByTiles(RoomDoodadPlace place)
         {
             RoomCandidate where = place.Where;
             string anchor = TerrainRooms.NameFor(place.Anchor);
-            return place.Variants.Count switch
+            string names = string.Join(", ", place.Variants.Select(TerrainRooms.NameFor));
+            return (place.Variants.Count, place.WholeRoom) switch
             {
-                0 => string.Create(CultureInfo.InvariantCulture,
+                (0, _) => string.Create(CultureInfo.InvariantCulture,
                     $"tile {where.X}, {where.Y}, {RoomFinder.Said(where.Turn)}: every one of its {where.Big} big slots alike on {anchor}, laid {place.AnchorLaid}x, {where.TilesAgree} of {where.Tiles} slots alike"),
-                1 => string.Create(CultureInfo.InvariantCulture,
+                (1, true) => string.Create(CultureInfo.InvariantCulture,
+                    $"tile {where.X}, {where.Y}, {where.Width} x {where.Height}: the room's whole footprint, anchored on {anchor} - it stands there more than one way round, every way on this footprint"),
+                (1, false) => string.Create(CultureInfo.InvariantCulture,
                     $"tile {where.X}, {where.Y}: the {anchor} tile's own footprint, {where.Width} x {where.Height} - the room stands on it more than one way round and the tiles cannot say which, so the tile is drawn"),
-                _ => string.Create(CultureInfo.InvariantCulture,
-                    $"tile {where.X}, {where.Y}: the {anchor} tile's own footprint, {where.Width} x {where.Height} - {string.Join(", ", place.Variants.Select(TerrainRooms.NameFor))} all stand on it and the tiles cannot say which, drawn once"),
+                (_, true) => string.Create(CultureInfo.InvariantCulture,
+                    $"tile {where.X}, {where.Y}, {where.Width} x {where.Height}: the whole footprint {names} all stand on, anchored on {anchor}, drawn once"),
+                (_, false) => string.Create(CultureInfo.InvariantCulture,
+                    $"tile {where.X}, {where.Y}: the {anchor} tile's own footprint, {where.Width} x {where.Height} - {names} all stand on it and the tiles cannot say which, drawn once"),
             };
         }
     }

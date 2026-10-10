@@ -178,9 +178,16 @@ tile is the room's fingerprint, `boss_01.tdt` laid once in the area. Two things 
 boss's doodad place before anything was built on them: every big slot's cell carries the FIRST PIECE
 of a tile alike to it (the slot's corner is the tile's corner), and 15 of its 17 big slots were alike
 by the rule that asked the type sets to be equal, 17 of 17 with an unnamed type as any - so an
-unnamed type in a slot is any, as nought is in the stamp (`SlotWants`). A tile several rooms or
-ways round stand on is drawn once as itself under the shared name ("entrance" for `entrance_01` to
-`entrance_04`). A fingerprint is a TAGGED tile laid once - a slot asking for a feature, answered by
+unnamed type in a slot is any, as nought is in the stamp (`SlotWants`). The first piece is the
+lowest corner of the tile's LAID footprint whichever way it went - measured over three captures on
+every laid file at every placement, oblong ones included - so a turned big slot's corner is the
+lowest corner of its rectangle turned (`RoomFinder.CornerOf`), not its origin cell turned: that put
+the StoneCircle two tiles off and a second checkpoint room inside the first, each "confirmed" by a
+line that landed near enough. Rooms or ways round standing on one tile are drawn once under the
+shared name ("entrance" for `entrance_01` to `entrance_04`): as the whole footprint they agree on,
+or as the tile where they do not. A checkpoint entity that places of several footprints claim
+confirms the nearest line's alone - the entrance's own checkpoint had confirmed a checkpoint room
+inside the entrance. A fingerprint is a TAGGED tile laid once - a slot asking for a feature, answered by
 one tile - because a ledge checkpoint's one untagged 3x3 ledge tile is laid ten times (116
 candidates) and another ledge piece laid once stood beside the entrance; a place on anything else
 counts only where a doodad of the room stands in it, the checkpoint itself once the player has
