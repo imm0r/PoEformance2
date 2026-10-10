@@ -25,13 +25,50 @@ public static class AreaArenas
     private const int MostIncludes = 8;
 
     /// <summary>
-    /// The arena tiles under the folders, distinct and in the order found. Never throws.
+    /// What a search found, and what it searched - so an empty answer says which step was empty.
+    /// </summary>
+    /// <param name="Folders">The folders searched.</param>
+    /// <param name="Tiles">The arena tiles found, distinct and in the order found.</param>
+    /// <param name="TilesIndexed">How many tiles the install's index held - nought before its walk, which is the usual reason for nothing found.</param>
+    /// <param name="MastersIndexed">How many masters the install's index held.</param>
+    /// <param name="MastersRead">How many masters sat in the folders and named a tileset.</param>
+    /// <param name="Listed">How many tiles those tilesets listed, includes followed.</param>
+    public readonly record struct Search(
+        IReadOnlyList<string> Folders,
+        IReadOnlyList<string> Tiles,
+        int TilesIndexed,
+        int MastersIndexed,
+        int MastersRead,
+        int Listed)
+    {
+        /// <summary>The search in a line, for under the book's combo.</summary>
+        public string Said
+            => TilesIndexed == 0 && MastersIndexed == 0
+                ? "the install's tile index is not walked yet - open the combo again in a moment"
+                : string.Create(
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    $"{Tiles.Count} arena tile{(Tiles.Count == 1 ? string.Empty : "s")} in {Folders.Count} folder{(Folders.Count == 1 ? string.Empty : "s")} ({string.Join(", ", Folders.Select(Shortened))}) · {MastersRead} master{(MastersRead == 1 ? string.Empty : "s")} listing {Listed} tiles · index: {TilesIndexed} tiles, {MastersIndexed} tilesets");
+
+        private static string Shortened(string folder)
+            => folder.StartsWith("Metadata/Terrain/", StringComparison.OrdinalIgnoreCase) ? folder["Metadata/Terrain/".Length..] : folder;
+    }
+
+    /// <summary>The arena tiles under the folders, distinct and in the order found. Never throws. See <see cref="Find"/>.</summary>
+    public static IReadOnlyList<string> Of(
+        Func<string, byte[]?>? read,
+        IReadOnlyList<string> folders,
+        IReadOnlyList<string> tiles,
+        IReadOnlyList<string> masters)
+        => Find(read, folders, tiles, masters).Tiles;
+
+    /// <summary>
+    /// The arena tiles under the folders, with what was searched to find them. Never throws.
     /// </summary>
     /// <param name="read">How to get a file out of the install, by path - or null, and only the tile index is searched.</param>
     /// <param name="folders">The area's terrain folders, each with its trailing slash - see AreaGraphs.FoldersOf.</param>
     /// <param name="tiles">Every <c>.tdt</c> the install has, or empty before its walk.</param>
     /// <param name="masters">Every <c>.tsi</c> the install has, or empty before its walk.</param>
-    public static IReadOnlyList<string> Of(
+    public static Search Find(
         Func<string, byte[]?>? read,
         IReadOnlyList<string> folders,
         IReadOnlyList<string> tiles,
@@ -42,7 +79,7 @@ public static class AreaArenas
         ArgumentNullException.ThrowIfNull(masters);
         if (folders.Count == 0)
         {
-            return [];
+            return new Search([], [], tiles.Count, masters.Count, 0, 0);
         }
 
         var found = new List<string>();
@@ -61,10 +98,12 @@ public static class AreaArenas
 
         if (read is null)
         {
-            return found;
+            return new Search(folders, found, tiles.Count, masters.Count, 0, 0);
         }
 
         var lists = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+        var mastersRead = 0;
+        var listed = 0;
         foreach (string folder in folders)
         {
             foreach (string master in masters)
@@ -82,8 +121,10 @@ public static class AreaArenas
                     continue;
                 }
 
+                mastersRead++;
                 foreach (string tile in Listed(read, TilesetFile.Beside(master, set), lists, 0))
                 {
+                    listed++;
                     if (TerrainLandmarks.LooksLikeArena(tile) && seen.Add(tile))
                     {
                         found.Add(tile);
@@ -92,7 +133,7 @@ public static class AreaArenas
             }
         }
 
-        return found;
+        return new Search(folders, found, tiles.Count, masters.Count, mastersRead, listed);
     }
 
     /// <summary>Every tile a list names, its includes' tiles among them, as the files spell them - memoised per list.</summary>

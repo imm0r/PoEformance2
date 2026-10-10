@@ -550,11 +550,17 @@ public sealed class MonsterBookWindow : BookWindow<MonsterBook>
     /// with the tool - the first twenty bosses tried offered no stage at all. The install itself names
     /// every map's tiles, and this reads them.
     /// </remarks>
-    public Func<string, IReadOnlyList<string>>? ArenasOf { get; set; }
+    public Func<string, AreaArenas.Search>? ArenasOf { get; set; }
 
-    /// <summary>The arenas last worked out and what they were worked out for - a few file reads, kept until the choice moves.</summary>
+    /// <summary>The arenas last worked out, what they were worked out for, and the line saying how - a few file reads, kept while the combo is open.</summary>
+    /// <remarks>
+    /// WORKED OUT AGAIN EACH TIME THE COMBO OPENS, not once per choice: the install's tile index arrives
+    /// from a background walk, and a list worked out before it landed was empty and stayed empty for that
+    /// boss - which is what "no arena for twenty bosses" looked like from the client.
+    /// </remarks>
     private IReadOnlyList<string> _arenas = [];
     private string _arenasFor = "\0";
+    private string _arenasSaid = string.Empty;
 
     /// <summary>
     /// The game's light for the picture, drawn under the stage - see SceneLightPanel. Null leaves the picture under its own lamp.
@@ -612,7 +618,7 @@ public sealed class MonsterBookWindow : BookWindow<MonsterBook>
                     model.Stage = string.Empty;
                 }
 
-                foreach (string tile in Arenas(model, chosen))
+                foreach (string tile in Arenas(model, chosen, ImGui.IsWindowAppearing()))
                 {
                     Offer(model, "arena: " + Tail(tile), tile);
                 }
@@ -627,9 +633,19 @@ public sealed class MonsterBookWindow : BookWindow<MonsterBook>
             }
 
             OverlayLayout.Hint("The monster drawn standing in the middle of a terrain tile, at the size the game draws it,"
-                + " on the tile's ground. The arenas listed are the ones written down for this boss and the ones"
-                + " seen in the areas the game lists it as the boss of; the Tile Book's tile is whatever that book is open at."
+                + " on the tile's floor. The arenas listed are the ones written down for this boss, the ones"
+                + " seen in the areas the game lists it as the boss of, and the arena-named tiles the install keeps for those areas;"
+                + " the Tile Book's tile is whatever that book is open at."
                 + " The picture frames the whole tile - the wheel zooms in on the monster.");
+
+            // WHAT THE SEARCH WENT THROUGH, under the combo once it has run: which areas, which folders, how
+            // many tiles the index held - so an empty list says which step was empty rather than nothing.
+            if (_arenasSaid.Length > 0 && string.Equals(_arenasFor, chosen, StringComparison.Ordinal))
+            {
+                ImGui.PushTextWrapPos(0f);
+                ImGui.TextDisabled(ImGuiText.Escape(_arenasSaid));
+                ImGui.PopTextWrapPos();
+            }
 
             ImGui.SetNextItemWidth(MathF.Max(120f, ImGui.GetContentRegionAvail().X * 0.6f));
             bool typed = ImGui.InputText("##monster-stage-path", ref _stagePath, StagePathLength, ImGuiInputTextFlags.EnterReturnsTrue);
@@ -676,30 +692,32 @@ public sealed class MonsterBookWindow : BookWindow<MonsterBook>
     /// in the areas the game lists him the boss of, and what the install names for those areas. The
     /// first two are exact and the third is every arena-looking tile of the map's folder and tileset.
     /// </remarks>
-    private IReadOnlyList<string> Arenas(MonsterPortrait model, string chosen)
+    private IReadOnlyList<string> Arenas(MonsterPortrait model, string chosen, bool opening)
     {
         if (model.Icons is not { } icons)
         {
             return [];
         }
 
-        string key = chosen + '\0' + icons.Revision.ToString(CultureInfo.InvariantCulture);
-        if (string.Equals(key, _arenasFor, StringComparison.Ordinal))
+        if (!opening && string.Equals(chosen, _arenasFor, StringComparison.Ordinal))
         {
             return _arenas;
         }
 
         var found = new List<string>();
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        int written = 0;
         foreach (string tile in icons.TilesOf(BossIcons.FamilyOfPath(chosen)))
         {
             if (seen.Add(tile))
             {
                 found.Add(tile);
+                written++;
             }
         }
 
         IReadOnlyList<string> areas = icons.Bosses.AreasOf(chosen);
+        int live = 0;
         foreach (string area in areas)
         {
             foreach (string tile in model.ArenasIn?.Invoke(area) ?? [])
@@ -707,23 +725,35 @@ public sealed class MonsterBookWindow : BookWindow<MonsterBook>
                 if (seen.Add(tile))
                 {
                     found.Add(tile);
+                    live++;
                 }
             }
         }
 
+        var said = new System.Text.StringBuilder();
+        said.Append(CultureInfo.InvariantCulture, $"written down: {written} · seen in play: {live} · areas: ");
+        said.Append(areas.Count == 0 ? "none list this monster as their boss" : string.Join(", ", areas));
         foreach (string area in areas)
         {
-            foreach (string tile in ArenasOf?.Invoke(area) ?? [])
+            if (ArenasOf?.Invoke(area) is not { } search)
+            {
+                continue;
+            }
+
+            foreach (string tile in search.Tiles)
             {
                 if (seen.Add(tile))
                 {
                     found.Add(tile);
                 }
             }
+
+            said.Append(" · ").Append(area).Append(": ").Append(search.Said);
         }
 
-        _arenasFor = key;
+        _arenasFor = chosen;
         _arenas = found;
+        _arenasSaid = said.ToString();
         return found;
     }
 

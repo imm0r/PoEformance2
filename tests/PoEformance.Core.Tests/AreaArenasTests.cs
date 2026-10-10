@@ -54,6 +54,22 @@ public class AreaArenasTests
     }
 
     [Fact]
+    public void TheSearchSaysWhatItWentThrough()
+    {
+        AreaArenas.Search search = AreaArenas.Find(Read, [Folder], Tiles, Masters);
+        Assert.Equal(3, search.Tiles.Count);
+        Assert.Equal(3, search.TilesIndexed);
+        Assert.Equal(3, search.MastersIndexed);
+        Assert.Equal(1, search.MastersRead);
+        Assert.Equal(4, search.Listed);
+        Assert.Contains("3 arena tiles in 1 folder (Maps/VaalFactory/)", search.Said, StringComparison.Ordinal);
+        Assert.Contains("1 master listing 4 tiles", search.Said, StringComparison.Ordinal);
+
+        // Before the install's walk the line says so, which is the usual reason for an empty list.
+        Assert.Contains("not walked yet", AreaArenas.Find(Read, [Folder], [], []).Said, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void AGraphsFolderIsTheOneAboveItsGraphs()
     {
         Assert.Equal(Folder, AreaGraphs.FolderOf("Metadata/Terrain/Maps/VaalFactory/Graphs/VaalFactory_01.dgr"));
