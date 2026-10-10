@@ -565,6 +565,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
             ModelLightTarget = _monsterBook?.Model?.LightTarget ?? basis.ModelLightTarget,
             ModelFlatLight = _modelWants.ModelFlatLight,
             ModelCard = _card.On,
+            ModelCardSharp = _card.Sharp,
             ShowProjectiles = _projectiles.Enabled,
             ProjectileTrails = _projectiles.ShowTrails,
             ProjectilePaths = _projectiles.ShowPaths,
@@ -799,6 +800,12 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         _card.Changed = on =>
         {
             _modelWants = _modelWants with { ModelCard = on };
+            SettingsChanged?.Invoke();
+        };
+        _card.Sharp = _modelWants.ModelCardSharp;
+        _card.SharpChanged = sharp =>
+        {
+            _modelWants = _modelWants with { ModelCardSharp = sharp };
             SettingsChanged?.Invoke();
         };
 

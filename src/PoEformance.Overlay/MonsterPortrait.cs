@@ -336,6 +336,9 @@ public sealed class MonsterPortrait
     /// <summary>The card's switch as the last picture was drawn - a press redraws.</summary>
     private bool _drawnCardOn;
 
+    /// <summary>The card's anisotropic read as the last picture was drawn - a right-click redraws.</summary>
+    private bool _drawnSharp;
+
     /// <summary>
     /// Whether the last picture went to the processor because the card said no, and how many material shaders had landed then - one landing since redraws, in case it was this picture's.
     /// </summary>
@@ -1758,6 +1761,14 @@ public sealed class MonsterPortrait
                 Pressed(which);
             }
 
+            // THE CARD BUTTON'S SECOND SWITCH IS THE RIGHT BUTTON: the anisotropic read is a question
+            // only the card is asked, so it lives on the card's button rather than in a row of its own.
+            if (which == CardSide && Card is { } card && ImGui.IsItemClicked(ImGuiMouseButton.Right))
+            {
+                card.Sharp = !card.Sharp;
+                card.SharpChanged?.Invoke(card.Sharp);
+            }
+
             if (ImGui.IsItemHovered())
             {
                 Tipped(which);
@@ -2856,6 +2867,7 @@ public sealed class MonsterPortrait
             || _drawnDust != Dusted()
             || (posed && (_drawnFrame != _frame || _drawnAnimation != _chosen))
             || _drawnCardOn != (Card?.On ?? false)
+            || _drawnSharp != (Card?.Sharp ?? false)
             || (_cardWaiting && Card is { On: true } card && card.Gpu is { } gpu && gpu.Landed != _cardLanded)
             || _probeAsked;
 
@@ -3238,6 +3250,7 @@ public sealed class MonsterPortrait
         _drawnLight = Lit();
         _drawnDust = Dusted();
         _drawnCardOn = Card?.On ?? false;
+        _drawnSharp = Card?.Sharp ?? false;
         _drawing++;
 
         try
@@ -3335,7 +3348,7 @@ public sealed class MonsterPortrait
 
         var scene = new ModelScene(
             _model.Mesh, _turn, _tilt, Ink, _model.Skin, _zoom, _pan, _model.Skins, Blends(),
-            moving ? _posed : null, moving ? _posedNormals : null, _drawnLight, ShadesOf(_model), _clock, _drawnDust);
+            moving ? _posed : null, moving ? _posedNormals : null, _drawnLight, ShadesOf(_model), _clock, _drawnDust, card.Sharp);
         if (!gpu.Can(scene, out string why))
         {
             // A MATERIAL'S SHADER STILL COMPILING is the usual no: the picture is the processor's until
@@ -3399,7 +3412,10 @@ public sealed class MonsterPortrait
                 ? "Pictures are drawn on the graphics card where it can draw the same picture as the processor, and on the processor where not."
                 : "Pictures are drawn on the processor, as before the card could draw them.")
             + (card.On && !_onCard && _cardWhy.Length > 0 ? "\nThis one on the processor: " + _cardWhy : string.Empty)
-            + "\nThe rate in the corner says which drew the picture shown. One switch for every book.");
+            + "\nThe rate in the corner says which drew the picture shown. One switch for every book."
+            + (card.Sharp
+                ? "\nRight-click: anisotropic texture read ON - a surface seen at a slant stays sharp along it, as in the game. The card only."
+                : "\nRight-click: anisotropic texture read OFF - the card reads textures as the processor does, trilinearly."));
 
     /// <summary>Hands a drawn picture to the renderer in place of the one shown.</summary>
     private void Upload(GamePicture drawn)

@@ -13,7 +13,8 @@ namespace PoEformance.Overlay;
 /// the processor as before, saying why on its card button.
 ///
 /// ONE SWITCH FOR EVERY BOOK, like the flat light: a press in one pane is carried to the others and
-/// kept in the settings (<c>modelCard</c>).
+/// kept in the settings (<c>modelCard</c>). The anisotropic read (<see cref="Sharp"/>) is a second
+/// switch on the same button, by right-click, kept as <c>modelCardSharp</c>.
 /// </remarks>
 public sealed class CardPictures : IDisposable
 {
@@ -49,6 +50,17 @@ public sealed class CardPictures : IDisposable
 
     /// <summary>Told when a pane's button turns the card on or off.</summary>
     public Action<bool>? Changed { get; set; }
+
+    /// <summary>Whether the card reads textures anisotropically - what the settings keep as <c>modelCardSharp</c>. See ModelScene.Sharp.</summary>
+    /// <remarks>
+    /// ONE SWITCH FOR EVERY BOOK, like <see cref="On"/>, and for the same reason: it is the same
+    /// question in each pane. ON TO START, because it is what the game does and the processor's
+    /// picture is still a right-click away for comparing.
+    /// </remarks>
+    public bool Sharp { get; set; } = true;
+
+    /// <summary>Told when a pane's button turns the anisotropic read on or off.</summary>
+    public Action<bool>? SharpChanged { get; set; }
 
     /// <summary>Why there is no drawing on the card, or empty while there is one or it has not been asked for.</summary>
     public string Why { get; private set; } = string.Empty;
