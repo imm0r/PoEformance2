@@ -3280,6 +3280,10 @@ internal static class Program
         bossIcons.Bosses = PoEformance.Game.World.AreaBosses.Load(FindDataFile("area-bosses.json"));
         overlay.BossIcons = bossIcons;
 
+        // AND WHERE EACH AREA'S TERRAIN LIVES, from the same export, so the Monster Book can offer a
+        // boss his arena as a stage without the map having been played - see AreaGraphs, AreaArenas.
+        overlay.AreaGraphs = PoEformance.Game.World.AreaGraphs.Load(FindDataFile("area-graphs.json"));
+
         // THE SAME INSTANCE GOES TO THE ATLAS WALK, which is what upgrades it from the shipped
         // file to the client's own column: WorldAreaCatalogue reads all 442 rows the first time
         // an atlas node is seen, and what it finds is merged over this. The file stays as the

@@ -542,6 +542,21 @@ public sealed class MonsterBookWindow : BookWindow<MonsterBook>
     public Func<string>? TileChoice { get; set; }
 
     /// <summary>
+    /// The arena tiles of an area found in the install, by area id - see AreaArenas - or null where the install is not there.
+    /// </summary>
+    /// <remarks>
+    /// THE ROAD THAT NEEDS NO VISIT: the pane's ArenasIn answers from the terrain under the player and
+    /// the arenas logged on earlier visits, which is nothing for a boss whose map has not been played
+    /// with the tool - the first twenty bosses tried offered no stage at all. The install itself names
+    /// every map's tiles, and this reads them.
+    /// </remarks>
+    public Func<string, IReadOnlyList<string>>? ArenasOf { get; set; }
+
+    /// <summary>The arenas last worked out and what they were worked out for - a few file reads, kept until the choice moves.</summary>
+    private IReadOnlyList<string> _arenas = [];
+    private string _arenasFor = "\0";
+
+    /// <summary>
     /// The game's light for the picture, drawn under the stage - see SceneLightPanel. Null leaves the picture under its own lamp.
     /// </summary>
     /// <remarks>
@@ -655,12 +670,23 @@ public sealed class MonsterBookWindow : BookWindow<MonsterBook>
     /// <summary>The key the pane loads a stage under: the tile, without its black walls.</summary>
     private static string Key(string tile) => new TileKey(tile, Walls: false).ToString();
 
-    /// <summary>The arena tiles known for a monster, distinct - see <see cref="Stage"/>.</summary>
-    private static IReadOnlyList<string> Arenas(MonsterPortrait model, string chosen)
+    /// <summary>The arena tiles known for a monster, distinct - see <see cref="Stage"/>. Worked out once per choice, while the combo is open.</summary>
+    /// <remarks>
+    /// IN THIS ORDER: what somebody wrote down for the boss, what the live area or an earlier visit saw
+    /// in the areas the game lists him the boss of, and what the install names for those areas. The
+    /// first two are exact and the third is every arena-looking tile of the map's folder and tileset.
+    /// </remarks>
+    private IReadOnlyList<string> Arenas(MonsterPortrait model, string chosen)
     {
         if (model.Icons is not { } icons)
         {
             return [];
+        }
+
+        string key = chosen + '\0' + icons.Revision.ToString(CultureInfo.InvariantCulture);
+        if (string.Equals(key, _arenasFor, StringComparison.Ordinal))
+        {
+            return _arenas;
         }
 
         var found = new List<string>();
@@ -673,7 +699,8 @@ public sealed class MonsterBookWindow : BookWindow<MonsterBook>
             }
         }
 
-        foreach (string area in icons.Bosses.AreasOf(chosen))
+        IReadOnlyList<string> areas = icons.Bosses.AreasOf(chosen);
+        foreach (string area in areas)
         {
             foreach (string tile in model.ArenasIn?.Invoke(area) ?? [])
             {
@@ -684,6 +711,19 @@ public sealed class MonsterBookWindow : BookWindow<MonsterBook>
             }
         }
 
+        foreach (string area in areas)
+        {
+            foreach (string tile in ArenasOf?.Invoke(area) ?? [])
+            {
+                if (seen.Add(tile))
+                {
+                    found.Add(tile);
+                }
+            }
+        }
+
+        _arenasFor = key;
+        _arenas = found;
         return found;
     }
 
