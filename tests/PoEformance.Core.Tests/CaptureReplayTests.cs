@@ -116,6 +116,72 @@ public class CaptureReplayTests
             }
         }
 
+        // WHERE A FILE'S FIRST PIECE SITS, by the tile's own placement: how far its pieces run right and
+        // down from the cell carrying it, and the piece on each neighbour. The tile placing stands on the
+        // first piece being the laid footprint's lowest corner whichever way the tile went - measured on
+        // the boss's square tiles - so the oblong ones are held against it here, placement by placement.
+        if (identities is not null && grid.Tiles is { } everyLaid)
+        {
+            var firsts = new SortedDictionary<string, SortedDictionary<int, SortedDictionary<string, int>>>(StringComparer.OrdinalIgnoreCase);
+            for (var y = 0; y < everyLaid.Height; y++)
+            {
+                for (var x = 0; x < everyLaid.Width; x++)
+                {
+                    if (everyLaid.SubAt(x, y) is not (0, 0))
+                    {
+                        continue;
+                    }
+
+                    string path = everyLaid.PathAt(x, y);
+                    if (!identities.TryGetValue(path, out TileIdentity? tile) || (tile.Width == 1 && tile.Height == 1))
+                    {
+                        continue;
+                    }
+
+                    int id = everyLaid.IdAt(x, y);
+                    var wide = 1;
+                    while (everyLaid.IdAt(x + wide, y) == id && everyLaid.SubAt(x + wide, y) == (wide, 0))
+                    {
+                        wide++;
+                    }
+
+                    var tall = 1;
+                    while (everyLaid.IdAt(x, y + tall) == id && everyLaid.SubAt(x, y + tall) == (0, tall))
+                    {
+                        tall++;
+                    }
+
+                    string Piece(int nx, int ny) => everyLaid.IdAt(nx, ny) == id ? string.Create(CultureInfo.InvariantCulture, $"{everyLaid.SubAt(nx, ny).X},{everyLaid.SubAt(nx, ny).Y}") : "-";
+                    string seen = string.Create(CultureInfo.InvariantCulture, $"runs {wide} x {tall}, right {Piece(x + 1, y)} down {Piece(x, y + 1)} left {Piece(x - 1, y)} up {Piece(x, y - 1)}");
+                    string file = string.Create(CultureInfo.InvariantCulture, $"{Short(path)} {tile.Width}x{tile.Height}");
+                    if (!firsts.TryGetValue(file, out SortedDictionary<int, SortedDictionary<string, int>>? byPlacement))
+                    {
+                        byPlacement = [];
+                        firsts[file] = byPlacement;
+                    }
+
+                    if (!byPlacement.TryGetValue(everyLaid.PlacementAt(x, y), out SortedDictionary<string, int>? patterns))
+                    {
+                        patterns = new SortedDictionary<string, int>(StringComparer.Ordinal);
+                        byPlacement[everyLaid.PlacementAt(x, y)] = patterns;
+                    }
+
+                    patterns[seen] = patterns.GetValueOrDefault(seen) + 1;
+                }
+            }
+
+            said.AppendLine();
+            said.AppendLine("=== where each laid file's first piece sits, by placement: how far its pieces run right and down from it, and the piece on each neighbour ('-' another tile)");
+            foreach ((string file, SortedDictionary<int, SortedDictionary<string, int>> byPlacement) in firsts)
+            {
+                said.Append("  ").AppendLine(file);
+                foreach ((int placement, SortedDictionary<string, int> patterns) in byPlacement)
+                {
+                    said.AppendLine(CultureInfo.InvariantCulture, $"    placement {placement}: {string.Join("; ", patterns.Select(one => $"{one.Key} x{one.Value}"))}");
+                }
+            }
+        }
+
         bool[] walkable = grid.WalkableTileMask();
         for (var one = 0; one < placing.Rooms.Count; one++)
         {
@@ -165,7 +231,7 @@ public class CaptureReplayTests
                         }
 
                         Ask ask = AskOf(layout, slot);
-                        (int cellX, int cellY) = RoomFinder.CellOf(column, line, layout.Width, layout.Height, at.Turn);
+                        (int cellX, int cellY) = RoomFinder.CornerOf(column, line, slot.Width, slot.Height, layout.Width, layout.Height, at.Turn);
                         int x = at.X + cellX, y = at.Y + cellY;
                         string path = laidTiles.PathAt(x, y);
                         TileIdentity? laid = identities.GetValueOrDefault(path);
