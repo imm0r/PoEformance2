@@ -25,7 +25,7 @@ already cost real time on this project.
   every element's StringId, rectangle, flags and child path, and F8 picks whatever is under
   the cursor. Any question of the form "does the game name that thing, and where is it" is
   one screenshot away — ask it there before concluding that something cannot be measured.
-  The model pane has the same thing for its OWN pictures: the corner button "probe", then a
+  The model pane has the same thing for its OWN pictures: the bug button down its right edge (the probe), then a
   click, lists every surface under that pixel (material, blend, program or texture, which
   doodad or tile piece, depths), and counts how each translucent layer came out over the
   whole picture. The capture key (F9, "Capture for Diagnosis") writes it to `model-probe.txt`

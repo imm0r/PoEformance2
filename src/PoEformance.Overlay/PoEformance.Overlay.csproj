@@ -42,8 +42,13 @@
          scripts/name-icon-cells.py can regenerate the table above without losing them. Written
          by tools/IconBaker. -->
     <EmbeddedResource Include="..\..\assets\icon-names-custom.tsv" LogicalName="PoEformance.Overlay.assets.icon-names-custom.tsv" />
-    <!-- The orbit button's art in the model pane, linked and pinned for the same reasons as
-         the sheet: MonsterPortrait.OrbitIcon matches on the END of the resource name. -->
+    <!-- The art of the five buttons down the model pane's right edge, linked and pinned for the
+         same reasons as the sheet: MonsterPortrait.SideIcon matches on the END of the resource
+         name. The sheet three were cut from (3dMV_light-cpugpu-probe.png) stays out. -->
+    <EmbeddedResource Include="..\..\assets\3dMV_cpugpu.png" LogicalName="PoEformance.Overlay.assets.3dMV_cpugpu.png" />
+    <EmbeddedResource Include="..\..\assets\3dMV_light.png" LogicalName="PoEformance.Overlay.assets.3dMV_light.png" />
     <EmbeddedResource Include="..\..\assets\3dMV_orbit.png" LogicalName="PoEformance.Overlay.assets.3dMV_orbit.png" />
+    <EmbeddedResource Include="..\..\assets\3dMV_probe.png" LogicalName="PoEformance.Overlay.assets.3dMV_probe.png" />
+    <EmbeddedResource Include="..\..\assets\3dMV_clock.png" LogicalName="PoEformance.Overlay.assets.3dMV_clock.png" />
   </ItemGroup>
 </Project>
