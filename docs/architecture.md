@@ -379,7 +379,10 @@ ones after, testing depth and writing none, mixed and added in premultiplied ter
 target that a last pass turns into straight bytes, truncated as `MeshPicture` truncates. Meshes
 and their textures - every level `Mipmaps` made - are uploaded once and kept while drawn. What the
 card cannot match exactly is small and said where it shows: an edge two triangles share is filled
-once rather than twice, and a texture is filtered with the card's own weights. The game's light
+once rather than twice, and a texture is filtered with the card's own weights. One difference is
+chosen rather than suffered: `modelCardSharp` (on by default, a right-click on the card button)
+reads textures anisotropically, as the game does, so a surface seen at a slant stays sharp along it
+where the trilinear read - the processor's, and the card's with it off - goes soft. The game's light
 (`SceneLight`) is drawn the same way (`ModelGpu.Light.cs`): the sun's shadow map is drawn on the
 card on the texels `ShadowMap.Framed` lays out for the processor, the same casters - solid, cut-out
 through their texture, shadow-only - each texel keeping its nearest depth through a blend's minimum,

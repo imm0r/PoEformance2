@@ -248,6 +248,12 @@ public sealed record OverlaySettings(
     // processor. ON, the usual: it is the same picture, faster. One for every book. See CardPictures.
     [property: JsonPropertyName("modelCard")] bool ModelCard = true,
 
+    // Whether the card reads textures anisotropically - the one picture it draws that the processor
+    // does not. ON, the usual: it is what the game does, and a surface seen at a slant stays sharp
+    // along it where a trilinear read goes soft. Off is the processor's read, for comparing. One for
+    // every book; a right-click on the card button. See ModelGpu and CardPictures.Sharp.
+    [property: JsonPropertyName("modelCardSharp")] bool ModelCardSharp = true,
+
     // Whether the monster book's facet rail has a pane of its own. ON by default, because a rail
     // nobody knows about is a rail nobody opens - and OFF is a real setting because this window is
     // read WHILE PLAYING: three panes wide enough to read is most of a monitor, and the game wants

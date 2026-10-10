@@ -28,6 +28,7 @@ namespace PoEformance.Gpu;
 /// <param name="Shades">One shade program per shape, or null - see MeshPicture.Of.</param>
 /// <param name="Time">The clock a program reads - MeshPicture.Canvas.Time.</param>
 /// <param name="Dust">The area's dust colour a program reads, or null for the assumed one - MeshPicture.Canvas.Dust.</param>
+/// <param name="Sharp">Whether textures are read anisotropically - the one way the card is let draw a picture the processor does not; see <see cref="ModelGpu"/>.</param>
 public readonly record struct ModelScene(
     SkinnedMesh Mesh,
     float Turn = 0f,
@@ -43,7 +44,8 @@ public readonly record struct ModelScene(
     SceneLight? Light = null,
     IReadOnlyList<ShadeProgram?>? Shades = null,
     float Time = 0f,
-    Vector3? Dust = null);
+    Vector3? Dust = null,
+    bool Sharp = false);
 
 /// <summary>
 /// Pictures of models drawn on the graphics card - MeshPicture's pictures, at the card's speed.
@@ -78,6 +80,15 @@ public readonly record struct ModelScene(
 ///
 /// NOT ON THE CARD: the probe and the grey, which read the processor's own pixels - the caller asks
 /// <see cref="Can"/> for the rest.
+///
+/// THE ONE PICTURE THE PROCESSOR DOES NOT DRAW, by choice (ModelScene.Sharp): textures read
+/// anisotropically. A trilinear read picks one level for a pixel from the LONGER of the two texel
+/// steps across it, so a surface seen at a slant - a floor, a limb from the side - reads a level
+/// made for its foreshortened axis and comes out soft along the other; the live client saw it as
+/// textures that blurred "from certain angles". An anisotropic read takes up to sixteen samples
+/// along the long axis from the level the short one asks for, which is what the game does, and is
+/// not a thing the processor's per-triangle level could do at a price anybody would pay. Off, the
+/// read is the processor's; the switch is kept in the settings beside the card's own.
 /// </remarks>
 public sealed partial class ModelGpu : IDisposable
 {
@@ -107,6 +118,7 @@ public sealed partial class ModelGpu : IDisposable
     private readonly ID3D11Buffer _part;
     private readonly ID3D11Buffer _scene;
     private readonly ID3D11SamplerState _wrap;
+    private readonly ID3D11SamplerState _sharp;
     private readonly ID3D11BlendState _covers;
     private readonly ID3D11BlendState _mixes;
     private readonly ID3D11BlendState _adds;
@@ -147,6 +159,12 @@ public sealed partial class ModelGpu : IDisposable
         _wrap = device.CreateSamplerState(new SamplerDescription(
             Filter.MinMagMipLinear, TextureAddressMode.Wrap, TextureAddressMode.Wrap, TextureAddressMode.Wrap,
             0f, 1, ComparisonFunction.Never, 0f, float.MaxValue));
+
+        // SIXTEEN WHERE THE LEVEL ALLOWS IT: feature level 9.1 caps the anisotropy at two, every
+        // level from 9.2 up at sixteen (D3D11_REQ_MAXANISOTROPY and its 9_1 counterpart).
+        _sharp = device.CreateSamplerState(new SamplerDescription(
+            Filter.Anisotropic, TextureAddressMode.Wrap, TextureAddressMode.Wrap, TextureAddressMode.Wrap,
+            0f, device.FeatureLevel >= FeatureLevel.Level_9_2 ? 16 : 2, ComparisonFunction.Never, 0f, float.MaxValue));
         _covers = device.CreateBlendState(BlendDescription.Opaque);
         _mixes = device.CreateBlendState(new BlendDescription(Blend.One, Blend.InverseSourceAlpha, Blend.One, Blend.InverseSourceAlpha));
         _adds = device.CreateBlendState(new BlendDescription(Blend.One, Blend.One, Blend.One, Blend.One));
@@ -436,7 +454,7 @@ public sealed partial class ModelGpu : IDisposable
         context.VSSetConstantBuffer(0, _frame);
         context.PSSetConstantBuffer(0, _frame);
         context.PSSetConstantBuffer(1, _part);
-        context.PSSetSampler(0, _wrap);
+        context.PSSetSampler(0, scene.Sharp ? _sharp : _wrap);
         context.PSSetShaderResource(1, _tables.View);
 
         // THE SUN'S SHADOW MAP BEFORE THE PICTURE, into its own target - see Lit.
@@ -565,6 +583,7 @@ public sealed partial class ModelGpu : IDisposable
         _adds.Dispose();
         _mixes.Dispose();
         _covers.Dispose();
+        _sharp.Dispose();
         _wrap.Dispose();
         _scene.Dispose();
         _part.Dispose();
