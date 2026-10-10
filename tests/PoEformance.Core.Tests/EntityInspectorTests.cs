@@ -275,6 +275,89 @@ public class EntityInspectorTests
         Assert.False(float.IsFinite(forever.TimeLeft));
     }
 
+    /// <summary>
+    /// The mods on an entity come off its ObjectMagicProperties by the game's own ids.
+    /// </summary>
+    /// <remarks>
+    /// The question this answers in the game: what tells an essence-imprisoned monster from a
+    /// free one. Its component list says nothing - a rare with a full bar and a targetable
+    /// byte - so if the game says so on the monster at all, it is as a mod or a buff. The one
+    /// candidate the data files hold, EncasedMonsterNoActionSpeed, has no display name, which
+    /// is why the id is what is listed and a name is only ever added beside it.
+    /// </remarks>
+    [Fact]
+    public void TheModsOnAnEntityAreReadByTheirIds()
+    {
+        OffsetSchema schema = Schema();
+        FakeMemoryReader reader = Entity(
+            schema, "Metadata/Monsters/KaruiTuatara/KaruiTuatara_", EntityAt, DetailsAt, BucketAt, ComponentsAt, NamesAt,
+            "Render", "ObjectMagicProperties");
+
+        EntityView placed = Look(new EntityInspector(reader, schema), new EntityRequest(true, EntityAt));
+        ulong magic = placed.Components.Single(c => c.Name == "ObjectMagicProperties").Address;
+
+        // Two mods in the first list, one in the third, the others empty - the shape a real
+        // rare reads in. Entries point at Mods.dat rows whose first field is the id string.
+        const ulong EntriesAt = 0x3000_0010_0000;
+        const ulong RowsAt = 0x3000_0011_0000;
+        const ulong StringsAt = 0x3000_0012_0000;
+        string[] ids = ["MonsterLesserEssenceModCold1", "EncasedMonsterNoActionSpeed", "MonsterEvasive1"];
+
+        int allMods = schema.Structs["ObjectMagicProperties"].OffsetOf("AllMods");
+        int vectorSize = (int)schema.Structs["StdVector"].Constants["StructSize"];
+        StructDef mod = schema.Structs["ModArray"];
+        int entrySize = (int)mod.Constants["EntrySize"];
+
+        reader.Place(magic, new byte[0x220]);
+        reader.Place(EntriesAt, new byte[entrySize * ids.Length]);
+        for (int i = 0; i < ids.Length; i++)
+        {
+            ulong row = RowsAt + (ulong)(i * 0x100);
+            ulong text = StringsAt + (ulong)(i * 0x100);
+            reader.Place<ulong>(EntriesAt + (ulong)(i * entrySize) + (ulong)mod.OffsetOf("ModsPtr"), row);
+            reader.Place<ulong>(row, text);
+            reader.Place(text, new byte[0x100]);
+            reader.PlaceUtf16(text, ids[i]);
+        }
+
+        reader.Place<ulong>(magic + (ulong)allMods, EntriesAt);
+        reader.Place<ulong>(magic + (ulong)allMods + 8, EntriesAt + (ulong)(entrySize * 2));
+        reader.Place<ulong>(magic + (ulong)allMods + (ulong)(2 * vectorSize), EntriesAt + (ulong)(entrySize * 2));
+        reader.Place<ulong>(magic + (ulong)allMods + (ulong)(2 * vectorSize) + 8, EntriesAt + (ulong)(entrySize * 3));
+
+        EntityView view = Look(new EntityInspector(reader, schema), new EntityRequest(true, EntityAt));
+
+        Assert.Equal(ids, view.Affixes.Select(m => m.Id));
+        Assert.Equal("3 mods on this entity:", view.ModsNote);
+
+        // With no name table wired up a mod keeps its id and nothing else - the id is the half
+        // that answers the question, and an invented name beside it would be a guess.
+        Assert.All(view.Affixes, m => Assert.Equal(string.Empty, m.Name));
+    }
+
+    /// <summary>Carrying ObjectMagicProperties with nothing on it does not look like carrying none.</summary>
+    [Fact]
+    public void CarryingMagicPropertiesWithNoModsSaysSo()
+    {
+        OffsetSchema schema = Schema();
+        FakeMemoryReader reader = Entity(
+            schema, "Metadata/Monsters/Skeleton", EntityAt, DetailsAt, BucketAt, ComponentsAt, NamesAt,
+            "Render", "ObjectMagicProperties");
+
+        EntityView placed = Look(new EntityInspector(reader, schema), new EntityRequest(true, EntityAt));
+        reader.Place(placed.Components.Single(c => c.Name == "ObjectMagicProperties").Address, new byte[0x220]);
+
+        EntityView view = Look(new EntityInspector(reader, schema), new EntityRequest(true, EntityAt));
+        Assert.Empty(view.Affixes);
+        Assert.Equal("carries ObjectMagicProperties, with no mods on it", view.ModsNote);
+
+        // And an entity without the component says nothing at all, rather than "no mods".
+        FakeMemoryReader bare = Entity(
+            schema, "Metadata/Monsters/Skeleton", EntityAt, DetailsAt, BucketAt, ComponentsAt, NamesAt,
+            "Render", "Life");
+        Assert.Equal(string.Empty, Look(new EntityInspector(bare, schema), new EntityRequest(true, EntityAt)).ModsNote);
+    }
+
     /// <summary>An entity with no Buffs component reports no effects rather than null.</summary>
     [Fact]
     public void AnEntityWithoutBuffsHasNoEffectsAndDoesNotThrow()

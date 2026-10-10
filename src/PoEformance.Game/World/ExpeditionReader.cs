@@ -55,9 +55,6 @@ public sealed class ExpeditionReader
     /// </remarks>
     public const string GatePath = "DevourerSegment";
 
-    private const int MostModLists = 5;
-    private const int MostModsPerList = 64;
-
     private readonly IMemoryReader _reader;
     private readonly EntityReader _entities;
     private readonly StateMachineReader _machines;
@@ -89,10 +86,7 @@ public sealed class ExpeditionReader
     private readonly int _text;
 
     private readonly int _blocked;
-    private readonly int _allMods;
-    private readonly int _vectorSize;
-    private readonly int _modEntrySize;
-    private readonly int _modRow;
+    private readonly ModListReader _mods;
 
     public ExpeditionReader(IMemoryReader reader, OffsetSchema schema, UiElementReader elements)
     {
@@ -140,11 +134,7 @@ public sealed class ExpeditionReader
         _text = schema.Structs["UiElementBase"].OffsetOf("TextPtr");
 
         _blocked = schema.Structs["TriggerableBlockage"].OffsetOf("IsBlocked");
-        _allMods = schema.Structs["ObjectMagicProperties"].OffsetOf("AllMods");
-        _vectorSize = (int)schema.Structs["StdVector"].Constants["StructSize"];
-        StructDef mod = schema.Structs["ModArray"];
-        _modEntrySize = (int)mod.Constants["EntrySize"];
-        _modRow = mod.OffsetOf("ModsPtr");
+        _mods = new ModListReader(reader, schema);
     }
 
     /// <summary>
@@ -333,48 +323,7 @@ public sealed class ExpeditionReader
     public IReadOnlyList<string> ModIds(ulong entity)
     {
         Entity? read = _entities.Read(entity);
-        ulong magic = read?.Component("ObjectMagicProperties") ?? 0;
-        if (magic == 0)
-        {
-            return [];
-        }
-
-        var ids = new List<string>();
-        for (int list = 0; list < MostModLists; list++)
-        {
-            ulong vector = magic + (ulong)_allMods + (ulong)(list * _vectorSize);
-            ulong first = _reader.ReadPointer(vector);
-            ulong last = _reader.ReadPointer(vector + 8);
-            if (!MemoryReaderExtensions.IsPlausiblePointer(first) || last <= first)
-            {
-                continue;
-            }
-
-            ulong bytes = last - first;
-            if (bytes % (ulong)_modEntrySize != 0 || bytes > (ulong)(_modEntrySize * MostModsPerList))
-            {
-                continue;
-            }
-
-            for (ulong i = 0; i < bytes / (ulong)_modEntrySize; i++)
-            {
-                ulong row = _reader.ReadPointer(first + (i * (ulong)_modEntrySize) + (ulong)_modRow);
-                if (!MemoryReaderExtensions.IsPlausiblePointer(row))
-                {
-                    continue;
-                }
-
-                // The dat row's first field is a pointer to the mod's id string.
-                ulong text = _reader.ReadPointer(row);
-                string id = MemoryReaderExtensions.IsPlausiblePointer(text) ? _reader.ReadUnicodeString(text, 128) : string.Empty;
-                if (id.Length > 0)
-                {
-                    ids.Add(id);
-                }
-            }
-        }
-
-        return ids;
+        return _mods.Ids(read?.Component("ObjectMagicProperties") ?? 0);
     }
 
     /// <summary>The counter widget, or 0 - the child path from the root.</summary>

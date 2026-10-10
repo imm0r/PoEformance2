@@ -70,6 +70,19 @@ public readonly record struct TimedEffect(string Name, float TimeLeft, float Tot
 /// </param>
 public readonly record struct EntityStat(uint Id, int Value, string Name = "", string Source = "");
 
+/// <summary>One mod on the inspected entity's ObjectMagicProperties.</summary>
+/// <remarks>
+/// The id is the game's own and is the thing to read: most mods a monster carries have no
+/// display name, and the ones that decide something - whether it can act at all - are among
+/// the nameless. Read for the SELECTED entity only, like the buffs and stats beside it.
+///
+/// Why it is here: an essence-imprisoned monster reads as a rare with a full bar and a
+/// targetable byte, and nothing in its component list says it cannot be hit. If the game says
+/// so anywhere on the monster, it is as a mod or a buff - and the buffs were already listed.
+/// </remarks>
+/// <param name="Name">What the game's Mods table calls it, empty for a mod with no display name.</param>
+public readonly record struct EntityMod(string Id, string Name = "", string Kind = "");
+
 /// <summary>Narrowing a stat list to what somebody is looking for.</summary>
 /// <remarks>
 /// Here rather than in the window that draws the box, so it can be tested: a search that
@@ -167,12 +180,17 @@ public sealed record EntityView(
     /// looking. The note read "(of 392)" while a search over the 256 that were read reported an
     /// absence, and prose in the line above did not stop that being taken at face value.
     /// </remarks>
-    bool StatsCutShort = false)
+    bool StatsCutShort = false,
+    IReadOnlyList<EntityMod>? Mods = null,
+    string ModsNote = "")
 {
     public static EntityView Empty { get; } = new(0, 0, string.Empty, [], [], 0, "nothing selected");
 
     /// <summary>What is currently on this entity, with its clock. Empty when it carries no Buffs.</summary>
     public IReadOnlyList<TimedEffect> Timed => Effects ?? [];
+
+    /// <summary>The mods on this entity. Empty when it carries no ObjectMagicProperties.</summary>
+    public IReadOnlyList<EntityMod> Affixes => Mods ?? [];
 
     /// <summary>The entity's own stat pairs. Empty when it carries no Stats component.</summary>
     public IReadOnlyList<EntityStat> Numbers => Stats ?? [];
@@ -211,6 +229,7 @@ public sealed class EntityInspector
     private readonly IMemoryReader _reader;
     private readonly EntityReader _entities;
     private readonly PoEformance.Game.Components.BuffsReader _buffs;
+    private readonly PoEformance.Game.Components.ModListReader _mods;
     private readonly PoEformance.Game.Components.StatNames _statNames;
 
     // Given the SAME table this walk was paying for anyway. The item readers key their stats by
@@ -260,6 +279,7 @@ public sealed class EntityInspector
         _fileRoot = fileRootStatic;
         _entities = new EntityReader(reader, schema);
         _buffs = new PoEformance.Game.Components.BuffsReader(reader, schema);
+        _mods = new PoEformance.Game.Components.ModListReader(reader, schema);
     }
 
     /// <summary>The newest reading. Never blocks, never null, never partially built.</summary>
@@ -412,6 +432,7 @@ public sealed class EntityInspector
         }
 
         (List<EntityStat> numbers, string statsNote, bool cutShort) = ReadStats(entity);
+        (List<EntityMod> mods, string modsNote) = ReadMods(entity);
 
         return new EntityView(
             entity.Address,
@@ -426,7 +447,44 @@ public sealed class EntityInspector
             note,
             numbers,
             statsNote,
-            cutShort);
+            cutShort,
+            mods,
+            modsNote);
+    }
+
+    /// <summary>
+    /// Reads the mods on the entity's ObjectMagicProperties, and says which kind of nothing it found.
+    /// </summary>
+    /// <remarks>
+    /// The same three outcomes the buffs keep apart, for the same reason: "carries no such
+    /// component", "carries one with nothing in it" and "carries one nobody could read" each
+    /// want a different next step, and a blank line answers none of them. Named where the
+    /// game's Mods table has a name for the id; a nameless mod is still a mod and is listed by
+    /// its id, which is readable enough and is the half that matters.
+    /// </remarks>
+    private (List<EntityMod> Mods, string Note) ReadMods(Entity entity)
+    {
+        var mods = new List<EntityMod>();
+        ulong magic = entity.Component("ObjectMagicProperties");
+        if (magic == 0)
+        {
+            return (mods, string.Empty);
+        }
+
+        if (!_reader.TryRead(magic + (ulong)_schema.Structs["ObjectMagicProperties"].OffsetOf("AllMods"), out ulong _))
+        {
+            return (mods, "carries ObjectMagicProperties, and it could not be read");
+        }
+
+        foreach (string id in _mods.Ids(magic))
+        {
+            PoEformance.Game.Items.ModMeaning meaning = _itemNames?.Mod(id) ?? new PoEformance.Game.Items.ModMeaning(string.Empty, string.Empty);
+            mods.Add(new EntityMod(id, meaning.Name, meaning.Kind));
+        }
+
+        return (mods, mods.Count > 0
+            ? $"{mods.Count} mods on this entity:"
+            : "carries ObjectMagicProperties, with no mods on it");
     }
 
     /// <summary>
