@@ -535,6 +535,11 @@ public sealed class EntityBrowserWindow
         // opened, closed, remembered - say what state the thing is in, not what to make of it.
         string absent = entity.Present == false ? "  absent" : string.Empty;
 
+        // The same word for a monster: the game has it listed, positioned, with a full bar,
+        // and out of the fight - imprisoned by essences, or a boss between phases - and the
+        // overlay draws nothing for it. See HiddenMonsters for the buff that says so.
+        string hidden = entity.IsHidden ? "  hidden" : string.Empty;
+
         // Said out loud, because this row's numbers are a RECORDING and its address no longer
         // points at anything: clicking it draws a route to where the thing was, which is
         // useful, while taking it apart in the dissector reads whatever now sits at that
@@ -543,7 +548,7 @@ public sealed class EntityBrowserWindow
             ? $"  remembered {since / 1000}s"
             : string.Empty;
 
-        return life + shield + chest + absent + remembered;
+        return life + shield + chest + absent + hidden + remembered;
     }
 
     private void DrawList(List<WorldEntity> listed, WorldEntity? player)

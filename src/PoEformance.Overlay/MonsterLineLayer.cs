@@ -69,7 +69,7 @@ public sealed class MonsterLineLayer
             // Friendly excluded for the same reason the health bars exclude them: your own
             // minions and totems are numerous, and a line to each turns the screen into a fan
             // centred on your own character.
-            if (monster.Kind != EntityKind.Monster || monster.IsFriendly || monster.IsEffect)
+            if (monster.Kind != EntityKind.Monster || monster.IsFriendly || monster.IsEffect || monster.IsHidden)
             {
                 continue;
             }

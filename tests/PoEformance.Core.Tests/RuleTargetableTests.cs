@@ -253,6 +253,22 @@ public class RuleTargetableTests
             m => Assert.False(m.Targetable));
     }
 
+    [Fact]
+    public void AHiddenMonsterIsNotOnTheFactSheetAtAll()
+    {
+        // The essence prison. Its rare has a full bar and a targetable byte of 1, and the only
+        // thing that says it is out of the fight is the buff the reader turns into IsHidden -
+        // so it is left out before any count, nearest or aim can reach it.
+        WorldSnapshot snapshot = Snapshot(
+            Entity(1, 10, targetable: true) with { IsHidden = true },
+            Entity(2, 20, targetable: true));
+
+        RuleState state = RuleState.From(snapshot, focused: true, new RuleHistory(), 0);
+
+        Assert.Equal(1, state.MonsterCount);
+        Assert.Equal(20, Assert.Single(state.Monsters).Distance, 3);
+    }
+
     private static double Distance((float X, float Y) from, (float X, float Y) to)
         => Math.Sqrt(((to.X - from.X) * (to.X - from.X)) + ((to.Y - from.Y) * (to.Y - from.Y)));
 

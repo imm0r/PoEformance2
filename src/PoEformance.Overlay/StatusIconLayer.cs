@@ -118,7 +118,7 @@ public sealed class StatusIconLayer
         {
             // Buffs null means the reader was never asked for this monster's - see the rarity
             // floor in WorldReader - so there is nothing to draw and nothing wrong.
-            if (monster.Kind != EntityKind.Monster || monster.IsFriendly || monster.Buffs is null)
+            if (monster.Kind != EntityKind.Monster || monster.IsFriendly || monster.IsHidden || monster.Buffs is null)
             {
                 continue;
             }

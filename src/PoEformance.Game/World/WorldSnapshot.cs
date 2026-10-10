@@ -311,7 +311,14 @@ public sealed record WorldEntity(
     // Carried because a rule wants it and nothing else here kept it: a boss between phases
     // and a monster still spawning both stand in every count with a full health bar, and a
     // skill fired at either is mana spent on something the game refuses to hit.
-    bool? Targetable = null)
+    bool? Targetable = null,
+
+    // Whether the game has taken this monster out of the fight for now - imprisoned by
+    // essences, or a boss between phases - by the buff it marks them with. See HiddenMonsters
+    // for the two captures that settled which buff. Such a monster is not counted, aimed at,
+    // given a bar or drawn as a dot: it stands there with a full bar and a targetable byte, and
+    // nothing can hit it.
+    bool IsHidden = false)
 {
     /// <summary>Whether this comes from memory rather than from the game's current list.</summary>
     public bool IsRemembered => RememberedForMs is not null;
@@ -559,6 +566,7 @@ public sealed class WorldReader
     private readonly ActionReader _actions;
     private readonly FlaskBeltReader _flasks;
     private readonly CorpseFilter _corpses = new();
+    private readonly HiddenMonsters _hidden = new();
 
     /// <summary>
     /// Which entities are not worth reading. On by default; turn it off to see everything.
@@ -1299,6 +1307,7 @@ public sealed class WorldReader
         var entities = new List<WorldEntity>(pointers.Count);
         WorldEntity? player = null;
         long nowMs = Environment.TickCount64;
+        _hidden.Tick(nowMs);
 
         // Which rendered objects a monster has already been taken for this read, and how
         // many repeat entities were dropped because of it. See where they are used, below.
@@ -1521,6 +1530,18 @@ public sealed class WorldReader
                 }
             }
 
+            // Whether the game has taken it out of the fight - imprisoned, or a boss between
+            // phases - which only its buffs say. Paced by HiddenMonsters so every hostile monster
+            // can be asked without paying the buff walk for each on every read, and told the
+            // buffs already read above so a rare the status icons watch is never walked twice.
+            // Off screen it keeps its last answer, as the aim and the buffs keep theirs.
+            bool hidden = false;
+            if (kind == EntityKind.Monster && !friendly)
+            {
+                hidden = _hidden.IsHidden(
+                    renderAddress, buffs, buffs is null ? entity.Component("Buffs") : 0, _buffs, drawn, nowMs);
+            }
+
             // Where it is pointing and what it is doing. Only the things that can aim at you -
             // the player, and the monsters that are not on your side - because everything else
             // here is scenery, a drop, or your own summon.
@@ -1567,7 +1588,8 @@ public sealed class WorldReader
                 GroundRadius: ReadGroundRadius(entity),
                 Beam: ReadBeam(entity),
                 GroundType: ReadGroundType(entity),
-                Targetable: signs.Targetable);
+                Targetable: signs.Targetable,
+                IsHidden: hidden);
 
             entities.Add(world);
             if (address == chain.PlayerEntity)
