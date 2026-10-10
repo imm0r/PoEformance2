@@ -450,21 +450,27 @@ public static class CaptureReport
     }
 
     /// <summary>
-    /// Every room placed by its doodads, in a line and its detail: each room's places with their hits, lines, offset and tiles agreeing, what it yielded to whom, or why it has none - see RoomDoodadFinder.
+    /// Every room placed by its doodads or, where they could not, its tiles, in a line and its detail: each room's places with their hits, lines, offset and tiles agreeing - or the tile they are anchored on - what it yielded to whom, or why it has none. See RoomDoodadFinder and RoomTileFinder.
     /// </summary>
     public static (string Said, string Detail) Placed(IReadOnlyList<(string Room, RoomLayout Layout, RoomDoodadPlaces Places)> placed)
     {
         ArgumentNullException.ThrowIfNull(placed);
-        int places = 0, unplaced = 0;
+        int byDoodads = 0, doodadPlaces = 0, byTiles = 0, tilePlaces = 0, unplaced = 0;
         var lines = new List<string>(placed.Count);
         foreach ((string room, _, RoomDoodadPlaces found) in placed)
         {
-            places += found.Places.Count;
-            unplaced += found.Places.Count == 0 ? 1 : 0;
             string name = TerrainRooms.NameFor(room);
             var said = new List<string>(found.Places.Count + found.Yielded.Count);
+            bool tiled = found.Places.Count > 0;
             foreach (RoomDoodadPlace place in found.Places)
             {
+                if (place.Anchor.Length > 0)
+                {
+                    said.Add(ByTiles(place));
+                    continue;
+                }
+
+                tiled = false;
                 said.Add(string.Create(CultureInfo.InvariantCulture,
                     $"tile {place.Where.X}, {place.Where.Y}, {RoomFinder.Said(place.Where.Turn)}: {place.Hits} of {place.Lines} doodads within a tile ({place.PropHits} of {place.Props} props), off {place.MeanOff:0} on average, {Tiles(place)}"));
             }
@@ -480,24 +486,53 @@ public static class CaptureReport
 
             if (found.Places.Count == 0)
             {
+                unplaced++;
                 lines.Add(string.Create(CultureInfo.InvariantCulture,
                     $"{name}: no place - {found.Why}; {found.Matchable} of its {found.Lines} doodad lines stand in the area, {found.Props} of them props, {found.ByModel} told by their model")
                     + (said.Count > 0 ? " - " + string.Join("; ", said) : string.Empty));
                 continue;
             }
 
+            if (tiled)
+            {
+                byTiles++;
+                tilePlaces += found.Places.Count;
+                lines.Add(string.Create(CultureInfo.InvariantCulture, $"{name}: {found.Places.Count} place{(found.Places.Count == 1 ? string.Empty : "s")} by its tiles - ") + string.Join("; ", said));
+                continue;
+            }
+
+            byDoodads++;
+            doodadPlaces += found.Places.Count;
             lines.Add(string.Create(CultureInfo.InvariantCulture,
                 $"{name}: {found.Places.Count} place{(found.Places.Count == 1 ? string.Empty : "s")}, {found.ByModel} of {found.Matchable} doodads told by their model - ")
                 + string.Join("; ", said));
         }
 
-        string line = string.Create(CultureInfo.InvariantCulture, $"rooms: {placed.Count - unplaced} placed by their doodads at {places} places")
+        string line = string.Create(CultureInfo.InvariantCulture, $"rooms: {byDoodads} placed by their doodads at {doodadPlaces} places")
+            + (byTiles > 0 ? string.Create(CultureInfo.InvariantCulture, $", {byTiles} by their tiles at {tilePlaces} places") : string.Empty)
             + (unplaced > 0 ? string.Create(CultureInfo.InvariantCulture, $", {unplaced} with no place") : string.Empty);
         return (line, string.Join('\n', lines));
 
         // The tiles' verdict at the place, or that the room could not be scored against this area's ground - see RoomFinder.Scorer.
         static string Tiles(RoomDoodadPlace place)
             => place.TilesAgree >= 0 ? string.Create(CultureInfo.InvariantCulture, $"{place.TilesAgree} tiles agree") : "tiles not scored";
+
+        // A place by the tiles: a room's own, anchored on a tile, or an anchor tile's footprint drawn once
+        // for the room or rooms standing on it that the tiles cannot tell apart - see RoomTileFinder.
+        static string ByTiles(RoomDoodadPlace place)
+        {
+            RoomCandidate where = place.Where;
+            string anchor = TerrainRooms.NameFor(place.Anchor);
+            return place.Variants.Count switch
+            {
+                0 => string.Create(CultureInfo.InvariantCulture,
+                    $"tile {where.X}, {where.Y}, {RoomFinder.Said(where.Turn)}: every one of its {where.Big} big slots alike on {anchor}, laid {place.AnchorLaid}x, {where.TilesAgree} of {where.Tiles} slots alike"),
+                1 => string.Create(CultureInfo.InvariantCulture,
+                    $"tile {where.X}, {where.Y}: the {anchor} tile's own footprint, {where.Width} x {where.Height} - the room stands on it more than one way round and the tiles cannot say which, so the tile is drawn"),
+                _ => string.Create(CultureInfo.InvariantCulture,
+                    $"tile {where.X}, {where.Y}: the {anchor} tile's own footprint, {where.Width} x {where.Height} - {string.Join(", ", place.Variants.Select(TerrainRooms.NameFor))} all stand on it and the tiles cannot say which, drawn once"),
+            };
+        }
     }
 
     /// <summary>

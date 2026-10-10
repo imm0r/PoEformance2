@@ -141,14 +141,14 @@ public class CaptureReplayTests
             }
 
             // THE OTHER HALF, FIRST: what lies under each place the doodads found, whether or not the search
-            // can run - and for a place laid as written, every big slot against the tile on its own cell, by
-            // the strict rule and with an unnamed type as any, so the rule can be held against a known place.
+            // can run - and every big slot against the tile on its own cell, by the rule of 0.1.157 (an
+            // unnamed type as any) and the stricter one before it, so the rule stays held against known places.
             RoomDoodadPlaces places = placing.Placed[one].Places;
             foreach (RoomDoodadPlace place in places.Places)
             {
                 RoomCandidate at = place.Where;
                 said.AppendLine(CultureInfo.InvariantCulture, $"  doodads at tile {at.X}, {at.Y}, {RoomFinder.Said(at.Turn)}, {at.Width} x {at.Height} on the grid - laid under it: {Under(grid.Tiles, at)}");
-                if (at.Turn != 0 || identities is null || grid.Tiles is not { } laidTiles)
+                if (identities is null || grid.Tiles is not { } laidTiles)
                 {
                     continue;
                 }
@@ -164,16 +164,31 @@ public class CaptureReplayTests
                         }
 
                         Ask ask = AskOf(layout, slot);
-                        string path = laidTiles.PathAt(at.X + column, at.Y + line);
+                        (int cellX, int cellY) = RoomFinder.CellOf(column, line, layout.Width, layout.Height, at.Turn);
+                        int x = at.X + cellX, y = at.Y + cellY;
+                        string path = laidTiles.PathAt(x, y);
                         TileIdentity? laid = identities.GetValueOrDefault(path);
-                        string verdict = laid is null ? "no identity" : Alike(ask, laid) ? "alike" : Loosely(ask, laid) ? "alike with an unnamed type as any" : "unlike";
+                        string verdict = laid is null ? "no identity" : !Alike(ask, laid) ? "unlike" : Strictly(ask, laid) ? "alike" : "alike, an unnamed type as any";
 
                         // AND WHICH PIECE of its file the tile on the slot's own cell is: (0, 0) there says the
                         // slot's corner is the tile's corner, which is what pins a placement to the tile and not
-                        // merely into it. The placement is -1 without the rotation tables, which a replay has not.
-                        (int pieceX, int pieceY) = laidTiles.SubAt(at.X + column, at.Y + line);
-                        said.AppendLine(CultureInfo.InvariantCulture, $"    slot {column}, {line} {ask.Said} - laid {(laid is null ? Short(path) : LaidSaid(path, 0, identities, null))} piece {pieceX}, {pieceY} placement {laidTiles.PlacementAt(at.X + column, at.Y + line)}: {verdict}");
+                        // merely into it; the placement is how the tile was laid, -1 where the rotation tables
+                        // were not in the recording.
+                        (int pieceX, int pieceY) = laidTiles.SubAt(x, y);
+                        said.AppendLine(CultureInfo.InvariantCulture, $"    slot {column}, {line} {ask.Said} - laid {(laid is null ? Short(path) : LaidSaid(path, 0, identities, null))} piece {pieceX}, {pieceY} placement {laidTiles.PlacementAt(x, y)}: {verdict}");
                     }
+                }
+            }
+
+            // THE TILE PLACING ITSELF, as the tool now runs it for a room the doodads could not place.
+            if (grid.Tiles is { } tilesLaid && identity is not null)
+            {
+                RoomTilePlaces byTiles = RoomTileFinder.Find(layout, tilesLaid, identity);
+                said.Append(CultureInfo.InvariantCulture, $"  tiles: {byTiles.Places.Count} places on its {byTiles.Anchor} slot, {byTiles.Anchors} anchor cells, {byTiles.Tried} candidates tried");
+                said.AppendLine(byTiles.Why.Length > 0 ? " - " + byTiles.Why : string.Empty);
+                foreach (RoomTilePlace place in byTiles.Places)
+                {
+                    said.AppendLine(CultureInfo.InvariantCulture, $"    tile {place.Where.X}, {place.Where.Y}, {RoomFinder.Said(place.Where.Turn)}: {place.Where.BigAgree} of {place.Where.Big} big slots, {place.Where.TilesAgree} of {place.Where.Tiles} slots alike, on {Short(place.Anchor)} laid {place.AnchorLaid}x at {place.AnchorX}, {place.AnchorY}");
                 }
             }
 
@@ -262,6 +277,19 @@ public class CaptureReplayTests
             }
         }
 
+        // WHAT THE TOOL WOULD NOW WRITE to rooms-placed.txt: the doodads' places with the tiles' settled in.
+        if (grid.Tiles is { } laidAll && identity is not null)
+        {
+            var tilePlaces = new Dictionary<string, RoomTilePlaces>(StringComparer.OrdinalIgnoreCase);
+            List<(string Room, RoomLayout Layout, RoomDoodadPlaces Places)> settled = RoomTileFinder.Settled(
+                placing.Placed,
+                (room, layout) => tilePlaces.TryGetValue(room, out RoomTilePlaces? had) ? had : tilePlaces[room] = RoomTileFinder.Find(layout, laidAll, identity),
+                placing.Survey.Found);
+            said.AppendLine();
+            said.AppendLine("=== rooms-placed.txt as the tool would now write it, the tiles' places settled in");
+            said.AppendLine(CaptureReport.Lined(CaptureReport.Placed(settled)));
+        }
+
         return said.ToString();
     }
 
@@ -314,21 +342,19 @@ public class CaptureReplayTests
             Sorted([room.Named(slot.Edge(0)), room.Named(slot.Edge(1)), room.Named(slot.Edge(2)), room.Named(slot.Edge(3))]),
             Sorted([room.Named(slot.Ground(0)), room.Named(slot.Ground(1)), room.Named(slot.Ground(2)), room.Named(slot.Ground(3))]));
 
-    /// <summary>Whether a laid file answers a slot's ask - RoomPlacements.Compare's rule, kept in step with it by hand.</summary>
+    /// <summary>Whether a laid file answers a slot's ask - SlotWants' rule, an unnamed type in the ask taken as any, kept in step with it by hand.</summary>
     private static bool Alike(Ask ask, TileIdentity laid)
-        => SameSize(ask, laid)
-            && (ask.Tag.Length == 0 || string.Equals(ask.Tag, laid.Tag, StringComparison.OrdinalIgnoreCase))
-            && Sorted(laid.Edges).AsSpan().SequenceEqual(ask.Edges, StringComparer.OrdinalIgnoreCase)
-            && Sorted(laid.Grounds).AsSpan().SequenceEqual(ask.Grounds, StringComparer.OrdinalIgnoreCase);
-
-    /// <summary>
-    /// The same, with an unnamed type in the ask taken as any - the reading the ground stamp gives nought (RoomFinder: a corner type nought names nothing). A hypothesis to hold against a known place, not the tool's rule.
-    /// </summary>
-    private static bool Loosely(Ask ask, TileIdentity laid)
         => SameSize(ask, laid)
             && (ask.Tag.Length == 0 || string.Equals(ask.Tag, laid.Tag, StringComparison.OrdinalIgnoreCase))
             && Covers(laid.Edges, ask.Edges)
             && Covers(laid.Grounds, ask.Grounds);
+
+    /// <summary>The rule before 0.1.157, the sets equal - printed beside the other so a capture still shows where the two part.</summary>
+    private static bool Strictly(Ask ask, TileIdentity laid)
+        => SameSize(ask, laid)
+            && (ask.Tag.Length == 0 || string.Equals(ask.Tag, laid.Tag, StringComparison.OrdinalIgnoreCase))
+            && Sorted(laid.Edges).AsSpan().SequenceEqual(ask.Edges, StringComparer.OrdinalIgnoreCase)
+            && Sorted(laid.Grounds).AsSpan().SequenceEqual(ask.Grounds, StringComparer.OrdinalIgnoreCase);
 
     private static bool SameSize(Ask ask, TileIdentity laid)
         => (laid.Width == ask.Width && laid.Height == ask.Height) || (laid.Width == ask.Height && laid.Height == ask.Width);
@@ -520,8 +546,13 @@ public class CaptureReplayTests
             return null;
         }
 
-        // THE LIVE SCHEMA, not the one the committed recordings replay against: a capture is of the client as it is.
-        var world = new WorldReader(replay, RealSessionTests.LiveSchema());
+        // THE LIVE SCHEMA, not the one the committed recordings replay against: a capture is of the client
+        // as it is. THE ROTATION TABLES from the recording's statics, where the pass noted them, so each
+        // tile's placement decodes as it did live.
+        var rotation = new TerrainRotationTables(
+            replay.ResolvedStatics.GetValueOrDefault("TerrainRotationSelector"),
+            replay.ResolvedStatics.GetValueOrDefault("TerrainRotatorHelper"));
+        var world = new WorldReader(replay, RealSessionTests.LiveSchema(), rotation);
         TerrainGrid? grid = world.Read(gameStates, CaptureMemory.MostEntities).Terrain;
         if (grid is null)
         {
@@ -531,7 +562,8 @@ public class CaptureReplayTests
 
         string groundSaid = grid.Ground is null ? "not read" : string.Create(CultureInfo.InvariantCulture, $"{grid.Ground.Types.Count} named");
         string tilesSaid = grid.Tiles is null ? "not read" : string.Create(CultureInfo.InvariantCulture, $"{grid.Tiles.Paths.Count} files laid");
-        how = string.Create(CultureInfo.InvariantCulture, $"terrain {grid.TilesX} x {grid.TilesY} tiles from the recording, ground types {groundSaid}, tiles {tilesSaid}");
+        string rotationSaid = rotation.IsResolved ? "resolved" : "not both among the recording's statics (" + string.Join(", ", replay.ResolvedStatics.Keys.Order(StringComparer.Ordinal)) + ")";
+        how = string.Create(CultureInfo.InvariantCulture, $"terrain {grid.TilesX} x {grid.TilesY} tiles from the recording, ground types {groundSaid}, tiles {tilesSaid}, rotation tables {rotationSaid}");
         return grid;
     }
 

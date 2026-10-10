@@ -258,9 +258,13 @@ public sealed class RoomScorer
 /// against the definition laid where that slot falls, the big slots included: those are what the
 /// stamp leaves out and what makes a room this room. The check is the part of a slot no placement
 /// changes - the size as an unordered pair, the tag where the slot names one, and the edge and corner
-/// ground types as sets of four - because which side of a turned tile meets which side of a turned
+/// ground types as sets of four, a type the slot leaves unnamed meeting any (SlotWants has the rule
+/// and the measurement behind it) - because which side of a turned tile meets which side of a turned
 /// room is a convention nothing here has settled for tiles. The cell a slot falls on is the one at
 /// its own column and line, which every reading of a slot's footprint covers.
+///
+/// A ROOM OF BIG SLOTS ALONE has no stamp and is not searched here: its tiles place it instead, see
+/// RoomTileFinder.
 ///
 /// RANKED BY THE TILES, THEN THE CORNERS - and not by whether every corner fits, because a room
 /// does not fit every corner where it lies. Seepage's boss arena, measured where it stands: 208 of
@@ -541,8 +545,8 @@ public static class RoomFinder
     /// <summary>
     /// The area cell a room's slot falls on, for a candidate laid one of the eight ways: its centre, laid that way, floored.
     /// </summary>
-    /// <remarks>The corners' own arithmetic on a grid twice as fine, so a centre is a whole number.</remarks>
-    internal static (int X, int Y) CellOf(int column, int line, int width, int height, int turn)
+    /// <remarks>The corners' own arithmetic on a grid twice as fine, so a centre is a whole number. Public for the tile placing (RoomTileFinder) and the capture's replay, which hold a slot's cell against the tile on it.</remarks>
+    public static (int X, int Y) CellOf(int column, int line, int width, int height, int turn)
     {
         int u = (2 * column) + 1;
         int v = (2 * line) + 1;

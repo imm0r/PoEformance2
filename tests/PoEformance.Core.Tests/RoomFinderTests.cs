@@ -123,7 +123,7 @@ public class RoomFinderTests
     /// THE TEMPLE'S CASE, made small: the pattern pressed twice into the wall, once mirrored and turned
     /// a quarter at (12, 4), once as written at (16, 1). Under the first every slot's cell holds a
     /// tile whose sizes, edges and grounds are what that slot asks for; under the second the tiles
-    /// carry an edge type the room never names - see <see cref="RoomAndDecoyTiles"/>.
+    /// name wall where the room names floor and rubble - see <see cref="RoomAndDecoyTiles"/>.
     /// </remarks>
     [Fact]
     public void ANDWhereTwoPlacesFitTheGroundTheTilesLaidSayWhichIsTheRoom()
@@ -304,9 +304,13 @@ public class RoomFinderTests
     }
 
     /// <summary>
-    /// The room's slots as tiles under the room, mirrored and turned at (12, 4), and under the decoy, as written at (16, 1), with an edge the room never names.
+    /// The room's slots as tiles under the room, mirrored and turned at (12, 4), and under the decoy, as written at (16, 1), naming wall where the room names floor and rubble.
     /// </summary>
-    /// <remarks>The cells by hand: turned that way, slot (c, l) falls on cell (13 - l, 6 - c); as written, on (16 + c, 1 + l).</remarks>
+    /// <remarks>
+    /// The cells by hand: turned that way, slot (c, l) falls on cell (13 - l, 6 - c); as written, on
+    /// (16 + c, 1 + l). THE DECOY DIFFERS BY A TYPE THE SLOT NAMES AND THE TILE LACKS - the one thing
+    /// the rule catches; an edge the room never names would not be a difference, see SlotWants.
+    /// </remarks>
     private static (TerrainTiles Laid, Dictionary<string, TileIdentity> Identities) RoomAndDecoyTiles()
     {
         var paths = new List<string>();
@@ -319,7 +323,7 @@ public class RoomFinderTests
             {
                 IReadOnlyList<string> grounds = Grounds(column, line);
                 Lay(paths, identities, ids, 13 - line, 6 - column, new TileIdentity(1, 1, string.Empty, ["", "", "", ""], grounds));
-                Lay(paths, identities, ids, 16 + column, 1 + line, new TileIdentity(1, 1, string.Empty, ["Metadata/Terrain/Test/cliff.et", "", "", ""], grounds));
+                Lay(paths, identities, ids, 16 + column, 1 + line, new TileIdentity(1, 1, string.Empty, ["", "", "", ""], [.. grounds.Select(one => one == WallType ? one : WallType)]));
             }
         }
 
@@ -406,8 +410,9 @@ public class RoomFinderTests
         (TerrainTiles laid, Dictionary<string, TileIdentity> identities) = RoomAndDecoyTiles();
         foreach ((int x, int y) in new[] { (13, 4), (13, 5), (13, 6) })
         {
+            // THE AREA'S OWN TILES along the join: plain wall where the room's slots name floor and rubble.
             string path = string.Create(CultureInfo.InvariantCulture, $"Metadata/Terrain/Test/tile_{x}_{y}.tdt");
-            identities[path] = identities[path] with { Edges = ["Metadata/Terrain/Test/door.et", "", "", ""] };
+            identities[path] = identities[path] with { Grounds = [WallType, WallType, WallType, WallType] };
         }
 
         var walkable = new bool[TilesX * TilesY];
@@ -436,7 +441,7 @@ public class RoomFinderTests
         Assert.Equal((13, 5, false, true), (opening.X, opening.Y, opening.IsCorner, opening.Walkable));
         Assert.Equal(4, opening.SideEdges.Count);
         Assert.Equal(8, opening.SideExits.Count);
-        Assert.Contains("door", opening.Laid, StringComparison.Ordinal);
+        Assert.Contains("wall, wall, wall, wall", opening.Laid, StringComparison.Ordinal);
         RoomPart corner = Assert.Single(parts, one => one.IsCorner);
         Assert.Equal((14, 5, RoomJoin.Corner, "floor", "wall"), (corner.X, corner.Y, corner.Join, corner.Wanted, corner.Laid));
         Assert.Equal(2, parts.Count(one => one.Join == RoomJoin.Cap));
@@ -476,6 +481,48 @@ public class RoomFinderTests
         Assert.Equal((12, 4, 5), (found.X, found.Y, found.Turn));
         Assert.Equal((1, 1), (found.BigAgree, found.Big));
         Assert.Equal((6, 6), (found.TilesAgree, found.Tiles));
+    }
+
+    /// <summary>
+    /// A type a slot leaves unnamed meets whatever the tile names there - SlotWants' rule, the stamp's own for nought - and a type the slot names is one the tile must have.
+    /// </summary>
+    /// <remarks>
+    /// SINTER RIFT'S MEASUREMENT, made small: at the boss room's doodad place two of its seventeen big
+    /// slots left a ground unnamed where the laid tile named one, and the rule that asked the sets to be
+    /// equal called them unlike. Here the room leaves its inner corner (1, 1) unnamed and the tiles
+    /// laid where it stands name it, as the area does.
+    /// </remarks>
+    [Fact]
+    public void ATYPETheSlotLeavesUnnamedMeetsWhateverTheTileNames()
+    {
+        (TerrainGroundTypes ground, _) = Area(withRoom: true);
+        var freed = (int[,])Pattern.Clone();
+        freed[1, 1] = 0;
+        RoomLayout room = RoomLayout.Parse(Room(freed, 3, 2));
+
+        var paths = new List<string>();
+        var identities = new Dictionary<string, TileIdentity>(StringComparer.Ordinal);
+        var ids = new int[TilesX * TilesY];
+        Array.Fill(ids, -1);
+        for (var line = 0; line < 2; line++)
+        {
+            for (var column = 0; column < 3; column++)
+            {
+                Lay(paths, identities, ids, 13 - line, 6 - column, new TileIdentity(1, 1, string.Empty, ["", "", "", ""], Grounds(column, line)));
+            }
+        }
+
+        RoomSearch search = RoomFinder.Find(room, ground, TilesX, TilesY, Laid(paths, ids), path => identities.GetValueOrDefault(path));
+        RoomCandidate found = search.Candidates[0];
+        Assert.Equal((12, 4, 5), (found.X, found.Y, found.Turn));
+        Assert.Equal((6, 6), (found.TilesAgree, found.Tiles));
+
+        // AND THE OTHER WAY ROUND: a tile lacking a ground the slot names is not the slot's.
+        identities[paths[0]] = new TileIdentity(1, 1, string.Empty, ["", "", "", ""], ["", "", "", ""]);
+        search = RoomFinder.Find(room, ground, TilesX, TilesY, Laid(paths, ids), path => identities.GetValueOrDefault(path));
+        found = search.Candidates[0];
+        Assert.Equal((12, 4, 5), (found.X, found.Y, found.Turn));
+        Assert.Equal((5, 6), (found.TilesAgree, found.Tiles));
     }
 
     /// <summary>The ground types at one slot's four corners, down-left round to up-left, by name.</summary>

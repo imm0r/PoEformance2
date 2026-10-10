@@ -98,7 +98,7 @@ the rooms around you with their light data, every room as the ground-and-tile se
 no entities can be read, the Tile Book's picked row, and every laid tile's definition as a room's slot
 asks about it (with the recording's terrain, the search runs again from the capture); the doodad survey with every sighting, the
 scripted objects remembered from the network bubble since among them, and every room of the set as
-its doodads place it; what the diagnostic
+its doodads place it, or its tiles where the doodads cannot; what the diagnostic
 windows hold as the key goes down - the active routes, the light hunt's report, the model probe,
 the Memory Dissector's places and search, the atlas check; and a memory recording that `--replay`
 reads. Inside that recording the ticked parts are read once more from nothing - the world with

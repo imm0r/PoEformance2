@@ -17,17 +17,12 @@ namespace PoEformance.Game.World;
 /// </remarks>
 internal sealed class RoomPlacements
 {
-    /// <summary>A verdict not worked out yet.</summary>
+    /// <summary>A verdict not worked out yet; the others are SlotWants'.</summary>
     private const byte Unread = 0;
 
-    /// <summary>No definition to judge by - the tile does not count.</summary>
-    private const byte Unknown = 1;
-
-    /// <summary>The tile is not what the slot asks for.</summary>
-    private const byte Unlike = 2;
-
-    /// <summary>The tile is what the slot asks for.</summary>
-    private const byte Alike = 3;
+    private const byte Unknown = SlotWants.Unknown;
+    private const byte Unlike = SlotWants.Unlike;
+    private const byte Alike = SlotWants.Alike;
 
     private readonly int _tilesX;
     private readonly int _tilesY;
@@ -53,8 +48,8 @@ internal sealed class RoomPlacements
     /// <summary>Per turn, each slot's cell as an offset into the tiles' ids from the placement's corner.</summary>
     private readonly int[][] _cellAt = new int[8][];
 
-    /// <summary>Per slot, what it asks for - one instance per kind of slot.</summary>
-    private readonly Wanted[] _slotWants = [];
+    /// <summary>Per slot, what it asks for - one instance per kind of slot. See SlotWants for the rule a tile is judged by.</summary>
+    private readonly SlotWant[] _slotWants = [];
 
     /// <summary>Per slot, its kind's verdict on each tile file, by path id - shared by every slot of the kind.</summary>
     private readonly byte[][] _slotVerdicts = [];
@@ -63,7 +58,7 @@ internal sealed class RoomPlacements
     private readonly bool[] _large = [];
 
     /// <summary>Per tile file, what it is, once read.</summary>
-    private readonly Wanted?[] _laid = [];
+    private readonly SlotWant?[] _laid = [];
 
     private readonly bool[] _laidRead = [];
 
@@ -138,11 +133,11 @@ internal sealed class RoomPlacements
         _tiles = tiles;
         _identity = identity;
         int files = tiles.Paths.Count;
-        _laid = new Wanted?[files];
+        _laid = new SlotWant?[files];
         _laidRead = new bool[files];
 
-        var slots = new List<(int Column, int Line, Wanted Wants)>();
-        var kinds = new Dictionary<Wanted, byte[]>();
+        var slots = new List<(int Column, int Line, SlotWant Wants)>();
+        var kinds = new Dictionary<SlotWant, byte[]>();
         for (var line = 0; line < room.Height; line++)
         {
             for (var column = 0; column < room.Width; column++)
@@ -153,10 +148,7 @@ internal sealed class RoomPlacements
                     continue;
                 }
 
-                var wanted = new Wanted(
-                    slot.Width, slot.Height, room.Named(slot.Tag),
-                    Sorted(room, slot.Edge(0), slot.Edge(1), slot.Edge(2), slot.Edge(3)),
-                    Sorted(room, slot.Ground(0), slot.Ground(1), slot.Ground(2), slot.Ground(3)));
+                SlotWant wanted = SlotWants.Of(room, slot);
                 if (!kinds.ContainsKey(wanted))
                 {
                     kinds[wanted] = new byte[files];
@@ -166,13 +158,13 @@ internal sealed class RoomPlacements
             }
         }
 
-        _slotWants = new Wanted[slots.Count];
+        _slotWants = new SlotWant[slots.Count];
         _slotVerdicts = new byte[slots.Count][];
         _large = new bool[slots.Count];
         _slotAt = new (int, int)[slots.Count];
         for (var one = 0; one < slots.Count; one++)
         {
-            Wanted wanted = slots[one].Wants;
+            SlotWant wanted = slots[one].Wants;
             _slotAt[one] = (slots[one].Column, slots[one].Line);
             _slotVerdicts[one] = kinds[wanted];
             _slotWants[one] = wanted;
@@ -377,7 +369,7 @@ internal sealed class RoomPlacements
 
                 string path = _tiles.Paths[id];
                 TileIdentity? identity = _identity(path);
-                if (Compare(_slotWants[one], LaidOf(identity)) == Unlike)
+                if (SlotWants.Verdict(_slotWants[one], SlotWants.Of(identity)) == Unlike)
                 {
                     tiles.Add((x, y));
                     tileAt.Add((one, identity, path));
@@ -403,8 +395,8 @@ internal sealed class RoomPlacements
                 column,
                 line,
                 Sides(column == 0, column == _room.Width - 1, line == 0, line == _room.Height - 1),
-                Said(_slotWants[slot]),
-                laid is null ? Short(path) + " (no definition)" : Short(path) + " " + Said(LaidOf(laid)!),
+                SlotWants.Said(_slotWants[slot]),
+                laid is null ? Short(path) + " (no definition)" : Short(path) + " " + SlotWants.Said(SlotWants.Of(laid)!),
                 Walks(tiles[one].X, tiles[one].Y),
                 [_room.Named(numbers.Edge(0)), _room.Named(numbers.Edge(1)), _room.Named(numbers.Edge(2)), _room.Named(numbers.Edge(3))],
                 numbers.IsTile ? numbers.Numbers.AsSpan(6, 8).ToArray() : []));
@@ -542,11 +534,7 @@ internal sealed class RoomPlacements
         : "#" + type.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
     /// <summary>A file's name without its folder or extension.</summary>
-    private static string Short(string path) => path.Length == 0 ? "-" : Path.GetFileNameWithoutExtension(path.Replace('\\', '/'));
-
-    /// <summary>What a slot asks for, or what a tile is, in a line's words.</summary>
-    private static string Said(Wanted one)
-        => System.FormattableString.Invariant($"{one.Width}x{one.Height}{(one.Tag.Length > 0 ? " " + one.Tag : string.Empty)} edges [{string.Join(", ", one.Edges.Select(Short))}] grounds [{string.Join(", ", one.Grounds.Select(Short))}]");
+    private static string Short(string path) => SlotWants.Short(path);
 
     /// <summary>
     /// The best placement whose footprint covers a tile - most tiles agreeing, then most corners, the earliest on a tie - or null.
@@ -598,76 +586,17 @@ internal sealed class RoomPlacements
         return best is { } found ? new RoomPlace(found, Misses(found)) : null;
     }
 
-    /// <summary>A slot kind's verdict on a tile file, worked out and kept.</summary>
+    /// <summary>A slot kind's verdict on a tile file, worked out and kept - by SlotWants' one rule.</summary>
     private byte Judged(int slot, int id)
     {
         if (!_laidRead[id])
         {
-            _laid[id] = LaidOf(_identity!(_tiles!.Paths[id]));
+            _laid[id] = SlotWants.Of(_identity!(_tiles!.Paths[id]));
             _laidRead[id] = true;
         }
 
-        byte verdict = Compare(_slotWants[slot], _laid[id]);
+        byte verdict = SlotWants.Verdict(_slotWants[slot], _laid[id]);
         _slotVerdicts[slot][id] = verdict;
         return verdict;
     }
-
-    /// <summary>A tile file's identity in the terms a slot asks in, or null where it carries too little to judge by.</summary>
-    private static Wanted? LaidOf(TileIdentity? tile)
-        => tile is { Edges.Count: 4, Grounds.Count: 4 }
-            ? new Wanted(tile.Width, tile.Height, tile.Tag, Sorted(tile.Edges), Sorted(tile.Grounds))
-            : null;
-
-    /// <summary>A slot's verdict on a tile: the size either way round, the tag where the slot names one, and the edges and grounds as sets.</summary>
-    private static byte Compare(Wanted wanted, Wanted? laid)
-        => laid is null
-            ? Unknown
-            : ((laid.Width == wanted.Width && laid.Height == wanted.Height) || (laid.Width == wanted.Height && laid.Height == wanted.Width))
-                && (wanted.Tag.Length == 0 || string.Equals(wanted.Tag, laid.Tag, StringComparison.OrdinalIgnoreCase))
-                && laid.Edges.AsSpan().SequenceEqual(wanted.Edges, StringComparer.OrdinalIgnoreCase)
-                && laid.Grounds.AsSpan().SequenceEqual(wanted.Grounds, StringComparer.OrdinalIgnoreCase)
-                    ? Alike
-                    : Unlike;
-
-    private static string[] Sorted(RoomLayout room, int a, int b, int c, int d)
-        => Sorted([room.Named(a), room.Named(b), room.Named(c), room.Named(d)]);
-
-    private static string[] Sorted(IReadOnlyList<string> four)
-    {
-        string[] sorted = [.. four.Select(one => one.Replace('\\', '/'))];
-        Array.Sort(sorted, StringComparer.OrdinalIgnoreCase);
-        return sorted;
-    }
-
-    /// <summary>What a slot asks of the tile under it, or what a tile is, in the terms no placement changes - equal by value, so slots of a kind share one verdict row.</summary>
-    private sealed record Wanted(int Width, int Height, string Tag, string[] Edges, string[] Grounds)
-    {
-        public bool Equals(Wanted? other)
-            => other is not null
-                && Width == other.Width
-                && Height == other.Height
-                && string.Equals(Tag, other.Tag, StringComparison.OrdinalIgnoreCase)
-                && Edges.AsSpan().SequenceEqual(other.Edges, StringComparer.OrdinalIgnoreCase)
-                && Grounds.AsSpan().SequenceEqual(other.Grounds, StringComparer.OrdinalIgnoreCase);
-
-        public override int GetHashCode()
-        {
-            var hash = new HashCode();
-            hash.Add(Width);
-            hash.Add(Height);
-            hash.Add(Tag, StringComparer.OrdinalIgnoreCase);
-            foreach (string edge in Edges)
-            {
-                hash.Add(edge, StringComparer.OrdinalIgnoreCase);
-            }
-
-            foreach (string one in Grounds)
-            {
-                hash.Add(one, StringComparer.OrdinalIgnoreCase);
-            }
-
-            return hash.ToHashCode();
-        }
-    }
-
 }

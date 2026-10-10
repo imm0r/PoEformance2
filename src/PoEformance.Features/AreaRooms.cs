@@ -32,6 +32,13 @@ namespace PoEformance.Features;
 /// survey's sightings and everything remembered since, on the task, a second apart at most. The
 /// survey's walk is not repeated: the props it holds do not move.
 ///
+/// THE TILES FOR THE REST. A room of slots bigger than one tile and nothing else - Sinter Rift's boss,
+/// its eight checkpoints, a titan overlay - has no corners for the search's stamp and, with one scripted
+/// object or none, too few lines for the doodads; its tiles place it (RoomTileFinder), standing clear
+/// of the doodads' places, and a tile several rooms or ways round stand on is drawn once as itself,
+/// under the name the rooms share. The candidates are the terrain's and are found once per area; the
+/// sightings pick among them at every placing.
+///
 /// ONE TASK AT A TIME. Reading the files is quick; the survey is one walk of two entity maps (47 ms
 /// for an area of 1441 entities) and the finder after it; a placing again is the finder alone; the
 /// fallback search tries its room eight ways round at every tile corner and takes every core it is
@@ -88,6 +95,9 @@ public sealed class AreaRooms
     /// <summary>Each room's scorer and each tile file's identity, once per area - every placing of the area reads the same tiles.</summary>
     private ConcurrentDictionary<string, RoomScorer?>? _scorers;
     private ConcurrentDictionary<string, TileIdentity?>? _identities;
+
+    /// <summary>Each room's places by its tiles, once per area - the terrain does not change under a placing again, only the sightings do. See RoomTileFinder.</summary>
+    private ConcurrentDictionary<string, RoomTilePlaces>? _tilePlaces;
 
     /// <summary>The running task's count of rooms done - one array per task, so one left to run out cannot count into the next.</summary>
     private int[] _done = [0];
@@ -276,6 +286,7 @@ public sealed class AreaRooms
         int tilesY = grid.TilesY;
         TerrainTiles? tiles = grid.Tiles;
         ConcurrentDictionary<string, RoomScorer?> scorers = _scorers ??= new(StringComparer.OrdinalIgnoreCase);
+        ConcurrentDictionary<string, RoomTilePlaces> tilePlaces = _tilePlaces ??= new(StringComparer.OrdinalIgnoreCase);
         Func<string, TileIdentity?> identity = Identity();
         List<DoodadSighting> remembered = _memory.Held();
         _placedVersion = _memory.Version;
@@ -293,7 +304,7 @@ public sealed class AreaRooms
             }
 
             (List<(string Room, RoomLayout Layout, RoomDoodadPlaces Places)> placed, List<(string Room, RoomLayout Layout, RoomCandidate Where)> standing) =
-                Place(layouts, survey.Found, ground, tilesX, tilesY, tiles, grid.WalkableTileMask(), scorers, identity);
+                Place(layouts, survey.Found, ground, tilesX, tilesY, tiles, grid.WalkableTileMask(), scorers, identity, tilePlaces);
             return (survey, placed, standing);
         });
         return true;
@@ -338,6 +349,7 @@ public sealed class AreaRooms
             _placedAt = 0;
             _scorers = null;
             _identities = null;
+            _tilePlaces = null;
             int[] done = [0];
             _done = done;
             Volatile.Write(ref _of, rooms.Count);
@@ -406,6 +418,7 @@ public sealed class AreaRooms
         int tilesY = grid.TilesY;
         TerrainTiles? tiles = grid.Tiles;
         ConcurrentDictionary<string, RoomScorer?> scorers = _scorers ??= new(StringComparer.OrdinalIgnoreCase);
+        ConcurrentDictionary<string, RoomTilePlaces> tilePlaces = _tilePlaces ??= new(StringComparer.OrdinalIgnoreCase);
         Func<string, TileIdentity?> identity = Identity();
         List<DoodadSighting> remembered = _memory.Held();
         _placedVersion = _memory.Version;
@@ -414,13 +427,13 @@ public sealed class AreaRooms
         {
             DoodadSurvey survey = surveyed with { Found = DoodadMemory.Merged(surveyed.Found, remembered) };
             (List<(string Room, RoomLayout Layout, RoomDoodadPlaces Places)> placed, List<(string Room, RoomLayout Layout, RoomCandidate Where)> standing) =
-                Place(layouts, survey.Found, ground, tilesX, tilesY, tiles, grid.WalkableTileMask(), scorers, identity);
+                Place(layouts, survey.Found, ground, tilesX, tilesY, tiles, grid.WalkableTileMask(), scorers, identity, tilePlaces);
             return (survey, placed, standing);
         });
     }
 
     /// <summary>
-    /// Every room placed by its doodads over the sightings given, each place with the tiles agreeing there, settled against one another - and where every room stands, one entry a place. See RoomDoodadFinder.
+    /// Every room placed by its doodads over the sightings given, each place with the tiles agreeing there, settled against one another; the rooms the doodads could not place, by their tiles - and where every room stands, one entry a place. See RoomDoodadFinder and RoomTileFinder.
     /// </summary>
     private static (List<(string Room, RoomLayout Layout, RoomDoodadPlaces Places)> Placed, List<(string Room, RoomLayout Layout, RoomCandidate Where)> Standing) Place(
         List<(string Room, RoomLayout Layout)> layouts,
@@ -431,7 +444,8 @@ public sealed class AreaRooms
         TerrainTiles? tiles,
         bool[] walkable,
         ConcurrentDictionary<string, RoomScorer?> scorers,
-        Func<string, TileIdentity?> identity)
+        Func<string, TileIdentity?> identity,
+        ConcurrentDictionary<string, RoomTilePlaces> tilePlaces)
     {
         var found = new List<(string Room, RoomDoodadPlaces Places)>(layouts.Count);
         foreach ((string room, RoomLayout layout) in layouts)
@@ -452,12 +466,23 @@ public sealed class AreaRooms
         // ONE ROOM PER DOODAD: the variants of a room all vote for the tile where the laid one stands.
         List<(string Room, RoomDoodadPlaces Places)> settled = RoomDoodadFinder.Settle(found, tilesX, tilesY);
         var placed = new List<(string Room, RoomLayout Layout, RoomDoodadPlaces Places)>(layouts.Count);
-        var standing = new List<(string Room, RoomLayout Layout, RoomCandidate Where)>();
         for (var one = 0; one < layouts.Count; one++)
         {
-            (string room, RoomLayout layout) = layouts[one];
-            placed.Add((room, layout, settled[one].Places));
-            foreach (RoomDoodadPlace place in settled[one].Places.Places)
+            placed.Add((layouts[one].Room, layouts[one].Layout, settled[one].Places));
+        }
+
+        // THE TILES FOR THE ROOMS THE DOODADS COULD NOT PLACE - see RoomTileFinder. Each room's places by
+        // its tiles once per area: the terrain does not change under a placing again, the sightings do,
+        // and only they are asked again.
+        if (tiles is not null && tiles.Width == tilesX && tiles.Height == tilesY)
+        {
+            placed = RoomTileFinder.Settled(placed, (room, layout) => tilePlaces.GetOrAdd(room, _ => RoomTileFinder.Find(layout, tiles, identity)), sightings);
+        }
+
+        var standing = new List<(string Room, RoomLayout Layout, RoomCandidate Where)>();
+        foreach ((string room, RoomLayout layout, RoomDoodadPlaces places) in placed)
+        {
+            foreach (RoomDoodadPlace place in places.Places)
             {
                 standing.Add((room, layout, place.Where));
             }
