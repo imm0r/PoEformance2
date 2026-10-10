@@ -541,6 +541,16 @@ public sealed class MonsterBookWindow : BookWindow<MonsterBook>
     /// <summary>The tile chosen in the Tile Book, by path, or empty - so a monster can be stood on whatever tile that book is open at.</summary>
     public Func<string>? TileChoice { get; set; }
 
+    /// <summary>
+    /// The game's light for the picture, drawn under the stage - see SceneLightPanel. Null leaves the picture under its own lamp.
+    /// </summary>
+    /// <remarks>
+    /// THE TILE BOOK'S PANEL, OF THIS BOOK'S OWN: a stage and the monster on it are one mesh, so the
+    /// light built for it - the area's sun, its sky, the shadows the sun casts - falls on the arena
+    /// and on the monster alike, and the monster shades the ground as the arena's own props do.
+    /// </remarks>
+    public SceneLightPanel? Lighting { get; init; }
+
     /// <summary>A tile typed in by path, to stand the monster on. See <see cref="Stage"/>.</summary>
     private string _stagePath = string.Empty;
 
@@ -615,6 +625,11 @@ public sealed class MonsterBookWindow : BookWindow<MonsterBook>
             }
 
             OverlayLayout.Hint("Any tile's .tdt path, as the Tile Book lists it.");
+
+            if (Lighting is { } lighting && OverlayLayout.Subsection("Light"))
+            {
+                lighting.Draw(model.Showing);
+            }
         }
         finally
         {

@@ -3349,16 +3349,26 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         IReadOnlyDictionary<string, int>? columnWidths = null,
         IReadOnlyDictionary<string, double>? panes = null)
     {
+        // THE GAME'S LIGHT FOR A MONSTER ON A STAGE - the same panel the tile book has, of its own: a
+        // stage and the monster on it are one mesh, so one light, its sun and its shadows fall on both.
+        SceneLightPanel lighting = Lighting(readFile);
         var window = new MonsterBookWindow(() => Monsters, () => StatSentences?.Invoke() ?? _noSentences)
         {
             Changed = () => SettingsChanged?.Invoke(),
+            Lighting = lighting,
 
             // THE SAME PAIR EVERY PICTURE IN THIS OVERLAY IS MADE WITH - see the icon cache and
             // the terrain layer. The install is handed in because this class does not have one;
             // without it the book simply shows no model, which is the ordinary case on a machine
             // that has the tool and not the game. The unpacker is the install's own Oodle, which
             // is what an animation's keyframes come out of the skeleton file through.
-            Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize, unpack) { Book = "monster" },
+            Model = new MonsterPortrait(readFile, Upload, key => RemoveImage(key), modelSize, unpack)
+            {
+                Book = "monster",
+                SceneLit = lighting.For,
+                SceneDust = lighting.Dust,
+                Sun = lighting,
+            },
 
             // READ WHEN ASKED, not captured: the tile book is attached after this one, and the choice
             // is whatever that book is open at when the stage is picked.
@@ -3471,6 +3481,27 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
     }
 
     /// <summary>
+    /// A panel that lights a book's pictures the game's way, from the area's .env - one per book.
+    /// </summary>
+    /// <remarks>
+    /// ONE PER BOOK AND NOT ONE SHARED, because the panel keeps the light it last built for the model
+    /// it built it for, and hands the same object back while nothing changed - which is what tells a
+    /// pane not to redraw. Two panes asking one panel for two models would rebuild it on every ask,
+    /// and each pane would see a new light every frame and draw its picture again every frame.
+    ///
+    /// THE HUNT AS IT STANDS NOW: HuntFloats is set before the books are attached, and the anchor is
+    /// the player's own entity, on the game's heap, whenever the button is pressed.
+    /// </remarks>
+    private SceneLightPanel Lighting(Func<string, byte[]?>? readFile)
+    {
+        Func<IReadOnlyList<FloatNeedle>, ulong, FloatHuntProgress, Task<FloatHuntResult>?>? huntFloats = HuntFloats;
+        return new SceneLightPanel(
+            readFile, () => EnvironmentFiles, () => _snapshot.Area.Environment, PlayerGround, LiveGround,
+            huntFloats is null ? null : (needles, progress) => huntFloats(needles, _snapshot.Player?.Address ?? 0, progress),
+            EnvironmentDust);
+    }
+
+    /// <summary>
     /// Adds the tile reference book - every terrain tile the install has, and the tile's geometry.
     /// </summary>
     /// <remarks>
@@ -3506,13 +3537,7 @@ public sealed class EntityOverlay : ClickableTransparentOverlay.Overlay
         }
 
         _capture.Read = readFile;
-        // THE HUNT AS IT STANDS NOW: HuntFloats is set before the books are attached, and the anchor is
-        // the player's own entity, on the game's heap, whenever the button is pressed.
-        Func<IReadOnlyList<FloatNeedle>, ulong, FloatHuntProgress, Task<FloatHuntResult>?>? huntFloats = HuntFloats;
-        var lighting = new SceneLightPanel(
-            readFile, () => EnvironmentFiles, () => _snapshot.Area.Environment, PlayerGround, LiveGround,
-            huntFloats is null ? null : (needles, progress) => huntFloats(needles, _snapshot.Player?.Address ?? 0, progress),
-            EnvironmentDust);
+        SceneLightPanel lighting = Lighting(readFile);
         var window = new TileBookWindow(() => TileFiles, TilesHere)
         {
             Lighting = lighting,

@@ -139,6 +139,11 @@ public static class StagedModels
             ShadedBy = tile.ShadedBy + actor.ShadedBy,
             Bytes = tile.Bytes + actor.Bytes,
             Files = tile.Files + actor.Files,
+
+            // THE STAGE'S OWN LIGHTS, where it has any, shine on the monster too: the light is built for
+            // the one model, and the monster is in it. A tile carries none; a stage that does will.
+            Lights = tile.Lights,
+            LightsSaid = tile.LightsSaid,
             Actor = actor,
             ActorFirst = first,
             ActorPlace = place,
