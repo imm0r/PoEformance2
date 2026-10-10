@@ -82,7 +82,7 @@ public class CaptureSweepTests
 
         string said = CaptureMemory.Pass(
             replay, RealSessionTests.Schema(), replay.ResolvedStatics["GameStates"], default, null, null, null, default, 0, 0,
-            CaptureReads.World | CaptureReads.Loaded | CaptureReads.Sweep);
+            CaptureReads.World | CaptureReads.Loaded | CaptureReads.Sweep).Index;
 
         int world = said.IndexOf("=== a fresh world read, every switch on: ", StringComparison.Ordinal);
         int files = said.IndexOf("=== the area's loaded files: the file root or the area counter did not resolve", StringComparison.Ordinal);
@@ -108,21 +108,59 @@ public class CaptureSweepTests
         replay.Seek(600);
         ulong gameStates = replay.ResolvedStatics["GameStates"];
 
-        string doodads = CaptureMemory.Pass(replay, RealSessionTests.Schema(), gameStates, default, null, null, null, default, 0, 0, CaptureReads.Doodads);
+        string doodads = CaptureMemory.Pass(replay, RealSessionTests.Schema(), gameStates, default, null, null, null, default, 0, 0, CaptureReads.Doodads).Index;
         Assert.StartsWith("the pass reads both entity maps with every named entity's model", doodads, StringComparison.Ordinal);
         Assert.Contains("=== both entity maps, every named entity's path, position and model: ", doodads, StringComparison.Ordinal);
         Assert.DoesNotContain("=== a fresh world read", doodads, StringComparison.Ordinal);
         Assert.DoesNotContain("=== raw: ", doodads, StringComparison.Ordinal);
 
-        string sweep = CaptureMemory.Pass(replay, RealSessionTests.Schema(), gameStates, default, null, null, null, default, 0, 0, CaptureReads.Sweep);
+        string sweep = CaptureMemory.Pass(replay, RealSessionTests.Schema(), gameStates, default, null, null, null, default, 0, 0, CaptureReads.Sweep).Index;
         Assert.Contains("=== a fresh world read", sweep, StringComparison.Ordinal);
         Assert.Contains("=== raw: ", sweep, StringComparison.Ordinal);
         Assert.DoesNotContain("=== the area's loaded files", sweep, StringComparison.Ordinal);
 
-        string nothing = CaptureMemory.Pass(replay, RealSessionTests.Schema(), gameStates, default, null, null, null, default, 0, 0, CaptureReads.None);
+        string nothing = CaptureMemory.Pass(replay, RealSessionTests.Schema(), gameStates, default, null, null, null, default, 0, 0, CaptureReads.None).Index;
         Assert.Equal("nothing more", CaptureMemory.Said(CaptureReads.None));
         Assert.Contains("no ticked part asked for more", nothing, StringComparison.Ordinal);
         Assert.DoesNotContain("===", nothing, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// The monsters part writes its own file from the pass: every monster the fresh world read listed, with a line for its mods, one for its buffs, and the marked places after them.
+    /// </summary>
+    /// <remarks>
+    /// Against a real session, so the walk runs over real entities. What the mods READ as is not
+    /// asserted: the overlay's own reads never touched a mod vector, so a replay answers them
+    /// with nothing - and "none readable" is the honest line for that, which is the point of the
+    /// three kinds of nothing being kept apart.
+    /// </remarks>
+    [Fact]
+    public void THEMONSTERSPartListsEveryMonsterWithItsModsAndBuffs()
+    {
+        string fixture = Path.Combine(
+            Directory.GetParent(RealSessionTests.SceneFixturePath)!.FullName, "session-2026-08-rotation-clickmove.rec");
+        using var replay = ReplayMemoryReader.Load(File.OpenRead(fixture));
+        replay.Seek(600);
+
+        CapturePass pass = CaptureMemory.Pass(
+            replay, RealSessionTests.Schema(), replay.ResolvedStatics["GameStates"], default, null, null, null, default, 0, 0, CaptureReads.Monsters);
+
+        Assert.StartsWith("the pass reads the world with every switch on, every monster's mods", pass.Index, StringComparison.Ordinal);
+        Assert.Contains("=== every monster's mods, buffs and targetable byte", pass.Index, StringComparison.Ordinal);
+        Assert.DoesNotContain("=== raw: ", pass.Index, StringComparison.Ordinal);
+
+        string monsters = Assert.Contains(CaptureReport.MonstersFile, pass.Files);
+        Assert.Matches(@"^\d+ monsters among [1-9]\d* entities", monsters);
+        Assert.Contains("=== ", monsters, StringComparison.Ordinal);
+        Assert.Contains("marked places - every entity the game gives a map icon", monsters, StringComparison.Ordinal);
+
+        // Every monster block carries the two lines the comparison is made on.
+        int blocks = monsters.Split("\n### ").Length - 1;
+        Assert.Equal(blocks, monsters.Split("\n  mods: ").Length - 1);
+        Assert.Equal(blocks, monsters.Split("\n  buffs: ").Length - 1);
+
+        // And a pass that was not asked for them writes no file.
+        Assert.Empty(CaptureMemory.Pass(replay, RealSessionTests.Schema(), replay.ResolvedStatics["GameStates"], default, null, null, null, default, 0, 0, CaptureReads.World).Files);
     }
 
     /// <summary>A recording waiting on something runs past its frames until that is done - and no further than its cap.</summary>

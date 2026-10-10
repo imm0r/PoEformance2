@@ -29,7 +29,7 @@ public class CapturePartsTests
     public void THERECORDINGReadsWhatTheTickedPartsAsk()
     {
         var none = new HashSet<string>(StringComparer.Ordinal);
-        Assert.Equal(CaptureReads.World | CaptureReads.Loaded | CaptureReads.Doodads | CaptureReads.Sweep, CaptureParts.Reads(none));
+        Assert.Equal(CaptureReads.World | CaptureReads.Loaded | CaptureReads.Doodads | CaptureReads.Sweep | CaptureReads.Monsters, CaptureParts.Reads(none));
 
         var doodadsOnly = new HashSet<string>(
             CaptureParts.All.Select(part => part.Key).Where(key => key is not (CaptureParts.Doodads or CaptureParts.RoomsPlaced or CaptureParts.Memory)),
@@ -38,7 +38,13 @@ public class CapturePartsTests
         Assert.True(CaptureParts.IsOn(CaptureParts.Doodads, doodadsOnly));
         Assert.False(CaptureParts.IsOn(CaptureParts.Entities, doodadsOnly));
 
-        Assert.Equal(CaptureReads.Loaded | CaptureReads.Doodads, CaptureParts.Reads(new HashSet<string>([CaptureParts.Entities, CaptureParts.RawSweep], StringComparer.Ordinal)));
+        Assert.Equal(CaptureReads.Loaded | CaptureReads.Doodads, CaptureParts.Reads(new HashSet<string>([CaptureParts.Entities, CaptureParts.RawSweep, CaptureParts.Monsters], StringComparer.Ordinal)));
+
+        // The monsters bring the world read they list from, and live only inside the recording.
+        Assert.True(CaptureMemory.ReadsWorld(CaptureReads.Monsters));
+        Assert.True(CaptureParts.NeedsRecording(CaptureParts.Monsters));
+        Assert.True(CaptureParts.NeedsRecording(CaptureParts.RawSweep));
+        Assert.False(CaptureParts.NeedsRecording(CaptureParts.Entities));
         Assert.Equal(CaptureReads.None, CaptureParts.Reads(new HashSet<string>([CaptureParts.Memory], StringComparer.Ordinal)));
 
         Assert.True(CaptureMemory.ReadsWorld(CaptureReads.Sweep));

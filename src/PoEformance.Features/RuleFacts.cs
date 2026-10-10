@@ -264,15 +264,23 @@ public static class RuleFacts
 
         foreach (RuleCondition condition in conditions)
         {
-            if (condition.Kind == ConditionKind.Fact
-                ? Describe(condition.Fact).Argument == FactArgument.Distance
-                : HasRange(condition.Children, depth + 1))
+            if (HasRange(condition, depth))
             {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /// <summary>Whether this condition, or anything under it, measures a radius.</summary>
+    public static bool HasRange(RuleCondition condition, int depth = 0)
+    {
+        ArgumentNullException.ThrowIfNull(condition);
+
+        return condition.Kind == ConditionKind.Fact
+            ? Describe(condition.Fact).Argument == FactArgument.Distance
+            : HasRange(condition.Children, depth + 1);
     }
 
     /// <summary>Whether a number satisfies a comparison. An absent number never does.</summary>

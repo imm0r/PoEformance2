@@ -598,37 +598,11 @@ public sealed record RuleState
     public bool AnyTargetableIn(IReadOnlyList<RuleCondition> beside)
     {
         ArgumentNullException.ThrowIfNull(beside);
-        return AnyTargetableIn(beside, 0);
-    }
 
-    private bool AnyTargetableIn(IReadOnlyList<RuleCondition> conditions, int depth)
-    {
-        if (depth > RuleCondition.MaxDepth)
+        var search = new Search(null, 100, aiming: false);
+        foreach (RuleCondition condition in beside)
         {
-            return false;
-        }
-
-        foreach (RuleCondition condition in conditions)
-        {
-            if (condition.Kind != ConditionKind.Fact)
-            {
-                if (AnyTargetableIn(condition.Children, depth + 1))
-                {
-                    return true;
-                }
-
-                continue;
-            }
-
-            FactInfo info = RuleFacts.Describe(condition.Fact);
-            if (info.Argument != FactArgument.Distance)
-            {
-                continue;
-            }
-
-            if (info.AtCursor
-                ? AnyTargetableAtCursor(condition.Fact, condition.Argument)
-                : AnyTargetableWithin(condition.Fact, condition.Argument))
+            if (Walk(condition, ref search, 0))
             {
                 return true;
             }
@@ -637,8 +611,144 @@ public sealed record RuleState
         return false;
     }
 
-    /// <summary>A targetable monster among those a player-centred range fact counts.</summary>
-    private bool AnyTargetableWithin(RuleFact fact, double distance)
+    /// <summary>
+    /// The monster an aiming effect should put the cursor on, or null when there is none.
+    /// </summary>
+    /// <param name="within">
+    /// The rule's condition. Its range conditions - every one, at any depth - say WHERE to
+    /// look, exactly as they do for IsTargetable: the monsters those count are the monsters
+    /// the rule is about, so they are the ones worth a cast.
+    /// </param>
+    /// <remarks>
+    /// STRONGEST FIRST, not weakest, and that is the owner's call rather than a default: with
+    /// two things under the threshold at once the rare is the one worth the cull, because the
+    /// white monster beside it dies to anything. Ties inside a rarity go to the lowest bar -
+    /// among equals, the one closest to dying is the one the cast is most likely to land on
+    /// before something else kills it.
+    ///
+    /// ONLY WHAT CAN BE HIT. A monster reading untargetable is skipped however strong or
+    /// weak: the pointer would land on it, the hover check would fail, and the cast would be
+    /// skipped - a rule that fires and does nothing, which from outside reads as broken. Nor
+    /// would waiting help, because a boss between phases stays untargetable for as long as
+    /// the phase lasts. Skipping it lets the cast go to the next thing the rule is about.
+    ///
+    /// The region used to be a radius on the effect, repeated beside the condition's because
+    /// a condition is a boolean TREE with no subject and nothing in it says which leaf the
+    /// effect belongs to. Reading every range leaf instead keeps the one honest answer to that
+    /// - the rule's regions, all of them - and removes the number that had to be kept in step
+    /// by hand. The threshold stays on the effect: a cull's share is a fact about the skill,
+    /// not about the area, and nothing in the condition carries it.
+    /// </remarks>
+    public NearMonster? AimTarget(RuleCondition within, ItemRarity? only, double atOrBelowPercent)
+    {
+        ArgumentNullException.ThrowIfNull(within);
+
+        var search = new Search(only, atOrBelowPercent, aiming: true);
+        Walk(within, ref search, 0);
+        return search.Best;
+    }
+
+    /// <summary>
+    /// What one walk over the rule's regions is looking for, and what it has found so far.
+    /// </summary>
+    /// <remarks>
+    /// A struct carried by reference rather than a callback, so the two questions asked of the
+    /// regions - "is anything here targetable" and "which of these is worth a cast" - share
+    /// one walk without a delegate allocated per tick. The first is the second with every
+    /// candidate acceptable and the walk ending at the first.
+    /// </remarks>
+    private struct Search(ItemRarity? only, double atOrBelowPercent, bool aiming)
+    {
+        private readonly ItemRarity? _only = only;
+        private readonly double _atOrBelow = atOrBelowPercent;
+        private readonly bool _aiming = aiming;
+
+        /// <summary>The best candidate so far, when aiming.</summary>
+        public NearMonster? Best { get; private set; }
+
+        /// <summary>Whether anything acceptable has been offered.</summary>
+        public bool Found { get; private set; }
+
+        /// <summary>Whether the walk may stop: a yes-or-no question is answered at the first yes.</summary>
+        public readonly bool Done => Found && !_aiming;
+
+        /// <summary>Considers one monster a region contains.</summary>
+        public void Offer(NearMonster monster)
+        {
+            if (!monster.Targetable)
+            {
+                return;
+            }
+
+            if (!_aiming)
+            {
+                Found = true;
+                return;
+            }
+
+            // The address is what the hover check compares against; without one the cursor
+            // could be placed but never confirmed. A pool that did not resolve is not a
+            // monster at zero, so it is not under any threshold.
+            if (monster.Address == 0
+                || monster.LifePercent is not double life
+                || life > _atOrBelow
+                || (_only is ItemRarity wanted && monster.Rarity != wanted))
+            {
+                return;
+            }
+
+            if (Best is not NearMonster held
+                || monster.Rarity > held.Rarity
+                || (monster.Rarity == held.Rarity && life < held.LifePercent))
+            {
+                Best = monster;
+            }
+
+            Found = true;
+        }
+    }
+
+    /// <summary>Offers every monster the range conditions under a node select. True once the search is done.</summary>
+    private bool Walk(RuleCondition node, ref Search search, int depth)
+    {
+        if (depth > RuleCondition.MaxDepth)
+        {
+            return false;
+        }
+
+        if (node.Kind != ConditionKind.Fact)
+        {
+            foreach (RuleCondition child in node.Children)
+            {
+                if (Walk(child, ref search, depth + 1))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        FactInfo info = RuleFacts.Describe(node.Fact);
+        if (info.Argument != FactArgument.Distance)
+        {
+            return false;
+        }
+
+        if (info.AtCursor)
+        {
+            OfferAtCursor(node.Fact, node.Argument, ref search);
+        }
+        else
+        {
+            OfferWithin(node.Fact, node.Argument, ref search);
+        }
+
+        return search.Done;
+    }
+
+    /// <summary>Offers the monsters a player-centred range fact counts.</summary>
+    private void OfferWithin(RuleFact fact, double distance, ref Search search)
     {
         bool inSight = fact == RuleFact.MonsterCountInSight;
         TerrainGrid? grid = null;
@@ -646,10 +756,10 @@ public sealed record RuleState
         if (inSight)
         {
             // The same answer MonsterCountInSight gives while the terrain is loading: nothing
-            // is in sight, so nothing in sight is targetable.
+            // is in sight, so there is nothing to offer.
             if (Terrain is not TerrainGrid loaded || PlayerAt is not (float px, float py))
             {
-                return false;
+                return;
             }
 
             grid = loaded;
@@ -664,7 +774,7 @@ public sealed record RuleState
                 break;
             }
 
-            if (!monster.Targetable || !Counted(fact, monster))
+            if (!Counted(fact, monster))
             {
                 continue;
             }
@@ -678,38 +788,42 @@ public sealed record RuleState
                 }
             }
 
-            return true;
+            search.Offer(monster);
+            if (search.Done)
+            {
+                return;
+            }
         }
-
-        return false;
     }
 
-    /// <summary>A targetable monster among those a cursor-centred range fact counts.</summary>
-    private bool AnyTargetableAtCursor(RuleFact fact, double distance)
+    /// <summary>Offers the monsters a cursor-centred range fact counts.</summary>
+    private void OfferAtCursor(RuleFact fact, double distance, ref Search search)
     {
         if (CursorGround is not (float cx, float cy))
         {
-            return false;
+            return;
         }
 
         foreach (NearMonster monster in Monsters)
         {
             // Not sorted by this measure - see CountAtCursor - so every monster is looked at.
-            if (monster.Targetable && Counted(fact, monster) && Away(monster, cx, cy) <= distance)
+            if (Counted(fact, monster) && Away(monster, cx, cy) <= distance)
             {
-                return true;
+                search.Offer(monster);
+                if (search.Done)
+                {
+                    return;
+                }
             }
         }
-
-        return false;
     }
 
     /// <summary>
     /// Whether a range fact would count this monster, radius aside.
     /// </summary>
     /// <remarks>
-    /// Each fact's own filter, restated in one place so IsTargetable asks the same monsters
-    /// its neighbour counts. The life facts are the subtle ones: <see cref="LowestWithin"/>
+    /// Each fact's own filter, restated in one place so IsTargetable and the aim ask the same
+    /// monsters the condition counts. The life facts are the subtle ones: <see cref="LowestWithin"/>
     /// skips a monster with no reading rather than ranking it lowest, so one with no reading
     /// is not among the monsters that fact is about.
     /// </remarks>
@@ -722,53 +836,6 @@ public sealed record RuleState
         RuleFact.LowestUniqueMonsterLifePercent => monster.Rarity == ItemRarity.Unique && monster.LifePercent is not null,
         _ => true,
     };
-
-    /// <summary>
-    /// The monster an aiming effect should put the cursor on, or null when there is none.
-    /// </summary>
-    /// <remarks>
-    /// STRONGEST FIRST, not weakest, and that is the owner's call rather than a default: with
-    /// two things under the threshold at once the rare is the one worth the cull, because the
-    /// white monster beside it dies to anything. Ties inside a rarity go to the lowest bar -
-    /// among equals, the one closest to dying is the one the cast is most likely to land on
-    /// before something else kills it.
-    ///
-    /// The threshold is repeated here rather than taken from the condition, and that is not
-    /// duplication for its own sake: a condition is a boolean TREE with no subject, so nothing
-    /// in it remembers WHICH monster made it true. An effect that has to point at something has
-    /// to choose it. The cost is that a spec which disagrees with its own condition finds
-    /// nothing - which shows up as a rule that fires and reports "nothing to aim at", not as a
-    /// key pressed at the wrong place.
-    /// </remarks>
-    public NearMonster? AimTarget(double distance, ItemRarity? only, double atOrBelowPercent)
-    {
-        NearMonster? best = null;
-        foreach (NearMonster monster in Monsters)
-        {
-            // Sorted nearest first, so the first one out of range ends the walk.
-            if (monster.Distance > distance)
-            {
-                break;
-            }
-
-            if (monster.Address == 0
-                || monster.LifePercent is not double life
-                || life > atOrBelowPercent
-                || (only is ItemRarity wanted && monster.Rarity != wanted))
-            {
-                continue;
-            }
-
-            if (best is not NearMonster held
-                || monster.Rarity > held.Rarity
-                || (monster.Rarity == held.Rarity && life < held.LifePercent))
-            {
-                best = monster;
-            }
-        }
-
-        return best;
-    }
 
     /// <summary>The emptiest health bar within a radius of the player, of one rarity or of any.</summary>
     /// <remarks>

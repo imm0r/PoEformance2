@@ -27,6 +27,9 @@ public enum CaptureReads
 
     /// <summary>The raw sweep: the chain's roots whole, one hop beyond them, and every component of the entities around the player - see CaptureSweep.</summary>
     Sweep = 8,
+
+    /// <summary>Every monster's mods off its ObjectMagicProperties, with the world read that lists the monsters - see CaptureMonsters.</summary>
+    Monsters = 16,
 }
 
 /// <summary>One thing a capture can write, as the catalogue lists it - see <see cref="CaptureParts"/>.</summary>
@@ -76,6 +79,9 @@ public static class CaptureParts
 
     /// <summary>Every entity the overlay read this frame.</summary>
     public const string Entities = "entities";
+
+    /// <summary>Every monster with what the game put on it - mods, buffs, the targetable byte - and the marked places beside them.</summary>
+    public const string Monsters = "monsters";
 
     /// <summary>The files the area loaded.</summary>
     public const string LoadedFiles = "loaded-files";
@@ -142,6 +148,12 @@ public static class CaptureParts
             + "With the recording on, the world is read once more inside it with every switch on - visuals, effects, buffs, aim, "
             + "actions, as many entities as the game lists, and the terrain.",
             CaptureReads.World),
+        new(Monsters, "Entities", "every monster's mods and buffs", CaptureReport.MonstersFile,
+            "Inside the recording: every monster the game lists, nearest first, with its mods by the game's own ids, its buffs "
+            + "with their clocks, its life and its targetable byte - and every marked place standing on it, an essence prison "
+            + "being one. Two captures, before and after an essence is clicked, say what the game puts on an imprisoned "
+            + "monster and takes off a freed one. Needs the recording.",
+            CaptureReads.Monsters),
 
         new(LoadedFiles, "Area files", "the area's loaded files", CaptureReport.LoadedFile,
             "Every file the area loaded, as the game lists them - which rooms, tiles, models and environments the area is built from. "
@@ -200,6 +212,15 @@ public static class CaptureParts
 
     /// <summary>The parts under one heading, in the catalogue's order.</summary>
     public static IEnumerable<CapturePart> In(string group) => All.Where(part => string.Equals(part.Group, group, StringComparison.Ordinal));
+
+    /// <summary>
+    /// Whether a part exists only inside the recording - nothing of it is written when the recording is off.
+    /// </summary>
+    /// <remarks>
+    /// The Keys page greys these while the recording's box is unticked, so what they would add
+    /// stays readable and a tick that would write nothing is not offered.
+    /// </remarks>
+    public static bool NeedsRecording(string key) => key is RawSweep or Monsters;
 
     /// <summary>Whether a part is written, given the keys that are off.</summary>
     public static bool IsOn(string key, IReadOnlySet<string> off)

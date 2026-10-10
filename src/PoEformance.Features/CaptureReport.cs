@@ -48,6 +48,9 @@ public static class CaptureReport
     /// <summary>Every entity the snapshot held, nearest first.</summary>
     public const string EntitiesFile = "entities.txt";
 
+    /// <summary>Every monster with its mods, buffs and targetable byte, and the marked places beside them - written by the pass inside the recording. See CaptureMonsters.</summary>
+    public const string MonstersFile = "monsters.txt";
+
     /// <summary>The files the area loaded.</summary>
     public const string LoadedFile = "loaded-files.txt";
 

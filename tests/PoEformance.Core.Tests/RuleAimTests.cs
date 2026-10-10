@@ -23,9 +23,13 @@ public class RuleAimTests
         Monsters = [.. monsters.OrderBy(m => m.Distance)],
     };
 
-    /// <summary>A monster at a distance, with an address so it can be aimed at.</summary>
-    private static NearMonster At(double distance, ItemRarity rarity, double life, ulong address)
-        => new(distance, rarity, (float)distance, 0, life, 10f, address);
+    /// <summary>A targetable monster at a distance, with an address so it can be aimed at.</summary>
+    private static NearMonster At(double distance, ItemRarity rarity, double life, ulong address, bool targetable = true)
+        => new(distance, rarity, (float)distance, 0, life, 10f, address, Targetable: targetable);
+
+    /// <summary>The region an aim looks in: a count within a radius of the player.</summary>
+    private static RuleCondition Within(double radius, RuleFact fact = RuleFact.MonsterCountWithin)
+        => RuleCondition.Of(fact, Compare.AtLeast, 1) with { Argument = radius };
 
     [Fact]
     public void TakesTheSTRONGESTThingUnderTheThreshold()
@@ -38,7 +42,7 @@ public class RuleAimTests
             At(20, ItemRarity.Rare, 8, 0xB),
             At(30, ItemRarity.Magic, 4, 0xC));
 
-        NearMonster target = Assert.NotNull(state.AimTarget(100, null, 20));
+        NearMonster target = Assert.NotNull(state.AimTarget(Within(100), null, 20));
         Assert.Equal(0xBUL, target.Address);
         Assert.Equal(ItemRarity.Rare, target.Rarity);
     }
@@ -53,7 +57,7 @@ public class RuleAimTests
             At(20, ItemRarity.Rare, 3, 0xB),
             At(30, ItemRarity.Rare, 7, 0xC));
 
-        Assert.Equal(0xBUL, Assert.NotNull(state.AimTarget(100, null, 10)).Address);
+        Assert.Equal(0xBUL, Assert.NotNull(state.AimTarget(Within(100), null, 10)).Address);
     }
 
     [Fact]
@@ -66,7 +70,7 @@ public class RuleAimTests
             At(10, ItemRarity.Rare, 60, 0xA),
             At(20, ItemRarity.Unique, 55, 0xB));
 
-        Assert.Null(state.AimTarget(100, null, 10));
+        Assert.Null(state.AimTarget(Within(100), null, 10));
     }
 
     [Fact]
@@ -78,11 +82,11 @@ public class RuleAimTests
             At(500, ItemRarity.Unique, 1, 0xC));
 
         // Out of range, however low it is.
-        Assert.Equal(0xBUL, Assert.NotNull(state.AimTarget(100, null, 20)).Address);
+        Assert.Equal(0xBUL, Assert.NotNull(state.AimTarget(Within(100), null, 20)).Address);
 
         // And a rarity that is asked for by name excludes the stronger one.
-        Assert.Equal(0xAUL, Assert.NotNull(state.AimTarget(100, ItemRarity.Magic, 20)).Address);
-        Assert.Null(state.AimTarget(100, ItemRarity.Unique, 20));
+        Assert.Equal(0xAUL, Assert.NotNull(state.AimTarget(Within(100), ItemRarity.Magic, 20)).Address);
+        Assert.Null(state.AimTarget(Within(100), ItemRarity.Unique, 20));
     }
 
     [Fact]
@@ -90,9 +94,9 @@ public class RuleAimTests
     {
         // Same rule the cull facts follow. A pool that did not resolve is not a monster at
         // zero, and aiming at one would be the tool acting on a number it does not have.
-        RuleState state = With(new NearMonster(10, ItemRarity.Rare, 10, 0, null, 10f, 0xA));
+        RuleState state = With(new NearMonster(10, ItemRarity.Rare, 10, 0, null, 10f, 0xA, Targetable: true));
 
-        Assert.Null(state.AimTarget(100, null, 100));
+        Assert.Null(state.AimTarget(Within(100), null, 100));
     }
 
     [Fact]
@@ -102,7 +106,7 @@ public class RuleAimTests
         // placed but never verified, which is the one thing this design exists to avoid.
         RuleState state = With(At(10, ItemRarity.Rare, 5, 0));
 
-        Assert.Null(state.AimTarget(100, null, 20));
+        Assert.Null(state.AimTarget(Within(100), null, 20));
     }
 
     [Fact]
@@ -115,11 +119,10 @@ public class RuleAimTests
         {
             Key = "R",
             AimAt = AimTarget.Rare,
-            AimRadius = 100,
             AimAtOrBelowPercent = 10,
         };
 
-        var rule = new Rule("r", "Power Siphon", RuleCondition.Of(RuleFact.InGame), [effect]) { Enabled = true };
+        var rule = new Rule("r", "Power Siphon", Within(100), [effect]) { Enabled = true };
         var settings = new RuleSettings(true, "P", [new RuleProfile("P", [new RuleGroup("G", [rule])])])
         {
             MinInputGapMs = 0,
@@ -141,6 +144,69 @@ public class RuleAimTests
         AimPoint aim = Assert.NotNull(input.Aim);
         Assert.Equal(0xBUL, aim.Address);
         Assert.Equal(10f, aim.Z);
+    }
+
+    [Fact]
+    public void SkipsWhatTheGameWouldNotLetAClickLandOn()
+    {
+        // A boss between phases is the strongest thing in range and reads untargetable. Aimed
+        // at, the pointer lands, the hover check fails and the cast is skipped - a rule that
+        // fires and does nothing. The cast goes to the next thing the rule is about instead.
+        RuleState state = With(
+            At(10, ItemRarity.Unique, 5, 0xA, targetable: false),
+            At(20, ItemRarity.Rare, 8, 0xB));
+
+        Assert.Equal(0xBUL, Assert.NotNull(state.AimTarget(Within(100), null, 20)).Address);
+
+        // And with nothing targetable in range there is nothing to aim at, however low it is.
+        Assert.Null(With(At(10, ItemRarity.Unique, 5, 0xA, targetable: false)).AimTarget(Within(100), null, 20));
+    }
+
+    [Fact]
+    public void LooksWhereTheRulesRangeConditionsLook()
+    {
+        // The region is the rule's, not the effect's. A rule about what is under the CURSOR
+        // aims at what is under the cursor, however near the player something else stands.
+        RuleState state = With(
+            At(10, ItemRarity.Rare, 5, 0xA),
+            new NearMonster(300, ItemRarity.Normal, 305, 300, 5, 10f, 0xB, Targetable: true))
+            with { CursorGround = (300f, 300f) };
+
+        RuleCondition atCursor = Within(30, RuleFact.MonsterCountAtCursor);
+        Assert.Equal(0xBUL, Assert.NotNull(state.AimTarget(atCursor, null, 20)).Address);
+
+        // Every range condition in the tree counts, at any depth: the rare near the player is
+        // in the OR's second region, and it is the stronger of the two.
+        RuleCondition either = RuleCondition.All(
+            RuleCondition.Of(RuleFact.InGame),
+            RuleCondition.Any(atCursor, Within(50)));
+        Assert.Equal(0xAUL, Assert.NotNull(state.AimTarget(either, null, 20)).Address);
+
+        // A region's own filter holds for the aim as it does for the count: beside a
+        // rares-and-uniques condition the white monster is not among the candidates.
+        RuleCondition rares = Within(30, RuleFact.RareOrUniqueCountAtCursor);
+        Assert.Null(state.AimTarget(rares, null, 20));
+    }
+
+    [Fact]
+    public void ARuleWithNoRangeConditionHasNowhereToAim()
+    {
+        // Reported under its own reason: "nothing to aim at" is a room that says no, this is
+        // a rule written wrong, and only the second one needs the editor opened.
+        var effect = new RuleEffect(RuleEffectKind.KeyPress) { Key = "R", AimAt = AimTarget.AnyMonster };
+        var rule = new Rule("r", "Living Bomb", RuleCondition.Of(RuleFact.InGame), [effect]) { Enabled = true };
+        var settings = new RuleSettings(true, "P", [new RuleProfile("P", [new RuleGroup("G", [rule])])])
+        {
+            MinInputGapMs = 0,
+            CooldownJitterMs = 0,
+        };
+
+        var engine = new RuleEngine(new Random(1));
+        engine.Configure(settings);
+
+        RuleTick tick = engine.Evaluate(With(At(10, ItemRarity.Rare, 50, 0xA)), 0);
+        Assert.Empty(tick.Inputs);
+        Assert.Contains("no range condition", tick.Reason, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -191,13 +257,11 @@ public class RuleAimTests
         RuleEffect wild = new RuleEffect(RuleEffectKind.KeyPress)
         {
             AimAt = AimTarget.Rare,
-            AimRadius = 0,
             AimAtOrBelowPercent = 900,
         }.Normalised();
 
-        // A radius of 0 finds nothing and a threshold of 900 can never be missed; both are how
-        // a hand-edited file quietly stops aiming at what it says it aims at.
-        Assert.InRange(wild.AimRadius, 1, 10_000);
+        // A threshold of 900 can never be missed, which is how a hand-edited file quietly
+        // stops aiming at what it says it aims at.
         Assert.InRange(wild.AimAtOrBelowPercent, 0, 100);
     }
 }

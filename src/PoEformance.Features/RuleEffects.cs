@@ -159,18 +159,13 @@ public sealed record RuleEffect(
     /// "A rare within range is nearly dead" is a fact about the area; a cull needs the cursor
     /// on that rare, and until this existed the rule pressed its key at whatever happened to be
     /// under the pointer.
+    ///
+    /// WHERE to look is not an option here: the rule's own range conditions say it - see
+    /// <see cref="RuleState.AimTarget"/>. There used to be a radius beside this, repeated from
+    /// the condition by hand, and a file read with one still carries the field and ignores it.
     /// </remarks>
     [JsonPropertyName("aimAt")]
     public AimTarget AimAt { get; init; } = AimTarget.None;
-
-    /// <summary>How far to look for something to aim at, in world units.</summary>
-    /// <remarks>
-    /// Its own number rather than the condition's, because the condition is a tree and nothing
-    /// in it says which leaf the effect belongs to. Set it to match the leaf that gates the
-    /// rule; where the two disagree the effect finds nothing and says so.
-    /// </remarks>
-    [JsonPropertyName("aimRadius")]
-    public double AimRadius { get; init; } = 1000;
 
     /// <summary>Only aim at something at or below this share of its life. 0-100.</summary>
     [JsonPropertyName("aimAtOrBelowPercent")]
@@ -229,9 +224,8 @@ public sealed record RuleEffect(
         Pitch = Math.Clamp(Pitch, 37, 32_767),
         SoundMs = Math.Clamp(SoundMs, 1, 5_000),
 
-        // A radius of 0 would find nothing and a threshold outside 0-100 cannot be met or can
-        // never be missed; both are how a hand-edited file quietly stops aiming.
-        AimRadius = Math.Clamp(AimRadius, 1, 10_000),
+        // A threshold outside 0-100 cannot be met or can never be missed; either is how a
+        // hand-edited file quietly stops aiming at what it says it aims at.
         AimAtOrBelowPercent = Math.Clamp(AimAtOrBelowPercent, 0, 100),
     };
 

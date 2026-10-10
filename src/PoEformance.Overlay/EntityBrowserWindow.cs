@@ -1042,6 +1042,25 @@ public sealed class EntityBrowserWindow
             ImGui.Separator();
         }
 
+        // The mods on it, by the game's own ids. Beside the buffs on purpose: between the two
+        // is everything the game can have PUT on a monster after making it, and a monster that
+        // stands in every count while the game refuses to let a skill hit it - one imprisoned
+        // by essences - is told from a free one here or nowhere. Nameless where the game keeps
+        // them nameless, which is most of them; the id is the half worth reading.
+        if (view.ModsNote.Length > 0)
+        {
+            ImGui.TextColored(view.Affixes.Count > 0 ? PathText : DimText, ImGuiText.Escape(view.ModsNote));
+            foreach (EntityMod mod in view.Affixes)
+            {
+                string called = mod.Name.Length > 0
+                    ? $"  \"{ImGuiText.Escape(mod.Name)}\"{(mod.Kind.Length > 0 ? $" {mod.Kind}" : string.Empty)}"
+                    : "  (no display name)";
+                ImGuiText.Mono(DimText, $"    {ImGuiText.Escape(mod.Id)}{called}");
+            }
+
+            ImGui.Separator();
+        }
+
         // The entity's own numbers, as the game keeps them: a flat vector of (stat id, value).
         // Raw ids rather than names, because the names come from the game's Stats table and
         // that is 27,000 rows nobody needs in this repo to answer one question - 347 is

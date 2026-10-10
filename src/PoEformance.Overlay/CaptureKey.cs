@@ -564,10 +564,19 @@ internal sealed class CaptureKey
             {
                 parts.Add($"{CaptureReport.MemoryFile}  FAILED: {failed.GetBaseException().Message}");
             }
+
+            if (On(CaptureParts.Monsters))
+            {
+                parts.Add($"{CaptureReport.MonstersFile}  written by the pass inside the recording - {CaptureMemory.IndexFile} says what it holds");
+            }
         }
         else
         {
             parts.Add($"{CaptureReport.MemoryFile}  not recorded: {run.MemoryNote}");
+            if (On(CaptureParts.Monsters))
+            {
+                parts.Add($"{CaptureReport.MonstersFile}  not written: it is read inside the recording, and there is none");
+            }
         }
 
         string[] off = [.. CaptureParts.All.Where(part => run.Off.Contains(part.Key)).Select(part => part.Key)];
@@ -699,9 +708,9 @@ internal sealed class CaptureKey
                     OverlayLayout.Flow(end, OverlayLayout.CheckboxWidth(part.Label), right, indent);
                 }
 
-                // A sweep inside a recording nobody makes is no sweep: the box stays, greyed, so what
-                // it would add is still readable.
-                bool moot = part.Key == CaptureParts.RawSweep && !memory;
+                // A part that lives inside a recording nobody makes writes nothing: the box stays,
+                // greyed, so what it would add is still readable.
+                bool moot = CaptureParts.NeedsRecording(part.Key) && !memory;
                 ImGui.BeginDisabled(moot);
                 bool on = On(part.Key);
                 if (ImGui.Checkbox(part.Box, ref on))
